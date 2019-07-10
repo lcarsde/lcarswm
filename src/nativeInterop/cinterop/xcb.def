@@ -1,0 +1,3 @@
+headers = xcb/xcb.h xcb/xcb_aux.h
+compilerOpts = -I/usr/include
+linkerOpts = -L/usr/lib -lxcb -lxcb-util
