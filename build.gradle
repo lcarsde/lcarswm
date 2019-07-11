@@ -18,6 +18,14 @@ kotlin {
             executable()
         }
     }
+    sourceSets {
+        commonTest {
+            dependencies {
+                api "org.jetbrains.kotlin:kotlin-test-common:1.3.21"
+                api "org.jetbrains.kotlin:kotlin-test-annotations-common:1.3.21"
+            }
+        }
+    }
 }
 
 wrapper {
