@@ -1,6 +1,7 @@
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class TestTest {
     @BeforeTest
@@ -16,5 +17,6 @@ class TestTest {
     @Test
     fun `my test`() {
         println("this is my common test")
+        assertTrue(false)
     }
 }
