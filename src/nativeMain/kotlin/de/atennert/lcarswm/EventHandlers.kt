@@ -7,9 +7,18 @@ import kotlinx.cinterop.toCValues
 import xcb.*
 
 /**
+ * Map of event types to event handlers. DON'T EDIT THE MAPS CONTENT!!!
+ */
+val eventHandlers = hashMapOf<Int, Function2<CPointer<xcb_connection_t>, CPointer<xcb_generic_event_t>, Boolean>>(
+    Pair(XCB_BUTTON_RELEASE, { _, e -> handleButtonRelease(e) }),
+    Pair(XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
+    Pair(XCB_MAP_REQUEST, ::handleMapRequest)
+)
+
+/**
  * TODO description
  */
-fun handleButtonRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean {
+private fun handleButtonRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean {
     @Suppress("UNCHECKED_CAST")
     val button = (xEvent as CPointer<xcb_button_release_event_t>).pointed.detail.toInt()
     println("::handleButtonRelease::Button released: $button")
@@ -19,7 +28,7 @@ fun handleButtonRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean {
 /**
  * TODO description
  */
-fun handleMapRequest(xcbConnection: CPointer<xcb_connection_t>, xEvent: CPointer<xcb_generic_event_t>): Boolean {
+private fun handleMapRequest(xcbConnection: CPointer<xcb_connection_t>, xEvent: CPointer<xcb_generic_event_t>): Boolean {
     println("::handleMapRequest::map request")
     @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent as CPointer<xcb_map_request_event_t>
@@ -31,7 +40,7 @@ fun handleMapRequest(xcbConnection: CPointer<xcb_connection_t>, xEvent: CPointer
 /**
  * TODO description
  */
-fun handleConfigureRequest(xcbConnection: CPointer<xcb_connection_t>, xEvent: CPointer<xcb_generic_event_t>): Boolean {
+private fun handleConfigureRequest(xcbConnection: CPointer<xcb_connection_t>, xEvent: CPointer<xcb_generic_event_t>): Boolean {
     println("::handleConfigureRequest::configure request")
     @Suppress("UNCHECKED_CAST")
     val configureEvent = (xEvent as CPointer<xcb_configure_request_event_t>).pointed

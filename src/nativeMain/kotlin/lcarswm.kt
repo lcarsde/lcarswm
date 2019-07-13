@@ -49,25 +49,19 @@ fun main() {
     println("::main::lcarswm stopped")
 }
 
-fun registerButton(xcbConnection: CPointer<xcb_connection_t>, window: xcb_window_t, buttonId: Int) {
+private fun registerButton(xcbConnection: CPointer<xcb_connection_t>, window: xcb_window_t, buttonId: Int) {
     xcb_grab_button(
-        xcbConnection, 0, window,
+        xcbConnection, 0.convert(), window,
         (XCB_EVENT_MASK_BUTTON_PRESS or XCB_EVENT_MASK_BUTTON_RELEASE).convert(),
         XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert(), window,
         XCB_NONE.convert(), buttonId.convert(), XCB_NONE.convert()
     )
 }
 
-val eventHandlers = hashMapOf<Int, Function2<CPointer<xcb_connection_t>, CPointer<xcb_generic_event_t>, Boolean>>(
-    Pair(XCB_BUTTON_RELEASE, { _, e -> handleButtonRelease(e) }),
-    Pair(XCB_CONFIGURE_REQUEST, { x, e -> handleConfigureRequest(x, e) }),
-    Pair(XCB_MAP_REQUEST, { x, e -> handleMapRequest(x, e) })
-)
-
-fun eventLoop(xcbConnection: CPointer<xcb_connection_t>) {
+private fun eventLoop(xcbConnection: CPointer<xcb_connection_t>) {
     while (true) {
         val xEvent = xcb_wait_for_event(xcbConnection)
-        val eventType = xEvent?.pointed?.response_type ?: continue
+        val eventType = xEvent?.pointed?.response_type ?: continue // TODO check for connection error
         val eventId = eventType.toInt() and (0x08.inv())
 
         if (eventHandlers.containsKey(eventId)) {
