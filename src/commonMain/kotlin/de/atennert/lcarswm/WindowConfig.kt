@@ -24,7 +24,8 @@ class WindowConfig(
 }
 
 /**
- * TODO description
+ * Takes a mask that encodes XcbConfigWindow values and a WindowConfig to compute the
+ * output for xcb_configure_window. It filters values that lcarswm doesn't want to be in there
  */
 fun configureWindow(mask: Int, wc: WindowConfig): Pair<Int, ArrayList<Long>> {
     return XcbConfigWindow.values()

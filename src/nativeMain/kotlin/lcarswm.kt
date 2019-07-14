@@ -1,5 +1,6 @@
 import cnames.structs.xcb_connection_t
-import de.atennert.lcarswm.*
+import de.atennert.lcarswm.XcbEvent
+import de.atennert.lcarswm.eventHandlers
 import kotlinx.cinterop.*
 import xcb.*
 
@@ -23,8 +24,9 @@ fun main() {
         registerButton(xcbConnection, screen.root, 3) // right mouse button
 
         val values = UIntArray(2)
-        values[0] =
-            XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT or XCB_EVENT_MASK_STRUCTURE_NOTIFY or XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
+        values[0] = XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT or
+                XCB_EVENT_MASK_STRUCTURE_NOTIFY or
+                XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
 
         val cookie =
             xcb_change_window_attributes_checked(xcbConnection, screen.root, XCB_CW_EVENT_MASK, values.toCValues())
@@ -61,16 +63,22 @@ private fun registerButton(xcbConnection: CPointer<xcb_connection_t>, window: xc
 private fun eventLoop(xcbConnection: CPointer<xcb_connection_t>) {
     while (true) {
         val xEvent = xcb_wait_for_event(xcbConnection)
-        val eventType = xEvent?.pointed?.response_type ?: continue // TODO check for connection error
-        val eventId = eventType.toInt() and (0x08.inv())
+        val eventValue = xEvent?.pointed?.response_type ?: continue // TODO check for connection error
+        val eventId = eventValue.toInt() and (0x08.inv())
 
-        if (eventHandlers.containsKey(eventId)) {
-            val stop = eventHandlers[eventId]!!.invoke(xcbConnection, xEvent)
-            if (stop) {
-                break
+        try {
+            val eventType = XcbEvent.getEventTypeForCode(eventId) // throws IllegalArgumentException
+
+            if (eventHandlers.containsKey(eventType)) {
+                val stop = eventHandlers[eventType]!!.invoke(xcbConnection, xEvent)
+                if (stop) {
+                    break
+                }
+            } else {
+                println("::eventLoop::unhandled event: $eventType")
             }
-        } else {
-            println("::eventLoop::unhandled event: $eventType")
+        } catch (ex: IllegalArgumentException) {
+            println("WARN: " + ex.message)
         }
 
         nativeHeap.free(xEvent)

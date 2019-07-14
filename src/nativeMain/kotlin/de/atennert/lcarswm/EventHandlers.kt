@@ -9,24 +9,25 @@ import xcb.*
 /**
  * Map of event types to event handlers. DON'T EDIT THE MAPS CONTENT!!!
  */
-val eventHandlers = hashMapOf<Int, Function2<CPointer<xcb_connection_t>, CPointer<xcb_generic_event_t>, Boolean>>(
-    Pair(XCB_BUTTON_RELEASE, { _, e -> handleButtonRelease(e) }),
-    Pair(XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
-    Pair(XCB_MAP_REQUEST, ::handleMapRequest)
+val eventHandlers = hashMapOf<XcbEvent, Function2<CPointer<xcb_connection_t>, CPointer<xcb_generic_event_t>, Boolean>>(
+    Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, e -> handleButtonRelease(e) }),
+    Pair(XcbEvent.XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
+    Pair(XcbEvent.XCB_MAP_REQUEST, ::handleMapRequest)
 )
 
 /**
- * TODO description
+ * TODO remove when not necessary anymore
+ * Handling for mouse buttons for testing purposes.
  */
 private fun handleButtonRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean {
     @Suppress("UNCHECKED_CAST")
     val button = (xEvent as CPointer<xcb_button_release_event_t>).pointed.detail.toInt()
     println("::handleButtonRelease::Button released: $button")
-    return button != 2
+    return button != 2 // close lcarswm when right or left mouse buttons are pressed
 }
 
 /**
- * TODO description
+ * Forward map requests as is for now
  */
 private fun handleMapRequest(xcbConnection: CPointer<xcb_connection_t>, xEvent: CPointer<xcb_generic_event_t>): Boolean {
     println("::handleMapRequest::map request")
@@ -38,7 +39,7 @@ private fun handleMapRequest(xcbConnection: CPointer<xcb_connection_t>, xEvent: 
 }
 
 /**
- * TODO description
+ * Filter the values that lcarswm requires and send the configuration to X.
  */
 private fun handleConfigureRequest(xcbConnection: CPointer<xcb_connection_t>, xEvent: CPointer<xcb_generic_event_t>): Boolean {
     println("::handleConfigureRequest::configure request")

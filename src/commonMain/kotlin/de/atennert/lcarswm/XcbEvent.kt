@@ -1,9 +1,9 @@
 package de.atennert.lcarswm
 
 /**
- *
+ * Enum for XCB events that can be received via xcb_wait_for_event
  */
-enum class XcbEvent(private val code: Int) {
+enum class XcbEvent(val code: Int) {
     XCB_KEY_PRESS(2),
     XCB_KEY_RELEASE(3),
     XCB_BUTTON_PRESS(4),
@@ -20,4 +20,11 @@ enum class XcbEvent(private val code: Int) {
     XCB_CIRCULATE_REQUEST(27),
     XCB_CLIENT_MESSAGE(33),
     XCB_MAPPING_NOTIFY(34);
+
+    companion object {
+        fun getEventTypeForCode(code: Int): XcbEvent {
+            return values().find { it.code == code }
+                ?: throw IllegalArgumentException("XcbEvent::getEventTypeForCode::unknown code $code")
+        }
+    }
 }
