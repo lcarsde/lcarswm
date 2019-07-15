@@ -10,25 +10,48 @@ import xcb.*
  * Map of event types to event handlers. DON'T EDIT THE MAPS CONTENT!!!
  */
 val eventHandlers = hashMapOf<XcbEvent, Function2<CPointer<xcb_connection_t>, CPointer<xcb_generic_event_t>, Boolean>>(
+    Pair(XcbEvent.XCB_KEY_PRESS, { _, e -> handleKeyPress(e) }),
+    Pair(XcbEvent.XCB_KEY_RELEASE, { _, e -> handleKeyRelease(e) }),
+    Pair(XcbEvent.XCB_BUTTON_PRESS, { _, e -> handleButtonPress(e) }),
     Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, e -> handleButtonRelease(e) }),
     Pair(XcbEvent.XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
     Pair(XcbEvent.XCB_MAP_REQUEST, ::handleMapRequest)
 )
 
-/**
- * TODO remove when not necessary anymore
- * Handling for mouse buttons for testing purposes.
- */
+private fun handleKeyPress(xEvent: CPointer<xcb_generic_event_t>): Boolean {
+    @Suppress("UNCHECKED_CAST")
+    val pressEvent = (xEvent as CPointer<xcb_key_press_event_t>).pointed
+    val key = pressEvent.detail.toInt()
+    println("::handleKeyPress::Key pressed: $key")
+    return false
+}
+
+private fun handleKeyRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean {
+    @Suppress("UNCHECKED_CAST")
+    val releasedEvent = (xEvent as CPointer<xcb_key_release_event_t>).pointed
+    val key = releasedEvent.detail.toInt()
+    println("::handleKeyRelease::Key released: $key")
+    return false
+}
+
+private fun handleButtonPress(xEvent: CPointer<xcb_generic_event_t>): Boolean {
+    @Suppress("UNCHECKED_CAST")
+    val pressEvent = (xEvent as CPointer<xcb_button_press_event_t>).pointed
+    val button = pressEvent.detail.toInt()
+//    val window = pressEvent.child // 0 for root
+    println("::handleButtonPress::Button pressed: $button")
+    return false
+}
+
 private fun handleButtonRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean {
     @Suppress("UNCHECKED_CAST")
-    val button = (xEvent as CPointer<xcb_button_release_event_t>).pointed.detail.toInt()
+    val releaseEvent = (xEvent as CPointer<xcb_button_release_event_t>).pointed
+    val button = releaseEvent.detail.toInt()
+//    val window = releaseEvent.child // 0 for root
     println("::handleButtonRelease::Button released: $button")
     return button != 2 // close lcarswm when right or left mouse buttons are pressed
 }
 
-/**
- * Forward map requests as is for now
- */
 private fun handleMapRequest(xcbConnection: CPointer<xcb_connection_t>, xEvent: CPointer<xcb_generic_event_t>): Boolean {
     println("::handleMapRequest::map request")
     @Suppress("UNCHECKED_CAST")
