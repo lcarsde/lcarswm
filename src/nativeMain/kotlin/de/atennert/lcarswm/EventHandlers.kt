@@ -40,6 +40,9 @@ private fun handleButtonPress(xEvent: CPointer<xcb_generic_event_t>): Boolean {
     val button = pressEvent.detail.toInt()
 //    val window = pressEvent.child // 0 for root
     println("::handleButtonPress::Button pressed: $button")
+    if (button == 2) {
+        runProgram("/usr/bin/xterm")
+    }
     return false
 }
 

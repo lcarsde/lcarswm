@@ -2,7 +2,9 @@
 It's a window manager written in Kotlin. The goal is to finish it and if that happens to happen, it will look like an LCARS interface.
 
 ## Functionality
-The window manager can be started. It can be closed using the left or right mouse button.
+* The window manager can be started.
+* The window manager can be closed using the left or right mouse button.
+* Using the middle mouse button opens a terminal.
 
 ## Required
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
