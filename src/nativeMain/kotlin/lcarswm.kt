@@ -1,6 +1,6 @@
 import cnames.structs.xcb_connection_t
 import de.atennert.lcarswm.XcbEvent
-import de.atennert.lcarswm.eventHandlers
+import de.atennert.lcarswm.EVENT_HANDLERS
 import kotlinx.cinterop.*
 import xcb.*
 
@@ -10,6 +10,7 @@ fun main() {
     memScoped {
         val screenNumber = alloc<IntVar>()
 
+        // TODO support multi screen
         val xcbConnection = xcb_connect(null, screenNumber.ptr)
         if (xcbConnection == null || (xcb_connection_has_error(xcbConnection) != 0)) {
             error("::main::no XCB connection from setup")
@@ -69,13 +70,13 @@ private fun eventLoop(xcbConnection: CPointer<xcb_connection_t>) {
         try {
             val eventType = XcbEvent.getEventTypeForCode(eventId) // throws IllegalArgumentException
 
-            if (eventHandlers.containsKey(eventType)) {
-                val stop = eventHandlers[eventType]!!.invoke(xcbConnection, xEvent)
+            if (EVENT_HANDLERS.containsKey(eventType)) {
+                val stop = EVENT_HANDLERS[eventType]!!.invoke(xcbConnection, xEvent)
                 if (stop) {
                     break
                 }
             } else {
-                println("::eventLoop::unhandled event: $eventType")
+                println("::eventLoop::unhandled event: $eventType > $eventId")
             }
         } catch (ex: IllegalArgumentException) {
             println("WARN: " + ex.message)
