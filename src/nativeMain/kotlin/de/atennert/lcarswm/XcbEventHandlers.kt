@@ -103,3 +103,5 @@ private fun handleConfigureRequest(
     }
     return false
 }
+
+// TODO RANDR handler
