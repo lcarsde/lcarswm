@@ -38,4 +38,4 @@ That runs the X window manager with the lcarswm window manager and writes all st
 startx /path/to/executable/lcarswm.kexe
 ```
 
-Probably one of the most interesting features in using a VM and RANDR is screen resizing. For me this works with using VBoxVGA as graphics controller and `VBoxClient-all` needs to be called when the window manager is active to allow for resizing detection and all other things VBoxClient offers. Alternatively, VBoxClient can be called with specific flags.
+Probably one of the most interesting features in using a VM and RANDR is screen resizing. For me this works with using VBoxVGA as graphics controller and `VBoxClient-all` needs to be called after the activation of X to allow for resizing detection and all other things VBoxClient offers. Alternatively, VBoxClient can be called with specific flags.

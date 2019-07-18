@@ -1,5 +1,6 @@
 import cnames.structs.xcb_connection_t
 import de.atennert.lcarswm.EVENT_HANDLERS
+import de.atennert.lcarswm.WindowManagerConfig
 import de.atennert.lcarswm.XcbEvent
 import kotlinx.cinterop.*
 import xcb.*
@@ -21,7 +22,12 @@ fun main() {
         val screen = xcb_aux_get_screen(xcbConnection, screenNumber.value)?.pointed ?: error("::main::got no screen")
         println("::main::Screen size: ${screen.width_in_pixels}/${screen.height_in_pixels}, root: ${screen.root}")
 
-        val randrBase = setupRandr(xcbConnection, screen)
+        val windowManagerConfig = WindowManagerConfig(
+            Pair(screen.width_in_pixels.toInt(), screen.height_in_pixels.toInt()),
+            screen.root
+        )
+
+        val randrBase = setupRandr(xcbConnection, windowManagerConfig)
 
         // register buttons
         registerButton(xcbConnection, screen.root, 1) // left mouse button
@@ -48,7 +54,7 @@ fun main() {
         }
 
         // event loop
-        eventLoop(xcbConnection, randrBase)
+        eventLoop(xcbConnection, windowManagerConfig, randrBase)
 
         xcb_disconnect(xcbConnection)
     }
@@ -68,7 +74,7 @@ private fun registerButton(xcbConnection: CPointer<xcb_connection_t>, window: xc
 /**
  * @return RANDR base value
  */
-private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, screen: xcb_screen_t): Int {
+private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerConfig: WindowManagerConfig): Int {
     val extension = xcb_get_extension_data(xcbConnection, xcb_randr_id.ptr)!!.pointed
 
     if (extension.present.toInt() == 0) {
@@ -77,7 +83,7 @@ private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, screen: xcb_sc
     }
 
     xcb_randr_select_input(
-        xcbConnection, screen.root,
+        xcbConnection, windowManagerConfig.screenRoot.toUInt(),
         (XCB_RANDR_NOTIFY_MASK_SCREEN_CHANGE or
                 XCB_RANDR_NOTIFY_MASK_OUTPUT_CHANGE or
                 XCB_RANDR_NOTIFY_CRTC_CHANGE or
@@ -91,7 +97,7 @@ private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, screen: xcb_sc
     return extension.first_event.toInt()
 }
 
-private fun eventLoop(xcbConnection: CPointer<xcb_connection_t>, randrBase: Int) {
+private fun eventLoop(xcbConnection: CPointer<xcb_connection_t>, windowManagerConfig: WindowManagerConfig, randrBase: Int) {
     val randrEventValue = randrBase + XCB_RANDR_SCREEN_CHANGE_NOTIFY
 
     while (true) {
@@ -109,7 +115,7 @@ private fun eventLoop(xcbConnection: CPointer<xcb_connection_t>, randrBase: Int)
             val eventType = XcbEvent.getEventTypeForCode(eventId) // throws IllegalArgumentException
 
             if (EVENT_HANDLERS.containsKey(eventType)) {
-                val stop = EVENT_HANDLERS[eventType]!!.invoke(xcbConnection, xEvent)
+                val stop = EVENT_HANDLERS[eventType]!!.invoke(xcbConnection, windowManagerConfig, xEvent)
                 if (stop) {
                     break
                 }

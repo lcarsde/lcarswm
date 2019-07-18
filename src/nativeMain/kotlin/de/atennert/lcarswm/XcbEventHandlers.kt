@@ -10,13 +10,13 @@ import xcb.*
 /**
  * Map of event types to event handlers. DON'T EDIT THE MAPS CONTENT!!!
  */
-val EVENT_HANDLERS = hashMapOf<XcbEvent, Function2<CPointer<xcb_connection_t>, CPointer<xcb_generic_event_t>, Boolean>>(
-    Pair(XcbEvent.XCB_KEY_PRESS, { _, e -> handleKeyPress(e) }),
-    Pair(XcbEvent.XCB_KEY_RELEASE, { _, e -> handleKeyRelease(e) }),
-    Pair(XcbEvent.XCB_BUTTON_PRESS, { _, e -> handleButtonPress(e) }),
-    Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, e -> handleButtonRelease(e) }),
+val EVENT_HANDLERS = hashMapOf<XcbEvent, Function3<CPointer<xcb_connection_t>, WindowManagerConfig, CPointer<xcb_generic_event_t>, Boolean>>(
+    Pair(XcbEvent.XCB_KEY_PRESS, { _, _, e -> handleKeyPress(e) }),
+    Pair(XcbEvent.XCB_KEY_RELEASE, { _, _, e -> handleKeyRelease(e) }),
+    Pair(XcbEvent.XCB_BUTTON_PRESS, { _, _, e -> handleButtonPress(e) }),
+    Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, _, e -> handleButtonRelease(e) }),
     Pair(XcbEvent.XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
-    Pair(XcbEvent.XCB_MAP_REQUEST, ::handleMapRequest)
+    Pair(XcbEvent.XCB_MAP_REQUEST, { c, _, e -> handleMapRequest(c, e) })
 )
 
 val ROOT_WINDOW_ID = 0.toUInt()
@@ -75,11 +75,14 @@ private fun handleMapRequest(
  */
 private fun handleConfigureRequest(
     xcbConnection: CPointer<xcb_connection_t>,
+    windowManagerConfig: WindowManagerConfig,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
     println("::handleConfigureRequest::configure request")
     @Suppress("UNCHECKED_CAST")
     val configureEvent = (xEvent as CPointer<xcb_configure_request_event_t>).pointed
+    //val (x, y) = windowManagerConfig.defaultWindowPosition
+    //val (width, height) = windowManagerConfig.defaultWindowSize
 
     val conf = WindowConfig(
         configureEvent.x.toLong(),
