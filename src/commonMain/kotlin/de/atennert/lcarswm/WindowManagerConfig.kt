@@ -5,7 +5,8 @@ package de.atennert.lcarswm
  */
 class WindowManagerConfig(
     private val windowManagerSize: Pair<Int, Int>,
-    val screenRoot: UInt) {
+    val screenRoot: UInt,
+    private val atomProvider: Function1<String, UInt>) {
 
     val defaultWindowPosition = Pair(0, 100) // TODO get real values
 
@@ -18,4 +19,8 @@ class WindowManagerConfig(
     val fullscreenWindowPosition = Pair(0, 0)
 
     val fullscreenWindowSize = this.windowManagerSize
+
+    val windows = hashMapOf<UInt, Window>()
+
+    val wm_state = atomProvider("WM_STATE")
 }

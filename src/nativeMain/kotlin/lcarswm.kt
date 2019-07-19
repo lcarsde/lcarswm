@@ -2,6 +2,7 @@ import cnames.structs.xcb_connection_t
 import de.atennert.lcarswm.EVENT_HANDLERS
 import de.atennert.lcarswm.WindowManagerConfig
 import de.atennert.lcarswm.XcbEvent
+import de.atennert.lcarswm.getAtom
 import kotlinx.cinterop.*
 import xcb.*
 
@@ -25,7 +26,7 @@ fun main() {
         val windowManagerConfig = WindowManagerConfig(
             Pair(screen.width_in_pixels.toInt(), screen.height_in_pixels.toInt()),
             screen.root
-        )
+        ) { getAtom(xcbConnection, it) }
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig)
 
@@ -83,7 +84,7 @@ private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerC
     }
 
     xcb_randr_select_input(
-        xcbConnection, windowManagerConfig.screenRoot.toUInt(),
+        xcbConnection, windowManagerConfig.screenRoot.convert(),
         (XCB_RANDR_NOTIFY_MASK_SCREEN_CHANGE or
                 XCB_RANDR_NOTIFY_MASK_OUTPUT_CHANGE or
                 XCB_RANDR_NOTIFY_CRTC_CHANGE or
@@ -97,7 +98,11 @@ private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerC
     return extension.first_event.toInt()
 }
 
-private fun eventLoop(xcbConnection: CPointer<xcb_connection_t>, windowManagerConfig: WindowManagerConfig, randrBase: Int) {
+private fun eventLoop(
+    xcbConnection: CPointer<xcb_connection_t>,
+    windowManagerConfig: WindowManagerConfig,
+    randrBase: Int
+) {
     val randrEventValue = randrBase + XCB_RANDR_SCREEN_CHANGE_NOTIFY
 
     while (true) {

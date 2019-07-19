@@ -3,7 +3,7 @@ package de.atennert.lcarswm
 /**
  * POJO containing window data
  */
-class WindowConfig(
+data class WindowConfig(
     private val x: Long,
     private val y: Long,
     private val width: Long,
