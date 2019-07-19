@@ -19,8 +19,8 @@ fun adjustWindowPositionAndSize(
     val mask = XCB_CONFIG_WINDOW_X or XCB_CONFIG_WINDOW_Y or
             XCB_CONFIG_WINDOW_WIDTH or XCB_CONFIG_WINDOW_HEIGHT
 
-    val configList = listOf(x, y, width, height).map { it.toUInt() }
-    val configData = UIntArray(4) { configList[it] }
+    val configList = listOf(x, y, width, height)
+    val configData = UIntArray(4) { configList[it].convert() }
 
     xcb_configure_window(xcbConnection, windowId, mask.convert(), configData.toCValues())
     xcb_flush(xcbConnection)
