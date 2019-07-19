@@ -88,7 +88,7 @@ private fun handleMapRequest(
 
     xcb_change_property(
         xcbConnection, XCB_PROP_MODE_REPLACE.convert(), windowId,
-        windowManagerConfig.wm_state, windowManagerConfig.wm_state,
+        windowManagerConfig.wmState, windowManagerConfig.wmState,
         32.convert(), 2.convert(), data.toCValues()
     )
 

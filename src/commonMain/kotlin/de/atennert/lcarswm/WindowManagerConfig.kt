@@ -22,5 +22,5 @@ class WindowManagerConfig(
 
     val windows = hashMapOf<UInt, Window>()
 
-    val wm_state = atomProvider("WM_STATE")
+    val wmState = atomProvider("WM_STATE")
 }
