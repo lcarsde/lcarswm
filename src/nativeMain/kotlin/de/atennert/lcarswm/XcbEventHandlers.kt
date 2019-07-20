@@ -18,7 +18,8 @@ val EVENT_HANDLERS =
         Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, _, e -> handleButtonRelease(e) }),
         Pair(XcbEvent.XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
         Pair(XcbEvent.XCB_MAP_REQUEST, ::handleMapRequest),
-        Pair(XcbEvent.XCB_DESTROY_NOTIFY, { _, w, e -> handleDestroyNotify(w, e) })
+        Pair(XcbEvent.XCB_DESTROY_NOTIFY, { _, w, e -> handleDestroyNotify(w, e) }),
+        Pair(XcbEvent.XCB_UNMAP_NOTIFY, { _, w, e -> handleUnmapNotify(w, e) })
     )
 
 private val ROOT_WINDOW_ID = 0.toUInt()
@@ -137,7 +138,7 @@ private fun handleConfigureRequest(
 }
 
 /**
- * Remove window from the wm data.
+ * Remove window from the wm data on window destroy.
  */
 private fun handleDestroyNotify(
     windowManagerConfig: WindowManagerConfig,
@@ -146,6 +147,19 @@ private fun handleDestroyNotify(
     @Suppress("UNCHECKED_CAST")
     val destroyEvent = (xEvent as CPointer<xcb_destroy_notify_event_t>).pointed
     windowManagerConfig.windows.remove(destroyEvent.window)
+    return false
+}
+
+/**
+ * Remove the window from the wm data on window unmap.
+ */
+private fun handleUnmapNotify(
+    windowManagerConfig: WindowManagerConfig,
+    xEvent: CPointer<xcb_generic_event_t>
+): Boolean {
+    @Suppress("UNCHECKED_CAST")
+    val unmapEvent = (xEvent as CPointer<xcb_unmap_notify_event_t>).pointed
+    windowManagerConfig.windows.remove(unmapEvent.window)
     return false
 }
 
