@@ -9,7 +9,8 @@ notifications:
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -y libxcb1-dev libxcb-util-dev libxcb-randr0-dev libxcb-icccm4-dev
+  - sudo apt-get install -y libxcb1-dev libxcb-util-dev libxcb-randr0-dev libxcb-icccm4-dev libxcb-keysyms1-dev
   - sudo ln -s /usr/lib/x86_64-linux-gnu/libxcb.so /usr/lib/libxcb.so
   - sudo ln -s /usr/lib/x86_64-linux-gnu/libxcb-util.so /usr/lib/libxcb-util.so
   - sudo ln -s /usr/lib/x86_64-linux-gnu/libxcb-randr.so /usr/lib/libxcb-randr.so
+  - sudo ln -s /usr/lib/x86_64-linux-gnu/libxcb-keysyms.so /usr/lib/libxcb-keysyms.so
