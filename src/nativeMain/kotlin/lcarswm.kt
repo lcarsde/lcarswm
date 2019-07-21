@@ -8,6 +8,8 @@ import xcb.*
 
 private const val NO_RANDR_BASE = -1
 
+private val WM_MODIFIER_KEY = XCB_MOD_MASK_4 // should be windows key
+
 fun main() {
     println("::main::start lcarswm initialization")
 
@@ -29,6 +31,11 @@ fun main() {
         ) { getAtom(xcbConnection, it) }
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig)
+
+        if (!setupKeys(xcbConnection, screen.root)) {
+            xcb_disconnect(xcbConnection)
+            error("::main::unable to setup the wm control keys")
+        }
 
         // register buttons
         registerButton(xcbConnection, screen.root, 1) // left mouse button
@@ -61,6 +68,44 @@ fun main() {
     }
 
     println("::main::lcarswm stopped")
+}
+
+/**
+ * @return <code>true</code> if setting up the keys was successful, <code>false</code> otherwise.
+ */
+fun setupKeys(xcbConnection: CPointer<xcb_connection_t>, window: xcb_window_t): Boolean {
+    // TODO create a key management
+    val keySyms = xcb_key_symbols_alloc(xcbConnection)
+    val keyCode = getKeyCodeFromKeySym(XK_Tab, keySyms)
+
+    if (keyCode.toInt() == 0) {
+        // if one key can't be set up nothing can
+        xcb_key_symbols_free(keySyms)
+        return false
+    }
+
+    xcb_grab_key(xcbConnection, 1.convert(), window, WM_MODIFIER_KEY.convert(), keyCode,
+        XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert())
+
+    xcb_flush(xcbConnection)
+    xcb_key_symbols_free(keySyms)
+    return true
+}
+
+/**
+ * Get the key code for a key symbol for registration.
+ */
+fun getKeyCodeFromKeySym(keySym: Int, keySyms: CPointer<xcb_key_symbols_t>?): xcb_keycode_t {
+    val keyPointer = xcb_key_symbols_get_keycode(keySyms, keySym.convert())
+
+    if (keyPointer == null) {
+        println("::getKeyCodeFromKeySym::unable to get key code for $keySym")
+        return 0.convert()
+    }
+
+    val key = keyPointer.pointed.value
+    nativeHeap.free(keyPointer)
+    return key
 }
 
 private fun registerButton(xcbConnection: CPointer<xcb_connection_t>, window: xcb_window_t, buttonId: Int) {

@@ -23,4 +23,6 @@ class WindowManagerConfig(
     val windows = hashMapOf<UInt, Window>()
 
     val wmState = atomProvider("WM_STATE")
+
+    // TODO introduce a mode and return the right size and position, corresponding with the mode.
 }
