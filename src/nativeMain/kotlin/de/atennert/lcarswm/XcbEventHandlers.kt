@@ -11,9 +11,9 @@ import xcb.*
  * Map of event types to event handlers. DON'T EDIT THE MAPS CONTENT!!!
  */
 val EVENT_HANDLERS =
-    hashMapOf<XcbEvent, Function3<CPointer<xcb_connection_t>, WindowManagerConfig, CPointer<xcb_generic_event_t>, Boolean>>(
+    hashMapOf<XcbEvent, Function3<CPointer<xcb_connection_t>, WindowManagerState, CPointer<xcb_generic_event_t>, Boolean>>(
         Pair(XcbEvent.XCB_KEY_PRESS, { _, _, e -> handleKeyPress(e) }),
-        Pair(XcbEvent.XCB_KEY_RELEASE, { _, _, e -> handleKeyRelease(e) }),
+        Pair(XcbEvent.XCB_KEY_RELEASE, ::handleKeyRelease),
         Pair(XcbEvent.XCB_BUTTON_PRESS, { _, _, e -> handleButtonPress(e) }),
         Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, _, e -> handleButtonRelease(e) }),
         Pair(XcbEvent.XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
@@ -32,11 +32,17 @@ private fun handleKeyPress(xEvent: CPointer<xcb_generic_event_t>): Boolean {
     return false
 }
 
-private fun handleKeyRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean {
+private fun handleKeyRelease(
+    xcbConnection: CPointer<xcb_connection_t>,
+    windowManagerState: WindowManagerState,
+    xEvent: CPointer<xcb_generic_event_t>
+): Boolean {
     @Suppress("UNCHECKED_CAST")
     val releasedEvent = (xEvent as CPointer<xcb_key_release_event_t>).pointed
     val key = releasedEvent.detail.toInt()
     println("::handleKeyRelease::Key released: $key")
+
+    toggleScreenMode(xcbConnection, windowManagerState)
     return false
 }
 
@@ -63,7 +69,7 @@ private fun handleButtonRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean 
 
 private fun handleMapRequest(
     xcbConnection: CPointer<xcb_connection_t>,
-    windowManagerConfig: WindowManagerConfig,
+    windowManagerState: WindowManagerState,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
     println("::handleMapRequest::map request")
@@ -71,15 +77,15 @@ private fun handleMapRequest(
     val mapEvent = xEvent as CPointer<xcb_map_request_event_t>
     val windowId = mapEvent.pointed.window
 
-    if (windowManagerConfig.windows.containsKey(windowId)) return false
+    if (windowManagerState.windows.containsKey(windowId)) return false
 
     // TODO setup window
     // TODO add window to workspace
     // TODO find monitor for window
 
-    adjustWindowPositionAndSize(xcbConnection, windowManagerConfig, windowId)
+    adjustWindowPositionAndSize(xcbConnection, windowManagerState.currentWindowMeasurements, windowId)
 
-    windowManagerConfig.windows[windowId] = Window(windowId)
+    windowManagerState.windows[windowId] = Window(windowId)
 
     xcb_map_window(xcbConnection, mapEvent.pointed.window)
 
@@ -89,7 +95,7 @@ private fun handleMapRequest(
 
     xcb_change_property(
         xcbConnection, XCB_PROP_MODE_REPLACE.convert(), windowId,
-        windowManagerConfig.wmState, windowManagerConfig.wmState,
+        windowManagerState.wmState, windowManagerState.wmState,
         32.convert(), 2.convert(), data.toCValues()
     )
 
@@ -102,15 +108,19 @@ private fun handleMapRequest(
  */
 private fun handleConfigureRequest(
     xcbConnection: CPointer<xcb_connection_t>,
-    windowManagerConfig: WindowManagerConfig,
+    windowManagerState: WindowManagerState,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
     println("::handleConfigureRequest::configure request")
     @Suppress("UNCHECKED_CAST")
     val configureEvent = (xEvent as CPointer<xcb_configure_request_event_t>).pointed
 
-    if (windowManagerConfig.windows.containsKey(configureEvent.window)) {
-        adjustWindowPositionAndSize(xcbConnection, windowManagerConfig, configureEvent.window)
+    if (windowManagerState.windows.containsKey(configureEvent.window)) {
+        adjustWindowPositionAndSize(
+            xcbConnection,
+            windowManagerState.currentWindowMeasurements,
+            configureEvent.window
+        )
         return false
     }
 
@@ -141,12 +151,12 @@ private fun handleConfigureRequest(
  * Remove window from the wm data on window destroy.
  */
 private fun handleDestroyNotify(
-    windowManagerConfig: WindowManagerConfig,
+    windowManagerState: WindowManagerState,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val destroyEvent = (xEvent as CPointer<xcb_destroy_notify_event_t>).pointed
-    windowManagerConfig.windows.remove(destroyEvent.window)
+    windowManagerState.windows.remove(destroyEvent.window)
     return false
 }
 
@@ -154,12 +164,12 @@ private fun handleDestroyNotify(
  * Remove the window from the wm data on window unmap.
  */
 private fun handleUnmapNotify(
-    windowManagerConfig: WindowManagerConfig,
+    windowManagerState: WindowManagerState,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val unmapEvent = (xEvent as CPointer<xcb_unmap_notify_event_t>).pointed
-    windowManagerConfig.windows.remove(unmapEvent.window)
+    windowManagerState.windows.remove(unmapEvent.window)
     return false
 }
 

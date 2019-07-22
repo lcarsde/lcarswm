@@ -11,16 +11,13 @@ import xcb.*
  */
 fun adjustWindowPositionAndSize(
     xcbConnection: CPointer<xcb_connection_t>,
-    windowManagerConfig: WindowManagerConfig,
+    windowMeasurements: List<Int>,
     windowId: UInt
 ) {
-    val (x, y) = windowManagerConfig.defaultWindowPosition
-    val (width, height) = windowManagerConfig.defaultWindowSize
     val mask = XCB_CONFIG_WINDOW_X or XCB_CONFIG_WINDOW_Y or
             XCB_CONFIG_WINDOW_WIDTH or XCB_CONFIG_WINDOW_HEIGHT
 
-    val configList = listOf(x, y, width, height)
-    val configData = UIntArray(4) { configList[it].convert() }
+    val configData = UIntArray(4) { windowMeasurements[it].convert() }
 
     xcb_configure_window(xcbConnection, windowId, mask.convert(), configData.toCValues())
     xcb_flush(xcbConnection)

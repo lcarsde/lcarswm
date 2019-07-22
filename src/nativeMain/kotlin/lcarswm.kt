@@ -1,6 +1,6 @@
 import cnames.structs.xcb_connection_t
 import de.atennert.lcarswm.EVENT_HANDLERS
-import de.atennert.lcarswm.WindowManagerConfig
+import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.XcbEvent
 import de.atennert.lcarswm.getAtom
 import kotlinx.cinterop.*
@@ -25,7 +25,7 @@ fun main() {
         val screen = xcb_aux_get_screen(xcbConnection, screenNumber.value)?.pointed ?: error("::main::got no screen")
         println("::main::Screen size: ${screen.width_in_pixels}/${screen.height_in_pixels}, root: ${screen.root}")
 
-        val windowManagerConfig = WindowManagerConfig(
+        val windowManagerConfig = WindowManagerState(
             Pair(screen.width_in_pixels.toInt(), screen.height_in_pixels.toInt()),
             screen.root
         ) { getAtom(xcbConnection, it) }
@@ -120,7 +120,7 @@ private fun registerButton(xcbConnection: CPointer<xcb_connection_t>, window: xc
 /**
  * @return RANDR base value
  */
-private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerConfig: WindowManagerConfig): Int {
+private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: WindowManagerState): Int {
     val extension = xcb_get_extension_data(xcbConnection, xcb_randr_id.ptr)!!.pointed
 
     if (extension.present.toInt() == 0) {
@@ -129,7 +129,7 @@ private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerC
     }
 
     xcb_randr_select_input(
-        xcbConnection, windowManagerConfig.screenRoot.convert(),
+        xcbConnection, windowManagerState.screenRoot.convert(),
         (XCB_RANDR_NOTIFY_MASK_SCREEN_CHANGE or
                 XCB_RANDR_NOTIFY_MASK_OUTPUT_CHANGE or
                 XCB_RANDR_NOTIFY_CRTC_CHANGE or
@@ -145,7 +145,7 @@ private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerC
 
 private fun eventLoop(
     xcbConnection: CPointer<xcb_connection_t>,
-    windowManagerConfig: WindowManagerConfig,
+    windowManagerState: WindowManagerState,
     randrBase: Int
 ) {
     val randrEventValue = randrBase + XCB_RANDR_SCREEN_CHANGE_NOTIFY
@@ -165,7 +165,7 @@ private fun eventLoop(
             val eventType = XcbEvent.getEventTypeForCode(eventId) // throws IllegalArgumentException
 
             if (EVENT_HANDLERS.containsKey(eventType)) {
-                val stop = EVENT_HANDLERS[eventType]!!.invoke(xcbConnection, windowManagerConfig, xEvent)
+                val stop = EVENT_HANDLERS[eventType]!!.invoke(xcbConnection, windowManagerState, xEvent)
                 if (stop) {
                     break
                 }
