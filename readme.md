@@ -13,7 +13,7 @@ Thank you very much to the creators of the following resources:
 * Using the middle mouse button opens a terminal.
 
 ## UI?
-Not yet, but there arre some concept pictures in the doc folder.
+Not yet, but there are some concept pictures in the doc folder.
 
 ## Required
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
