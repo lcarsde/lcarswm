@@ -42,3 +42,10 @@ startx /path/to/executable/lcarswm.kexe
 ```
 
 Probably one of the most interesting features in using a VM and RANDR is screen resizing. For me this works with using VBoxVGA as graphics controller and `VBoxClient-all` needs to be called after the activation of X to allow for resizing detection and all other things VBoxClient offers. Alternatively, VBoxClient can be called with specific flags.
+
+## Some definitions
+* Height of top and bottom bar: 40px
+* Width of height and bottom bar ends: 32px
+* Width of bar gaps: 8px
+* Corner pieces have an inner corner with radius: 10px
+* Random data area height: 100px

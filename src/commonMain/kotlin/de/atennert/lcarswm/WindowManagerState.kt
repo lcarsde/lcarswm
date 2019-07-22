@@ -9,14 +9,14 @@ class WindowManagerState(
     private val atomProvider: Function1<String, UInt>
 ) {
 
-    private val defaultWindowPosition = Pair(0, 100) // TODO get real values
+    private val defaultWindowPosition = Pair(208, 234)
 
-    private val defaultWindowSize = Pair(windowManagerSize.first, windowManagerSize.second / 2) // TODO get real values
+    private val defaultWindowSize = Pair(windowManagerSize.first - 256, windowManagerSize.second - 292)
 
-    private val maximizedWindowPosition = Pair(5, 20) // TODO get real values
+    private val maximizedWindowPosition = Pair(40, 48)
 
     private val maximizedWindowSize =
-        Pair(windowManagerSize.first / 2, windowManagerSize.second / 2) // TODO get real values
+        Pair(windowManagerSize.first - 80, windowManagerSize.second - 96)
 
     private val fullscreenWindowPosition = Pair(0, 0)
 
