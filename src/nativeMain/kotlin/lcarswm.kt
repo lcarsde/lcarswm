@@ -58,6 +58,9 @@ fun main() {
             )
         }
 
+        // FIXME this needs be removed once RANDR development is finished. In the meantime it's here for convenience
+        runProgram("VBoxClient-all")
+
         // event loop
         eventLoop(xcbConnection, windowManagerConfig, randrBase)
 
