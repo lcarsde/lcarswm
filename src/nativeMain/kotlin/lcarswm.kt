@@ -1,8 +1,5 @@
 import cnames.structs.xcb_connection_t
-import de.atennert.lcarswm.EVENT_HANDLERS
-import de.atennert.lcarswm.WindowManagerState
-import de.atennert.lcarswm.XcbEvent
-import de.atennert.lcarswm.getAtom
+import de.atennert.lcarswm.*
 import kotlinx.cinterop.*
 import xcb.*
 
@@ -128,6 +125,8 @@ private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerS
         return NO_RANDR_BASE
     }
 
+    handleRandrEvent(xcbConnection, windowManagerState)
+
     xcb_randr_select_input(
         xcbConnection, windowManagerState.screenRoot.convert(),
         (XCB_RANDR_NOTIFY_MASK_SCREEN_CHANGE or
@@ -157,6 +156,7 @@ private fun eventLoop(
 
         if (eventValue == randrEventValue) {
             println("::eventLoop::received randr event")
+            handleRandrEvent(xcbConnection, windowManagerState)
             nativeHeap.free(xEvent)
             continue
         }

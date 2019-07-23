@@ -1,10 +1,7 @@
 package de.atennert.lcarswm
 
 import cnames.structs.xcb_connection_t
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.pointed
-import kotlinx.cinterop.toCValues
+import kotlinx.cinterop.*
 import xcb.*
 
 /**
@@ -173,4 +170,46 @@ private fun handleUnmapNotify(
     return false
 }
 
-// TODO RANDR handler
+/**
+ * Get RANDR information and update window management accordingly.
+ */
+fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: WindowManagerState) {
+    val resourcesCookie = xcb_randr_get_screen_resources_current(xcbConnection, windowManagerState.screenRoot)
+    val resourcesReply = xcb_randr_get_screen_resources_current_reply(xcbConnection, resourcesCookie, null)
+
+    if (resourcesReply == null) {
+        println("::handleRandrEvent::no RANDR extension found")
+        return
+    }
+
+    val timestamp = resourcesReply.pointed.config_timestamp
+
+    val outputCount = xcb_randr_get_screen_resources_current_outputs_length(resourcesReply)
+    val outputs = xcb_randr_get_screen_resources_current_outputs(resourcesReply)!!
+
+    val outputInfoCookies = ArrayList<Pair<xcb_randr_output_t, CValue<xcb_randr_get_output_info_cookie_t>>>(outputCount)
+    for (i in 0 until outputCount) {
+        outputInfoCookies.add(Pair(outputs[i], xcb_randr_get_output_info(xcbConnection, outputs[i], timestamp)))
+    }
+
+    outputInfoCookies
+        .map { Pair(it.first, xcb_randr_get_output_info_reply(xcbConnection, it.second, null)) }
+        .filter { it.second != null }
+        .map { Pair(it.first, it.second!!) }
+        .onEach(::printOutput)
+        .forEach { nativeHeap.free(it.second) }
+
+    nativeHeap.free(resourcesReply)
+}
+
+private fun printOutput(output: Pair<xcb_randr_output_t, CPointer<xcb_randr_get_output_info_reply_t>>) {
+    val (outputId, outputObject) = output
+    val nameLength = xcb_randr_get_output_info_name_length(outputObject)
+    val namePointer = xcb_randr_get_output_info_name(outputObject)!!
+    val nameArray = ByteArray(nameLength)
+    for (i in 0 until nameLength) nameArray[i] = namePointer[i].toByte()
+    val name = nameArray.decodeToString()
+
+    println("::printOutput::name: $name, id: $outputId")
+    println("::printOutput::width: ${outputObject.pointed.mm_width}, height: ${outputObject.pointed.mm_height}")
+}
