@@ -200,7 +200,7 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
         .map { Triple(Monitor(it.first, it.third), it.second.pointed.crtc, it.second)}
         .onEach { println("::printOutput::name: ${it.first.name}, id: ${it.first.id}") }
         .map { nativeHeap.free(it.third); Pair(it.first, it.second) }
-        .groupBy { it.second != 0.convert() }
+        .groupBy { it.second.toInt() != 0 }
 
     // unused monitors
     sortedMonitors[false]
