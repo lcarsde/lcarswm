@@ -192,24 +192,34 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
         outputInfoCookies.add(Pair(outputs[i], xcb_randr_get_output_info(xcbConnection, outputs[i], timestamp)))
     }
 
-    outputInfoCookies
+    val sortedMonitors = outputInfoCookies
+        .asSequence()
         .map { Pair(it.first, xcb_randr_get_output_info_reply(xcbConnection, it.second, null)) }
         .filter { it.second != null }
-        .map { Pair(it.first, it.second!!) }
-        .onEach(::printOutput)
-        .forEach { nativeHeap.free(it.second) }
+        .map { Triple(it.first, it.second!!, getOutputName(it.second!!)) }
+        .map { Triple(Monitor(it.first, it.third), it.second.pointed.crtc, it.second)}
+        .onEach { println("::printOutput::name: ${it.first.name}, id: ${it.first.id}") }
+        .map { nativeHeap.free(it.third); Pair(it.first, it.second) }
+        .groupBy { it.second != 0.convert() }
+
+    // unused monitors
+    sortedMonitors[false]
+
+    // used monitors
+    sortedMonitors[true]
 
     nativeHeap.free(resourcesReply)
 }
 
-private fun printOutput(output: Pair<xcb_randr_output_t, CPointer<xcb_randr_get_output_info_reply_t>>) {
-    val (outputId, outputObject) = output
+/**
+ * Get the name of the given output.
+ */
+private fun getOutputName(outputObject: CPointer<xcb_randr_get_output_info_reply_t>): String {
     val nameLength = xcb_randr_get_output_info_name_length(outputObject)
     val namePointer = xcb_randr_get_output_info_name(outputObject)!!
     val nameArray = ByteArray(nameLength)
-    for (i in 0 until nameLength) nameArray[i] = namePointer[i].toByte()
-    val name = nameArray.decodeToString()
 
-    println("::printOutput::name: $name, id: $outputId")
-    println("::printOutput::width: ${outputObject.pointed.mm_width}, height: ${outputObject.pointed.mm_height}")
+    for (i in 0 until nameLength) nameArray[i] = namePointer[i].toByte()
+
+    return nameArray.decodeToString()
 }
