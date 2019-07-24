@@ -22,10 +22,7 @@ fun main() {
         val screen = xcb_aux_get_screen(xcbConnection, screenNumber.value)?.pointed ?: error("::main::got no screen")
         println("::main::Screen size: ${screen.width_in_pixels}/${screen.height_in_pixels}, root: ${screen.root}")
 
-        val windowManagerConfig = WindowManagerState(
-            Pair(screen.width_in_pixels.toInt(), screen.height_in_pixels.toInt()),
-            screen.root
-        ) { getAtom(xcbConnection, it) }
+        val windowManagerConfig = WindowManagerState(screen.root) { getAtom(xcbConnection, it) }
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig)
 
@@ -84,8 +81,10 @@ fun setupKeys(xcbConnection: CPointer<xcb_connection_t>, window: xcb_window_t): 
         return false
     }
 
-    xcb_grab_key(xcbConnection, 1.convert(), window, WM_MODIFIER_KEY.convert(), keyCode,
-        XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert())
+    xcb_grab_key(
+        xcbConnection, 1.convert(), window, WM_MODIFIER_KEY.convert(), keyCode,
+        XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert()
+    )
 
     xcb_flush(xcbConnection)
     xcb_key_symbols_free(keySyms)

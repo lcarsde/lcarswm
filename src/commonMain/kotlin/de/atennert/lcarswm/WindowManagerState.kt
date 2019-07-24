@@ -4,45 +4,54 @@ package de.atennert.lcarswm
  * Container class for the state of the window manager.
  */
 class WindowManagerState(
-    private var windowManagerSize: Pair<Int, Int>,
     val screenRoot: UInt,
     private val atomProvider: Function1<String, UInt>
 ) {
 
-    private val defaultWindowPosition = Pair(208, 234)
-
-    private val defaultWindowSize = Pair(windowManagerSize.first - 256, windowManagerSize.second - 292)
-
-    private val maximizedWindowPosition = Pair(40, 48)
-
-    private val maximizedWindowSize =
-        Pair(windowManagerSize.first - 80, windowManagerSize.second - 96)
-
-    private val fullscreenWindowPosition = Pair(0, 0)
-
-    private val fullscreenWindowSize = this.windowManagerSize
-
-    val windows = hashMapOf<UInt, Window>()
-
     val wmState = atomProvider("WM_STATE")
 
     var screenMode = ScreenMode.NORMAL
+        private set
+
+    private val monitors = ArrayList<Monitor>(3)
 
     /**
-     * @return the current window measurements in the form [x, y, width, height], depending on the current screenMode
+     * @return the monitor to which the window was added
      */
-    val currentWindowMeasurements: List<Int>
-        get() = when (this.screenMode) {
-            ScreenMode.NORMAL -> windowMeasurementsToList(this.defaultWindowPosition, this.defaultWindowSize)
-            ScreenMode.MAXIMIZED -> windowMeasurementsToList(this.maximizedWindowPosition, this.maximizedWindowSize)
-            ScreenMode.FULLSCREEN -> windowMeasurementsToList(this.fullscreenWindowPosition, this.fullscreenWindowSize)
+    fun addWindow(windowId: UInt, window: Window): Monitor {
+        monitors[0].windows[windowId] = window
+        return monitors[0]
+    }
+
+    fun removeWindow(windowId: UInt) {
+        for (monitor in monitors) {
+            if (monitor.windows.remove(windowId) != null) {
+                return
+            }
         }
+    }
 
-    private fun windowMeasurementsToList(position: Pair<Int, Int>, size: Pair<Int, Int>): List<Int> {
-        val (x, y) = position
-        val (width, height) = size
+    fun getWindowMonitor(windowId: UInt): Monitor? {
+        return monitors.find { it.windows.containsKey(windowId) }
+    }
 
-        // why a list and not an array you ask? because no toCValues() on the array created with arrayOf :-(
-        return listOf(x, y, width, height)
+    fun updateMonitors(monitors: List<Monitor>, updateWindowFcn: Function2<List<Int>, UInt, Unit>) {
+        this.monitors.forEach { monitors[0].windows.putAll(it.windows) }
+        this.monitors.clear()
+        this.monitors.addAll(monitors)
+
+        val windowMeasurements = monitors[0].getCurrentWindowMeasurements(this.screenMode)
+        monitors[0].windows.keys.forEach { updateWindowFcn(windowMeasurements, it) }
+    }
+
+    fun updateScreenMode(screenMode: ScreenMode, updateWindowFcn: Function2<List<Int>, UInt, Unit>) {
+        this.screenMode = screenMode
+
+        this.monitors.forEach { monitor ->
+            val measurements = monitor.getCurrentWindowMeasurements(screenMode)
+            monitor.windows.keys.forEach { windowId ->
+                updateWindowFcn(measurements, windowId)
+            }
+        }
     }
 }

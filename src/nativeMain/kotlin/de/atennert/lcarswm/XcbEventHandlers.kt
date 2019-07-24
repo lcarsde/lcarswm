@@ -74,15 +74,26 @@ private fun handleMapRequest(
     val mapEvent = xEvent as CPointer<xcb_map_request_event_t>
     val windowId = mapEvent.pointed.window
 
-    if (windowManagerState.windows.containsKey(windowId)) return false
+    if (windowManagerState.getWindowMonitor(windowId) != null) {
+        return false
+    }
 
     // TODO setup window
     // TODO add window to workspace
     // TODO find monitor for window
 
-    adjustWindowPositionAndSize(xcbConnection, windowManagerState.currentWindowMeasurements, windowId)
+    val windowMonitor = windowManagerState.addWindow(windowId, Window(windowId))
 
-    windowManagerState.windows[windowId] = Window(windowId)
+    println(
+        "::handleMapRequest::monitor: ${windowMonitor.name} position: ${windowMonitor.getCurrentWindowMeasurements(
+            windowManagerState.screenMode
+        )}"
+    )
+    adjustWindowPositionAndSize(
+        xcbConnection,
+        windowMonitor.getCurrentWindowMeasurements(windowManagerState.screenMode),
+        windowId
+    )
 
     xcb_map_window(xcbConnection, mapEvent.pointed.window)
 
@@ -112,10 +123,11 @@ private fun handleConfigureRequest(
     @Suppress("UNCHECKED_CAST")
     val configureEvent = (xEvent as CPointer<xcb_configure_request_event_t>).pointed
 
-    if (windowManagerState.windows.containsKey(configureEvent.window)) {
+    val windowMonitor = windowManagerState.getWindowMonitor(configureEvent.window)
+    if (windowMonitor != null) {
         adjustWindowPositionAndSize(
             xcbConnection,
-            windowManagerState.currentWindowMeasurements,
+            windowMonitor.getCurrentWindowMeasurements(windowManagerState.screenMode),
             configureEvent.window
         )
         return false
@@ -153,7 +165,7 @@ private fun handleDestroyNotify(
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val destroyEvent = (xEvent as CPointer<xcb_destroy_notify_event_t>).pointed
-    windowManagerState.windows.remove(destroyEvent.window)
+    windowManagerState.removeWindow(destroyEvent.window)
     return false
 }
 
@@ -166,7 +178,7 @@ private fun handleUnmapNotify(
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val unmapEvent = (xEvent as CPointer<xcb_unmap_notify_event_t>).pointed
-    windowManagerState.windows.remove(unmapEvent.window)
+    windowManagerState.removeWindow(unmapEvent.window)
     return false
 }
 
@@ -192,21 +204,35 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
         outputInfoCookies.add(Pair(outputs[i], xcb_randr_get_output_info(xcbConnection, outputs[i], timestamp)))
     }
 
-    val sortedMonitors = outputInfoCookies
-        .asSequence()
-        .map { Pair(it.first, xcb_randr_get_output_info_reply(xcbConnection, it.second, null)) }
-        .filter { it.second != null }
-        .map { Triple(it.first, it.second!!, getOutputName(it.second!!)) }
-        .map { Triple(Monitor(it.first, it.third), it.second.pointed.crtc, it.second)}
-        .onEach { println("::printOutput::name: ${it.first.name}, id: ${it.first.id}") }
-        .map { nativeHeap.free(it.third); Pair(it.first, it.second) }
-        .groupBy { it.second.toInt() != 0 }
+    val sortedMonitors = outputInfoCookies.asSequence()
+        .map { (outputId, outputObject) ->
+            Pair(outputId, xcb_randr_get_output_info_reply(xcbConnection, outputObject, null))
+        }
+        .filter { (_, outputObject) ->
+            outputObject != null
+        }
+        .map { (outputId, outputObject) ->
+            Triple(outputId, outputObject!!, getOutputName(outputObject!!))
+        }
+        .map { (outputId, outputObject, outputName) ->
+            Triple(Monitor(outputId, outputName), outputObject.pointed.crtc, outputObject)
+        }
+        .onEach { (monitor, _, _) ->
+            println("::printOutput::name: ${monitor.name}, id: ${monitor.id}")
+        }
+        .map { (monitor, crtc, outputObject) ->
+            nativeHeap.free(outputObject)
+            Pair(monitor, crtc)
+        }
+        .groupBy { (_, crtc) -> crtc.toInt() != 0 }
 
     // unused monitors
     sortedMonitors[false]
 
     // used monitors
-    sortedMonitors[true]
+    // TODO set measurements on monitors
+    windowManagerState.updateMonitors(sortedMonitors[true]!!.map { it.first })
+    { measurements, windowId -> adjustWindowPositionAndSize(xcbConnection, measurements, windowId) }
 
     nativeHeap.free(resourcesReply)
 }
