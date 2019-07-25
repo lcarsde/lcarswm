@@ -6,6 +6,11 @@ import xcb.*
 private const val NO_RANDR_BASE = -1
 
 private val WM_MODIFIER_KEY = XCB_MOD_MASK_4 // should be windows key
+private val lcarsWmKeySyms = listOf(
+    XK_Tab, // toggle screen mode
+    XK_Up, // move windows up the monitor list
+    XK_Down // move windows down the monitor list
+)
 
 fun main() {
     println("::main::start lcarswm initialization")
@@ -13,7 +18,6 @@ fun main() {
     memScoped {
         val screenNumber = alloc<IntVar>()
 
-        // TODO support multi screen
         val xcbConnection = xcb_connect(null, screenNumber.ptr)
         if (xcbConnection == null || (xcb_connection_has_error(xcbConnection) != 0)) {
             error("::main::no XCB connection from setup")
@@ -26,10 +30,7 @@ fun main() {
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig)
 
-        if (!setupKeys(xcbConnection, screen.root)) {
-            xcb_disconnect(xcbConnection)
-            error("::main::unable to setup the wm control keys")
-        }
+        setupKeys(xcbConnection, windowManagerConfig)
 
         // register buttons
         registerButton(xcbConnection, screen.root, 1) // left mouse button
@@ -68,27 +69,26 @@ fun main() {
 }
 
 /**
- * @return <code>true</code> if setting up the keys was successful, <code>false</code> otherwise.
+ * Setup keyboard handling. Keys without key code for the key sym will not be working.
  */
-fun setupKeys(xcbConnection: CPointer<xcb_connection_t>, window: xcb_window_t): Boolean {
-    // TODO create a key management
+fun setupKeys(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: WindowManagerState) {
     val keySyms = xcb_key_symbols_alloc(xcbConnection)
-    val keyCode = getKeyCodeFromKeySym(XK_Tab, keySyms)
+    val windowId = windowManagerState.screenRoot
 
-    if (keyCode.toInt() == 0) {
-        // if one key can't be set up nothing can
-        xcb_key_symbols_free(keySyms)
-        return false
-    }
-
-    xcb_grab_key(
-        xcbConnection, 1.convert(), window, WM_MODIFIER_KEY.convert(), keyCode,
-        XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert()
-    )
+    lcarsWmKeySyms
+        .map { keySym -> Pair(keySym, getKeyCodeFromKeySym(keySym, keySyms)) }
+        .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
+        .onEach { (keySym, keyCode) -> windowManagerState.keyboardKeys[keyCode] = keySym }
+        .forEach { (_, keyCode) ->
+            xcb_grab_key(
+                xcbConnection, 1.convert(), windowId, WM_MODIFIER_KEY.convert(), keyCode,
+                XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert()
+            )
+        }
 
     xcb_flush(xcbConnection)
     xcb_key_symbols_free(keySyms)
-    return true
+    return
 }
 
 /**

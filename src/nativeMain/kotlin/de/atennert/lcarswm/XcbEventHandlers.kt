@@ -24,7 +24,7 @@ private val ROOT_WINDOW_ID = 0.toUInt()
 private fun handleKeyPress(xEvent: CPointer<xcb_generic_event_t>): Boolean {
     @Suppress("UNCHECKED_CAST")
     val pressEvent = (xEvent as CPointer<xcb_key_press_event_t>).pointed
-    val key = pressEvent.detail.toInt()
+    val key = pressEvent.detail
     println("::handleKeyPress::Key pressed: $key")
     return false
 }
@@ -36,10 +36,13 @@ private fun handleKeyRelease(
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val releasedEvent = (xEvent as CPointer<xcb_key_release_event_t>).pointed
-    val key = releasedEvent.detail.toInt()
+    val key = releasedEvent.detail
     println("::handleKeyRelease::Key released: $key")
 
-    toggleScreenMode(xcbConnection, windowManagerState)
+    when (windowManagerState.keyboardKeys[key]) {
+        XK_Tab -> toggleScreenMode(xcbConnection, windowManagerState)
+        else -> println("::handleKeyRelease::unknown key: $key")
+    }
     return false
 }
 

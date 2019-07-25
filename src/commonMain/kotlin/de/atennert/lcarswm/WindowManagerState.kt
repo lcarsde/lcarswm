@@ -13,6 +13,9 @@ class WindowManagerState( // TODO find a better name
     var screenMode = ScreenMode.NORMAL
         private set
 
+    /** map that holds the key sym to all registered key codes */
+    val keyboardKeys = HashMap<UByte, Int>()
+
     private val monitors = ArrayList<Monitor>(3)
 
     /**
