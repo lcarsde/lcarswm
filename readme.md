@@ -11,22 +11,26 @@ Thank you very much to the creators of the following resources:
 * The window manager can be started.
 * The window manager can be closed using the left or right mouse button.
 * Using the middle mouse button opens a terminal.
+* Windows-key + Tab toggles window positioning through default position, maximized and fullscreen
+* Windows are resized when the screen resolution is changed.
 
 ## UI?
 Not yet, but there are some concept pictures in the doc folder.
 
 ## Required
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
-* header files and libraries for xcb and xcb-util
+* header files and libraries for xcb, xcb-util, randr and xcb-icccm. Check the travis yaml file to see the install routines for Ubuntu.
 
 ## Notes to myself :-)
 * The main method needs to be outside of any packages so that the compiler can find it.
 
 ## Sources
-There are common* and native* source directories under `src`. Everything that interacts with XCB or other native resources is in native. Native types and type conversions are hereby also restricted to native*. Everything that has no native dependency is in the common* directories. The goal is to keep the native code as small as possible and put as much as possible in the common part.
+There are common* and native* source directories under `src`. Everything that interacts with XCB or other native resources is in native. Everything that has no native dependency is in the common* directories. The goal is to keep the native code as small as possible and put as much as possible in the common part.
 
 ## Automated testing
 Automated tests are set up using Travis CI. It's working well except for the fact, that the whole environment is downloaded again for every test run. That means downloads of over 500MB, which takes time. However, it's working and that's good enough for me for now.
+
+What's not working so far is system testing. I'd like to have tooling, that creates mocks from the generated Kotlin functions and when testing, the code works with the mocks and not compiling against the libraries. If you happen to something that does that, then write me :-).
 
 ## Manuel testing / running the wm
 To manually test the functionality, I've set up a virtual Linux machine in VirtualBox with a shared directory to the generated executables. In this virtual environment, I run the window manager like this:
