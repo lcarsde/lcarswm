@@ -6,10 +6,12 @@ import xcb.*
 private const val NO_RANDR_BASE = -1
 
 private val WM_MODIFIER_KEY = XCB_MOD_MASK_4 // should be windows key
-private val lcarsWmKeySyms = listOf(
-    XK_Tab, // toggle screen mode
+
+private val LCARS_WM_KEY_SYMS = listOf(
+    XK_Tab, // toggle through windows
     XK_Up, // move windows up the monitor list
-    XK_Down // move windows down the monitor list
+    XK_Down, // move windows down the monitor list
+    XK_M // toggle screen mode
 )
 
 fun main() {
@@ -75,7 +77,18 @@ fun setupKeys(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: Win
     val keySyms = xcb_key_symbols_alloc(xcbConnection)
     val windowId = windowManagerState.screenRoot
 
-    lcarsWmKeySyms
+    // get all key codes for our modifier key and grab them
+    windowManagerState.modifierKeys.addAll(getModifierKeys(xcbConnection, WM_MODIFIER_KEY))
+    windowManagerState.modifierKeys
+        .onEach { keyCode ->
+            xcb_grab_key(
+                xcbConnection, 1.convert(), windowId, XCB_MOD_MASK_ANY.convert(), keyCode,
+                XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert()
+            )
+        }
+
+    // get and grab all key codes for the short cut keys
+    LCARS_WM_KEY_SYMS
         .map { keySym -> Pair(keySym, getKeyCodeFromKeySym(keySym, keySyms)) }
         .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
         .onEach { (keySym, keyCode) -> windowManagerState.keyboardKeys[keyCode] = keySym }
@@ -89,6 +102,39 @@ fun setupKeys(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: Win
     xcb_flush(xcbConnection)
     xcb_key_symbols_free(keySyms)
     return
+}
+
+fun getModifierKeys(
+    xcbConnection: CPointer<xcb_connection_t>,
+    modifierKey: UInt
+): Collection<UByte> {
+    // the order determines the placing of what we look for in the result and comes from X
+    val modifierIndex = arrayOf(
+        XCB_MOD_MASK_SHIFT,
+        XCB_MOD_MASK_LOCK,
+        XCB_MOD_MASK_CONTROL,
+        XCB_MOD_MASK_1,
+        XCB_MOD_MASK_2,
+        XCB_MOD_MASK_3,
+        XCB_MOD_MASK_4,
+        XCB_MOD_MASK_5
+    ).indexOf(modifierKey)
+
+    val modCookie = xcb_get_modifier_mapping_unchecked(xcbConnection)
+    val modReply = xcb_get_modifier_mapping_reply(xcbConnection, modCookie, null) ?: return emptyList()
+    val modMap = xcb_get_modifier_mapping_keycodes(modReply)!!
+
+    val startPosition = modifierIndex * modReply.pointed.keycodes_per_modifier.toInt()
+    val endPosition = startPosition + modReply.pointed.keycodes_per_modifier.toInt()
+    val modKeys = ArrayList<UByte>(modReply.pointed.keycodes_per_modifier.toInt())
+
+    for (i in startPosition until endPosition) {
+        modKeys.add(modMap[i])
+    }
+
+    nativeHeap.free(modReply)
+
+    return modKeys
 }
 
 /**

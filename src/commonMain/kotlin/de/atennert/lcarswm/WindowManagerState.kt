@@ -16,6 +16,9 @@ class WindowManagerState( // TODO find a better name
     /** map that holds the key sym to all registered key codes */
     val keyboardKeys = HashMap<UByte, Int>()
 
+    /** List that holds all key codes for our used modifier key */
+    val modifierKeys = ArrayList<UByte>(8)
+
     private val monitors = ArrayList<Monitor>(3)
 
     /**

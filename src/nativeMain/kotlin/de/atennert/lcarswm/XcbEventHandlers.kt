@@ -9,7 +9,7 @@ import xcb.*
  */
 val EVENT_HANDLERS =
     hashMapOf<XcbEvent, Function3<CPointer<xcb_connection_t>, WindowManagerState, CPointer<xcb_generic_event_t>, Boolean>>(
-        Pair(XcbEvent.XCB_KEY_PRESS, { _, _, e -> handleKeyPress(e) }),
+        Pair(XcbEvent.XCB_KEY_PRESS, ::handleKeyPress),
         Pair(XcbEvent.XCB_KEY_RELEASE, ::handleKeyRelease),
         Pair(XcbEvent.XCB_BUTTON_PRESS, { _, _, e -> handleButtonPress(e) }),
         Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, _, e -> handleButtonRelease(e) }),
@@ -21,11 +21,20 @@ val EVENT_HANDLERS =
 
 private val ROOT_WINDOW_ID = 0.toUInt()
 
-private fun handleKeyPress(xEvent: CPointer<xcb_generic_event_t>): Boolean {
+private fun handleKeyPress(
+    xcbConnection: CPointer<xcb_connection_t>,
+    windowManagerState: WindowManagerState,
+    xEvent: CPointer<xcb_generic_event_t>
+): Boolean {
     @Suppress("UNCHECKED_CAST")
     val pressEvent = (xEvent as CPointer<xcb_key_press_event_t>).pointed
     val key = pressEvent.detail
     println("::handleKeyPress::Key pressed: $key")
+
+    when (windowManagerState.keyboardKeys[key]) {
+        else -> println("::handleKeyRelease::unknown key: $key")
+    }
+
     return false
 }
 
@@ -40,7 +49,7 @@ private fun handleKeyRelease(
     println("::handleKeyRelease::Key released: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
-        XK_Tab -> toggleScreenMode(xcbConnection, windowManagerState)
+        XK_M -> toggleScreenMode(xcbConnection, windowManagerState)
         else -> println("::handleKeyRelease::unknown key: $key")
     }
     return false
