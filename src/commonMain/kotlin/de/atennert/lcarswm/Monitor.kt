@@ -29,7 +29,8 @@ data class Monitor(val id: UInt, val name: String) {
 
     private val fullscreenWindowSize get() = Pair(width, height)
 
-    private var valuesAreSet = false
+    var isFullyInitialized = false
+        private set
 
     val windows = hashMapOf<UInt, Window>()
 
@@ -53,7 +54,7 @@ data class Monitor(val id: UInt, val name: String) {
      * @return true if any setting changed, false otherwise
      */
     fun setMeasurements(x: Short, y: Short, width: UShort, height: UShort) {
-        if (this.valuesAreSet) {
+        if (this.isFullyInitialized) {
             throw IllegalStateException("Tried to set values on monitor ${this.id}:$this.name but values are already set!")
         }
 
@@ -62,7 +63,7 @@ data class Monitor(val id: UInt, val name: String) {
         this.width = width.toInt()
         this.height = height.toInt()
 
-        this.valuesAreSet = true
+        this.isFullyInitialized = true
     }
 
     /**

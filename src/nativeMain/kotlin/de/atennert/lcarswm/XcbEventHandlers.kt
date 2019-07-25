@@ -186,6 +186,7 @@ private fun handleUnmapNotify(
  * Get RANDR information and update window management accordingly.
  */
 fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: WindowManagerState) {
+    // TODO check if we can optimize a little in here, current size change on single monitor is ~2s
     val resourcesCookie = xcb_randr_get_screen_resources_current(xcbConnection, windowManagerState.screenRoot)
     val resourcesReply = xcb_randr_get_screen_resources_current_reply(xcbConnection, resourcesCookie, null)
 
@@ -199,12 +200,9 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
     val outputCount = xcb_randr_get_screen_resources_current_outputs_length(resourcesReply)
     val outputs = xcb_randr_get_screen_resources_current_outputs(resourcesReply)!!
 
-    val outputInfoCookies = ArrayList<Pair<xcb_randr_output_t, CValue<xcb_randr_get_output_info_cookie_t>>>(outputCount)
-    for (i in 0 until outputCount) {
-        outputInfoCookies.add(Pair(outputs[i], xcb_randr_get_output_info(xcbConnection, outputs[i], timestamp)))
-    }
-
-    val sortedMonitors = outputInfoCookies.asSequence()
+    val sortedMonitors = Array(outputCount)
+    { i -> Pair(outputs[i], xcb_randr_get_output_info(xcbConnection, outputs[i], timestamp)) }
+        .asSequence()
         .map { (outputId, outputObject) ->
             Pair(outputId, xcb_randr_get_output_info_reply(xcbConnection, outputObject, null))
         }
@@ -217,8 +215,8 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
         .map { (outputId, outputObject, outputName) ->
             Triple(Monitor(outputId, outputName), outputObject.pointed.crtc, outputObject)
         }
-        .onEach { (monitor, _, _) ->
-            println("::printOutput::name: ${monitor.name}, id: ${monitor.id}")
+        .onEach { (monitor, c, _) ->
+            println("::printOutput::name: ${monitor.name}, id: ${monitor.id} crtc: $c")
         }
         .map { (monitor, crtc, outputObject) ->
             nativeHeap.free(outputObject)
@@ -229,12 +227,33 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
     // unused monitors
     sortedMonitors[false]
 
-    // used monitors
-    // TODO set measurements on monitors
-    windowManagerState.updateMonitors(sortedMonitors[true]!!.map { it.first })
+    val activeMonitors = sortedMonitors[true].orEmpty()
+        .map { (monitor, crtcReference) ->
+            addMeasurementToMonitor(xcbConnection, monitor, crtcReference, timestamp)
+        }
+        .filter { it.isFullyInitialized }
+
+    windowManagerState.updateMonitors(activeMonitors)
     { measurements, windowId -> adjustWindowPositionAndSize(xcbConnection, measurements, windowId) }
 
     nativeHeap.free(resourcesReply)
+}
+
+fun addMeasurementToMonitor(
+    xcbConnection: CPointer<xcb_connection_t>,
+    monitor: Monitor,
+    crtcReference: xcb_randr_crtc_t,
+    timestamp: xcb_timestamp_t
+): Monitor {
+    val crtcCookie = xcb_randr_get_crtc_info(xcbConnection, crtcReference, timestamp)
+    val crtcPointer = xcb_randr_get_crtc_info_reply(xcbConnection, crtcCookie, null) ?: return monitor
+    val crtc = crtcPointer.pointed
+
+    monitor.setMeasurements(crtc.x, crtc.y, crtc.width, crtc.height)
+
+    nativeHeap.free(crtcPointer)
+
+    return monitor
 }
 
 /**

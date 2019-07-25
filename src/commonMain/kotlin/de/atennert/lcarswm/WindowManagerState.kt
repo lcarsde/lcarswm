@@ -40,6 +40,7 @@ class WindowManagerState(
         this.monitors.clear()
         this.monitors.addAll(monitors)
 
+        // TODO not yet optimal: all windows are moved to screen 0s
         val windowMeasurements = monitors[0].getCurrentWindowMeasurements(this.screenMode)
         monitors[0].windows.keys.forEach { updateWindowFcn(windowMeasurements, it) }
     }
