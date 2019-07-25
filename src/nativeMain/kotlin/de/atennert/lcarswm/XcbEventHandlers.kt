@@ -210,7 +210,7 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
             outputObject != null
         }
         .map { (outputId, outputObject) ->
-            Triple(outputId, outputObject!!, getOutputName(outputObject!!))
+            Triple(outputId, outputObject!!, getOutputName(outputObject))
         }
         .map { (outputId, outputObject, outputName) ->
             Triple(Monitor(outputId, outputName), outputObject.pointed.crtc, outputObject)
@@ -262,9 +262,8 @@ fun addMeasurementToMonitor(
 private fun getOutputName(outputObject: CPointer<xcb_randr_get_output_info_reply_t>): String {
     val nameLength = xcb_randr_get_output_info_name_length(outputObject)
     val namePointer = xcb_randr_get_output_info_name(outputObject)!!
-    val nameArray = ByteArray(nameLength)
 
-    for (i in 0 until nameLength) nameArray[i] = namePointer[i].toByte()
+    val nameArray = ByteArray(nameLength) { i -> namePointer[i].toByte() }
 
     return nameArray.decodeToString()
 }

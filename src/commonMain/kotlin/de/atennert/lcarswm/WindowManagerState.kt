@@ -3,7 +3,7 @@ package de.atennert.lcarswm
 /**
  * Container class for the state of the window manager.
  */
-class WindowManagerState(
+class WindowManagerState( // TODO find a better name
     val screenRoot: UInt,
     private val atomProvider: Function1<String, UInt>
 ) {

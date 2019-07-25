@@ -74,4 +74,34 @@ class MonitorTest {
         assertFailsWith(IllegalStateException::class)
         { monitor.setMeasurements(1, 2, 3.toUShort(), 4.toUShort()) }
     }
+
+    @Test
+    fun `verify calculation of default window measurements`() {
+        val monitor = Monitor(1.toUInt(), "name")
+        monitor.setMeasurements(0, 0, 800.toUShort(), 600.toUShort())
+
+        val defaultMeasurements = monitor.getCurrentWindowMeasurements(ScreenMode.NORMAL)
+
+        assertEquals(listOf(208, 234, 544, 308), defaultMeasurements)
+    }
+
+    @Test
+    fun `verify calculation of maximized window measurements`() {
+        val monitor = Monitor(1.toUInt(), "name")
+        monitor.setMeasurements(0, 0, 800.toUShort(), 600.toUShort())
+
+        val defaultMeasurements = monitor.getCurrentWindowMeasurements(ScreenMode.MAXIMIZED)
+
+        assertEquals(listOf(40, 48, 720, 504), defaultMeasurements)
+    }
+
+    @Test
+    fun `verify calculation of full window measurements`() {
+        val monitor = Monitor(1.toUInt(), "name")
+        monitor.setMeasurements(0, 0, 800.toUShort(), 600.toUShort())
+
+        val defaultMeasurements = monitor.getCurrentWindowMeasurements(ScreenMode.FULLSCREEN)
+
+        assertEquals(listOf(0, 0, 800, 600), defaultMeasurements)
+    }
 }
