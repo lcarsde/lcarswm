@@ -9,14 +9,16 @@ import xcb.*
  */
 val EVENT_HANDLERS =
     hashMapOf<XcbEvent, Function3<CPointer<xcb_connection_t>, WindowManagerState, CPointer<xcb_generic_event_t>, Boolean>>(
+        // TODO handle create
         Pair(XcbEvent.XCB_KEY_PRESS, ::handleKeyPress),
         Pair(XcbEvent.XCB_KEY_RELEASE, ::handleKeyRelease),
         Pair(XcbEvent.XCB_BUTTON_PRESS, { _, _, e -> handleButtonPress(e) }),
         Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, _, e -> handleButtonRelease(e) }),
         Pair(XcbEvent.XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
         Pair(XcbEvent.XCB_MAP_REQUEST, ::handleMapRequest),
+        Pair(XcbEvent.XCB_MAP_NOTIFY, { x, _, e -> handleMapNotify(x, e) }),
         Pair(XcbEvent.XCB_DESTROY_NOTIFY, { _, w, e -> handleDestroyNotify(w, e) }),
-        Pair(XcbEvent.XCB_UNMAP_NOTIFY, { _, w, e -> handleUnmapNotify(w, e) })
+        Pair(XcbEvent.XCB_UNMAP_NOTIFY, ::handleUnmapNotify)
     )
 
 private val ROOT_WINDOW_ID = 0.toUInt()
@@ -32,6 +34,9 @@ private fun handleKeyPress(
     println("::handleKeyPress::Key pressed: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
+//        XK_Up -> // TODO move up the monitor list if possible
+//        XK_Down -> // TODO move down monitor list if possible
+        XK_Tab -> moveNextWindowToTopOfStack(xcbConnection, windowManagerState)
         else -> println("::handleKeyRelease::unknown key: $key")
     }
 
@@ -94,7 +99,7 @@ private fun handleMapRequest(
     // TODO add window to workspace
     // TODO find monitor for window
 
-    val windowMonitor = windowManagerState.addWindow(windowId, Window(windowId))
+    val windowMonitor = windowManagerState.addWindow(Window(windowId))
 
     println(
         "::handleMapRequest::monitor: ${windowMonitor.name} position: ${windowMonitor.getCurrentWindowMeasurements(
@@ -120,6 +125,21 @@ private fun handleMapRequest(
     )
 
     xcb_flush(xcbConnection)
+    return false
+}
+
+private fun handleMapNotify(
+    xcbConnection: CPointer<xcb_connection_t>,
+    xEvent: CPointer<xcb_generic_event_t>
+): Boolean {
+    println("::handleMapNotify::map notify")
+    @Suppress("UNCHECKED_CAST")
+    val mapEvent = xEvent as CPointer<xcb_map_notify_event_t>
+
+    xcb_set_input_focus(xcbConnection, XCB_INPUT_FOCUS_POINTER_ROOT.convert(), mapEvent.pointed.window, XCB_CURRENT_TIME.convert())
+
+    xcb_flush(xcbConnection)
+
     return false
 }
 
@@ -185,12 +205,15 @@ private fun handleDestroyNotify(
  * Remove the window from the wm data on window unmap.
  */
 private fun handleUnmapNotify(
+    xcbConnection: CPointer<xcb_connection_t>,
     windowManagerState: WindowManagerState,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val unmapEvent = (xEvent as CPointer<xcb_unmap_notify_event_t>).pointed
+    // only the active window can be closed, so make a new window active
     windowManagerState.removeWindow(unmapEvent.window)
+    moveNextWindowToTopOfStack(xcbConnection, windowManagerState)
     return false
 }
 
@@ -251,7 +274,7 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
     nativeHeap.free(resourcesReply)
 }
 
-fun addMeasurementToMonitor(
+private fun addMeasurementToMonitor(
     xcbConnection: CPointer<xcb_connection_t>,
     monitor: Monitor,
     crtcReference: xcb_randr_crtc_t,

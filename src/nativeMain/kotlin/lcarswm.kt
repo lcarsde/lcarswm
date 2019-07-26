@@ -34,7 +34,6 @@ fun main() {
 
         setupKeys(xcbConnection, windowManagerConfig)
 
-        // register buttons
         registerButton(xcbConnection, screen.root, 1) // left mouse button
         registerButton(xcbConnection, screen.root, 2) // middle mouse button
         registerButton(xcbConnection, screen.root, 3) // right mouse button

@@ -27,7 +27,7 @@ class WindowManagerStateTest {
         assertNull(windowManagerState.getWindowMonitor(1.toUInt()))
 
         // windows are added to the first monitor
-        val windowMonitor = windowManagerState.addWindow(1.toUInt(), Window(1.toUInt()))
+        val windowMonitor = windowManagerState.addWindow(Window(1.toUInt()))
         assertEquals(windowMonitor, monitor1)
 
         // we can now get the monitor with getWindowMonitor
@@ -44,5 +44,56 @@ class WindowManagerStateTest {
 
         // no window registered anymore
         assertNull(windowManagerState.getWindowMonitor(1.toUInt()))
+    }
+
+    @Test
+    fun `move up monitor list`() {
+        // TODO
+    }
+
+    @Test
+    fun `move down monitor list`() {
+        // TODO
+    }
+
+    @Test
+    fun `toggle active window`() {
+        val windowManagerState = WindowManagerState(0.toUInt()) { 1.toUInt() }
+        val monitor = Monitor(1.toUInt(), "name")
+        val window1 = Window(1.toUInt())
+        val window2 = Window(2.toUInt())
+        val windowUpdateFcn: Function2<List<Int>, UInt, Unit> = { _, _ -> }
+
+        windowManagerState.updateMonitors(listOf(monitor), windowUpdateFcn)
+
+        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window2)
+
+        assertEquals(windowManagerState.toggleActiveWindow(), window1, "Unable to activate first window")
+        assertEquals(windowManagerState.toggleActiveWindow(), window2, "Unable to activate second window")
+
+        // wrap around
+        assertEquals(windowManagerState.toggleActiveWindow(), window1, "Unable to wrap around")
+    }
+
+    @Test
+    fun `toggle away from removed window`() {
+        val windowManagerState = WindowManagerState(0.toUInt()) { 1.toUInt() }
+        val monitor = Monitor(1.toUInt(), "name")
+        val window1 = Window(1.toUInt())
+        val window2 = Window(2.toUInt())
+        val windowUpdateFcn: Function2<List<Int>, UInt, Unit> = { _, _ -> }
+
+        windowManagerState.updateMonitors(listOf(monitor), windowUpdateFcn)
+
+        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window2)
+
+        assertEquals(windowManagerState.toggleActiveWindow(), window1, "Unable to activate first window")
+        assertEquals(windowManagerState.toggleActiveWindow(), window2, "Unable to activate second window")
+
+        windowManagerState.removeWindow(window2.id)
+
+        assertEquals(windowManagerState.toggleActiveWindow(), window1, "Unable to activate window 1 after removal of window 2")
     }
 }

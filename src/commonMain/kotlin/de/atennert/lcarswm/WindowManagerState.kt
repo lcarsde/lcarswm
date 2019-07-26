@@ -19,13 +19,16 @@ class WindowManagerState( // TODO find a better name
     /** List that holds all key codes for our used modifier key */
     val modifierKeys = ArrayList<UByte>(8)
 
+    private var activeWindow: Window? = null
+
     private val monitors = ArrayList<Monitor>(3)
 
     /**
      * @return the monitor to which the window was added
      */
-    fun addWindow(windowId: UInt, window: Window): Monitor {
-        monitors[0].windows[windowId] = window
+    fun addWindow(window: Window): Monitor {
+        monitors[0].windows[window.id] = window
+
         return monitors[0]
     }
 
@@ -60,5 +63,16 @@ class WindowManagerState( // TODO find a better name
                 updateWindowFcn(measurements, windowId)
             }
         }
+    }
+
+    fun toggleActiveWindow(): Window? {
+        val currentActiveWindow = this.activeWindow
+
+        val windowList = monitors[0].windows.values.toList()
+        val activeWindowIndex = windowList.indexOf(currentActiveWindow)
+        val newActiveWindow = windowList.getOrElse(activeWindowIndex + 1) {windowList.firstOrNull()}
+
+        this.activeWindow = newActiveWindow
+        return newActiveWindow
     }
 }
