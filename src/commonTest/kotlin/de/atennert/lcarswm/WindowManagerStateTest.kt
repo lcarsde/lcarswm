@@ -155,4 +155,14 @@ class WindowManagerStateTest {
         assertEquals(windowManagerState.toggleActiveWindow(), window1) // monitor 1
         assertEquals(windowManagerState.toggleActiveWindow(), window2) // monitor 2
     }
+
+    @Test
+    fun `toggle returns null when there are no windows`() {
+        val windowManagerState = WindowManagerState(0.toUInt()) { 1.toUInt() }
+        val monitor = Monitor(1.toUInt(), "name")
+
+        windowManagerState.updateMonitors(listOf(monitor)) {_, _ ->}
+
+        assertNull(windowManagerState.toggleActiveWindow())
+    }
 }
