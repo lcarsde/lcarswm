@@ -11,7 +11,9 @@ Thank you very much to the creators of the following resources:
 * The window manager can be started.
 * The window manager can be closed using the left or right mouse button.
 * Using the middle mouse button opens a terminal.
-* Windows-key + Tab toggles window positioning through default position, maximized and fullscreen
+* Windows-key + Tab toggles through the windows
+* Windows-key + Up/Down moves the active window to other monitors
+* Windows-key + M toggles the display mode between normal, maximized and fullscreen
 * Windows are resized when the screen resolution is changed.
 
 ## UI?
