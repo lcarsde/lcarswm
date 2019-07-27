@@ -34,8 +34,8 @@ private fun handleKeyPress(
     println("::handleKeyPress::Key pressed: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
-//        XK_Up -> // TODO move up the monitor list if possible
-//        XK_Down -> // TODO move down monitor list if possible
+        XK_Up -> moveActiveWindow(xcbConnection, windowManagerState, windowManagerState::moveWindowToPreviousMonitor)
+        XK_Down -> moveActiveWindow(xcbConnection, windowManagerState, windowManagerState::moveWindowToNextMonitor)
         XK_Tab -> moveNextWindowToTopOfStack(xcbConnection, windowManagerState)
         else -> println("::handleKeyRelease::unknown key: $key")
     }
@@ -86,11 +86,11 @@ private fun handleMapRequest(
     windowManagerState: WindowManagerState,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
-    println("::handleMapRequest::map request")
     @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent as CPointer<xcb_map_request_event_t>
     val windowId = mapEvent.pointed.window
 
+    println("::handleMapRequest::map request for window $windowId")
     if (windowManagerState.getWindowMonitor(windowId) != null) {
         return false
     }
@@ -132,11 +132,17 @@ private fun handleMapNotify(
     xcbConnection: CPointer<xcb_connection_t>,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
-    println("::handleMapNotify::map notify")
     @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent as CPointer<xcb_map_notify_event_t>
+    val windowId = mapEvent.pointed.window
 
-    xcb_set_input_focus(xcbConnection, XCB_INPUT_FOCUS_POINTER_ROOT.convert(), mapEvent.pointed.window, XCB_CURRENT_TIME.convert())
+    println("::handleMapNotify::map notify for window $windowId")
+    xcb_set_input_focus(
+        xcbConnection,
+        XCB_INPUT_FOCUS_POINTER_ROOT.convert(),
+        windowId,
+        XCB_CURRENT_TIME.convert()
+    )
 
     xcb_flush(xcbConnection)
 
@@ -151,10 +157,10 @@ private fun handleConfigureRequest(
     windowManagerState: WindowManagerState,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
-    println("::handleConfigureRequest::configure request")
     @Suppress("UNCHECKED_CAST")
     val configureEvent = (xEvent as CPointer<xcb_configure_request_event_t>).pointed
 
+    println("::handleConfigureRequest::configure request for window ${configureEvent.window}")
     val windowMonitor = windowManagerState.getWindowMonitor(configureEvent.window)
     if (windowMonitor != null) {
         adjustWindowPositionAndSize(
@@ -301,4 +307,19 @@ private fun getOutputName(outputObject: CPointer<xcb_randr_get_output_info_reply
     val nameArray = ByteArray(nameLength) { i -> namePointer[i].toByte() }
 
     return nameArray.decodeToString()
+}
+
+
+private fun moveActiveWindow(
+    xcbConnection: CPointer<xcb_connection_t>,
+    windowManagerState: WindowManagerState,
+    windowMoveFunction: Function1<Window, Monitor>
+) {
+    val activeWindow = windowManagerState.activeWindow ?: return
+
+    adjustWindowPositionAndSize(
+        xcbConnection,
+        windowMoveFunction(activeWindow).getCurrentWindowMeasurements(windowManagerState.screenMode),
+        activeWindow.id
+    )
 }

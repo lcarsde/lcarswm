@@ -9,6 +9,22 @@ import kotlin.test.assertNull
  */
 class WindowManagerStateTest {
     @Test
+    fun `new added windows become active`() {
+        val windowManagerState = WindowManagerState(0.toUInt()) {1.toUInt()}
+        val monitor = Monitor(1.toUInt(), "name")
+        val window1 = Window(1.toUInt())
+        val window2 = Window(2.toUInt())
+
+        windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
+
+        windowManagerState.addWindow(window1)
+        assertEquals(windowManagerState.activeWindow, window1, "active window is not window1")
+
+        windowManagerState.addWindow(window2)
+        assertEquals(windowManagerState.activeWindow, window2, "active window is not window2")
+    }
+
+    @Test
     fun `test full lifecycle with one window`() {
         val monitor1 = Monitor(1.toUInt(), "name")
         val monitor2 = Monitor(2.toUInt(), "name")
@@ -47,13 +63,41 @@ class WindowManagerStateTest {
     }
 
     @Test
-    fun `move up monitor list`() {
-        // TODO
+    fun `move window up monitor list`() {
+        val windowManagerState = WindowManagerState(0.toUInt()) { 1.toUInt() }
+        val monitor1 = Monitor(1.toUInt(), "name1")
+        val monitor2 = Monitor(2.toUInt(), "name2")
+        val monitor3 = Monitor(3.toUInt(), "name3")
+        val window1 = Window(1.toUInt())
+
+        windowManagerState.updateMonitors(listOf(monitor1, monitor2, monitor3)) { _, _ -> }
+
+        windowManagerState.addWindow(window1)
+
+        // wrap around
+        assertEquals(windowManagerState.moveWindowToPreviousMonitor(window1), monitor3, "Unable to move window to 3rd monitor")
+
+        assertEquals(windowManagerState.moveWindowToPreviousMonitor(window1), monitor2, "Unable to move window to 2nd monitor")
+        assertEquals(windowManagerState.moveWindowToPreviousMonitor(window1), monitor1, "Unable to move window to 1st monitor")
     }
 
     @Test
-    fun `move down monitor list`() {
-        // TODO
+    fun `move window down monitor list`() {
+        val windowManagerState = WindowManagerState(0.toUInt()) { 1.toUInt() }
+        val monitor1 = Monitor(1.toUInt(), "name1")
+        val monitor2 = Monitor(2.toUInt(), "name2")
+        val monitor3 = Monitor(3.toUInt(), "name3")
+        val window1 = Window(1.toUInt())
+
+        windowManagerState.updateMonitors(listOf(monitor1, monitor2, monitor3)) { _, _ -> }
+
+        windowManagerState.addWindow(window1)
+
+        assertEquals(windowManagerState.moveWindowToNextMonitor(window1), monitor2, "Unable to move window to 2nd monitor")
+        assertEquals(windowManagerState.moveWindowToNextMonitor(window1), monitor3, "Unable to move window to 3rd monitor")
+
+        // wrap around
+        assertEquals(windowManagerState.moveWindowToNextMonitor(window1), monitor1, "Unable to move window to 1st monitor")
     }
 
     @Test
@@ -62,9 +106,8 @@ class WindowManagerStateTest {
         val monitor = Monitor(1.toUInt(), "name")
         val window1 = Window(1.toUInt())
         val window2 = Window(2.toUInt())
-        val windowUpdateFcn: Function2<List<Int>, UInt, Unit> = { _, _ -> }
 
-        windowManagerState.updateMonitors(listOf(monitor), windowUpdateFcn)
+        windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
         windowManagerState.addWindow(window1)
         windowManagerState.addWindow(window2)
@@ -82,9 +125,8 @@ class WindowManagerStateTest {
         val monitor = Monitor(1.toUInt(), "name")
         val window1 = Window(1.toUInt())
         val window2 = Window(2.toUInt())
-        val windowUpdateFcn: Function2<List<Int>, UInt, Unit> = { _, _ -> }
 
-        windowManagerState.updateMonitors(listOf(monitor), windowUpdateFcn)
+        windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
         windowManagerState.addWindow(window1)
         windowManagerState.addWindow(window2)
@@ -95,5 +137,22 @@ class WindowManagerStateTest {
         windowManagerState.removeWindow(window2.id)
 
         assertEquals(windowManagerState.toggleActiveWindow(), window1, "Unable to activate window 1 after removal of window 2")
+    }
+
+    @Test
+    fun `toggle between windows on different monitors`() {
+        val windowManagerState = WindowManagerState(0.toUInt()) { 1.toUInt() }
+        val monitor1 = Monitor(1.toUInt(), "name1")
+        val monitor2 = Monitor(2.toUInt(), "name2")
+        val window1 = Window(1.toUInt())
+        val window2 = Window(2.toUInt())
+
+        windowManagerState.updateMonitors(listOf(monitor1, monitor2)) {_, _ ->}
+        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window2)
+        windowManagerState.moveWindowToNextMonitor(window2)
+
+        assertEquals(windowManagerState.toggleActiveWindow(), window1) // monitor 1
+        assertEquals(windowManagerState.toggleActiveWindow(), window2) // monitor 2
     }
 }

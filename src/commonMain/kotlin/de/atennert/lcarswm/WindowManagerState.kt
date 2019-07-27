@@ -19,7 +19,9 @@ class WindowManagerState( // TODO find a better name
     /** List that holds all key codes for our used modifier key */
     val modifierKeys = ArrayList<UByte>(8)
 
-    private var activeWindow: Window? = null
+    var activeWindow: Window? = null
+        get() = field?.copy()
+        private set
 
     private val monitors = ArrayList<Monitor>(3)
 
@@ -28,13 +30,15 @@ class WindowManagerState( // TODO find a better name
      */
     fun addWindow(window: Window): Monitor {
         monitors[0].windows[window.id] = window
+        activeWindow = window
 
         return monitors[0]
     }
 
     fun removeWindow(windowId: UInt) {
         for (monitor in monitors) {
-            if (monitor.windows.remove(windowId) != null) {
+            val windowToRemove = monitor.windows.remove(windowId)
+            if (windowToRemove != null) {
                 return
             }
         }
@@ -68,11 +72,39 @@ class WindowManagerState( // TODO find a better name
     fun toggleActiveWindow(): Window? {
         val currentActiveWindow = this.activeWindow
 
-        val windowList = monitors[0].windows.values.toList()
+        val windowList = monitors
+            .map { monitor -> monitor.windows.values }
+            .fold(mutableListOf<Window>(), { combined, monitorList -> combined.addAll(monitorList); combined })
+            .toList()
+
+        if (windowList.isEmpty()) {
+            this.activeWindow = null
+            return null
+        }
+
         val activeWindowIndex = windowList.indexOf(currentActiveWindow)
-        val newActiveWindow = windowList.getOrElse(activeWindowIndex + 1) {windowList.firstOrNull()}
+        val newActiveWindow = windowList.getOrNull((activeWindowIndex+1) % windowList.size)
 
         this.activeWindow = newActiveWindow
         return newActiveWindow
+    }
+
+    fun moveWindowToNextMonitor(window: Window): Monitor {
+        return moveWindowToNewMonitor(window, 1)
+    }
+
+    fun moveWindowToPreviousMonitor(window: Window): Monitor {
+        return moveWindowToNewMonitor(window, -1)
+    }
+
+    private fun moveWindowToNewMonitor(window: Window, direction: Int): Monitor {
+        val currentMonitor = monitors.single { monitor -> monitor.windows.containsKey(window.id) }
+        val monitorIndex = monitors.indexOf(currentMonitor)
+        val newMonitor = monitors[(monitorIndex+direction+monitors.size) % monitors.size]
+
+        currentMonitor.windows.remove(window.id)
+        newMonitor.windows[window.id] = window
+
+        return newMonitor
     }
 }
