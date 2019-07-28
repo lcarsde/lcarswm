@@ -165,4 +165,44 @@ class WindowManagerStateTest {
 
         assertNull(windowManagerState.toggleActiveWindow())
     }
+
+    @Test
+    fun `windows stay in the same monitor on monitor update`() {
+        val windowManagerState = WindowManagerState(0.toUInt(), 42.toUInt()) { 1.toUInt() }
+        val monitor1 = Monitor(1.toUInt(), "name1")
+        val monitor2 = Monitor(2.toUInt(), "name2")
+        val window1 = Window(1.toUInt())
+        val window2 = Window(2.toUInt())
+
+        windowManagerState.updateMonitors(listOf(monitor1, monitor2)) {_, _ ->}
+        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window2)
+        windowManagerState.moveWindowToNextMonitor(window2)
+
+        windowManagerState.updateMonitors(listOf(monitor1, monitor2)) {_, _ ->}
+
+        assertEquals(windowManagerState.getWindowMonitor(window1.id), monitor1)
+        assertEquals(windowManagerState.getWindowMonitor(window2.id), monitor2)
+    }
+
+    @Test
+    fun `windows move to monitor 1 when their monitor is removed`() {
+        val windowManagerState = WindowManagerState(0.toUInt(), 42.toUInt()) { 1.toUInt() }
+        val monitor1 = Monitor(1.toUInt(), "name1")
+        val monitor2 = Monitor(2.toUInt(), "name2")
+        val monitor3 = Monitor(3.toUInt(), "name3")
+        val window1 = Window(1.toUInt())
+        val window2 = Window(2.toUInt())
+
+        windowManagerState.updateMonitors(listOf(monitor1, monitor2, monitor3)) {_, _ ->}
+        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window2)
+        windowManagerState.moveWindowToNextMonitor(window2)
+        windowManagerState.moveWindowToNextMonitor(window2)
+
+        windowManagerState.updateMonitors(listOf(monitor1, monitor2)) {_, _ ->}
+
+        assertEquals(windowManagerState.getWindowMonitor(window1.id), monitor1)
+        assertEquals(windowManagerState.getWindowMonitor(window2.id), monitor1)
+    }
 }

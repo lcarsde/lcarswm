@@ -52,13 +52,23 @@ class WindowManagerState(
     }
 
     fun updateMonitors(monitors: List<Monitor>, updateWindowFcn: Function2<List<Int>, UInt, Unit>) {
-        this.monitors.forEach { monitors[0].windows.putAll(it.windows) }
+        val windowsWithoutMonitor = HashMap<UInt, Window>()
+        this.monitors.forEach { oldMonitor ->
+            val newMonitor = monitors.find { newMonitor -> oldMonitor.id == newMonitor.id }
+            if (newMonitor != null) {
+                newMonitor.windows.putAll(oldMonitor.windows)
+            } else {
+                windowsWithoutMonitor.putAll(oldMonitor.windows)
+            }
+        }
+        monitors[0].windows.putAll(windowsWithoutMonitor)
         this.monitors.clear()
         this.monitors.addAll(monitors)
 
-        // TODO not yet optimal: all windows are moved to screen 0s
-        val windowMeasurements = monitors[0].getCurrentWindowMeasurements(this.screenMode)
-        monitors[0].windows.keys.forEach { updateWindowFcn(windowMeasurements, it) }
+        monitors.forEach { monitor ->
+            val windowMeasurements = monitor.getCurrentWindowMeasurements(this.screenMode)
+            monitor.windows.keys.forEach { updateWindowFcn(windowMeasurements, it) }
+        }
     }
 
     fun updateScreenMode(screenMode: ScreenMode, updateWindowFcn: Function2<List<Int>, UInt, Unit>) {
@@ -86,7 +96,7 @@ class WindowManagerState(
         }
 
         val activeWindowIndex = windowList.indexOf(currentActiveWindow)
-        val newActiveWindow = windowList.getOrNull((activeWindowIndex+1) % windowList.size)
+        val newActiveWindow = windowList.getOrNull((activeWindowIndex + 1) % windowList.size)
 
         this.activeWindow = newActiveWindow
         return newActiveWindow
@@ -103,7 +113,7 @@ class WindowManagerState(
     private fun moveWindowToNewMonitor(window: Window, direction: Int): Monitor {
         val currentMonitor = monitors.single { monitor -> monitor.windows.containsKey(window.id) }
         val monitorIndex = monitors.indexOf(currentMonitor)
-        val newMonitor = monitors[(monitorIndex+direction+monitors.size) % monitors.size]
+        val newMonitor = monitors[(monitorIndex + direction + monitors.size) % monitors.size]
 
         currentMonitor.windows.remove(window.id)
         newMonitor.windows[window.id] = window
