@@ -10,6 +10,8 @@ class WindowManagerState( // TODO find a better name
 
     val wmState = atomProvider("WM_STATE")
 
+    val wmName = atomProvider("WM_NAME")
+
     var screenMode = ScreenMode.NORMAL
         private set
 

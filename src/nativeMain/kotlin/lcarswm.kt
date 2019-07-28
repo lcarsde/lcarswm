@@ -32,6 +32,8 @@ fun main() {
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig)
 
+        setupScreen(xcbConnection, windowManagerConfig)
+
         setupKeys(xcbConnection, windowManagerConfig)
 
         registerButton(xcbConnection, screen.root, 1) // left mouse button
@@ -67,6 +69,33 @@ fun main() {
     }
 
     println("::main::lcarswm stopped")
+}
+
+fun setupScreen(xcbConnection: CPointer<xcb_connection_t>, windowManagerConfig: WindowManagerState) {
+    val queryTree = xcb_query_tree(xcbConnection, windowManagerConfig.screenRoot)
+    val queryTreeReply = xcb_query_tree_reply(xcbConnection, queryTree, null) ?: return
+
+    val childWindowCount = xcb_query_tree_children_length(queryTreeReply)
+    val childWindows = xcb_query_tree_children(queryTreeReply)!!
+
+    UIntArray(childWindowCount) { childWindows[it] }
+        .map { childId ->
+            val attributesRef = xcb_get_window_attributes(xcbConnection, childId)
+            val attributes = xcb_get_window_attributes_reply(xcbConnection, attributesRef, null)
+            Pair(childId, attributes)
+        }
+        .filter { (_, attributes) -> attributes != null }
+        .forEach { (childId, attributes) ->
+            if (attributes!!.pointed.override_redirect.toInt() == 0 &&
+                attributes.pointed.map_state.toUInt() == XCB_MAP_STATE_VIEWABLE
+            ) {
+                addWindow(xcbConnection, windowManagerConfig, childId)
+            }
+            nativeHeap.free(attributes)
+        }
+
+    xcb_flush(xcbConnection)
+    nativeHeap.free(queryTreeReply)
 }
 
 /**

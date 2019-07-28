@@ -99,30 +99,9 @@ private fun handleMapRequest(
     // TODO add window to workspace
     // TODO find monitor for window
 
-    val windowMonitor = windowManagerState.addWindow(Window(windowId))
-
-    println(
-        "::handleMapRequest::monitor: ${windowMonitor.name} position: ${windowMonitor.getCurrentWindowMeasurements(
-            windowManagerState.screenMode
-        )}"
-    )
-    adjustWindowPositionAndSize(
-        xcbConnection,
-        windowMonitor.getCurrentWindowMeasurements(windowManagerState.screenMode),
-        windowId
-    )
+    addWindow(xcbConnection, windowManagerState, windowId)
 
     xcb_map_window(xcbConnection, mapEvent.pointed.window)
-
-    val data = UIntArray(2)
-    data[0] = XCB_ICCCM_WM_STATE_NORMAL
-    data[1] = XCB_NONE.convert()
-
-    xcb_change_property(
-        xcbConnection, XCB_PROP_MODE_REPLACE.convert(), windowId,
-        windowManagerState.wmState, windowManagerState.wmState,
-        32.convert(), 2.convert(), data.toCValues()
-    )
 
     xcb_flush(xcbConnection)
     return false
@@ -135,17 +114,15 @@ private fun handleMapNotify(
     @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent as CPointer<xcb_map_notify_event_t>
     val windowId = mapEvent.pointed.window
-
     println("::handleMapNotify::map notify for window $windowId")
+
     xcb_set_input_focus(
         xcbConnection,
         XCB_INPUT_FOCUS_POINTER_ROOT.convert(),
         windowId,
         XCB_CURRENT_TIME.convert()
     )
-
     xcb_flush(xcbConnection)
-
     return false
 }
 

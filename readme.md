@@ -6,6 +6,7 @@ Thank you very much to the creators of the following resources:
 * [Chuan Ji - How X Window Managers Work, And How To Write One](https://jichu4n.com/posts/how-x-window-managers-work-and-how-to-write-one-part-i/)
 * [mcwm on GitHub](https://github.com/mchackorg/mcwm)
 * [XCB implementation of TinyWM on GitHub](https://github.com/stefanbidi/tinywm-xcb)
+* 
 
 ## Functionality
 * The window manager can be started.
