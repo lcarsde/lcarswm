@@ -5,6 +5,7 @@ package de.atennert.lcarswm
  */
 class WindowManagerState( // TODO find a better name
     val screenRoot: UInt,
+    val lcarsWindowId: UInt,
     private val atomProvider: Function1<String, UInt>
 ) {
 

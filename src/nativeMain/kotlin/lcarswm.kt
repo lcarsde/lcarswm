@@ -28,17 +28,20 @@ fun main() {
         val screen = xcb_aux_get_screen(xcbConnection, screenNumber.value)?.pointed ?: error("::main::got no screen")
         println("::main::Screen size: ${screen.width_in_pixels}/${screen.height_in_pixels}, root: ${screen.root}")
 
-        val windowManagerConfig = WindowManagerState(screen.root) { getAtom(xcbConnection, it) }
+        val windowManagerConfig =
+            WindowManagerState(screen.root, xcb_generate_id(xcbConnection)) { getAtom(xcbConnection, it) }
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig)
+
+        setupLcarsWindow(xcbConnection, screen, windowManagerConfig.lcarsWindowId)
 
         setupScreen(xcbConnection, windowManagerConfig)
 
         setupKeys(xcbConnection, windowManagerConfig)
 
-        registerButton(xcbConnection, screen.root, 1) // left mouse button
-        registerButton(xcbConnection, screen.root, 2) // middle mouse button
-        registerButton(xcbConnection, screen.root, 3) // right mouse button
+        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 1) // left mouse button
+        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 2) // middle mouse button
+        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 3) // right mouse button
 
         val values = UIntArray(2)
         values[0] = XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT or
@@ -79,6 +82,7 @@ fun setupScreen(xcbConnection: CPointer<xcb_connection_t>, windowManagerConfig: 
     val childWindows = xcb_query_tree_children(queryTreeReply)!!
 
     UIntArray(childWindowCount) { childWindows[it] }
+        .filter { childId -> childId != windowManagerConfig.lcarsWindowId }
         .map { childId ->
             val attributesRef = xcb_get_window_attributes(xcbConnection, childId)
             val attributes = xcb_get_window_attributes_reply(xcbConnection, attributesRef, null)
