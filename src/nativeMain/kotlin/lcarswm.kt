@@ -28,8 +28,9 @@ fun main() {
         val screen = xcb_aux_get_screen(xcbConnection, screenNumber.value)?.pointed ?: error("::main::got no screen")
         println("::main::Screen size: ${screen.width_in_pixels}/${screen.height_in_pixels}, root: ${screen.root}")
 
-        val windowManagerConfig =
-            WindowManagerState(screen.root, xcb_generate_id(xcbConnection)) { getAtom(xcbConnection, it) }
+        val windowManagerConfig = WindowManagerState(
+            screen.root, xcb_generate_id(xcbConnection)
+        ) { getAtom(xcbConnection, it) }
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig)
 

@@ -95,10 +95,6 @@ private fun handleMapRequest(
         return false
     }
 
-    // TODO setup window
-    // TODO add window to workspace
-    // TODO find monitor for window
-
     addWindow(xcbConnection, windowManagerState, windowId)
 
     xcb_map_window(xcbConnection, mapEvent.pointed.window)
@@ -250,6 +246,25 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
             addMeasurementToMonitor(xcbConnection, monitor, crtcReference, timestamp)
         }
         .filter { it.isFullyInitialized }
+
+    val (width, height) = activeMonitors
+        .fold(Pair(0, 0)) {(width, height), monitor ->
+            var newWidth = width
+            var newHeight = height
+            if (monitor.x + monitor.width > width) {
+                newWidth = monitor.x + monitor.width
+            }
+            if (monitor.y + monitor.height > height) {
+                newHeight = monitor.y + monitor.height
+            }
+            Pair(newWidth, newHeight)
+        }
+    val mask = XCB_CONFIG_WINDOW_WIDTH or XCB_CONFIG_WINDOW_HEIGHT
+
+    val configDataAr = arrayOf(width, height)
+    val configData = UIntArray(2) { configDataAr[it].convert() }
+
+    xcb_configure_window(xcbConnection, windowManagerState.lcarsWindowId, mask.convert(), configData.toCValues())
 
     windowManagerState.updateMonitors(activeMonitors)
     { measurements, windowId -> adjustWindowPositionAndSize(xcbConnection, measurements, windowId) }
