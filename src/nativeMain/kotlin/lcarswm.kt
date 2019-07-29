@@ -34,6 +34,8 @@ fun main() {
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig)
 
+        val colorMap = allocateColorMap(xcbConnection, screen.root_visual, windowManagerConfig.lcarsWindowId)
+
         setupLcarsWindow(xcbConnection, screen, windowManagerConfig.lcarsWindowId)
 
         setupScreen(xcbConnection, windowManagerConfig)
@@ -56,6 +58,7 @@ fun main() {
         xcb_flush(xcbConnection)
 
         if (error != null) {
+            cleanupColorMap(xcbConnection, colorMap)
             xcb_disconnect(xcbConnection)
             error(
                 "::main::Can't get SUBSTRUCTURE REDIRECT. Error code: ${error.pointed.error_code}\n" +
@@ -69,6 +72,7 @@ fun main() {
         // event loop
         eventLoop(xcbConnection, windowManagerConfig, randrBase)
 
+        cleanupColorMap(xcbConnection, colorMap)
         xcb_disconnect(xcbConnection)
     }
 
