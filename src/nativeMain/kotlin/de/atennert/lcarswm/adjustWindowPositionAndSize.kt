@@ -12,7 +12,8 @@ import xcb.*
 fun adjustWindowPositionAndSize(
     xcbConnection: CPointer<xcb_connection_t>,
     windowMeasurements: List<Int>,
-    windowId: UInt
+    windowId: UInt,
+    flush: Boolean
 ) {
     val mask = XCB_CONFIG_WINDOW_X or XCB_CONFIG_WINDOW_Y or
             XCB_CONFIG_WINDOW_WIDTH or XCB_CONFIG_WINDOW_HEIGHT
@@ -20,5 +21,6 @@ fun adjustWindowPositionAndSize(
     val configData = UIntArray(4) { windowMeasurements[it].convert() }
 
     xcb_configure_window(xcbConnection, windowId, mask.convert(), configData.toCValues())
-    xcb_flush(xcbConnection)
+
+    if (flush) xcb_flush(xcbConnection)
 }

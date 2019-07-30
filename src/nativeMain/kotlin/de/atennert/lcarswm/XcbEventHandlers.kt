@@ -16,7 +16,7 @@ val EVENT_HANDLERS =
         Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, _, e -> handleButtonRelease(e) }),
         Pair(XcbEvent.XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
         Pair(XcbEvent.XCB_MAP_REQUEST, ::handleMapRequest),
-        Pair(XcbEvent.XCB_MAP_NOTIFY, { x, _, e -> handleMapNotify(x, e) }),
+        Pair(XcbEvent.XCB_MAP_NOTIFY, ::handleMapNotify),
         Pair(XcbEvent.XCB_DESTROY_NOTIFY, { _, w, e -> handleDestroyNotify(w, e) }),
         Pair(XcbEvent.XCB_UNMAP_NOTIFY, ::handleUnmapNotify)
     )
@@ -105,6 +105,7 @@ private fun handleMapRequest(
 
 private fun handleMapNotify(
     xcbConnection: CPointer<xcb_connection_t>,
+    windowManagerState: WindowManagerState,
     xEvent: CPointer<xcb_generic_event_t>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
@@ -118,6 +119,15 @@ private fun handleMapNotify(
         windowId,
         XCB_CURRENT_TIME.convert()
     )
+
+    if (windowId == windowManagerState.lcarsWindowId) {
+        val drawFunction = DRAW_FUNCTIONS[windowManagerState.screenMode]!!
+        drawFunction(
+            xcbConnection,
+            windowManagerState
+        )
+    }
+
     xcb_flush(xcbConnection)
     return false
 }
@@ -139,7 +149,8 @@ private fun handleConfigureRequest(
         adjustWindowPositionAndSize(
             xcbConnection,
             windowMonitor.getCurrentWindowMeasurements(windowManagerState.screenMode),
-            configureEvent.window
+            configureEvent.window,
+            true
         )
         return false
     }
@@ -248,7 +259,7 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
         .filter { it.isFullyInitialized }
 
     val (width, height) = activeMonitors
-        .fold(Pair(0, 0)) {(width, height), monitor ->
+        .fold(Pair(0, 0)) { (width, height), monitor ->
             var newWidth = width
             var newHeight = height
             if (monitor.x + monitor.width > width) {
@@ -266,8 +277,17 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
 
     xcb_configure_window(xcbConnection, windowManagerState.lcarsWindowId, mask.convert(), configData.toCValues())
 
+    windowManagerState.screenSize = Pair(width, height)
     windowManagerState.updateMonitors(activeMonitors)
-    { measurements, windowId -> adjustWindowPositionAndSize(xcbConnection, measurements, windowId) }
+    { measurements, windowId -> adjustWindowPositionAndSize(xcbConnection, measurements, windowId, false) }
+
+    val drawFunction = DRAW_FUNCTIONS[windowManagerState.screenMode]!!
+    drawFunction(
+        xcbConnection,
+        windowManagerState
+    )
+
+    xcb_flush(xcbConnection)
 
     nativeHeap.free(resourcesReply)
 }
@@ -312,6 +332,7 @@ private fun moveActiveWindow(
     adjustWindowPositionAndSize(
         xcbConnection,
         windowMoveFunction(activeWindow).getCurrentWindowMeasurements(windowManagerState.screenMode),
-        activeWindow.id
+        activeWindow.id,
+        true
     )
 }

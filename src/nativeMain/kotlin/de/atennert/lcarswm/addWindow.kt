@@ -23,7 +23,8 @@ fun addWindow(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: Win
     adjustWindowPositionAndSize(
         xcbConnection,
         windowMonitor.getCurrentWindowMeasurements(windowManagerState.screenMode),
-        windowId
+        windowId,
+        false
     )
 
     val data = UIntArray(2)
@@ -35,4 +36,6 @@ fun addWindow(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: Win
         windowManagerState.wmState, windowManagerState.wmState,
         32.convert(), 2.convert(), data.toCValues()
     )
+
+    xcb_flush(xcbConnection)
 }

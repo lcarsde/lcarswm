@@ -28,23 +28,18 @@ fun main() {
         val screen = xcb_aux_get_screen(xcbConnection, screenNumber.value)?.pointed ?: error("::main::got no screen")
         println("::main::Screen size: ${screen.width_in_pixels}/${screen.height_in_pixels}, root: ${screen.root}")
 
+        val colorMap = allocateColorMap(xcbConnection, screen.root_visual, screen.root)
+        val graphicsContexts = getGraphicContexts(xcbConnection, screen.root, colorMap.second)
+
         val windowManagerConfig = WindowManagerState(
-            screen.root, xcb_generate_id(xcbConnection)
+            screen.root, xcb_generate_id(xcbConnection), graphicsContexts
         ) { getAtom(xcbConnection, it) }
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig)
 
-        val colorMap = allocateColorMap(xcbConnection, screen.root_visual, windowManagerConfig.lcarsWindowId)
-
-        setupLcarsWindow(xcbConnection, screen, windowManagerConfig.lcarsWindowId)
-
         setupScreen(xcbConnection, windowManagerConfig)
 
         setupKeys(xcbConnection, windowManagerConfig)
-
-        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 1) // left mouse button
-        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 2) // middle mouse button
-        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 3) // right mouse button
 
         val values = UIntArray(2)
         values[0] = XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT or
@@ -56,6 +51,12 @@ fun main() {
         val error = xcb_request_check(xcbConnection, cookie)
 
         xcb_flush(xcbConnection)
+
+        setupLcarsWindow(xcbConnection, screen, windowManagerConfig.lcarsWindowId)
+
+        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 1) // left mouse button
+        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 2) // middle mouse button
+        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 3) // right mouse button
 
         if (error != null) {
             cleanupColorMap(xcbConnection, colorMap)

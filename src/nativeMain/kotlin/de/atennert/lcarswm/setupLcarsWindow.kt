@@ -14,7 +14,7 @@ fun setupLcarsWindow(
     windowId: UInt
 ) {
     val mask = XCB_CW_BACK_PIXEL
-    val windowParametersArr = arrayOf(screen.white_pixel)
+    val windowParametersArr = arrayOf(screen.black_pixel)
     val windowParameters = UIntArray(windowParametersArr.size) {windowParametersArr[it]}
 
     xcb_create_window(

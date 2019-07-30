@@ -6,9 +6,9 @@ package de.atennert.lcarswm
 class WindowManagerState(
     val screenRoot: UInt,
     val lcarsWindowId: UInt,
+    val graphicsContexts: List<UInt>,
     private val atomProvider: Function1<String, UInt>
 ) {
-
     val wmState = atomProvider("WM_STATE")
 
     val wmName = atomProvider("WM_NAME")
@@ -26,7 +26,9 @@ class WindowManagerState(
         get() = field?.copy()
         private set
 
-    private val monitors = ArrayList<Monitor>(3)
+    var screenSize = Pair(0, 0)
+
+    val monitors = ArrayList<Monitor>(3)
 
     /**
      * @return the monitor to which the window was added
