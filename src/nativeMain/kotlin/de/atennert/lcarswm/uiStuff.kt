@@ -101,7 +101,8 @@ private fun drawMaximizedFrame(
         arcs[3].angle1 = 270.shl(6)
         arcs[3].angle2 = 180.shl(6)
 
-        val rects = nativeHeap.allocArray<xcb_rectangle_t>(4)
+        val rects = nativeHeap.allocArray<xcb_rectangle_t>(6)
+        // extensions for round pieces
         for (i in 0 until 4) {
             rects[i].width = 12.toUShort()
             rects[i].height = 40.toUShort()
@@ -118,8 +119,20 @@ private fun drawMaximizedFrame(
         rects[3].x = (monitor.x + monitor.width - 32).toShort()
         rects[3].y = (monitor.y + monitor.height - 40).toShort()
 
+        // top bar
+        rects[4].x = (monitor.x + 120).toShort()
+        rects[4].y = monitor.y.toShort()
+        rects[4].width = (monitor.width - 160).toUShort()
+        rects[4].height = 40.toUShort()
+
+        // bottom bar
+        rects[5].x = (monitor.x + 40).toShort()
+        rects[5].y = (monitor.y + monitor.height - 40).toShort()
+        rects[5].width = (monitor.width - 80).toUShort()
+        rects[5].height = 40.toUShort()
+
         xcb_poly_fill_arc(xcbConnection, windowManagerState.lcarsWindowId, graphicsContext, 4.convert(), arcs)
-        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, graphicsContext, 4.convert(), rects)
+        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, graphicsContext, 6.convert(), rects)
 
         nativeHeap.free(arcs)
         nativeHeap.free(rects)
@@ -156,6 +169,7 @@ private fun drawNormalFrame(
         arcs[2].angle2 = 180.shl(6)
 
         val rects = nativeHeap.allocArray<xcb_rectangle_t>(3)
+        // extensions for round pieces
         for (i in 0 until 3) {
             rects[i].width = 12.toUShort()
             rects[i].height = 40.toUShort()
