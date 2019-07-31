@@ -18,16 +18,12 @@ fun main() {
     println("::main::start lcarswm initialization")
 
     memScoped {
+        val display = XOpenDisplay(null) ?: error("::main::display from setup")
 
-        // TODO get XLib display ... :-(
-        val screenNumber = alloc<IntVar>()
+        val xcbConnection = XGetXCBConnection(display) ?: error("::main::no XCB connection from setup")
 
-        val xcbConnection = xcb_connect(null, screenNumber.ptr)
-        if (xcbConnection == null || (xcb_connection_has_error(xcbConnection) != 0)) {
-            error("::main::no XCB connection from setup")
-        }
-
-        val screen = xcb_aux_get_screen(xcbConnection, screenNumber.value)?.pointed ?: error("::main::got no screen")
+        val setup = xcb_get_setup(xcbConnection)
+        val screen = xcb_setup_roots_iterator(setup).ptr.pointed.data?.pointed ?: error("::main::got no screen")
         println("::main::Screen size: ${screen.width_in_pixels}/${screen.height_in_pixels}, root: ${screen.root}")
 
         val colorMap = allocateColorMap(xcbConnection, screen.root_visual, screen.root)
