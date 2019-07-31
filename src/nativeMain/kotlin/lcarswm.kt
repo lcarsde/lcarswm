@@ -18,6 +18,8 @@ fun main() {
     println("::main::start lcarswm initialization")
 
     memScoped {
+
+        // TODO get XLib display ... :-(
         val screenNumber = alloc<IntVar>()
 
         val xcbConnection = xcb_connect(null, screenNumber.ptr)

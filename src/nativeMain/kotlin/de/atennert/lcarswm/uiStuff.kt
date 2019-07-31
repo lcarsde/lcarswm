@@ -6,15 +6,21 @@ import xcb.*
 
 val COLORS = listOf(
     Triple(0, 0, 0),
-    Triple(0x9999, 0x9999, 0xffff)
+    Triple(0xFFFF, 0x9999, 0),
+    Triple(0xCCCC, 0x9999, 0xCCCC),
+    Triple(0x9999, 0x9999, 0xCCCC),
+    Triple(0xCCCC, 0x6666, 0x6666),
+    Triple(0xFFFF, 0xCCCC, 0x9999),
+    Triple(0x9999, 0x9999, 0xFFFF),
+    Triple(0xFFFF, 0x9999, 0x6666),
+    Triple(0xCCCC, 0x6666, 0x9999)
 )
 
-val DRAW_FUNCTIONS =
-    hashMapOf(
-        Pair(ScreenMode.NORMAL, ::drawNormalFrame),
-        Pair(ScreenMode.MAXIMIZED, ::drawMaximizedFrame),
-        Pair(ScreenMode.FULLSCREEN, ::clearScreen)
-    )
+val DRAW_FUNCTIONS = hashMapOf(
+    Pair(ScreenMode.NORMAL, ::drawNormalFrame),
+    Pair(ScreenMode.MAXIMIZED, ::drawMaximizedFrame),
+    Pair(ScreenMode.FULLSCREEN, ::clearScreen)
+)
 
 fun allocateColorMap(
     xcbConnection: CPointer<xcb_connection_t>,
@@ -73,9 +79,10 @@ private fun drawMaximizedFrame(
 ) {
     clearScreen(xcbConnection, windowManagerState)
 
-    val graphicsContext = windowManagerState.graphicsContexts[1]
+    val gcPurple2 = windowManagerState.graphicsContexts[6]
+    val gcOrchid = windowManagerState.graphicsContexts[2]
 
-    windowManagerState.monitors.forEach {monitor ->
+    windowManagerState.monitors.forEach { monitor ->
         val arcs = nativeHeap.allocArray<xcb_arc_t>(4)
         for (i in 0 until 4) {
             arcs[i].width = 40.toUShort()
@@ -101,7 +108,7 @@ private fun drawMaximizedFrame(
         arcs[3].angle1 = 270.shl(6)
         arcs[3].angle2 = 180.shl(6)
 
-        val rects = nativeHeap.allocArray<xcb_rectangle_t>(6)
+        val rects = nativeHeap.allocArray<xcb_rectangle_t>(4)
         // extensions for round pieces
         for (i in 0 until 4) {
             rects[i].width = 12.toUShort()
@@ -119,20 +126,22 @@ private fun drawMaximizedFrame(
         rects[3].x = (monitor.x + monitor.width - 32).toShort()
         rects[3].y = (monitor.y + monitor.height - 40).toShort()
 
+        val bars = nativeHeap.allocArray<xcb_rectangle_t>(2)
         // top bar
-        rects[4].x = (monitor.x + 120).toShort()
-        rects[4].y = monitor.y.toShort()
-        rects[4].width = (monitor.width - 160).toUShort()
-        rects[4].height = 40.toUShort()
+        bars[0].x = (monitor.x + 120).toShort()
+        bars[0].y = monitor.y.toShort()
+        bars[0].width = (monitor.width - 160).toUShort()
+        bars[0].height = 40.toUShort()
 
         // bottom bar
-        rects[5].x = (monitor.x + 40).toShort()
-        rects[5].y = (monitor.y + monitor.height - 40).toShort()
-        rects[5].width = (monitor.width - 80).toUShort()
-        rects[5].height = 40.toUShort()
+        bars[1].x = (monitor.x + 40).toShort()
+        bars[1].y = (monitor.y + monitor.height - 40).toShort()
+        bars[1].width = (monitor.width - 80).toUShort()
+        bars[1].height = 40.toUShort()
 
-        xcb_poly_fill_arc(xcbConnection, windowManagerState.lcarsWindowId, graphicsContext, 4.convert(), arcs)
-        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, graphicsContext, 6.convert(), rects)
+        xcb_poly_fill_arc(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 4.convert(), arcs)
+        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 4.convert(), rects)
+        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcOrchid, 2.convert(), bars)
 
         nativeHeap.free(arcs)
         nativeHeap.free(rects)
@@ -145,9 +154,9 @@ private fun drawNormalFrame(
 ) {
     clearScreen(xcbConnection, windowManagerState)
 
-    val graphicsContext = windowManagerState.graphicsContexts[1]
+    val gcPurple2 = windowManagerState.graphicsContexts[6]
 
-    windowManagerState.monitors.forEach {monitor ->
+    windowManagerState.monitors.forEach { monitor ->
         val arcs = nativeHeap.allocArray<xcb_arc_t>(3)
         for (i in 0 until 3) {
             arcs[i].width = 40.toUShort()
@@ -183,8 +192,8 @@ private fun drawNormalFrame(
         rects[2].x = (monitor.x + monitor.width - 32).toShort()
         rects[2].y = (monitor.y + monitor.height - 40).toShort()
 
-        xcb_poly_fill_arc(xcbConnection, windowManagerState.lcarsWindowId, graphicsContext, 3.convert(), arcs)
-        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, graphicsContext, 3.convert(), rects)
+        xcb_poly_fill_arc(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 3.convert(), arcs)
+        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 3.convert(), rects)
 
         nativeHeap.free(arcs)
         nativeHeap.free(rects)
