@@ -38,7 +38,6 @@ fun allocateColorMap(
             xcb_alloc_color(xcbConnection, colorMapId, red.convert(), green.convert(), blue.convert())
         }
         .map { colorCookie -> xcb_alloc_color_reply(xcbConnection, colorCookie, null) }
-        .onEach { println("color: $it") }
         .filterNotNull()
         .toList()
 
@@ -75,12 +74,16 @@ fun cleanupColorMap(
 
 private fun drawMaximizedFrame(
     xcbConnection: CPointer<xcb_connection_t>,
-    windowManagerState: WindowManagerState
+    windowManagerState: WindowManagerState,
+    display: CPointer<Display>,
+    image: CPointer<XImage>
 ) {
-    clearScreen(xcbConnection, windowManagerState)
+    clearScreen(xcbConnection, windowManagerState, display, image)
 
     val gcPurple2 = windowManagerState.graphicsContexts[6]
     val gcOrchid = windowManagerState.graphicsContexts[2]
+    val gcCopyImage = XCreateGC(display, windowManagerState.lcarsWindowId.convert(), 0.convert(), null)
+
 
     windowManagerState.monitors.forEach { monitor ->
         val arcs = nativeHeap.allocArray<xcb_arc_t>(4)
@@ -128,9 +131,9 @@ private fun drawMaximizedFrame(
 
         val bars = nativeHeap.allocArray<xcb_rectangle_t>(2)
         // top bar
-        bars[0].x = (monitor.x + 120).toShort()
+        bars[0].x = (monitor.x + 48 + image.pointed.width).toShort()
         bars[0].y = monitor.y.toShort()
-        bars[0].width = (monitor.width - 160).toUShort()
+        bars[0].width = (monitor.width - 249).toUShort()
         bars[0].height = 40.toUShort()
 
         // bottom bar
@@ -143,18 +146,25 @@ private fun drawMaximizedFrame(
         xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 4.convert(), rects)
         xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcOrchid, 2.convert(), bars)
 
+        XPutImage(display, windowManagerState.lcarsWindowId.convert(), gcCopyImage, image, 0, 0, monitor.x + 40, 0, image.pointed.width.convert(), image.pointed.height.convert())
+
         nativeHeap.free(arcs)
         nativeHeap.free(rects)
     }
+
+    XFreeGC(display, gcCopyImage)
 }
 
 private fun drawNormalFrame(
     xcbConnection: CPointer<xcb_connection_t>,
-    windowManagerState: WindowManagerState
+    windowManagerState: WindowManagerState,
+    display: CPointer<Display>,
+    image: CPointer<XImage>
 ) {
-    clearScreen(xcbConnection, windowManagerState)
+    clearScreen(xcbConnection, windowManagerState, display, image)
 
     val gcPurple2 = windowManagerState.graphicsContexts[6]
+    val gcCopyImage = XCreateGC(display, windowManagerState.lcarsWindowId.convert(), 0.convert(), null)
 
     windowManagerState.monitors.forEach { monitor ->
         val arcs = nativeHeap.allocArray<xcb_arc_t>(3)
@@ -195,14 +205,20 @@ private fun drawNormalFrame(
         xcb_poly_fill_arc(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 3.convert(), arcs)
         xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 3.convert(), rects)
 
+        XPutImage(display, windowManagerState.lcarsWindowId.convert(), gcCopyImage, image, 0, 0, monitor.x + monitor.width - 40 - image.pointed.width, 0, image.pointed.width.convert(), image.pointed.height.convert())
+
         nativeHeap.free(arcs)
         nativeHeap.free(rects)
     }
+
+    XFreeGC(display, gcCopyImage)
 }
 
 private fun clearScreen(
     xcbConnection: CPointer<xcb_connection_t>,
-    windowManagerState: WindowManagerState
+    windowManagerState: WindowManagerState,
+    display: CPointer<Display>,
+    image: CPointer<XImage>
 ) {
     val rect = nativeHeap.alloc<xcb_rectangle_t>()
 

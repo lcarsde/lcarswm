@@ -33,7 +33,12 @@ fun main() {
             screen.root, xcb_generate_id(xcbConnection), graphicsContexts
         ) { getAtom(xcbConnection, it) }
 
-        val randrBase = setupRandr(xcbConnection, windowManagerConfig)
+        setupLcarsWindow(xcbConnection, screen, windowManagerConfig.lcarsWindowId)
+        val logoImage = allocArrayOfPointersTo(alloc<XImage>())
+
+        XpmReadFileToImage(display, "logo.xpm", logoImage, null, null)
+
+        val randrBase = setupRandr(xcbConnection, windowManagerConfig, display, logoImage[0]!!)
 
         setupScreen(xcbConnection, windowManagerConfig)
 
@@ -49,8 +54,6 @@ fun main() {
         val error = xcb_request_check(xcbConnection, cookie)
 
         xcb_flush(xcbConnection)
-
-        setupLcarsWindow(xcbConnection, screen, windowManagerConfig.lcarsWindowId)
 
         registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 1) // left mouse button
         registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 2) // middle mouse button
@@ -69,7 +72,7 @@ fun main() {
         runProgram("VBoxClient-all")
 
         // event loop
-        eventLoop(xcbConnection, windowManagerConfig, randrBase)
+        eventLoop(xcbConnection, windowManagerConfig, randrBase, display, logoImage[0]!!)
 
         cleanupColorMap(xcbConnection, colorMap)
         xcb_disconnect(xcbConnection)
@@ -201,7 +204,12 @@ private fun registerButton(xcbConnection: CPointer<xcb_connection_t>, window: xc
 /**
  * @return RANDR base value
  */
-private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: WindowManagerState): Int {
+private fun setupRandr(
+    xcbConnection: CPointer<xcb_connection_t>,
+    windowManagerState: WindowManagerState,
+    display: CPointer<Display>,
+    image: CPointer<XImage>
+): Int {
     val extension = xcb_get_extension_data(xcbConnection, xcb_randr_id.ptr)!!.pointed
 
     if (extension.present.toInt() == 0) {
@@ -209,7 +217,7 @@ private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerS
         return NO_RANDR_BASE
     }
 
-    handleRandrEvent(xcbConnection, windowManagerState)
+    handleRandrEvent(xcbConnection, windowManagerState, display, image)
 
     xcb_randr_select_input(
         xcbConnection, windowManagerState.screenRoot.convert(),
@@ -229,7 +237,9 @@ private fun setupRandr(xcbConnection: CPointer<xcb_connection_t>, windowManagerS
 private fun eventLoop(
     xcbConnection: CPointer<xcb_connection_t>,
     windowManagerState: WindowManagerState,
-    randrBase: Int
+    randrBase: Int,
+    display: CPointer<Display>,
+    image: CPointer<XImage>
 ) {
     val randrEventValue = randrBase + XCB_RANDR_SCREEN_CHANGE_NOTIFY
 
@@ -240,7 +250,7 @@ private fun eventLoop(
 
         if (eventValue == randrEventValue) {
             println("::eventLoop::received randr event")
-            handleRandrEvent(xcbConnection, windowManagerState)
+            handleRandrEvent(xcbConnection, windowManagerState, display, image)
             nativeHeap.free(xEvent)
             continue
         }
@@ -249,7 +259,7 @@ private fun eventLoop(
             val eventType = XcbEvent.getEventTypeForCode(eventId) // throws IllegalArgumentException
 
             if (EVENT_HANDLERS.containsKey(eventType)) {
-                val stop = EVENT_HANDLERS[eventType]!!.invoke(xcbConnection, windowManagerState, xEvent)
+                val stop = EVENT_HANDLERS[eventType]!!.invoke(xcbConnection, windowManagerState, xEvent, display, image)
                 if (stop) {
                     break
                 }

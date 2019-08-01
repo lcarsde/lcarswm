@@ -8,17 +8,17 @@ import xcb.*
  * Map of event types to event handlers. DON'T EDIT THE MAPS CONTENT!!!
  */
 val EVENT_HANDLERS =
-    hashMapOf<XcbEvent, Function3<CPointer<xcb_connection_t>, WindowManagerState, CPointer<xcb_generic_event_t>, Boolean>>(
+    hashMapOf<XcbEvent, Function5<CPointer<xcb_connection_t>, WindowManagerState, CPointer<xcb_generic_event_t>, CPointer<Display>, CPointer<XImage>, Boolean>>(
         // TODO handle create
-        Pair(XcbEvent.XCB_KEY_PRESS, ::handleKeyPress),
+        Pair(XcbEvent.XCB_KEY_PRESS, { x, w, e, _, _ -> handleKeyPress(x, w, e) }),
         Pair(XcbEvent.XCB_KEY_RELEASE, ::handleKeyRelease),
-        Pair(XcbEvent.XCB_BUTTON_PRESS, { _, _, e -> handleButtonPress(e) }),
-        Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, _, e -> handleButtonRelease(e) }),
-        Pair(XcbEvent.XCB_CONFIGURE_REQUEST, ::handleConfigureRequest),
-        Pair(XcbEvent.XCB_MAP_REQUEST, ::handleMapRequest),
+        Pair(XcbEvent.XCB_BUTTON_PRESS, { _, _, e, _, _ -> handleButtonPress(e) }),
+        Pair(XcbEvent.XCB_BUTTON_RELEASE, { _, _, e, _, _ -> handleButtonRelease(e) }),
+        Pair(XcbEvent.XCB_CONFIGURE_REQUEST, { x, w, e, _, _ -> handleConfigureRequest(x, w, e) }),
+        Pair(XcbEvent.XCB_MAP_REQUEST, { x, w, e, _, _ -> handleMapRequest(x, w, e) }),
         Pair(XcbEvent.XCB_MAP_NOTIFY, ::handleMapNotify),
-        Pair(XcbEvent.XCB_DESTROY_NOTIFY, { _, w, e -> handleDestroyNotify(w, e) }),
-        Pair(XcbEvent.XCB_UNMAP_NOTIFY, ::handleUnmapNotify)
+        Pair(XcbEvent.XCB_DESTROY_NOTIFY, { _, w, e, _, _ -> handleDestroyNotify(w, e) }),
+        Pair(XcbEvent.XCB_UNMAP_NOTIFY, { x, w, e, _, _ -> handleUnmapNotify(x, w, e) })
     )
 
 private val ROOT_WINDOW_ID = 0.toUInt()
@@ -46,7 +46,9 @@ private fun handleKeyPress(
 private fun handleKeyRelease(
     xcbConnection: CPointer<xcb_connection_t>,
     windowManagerState: WindowManagerState,
-    xEvent: CPointer<xcb_generic_event_t>
+    xEvent: CPointer<xcb_generic_event_t>,
+    display: CPointer<Display>,
+    image: CPointer<XImage>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val releasedEvent = (xEvent as CPointer<xcb_key_release_event_t>).pointed
@@ -54,7 +56,7 @@ private fun handleKeyRelease(
     println("::handleKeyRelease::Key released: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
-        XK_M -> toggleScreenMode(xcbConnection, windowManagerState)
+        XK_M -> toggleScreenMode(xcbConnection, windowManagerState, display, image)
         else -> println("::handleKeyRelease::unknown key: $key")
     }
     return false
@@ -106,7 +108,9 @@ private fun handleMapRequest(
 private fun handleMapNotify(
     xcbConnection: CPointer<xcb_connection_t>,
     windowManagerState: WindowManagerState,
-    xEvent: CPointer<xcb_generic_event_t>
+    xEvent: CPointer<xcb_generic_event_t>,
+    display: CPointer<Display>,
+    image: CPointer<XImage>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent as CPointer<xcb_map_notify_event_t>
@@ -124,7 +128,9 @@ private fun handleMapNotify(
         val drawFunction = DRAW_FUNCTIONS[windowManagerState.screenMode]!!
         drawFunction(
             xcbConnection,
-            windowManagerState
+            windowManagerState,
+            display,
+            image
         )
     }
 
@@ -210,7 +216,12 @@ private fun handleUnmapNotify(
 /**
  * Get RANDR information and update window management accordingly.
  */
-fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: WindowManagerState) {
+fun handleRandrEvent(
+    xcbConnection: CPointer<xcb_connection_t>,
+    windowManagerState: WindowManagerState,
+    display: CPointer<Display>,
+    image: CPointer<XImage>
+) {
     // TODO check if we can optimize a little in here, current size change on single monitor is ~2s
     val resourcesCookie = xcb_randr_get_screen_resources_current(xcbConnection, windowManagerState.screenRoot)
     val resourcesReply = xcb_randr_get_screen_resources_current_reply(xcbConnection, resourcesCookie, null)
@@ -284,7 +295,9 @@ fun handleRandrEvent(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
     val drawFunction = DRAW_FUNCTIONS[windowManagerState.screenMode]!!
     drawFunction(
         xcbConnection,
-        windowManagerState
+        windowManagerState,
+        display,
+        image
     )
 
     xcb_flush(xcbConnection)
