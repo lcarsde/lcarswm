@@ -34,6 +34,11 @@ fun main() {
         ) { getAtom(xcbConnection, it) }
 
         setupLcarsWindow(xcbConnection, screen, windowManagerConfig.lcarsWindowId)
+
+        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 1) // left mouse button
+        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 2) // middle mouse button
+        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 3) // right mouse button
+
         val logoImage = allocArrayOfPointersTo(alloc<XImage>())
 
         XpmReadFileToImage(display, "logo.xpm", logoImage, null, null)
@@ -54,10 +59,6 @@ fun main() {
         val error = xcb_request_check(xcbConnection, cookie)
 
         xcb_flush(xcbConnection)
-
-        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 1) // left mouse button
-        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 2) // middle mouse button
-        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 3) // right mouse button
 
         if (error != null) {
             cleanupColorMap(xcbConnection, colorMap)

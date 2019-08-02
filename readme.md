@@ -56,3 +56,4 @@ Probably one of the most interesting features in using a VM and RANDR is screen 
 * Width of bar gaps: 8px
 * Corner pieces have an inner corner with radius: 10px
 * Random data area height: 100px
+* Width of normal mode side bar: ?

@@ -133,7 +133,7 @@ private fun drawMaximizedFrame(
         // top bar
         bars[0].x = (monitor.x + 48 + image.pointed.width).toShort()
         bars[0].y = monitor.y.toShort()
-        bars[0].width = (monitor.width - 249).toUShort()
+        bars[0].width = (monitor.width - 88 - image.pointed.width).toUShort()
         bars[0].height = 40.toUShort()
 
         // bottom bar
@@ -164,6 +164,9 @@ private fun drawNormalFrame(
     clearScreen(xcbConnection, windowManagerState, display, image)
 
     val gcPurple2 = windowManagerState.graphicsContexts[6]
+    val gcOrchid = windowManagerState.graphicsContexts[2]
+    val gcPurple1 = windowManagerState.graphicsContexts[3]
+    val gcBrick = windowManagerState.graphicsContexts[4]
     val gcCopyImage = XCreateGC(display, windowManagerState.lcarsWindowId.convert(), 0.convert(), null)
 
     windowManagerState.monitors.forEach { monitor ->
@@ -202,13 +205,58 @@ private fun drawNormalFrame(
         rects[2].x = (monitor.x + monitor.width - 32).toShort()
         rects[2].y = (monitor.y + monitor.height - 40).toShort()
 
+        val bigBars = nativeHeap.allocArray<xcb_rectangle_t>(2)
+        bigBars[0].x = (monitor.x + 250).toShort()
+        bigBars[0].y = monitor.y.toShort()
+        bigBars[0].width = (monitor.width - 298 - image.pointed.width).toUShort()
+        bigBars[0].height = 40.toUShort()
+
+        // bottom bar
+        bigBars[1].x = (monitor.x + 300).toShort()
+        bigBars[1].y = (monitor.y + monitor.height - 40).toShort()
+        bigBars[1].width = (monitor.width - 340).toUShort()
+        bigBars[1].height = 40.toUShort()
+
+        val middleBars = nativeHeap.allocArray<xcb_rectangle_t>(4)
+        val middleSegmentWidth = (monitor.width - 260) / 5
+
+        // upper middle bars
+        middleBars[0].x = (monitor.x + 220).toShort()
+        middleBars[0].y = (monitor.y + 176).toShort()
+        middleBars[0].width = (middleSegmentWidth * 4 - 8).toUShort()
+        middleBars[0].height = 16.toUShort()
+
+        middleBars[1].x = (monitor.x + 220 + middleSegmentWidth * 4).toShort()
+        middleBars[1].y = (monitor.y + 176).toShort()
+        middleBars[1].width = (middleSegmentWidth).toUShort()
+        middleBars[1].height = 16.toUShort()
+
+        // lower middle bars
+        middleBars[2].x = (monitor.x + 220).toShort()
+        middleBars[2].y = (monitor.y + 200).toShort()
+        middleBars[2].width = (middleSegmentWidth * 2).toUShort()
+        middleBars[2].height = 16.toUShort()
+
+        middleBars[3].x = (monitor.x + 228 + middleSegmentWidth * 2).toShort()
+        middleBars[3].y = (monitor.y + 200).toShort()
+        middleBars[3].width = (middleSegmentWidth * 3 - 8).toUShort()
+        middleBars[3].height = 16.toUShort()
+
         xcb_poly_fill_arc(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 3.convert(), arcs)
         xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 3.convert(), rects)
+        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 2.convert(), bigBars)
+
+        // middle bars
+        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcPurple1, 1.convert(), middleBars[0].ptr)
+        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcBrick, 1.convert(), middleBars[1].ptr)
+        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcPurple2, 1.convert(), middleBars[2].ptr)
+        xcb_poly_fill_rectangle(xcbConnection, windowManagerState.lcarsWindowId, gcOrchid, 1.convert(), middleBars[3].ptr)
 
         XPutImage(display, windowManagerState.lcarsWindowId.convert(), gcCopyImage, image, 0, 0, monitor.x + monitor.width - 40 - image.pointed.width, 0, image.pointed.width.convert(), image.pointed.height.convert())
 
         nativeHeap.free(arcs)
         nativeHeap.free(rects)
+        nativeHeap.free(bigBars)
     }
 
     XFreeGC(display, gcCopyImage)
