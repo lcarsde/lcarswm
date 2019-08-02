@@ -19,7 +19,7 @@ data class Monitor(val id: UInt, val name: String) {
 
     private val defaultWindowPosition get() = Pair(x + 208, y + 234)
 
-    private val defaultWindowSize get() = Pair(width - 256, height - 292)
+    private val defaultWindowSize get() = Pair(width - 248, height - 292)
 
     private val maximizedWindowPosition get() = Pair(x + 40, y + 48)
 

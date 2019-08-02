@@ -206,38 +206,38 @@ private fun drawNormalFrame(
         rects[2].y = (monitor.y + monitor.height - 40).toShort()
 
         val bigBars = nativeHeap.allocArray<xcb_rectangle_t>(2)
-        bigBars[0].x = (monitor.x + 250).toShort()
+        bigBars[0].x = (monitor.x + 260).toShort()
         bigBars[0].y = monitor.y.toShort()
-        bigBars[0].width = (monitor.width - 298 - image.pointed.width).toUShort()
+        bigBars[0].width = (monitor.width - 308 - image.pointed.width).toUShort()
         bigBars[0].height = 40.toUShort()
 
         // bottom bar
-        bigBars[1].x = (monitor.x + 300).toShort()
+        bigBars[1].x = (monitor.x + 310).toShort()
         bigBars[1].y = (monitor.y + monitor.height - 40).toShort()
-        bigBars[1].width = (monitor.width - 340).toUShort()
+        bigBars[1].width = (monitor.width - 350).toUShort()
         bigBars[1].height = 40.toUShort()
 
         val middleBars = nativeHeap.allocArray<xcb_rectangle_t>(4)
-        val middleSegmentWidth = (monitor.width - 260) / 5
+        val middleSegmentWidth = (monitor.width - 270) / 5
 
         // upper middle bars
-        middleBars[0].x = (monitor.x + 220).toShort()
+        middleBars[0].x = (monitor.x + 230).toShort()
         middleBars[0].y = (monitor.y + 176).toShort()
         middleBars[0].width = (middleSegmentWidth * 4 - 8).toUShort()
         middleBars[0].height = 16.toUShort()
 
-        middleBars[1].x = (monitor.x + 220 + middleSegmentWidth * 4).toShort()
+        middleBars[1].x = (monitor.x + 230 + middleSegmentWidth * 4).toShort()
         middleBars[1].y = (monitor.y + 176).toShort()
         middleBars[1].width = (middleSegmentWidth).toUShort()
         middleBars[1].height = 16.toUShort()
 
         // lower middle bars
-        middleBars[2].x = (monitor.x + 220).toShort()
+        middleBars[2].x = (monitor.x + 230).toShort()
         middleBars[2].y = (monitor.y + 200).toShort()
         middleBars[2].width = (middleSegmentWidth * 2).toUShort()
         middleBars[2].height = 16.toUShort()
 
-        middleBars[3].x = (monitor.x + 228 + middleSegmentWidth * 2).toShort()
+        middleBars[3].x = (monitor.x + 238 + middleSegmentWidth * 2).toShort()
         middleBars[3].y = (monitor.y + 200).toShort()
         middleBars[3].width = (middleSegmentWidth * 3 - 8).toUShort()
         middleBars[3].height = 16.toUShort()
