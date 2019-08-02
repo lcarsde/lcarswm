@@ -82,7 +82,7 @@ class MonitorTest {
 
         val defaultMeasurements = monitor.getCurrentWindowMeasurements(ScreenMode.NORMAL)
 
-        assertEquals(listOf(208, 234, 552, 308), defaultMeasurements)
+        assertEquals(listOf(208, 242, 552, 292), defaultMeasurements)
     }
 
     @Test
