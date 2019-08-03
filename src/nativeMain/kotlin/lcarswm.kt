@@ -11,7 +11,9 @@ private val LCARS_WM_KEY_SYMS = listOf(
     XK_Tab, // toggle through windows
     XK_Up, // move windows up the monitor list
     XK_Down, // move windows down the monitor list
-    XK_M // toggle screen mode
+    XK_M, // toggle screen mode
+    XK_Q, // quit
+    XK_T // terminal
 )
 
 fun main() {

@@ -57,6 +57,8 @@ private fun handleKeyRelease(
 
     when (windowManagerState.keyboardKeys[key]) {
         XK_M -> toggleScreenMode(xcbConnection, windowManagerState, display, image)
+        XK_T -> runProgram("/usr/bin/xterm")
+        XK_Q -> return true
         else -> println("::handleKeyRelease::unknown key: $key")
     }
     return false
@@ -68,9 +70,6 @@ private fun handleButtonPress(xEvent: CPointer<xcb_generic_event_t>): Boolean {
     val button = pressEvent.detail.toInt()
 
     println("::handleButtonPress::Button pressed: $button")
-    if (button == 2 && pressEvent.child == ROOT_WINDOW_ID) {
-        runProgram("/usr/bin/xterm")
-    }
     return false
 }
 
@@ -80,7 +79,7 @@ private fun handleButtonRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean 
     val button = releaseEvent.detail.toInt()
 
     println("::handleButtonRelease::Button released: $button")
-    return button != 2 && releaseEvent.child == ROOT_WINDOW_ID // close lcarswm when right or left mouse buttons are pressed
+    return false
 }
 
 private fun handleMapRequest(
@@ -226,6 +225,9 @@ fun handleRandrEvent(
     val resourcesCookie = xcb_randr_get_screen_resources_current(xcbConnection, windowManagerState.screenRoot)
     val resourcesReply = xcb_randr_get_screen_resources_current_reply(xcbConnection, resourcesCookie, null)
 
+    val primaryCookie = xcb_randr_get_output_primary(xcbConnection, windowManagerState.screenRoot)
+    val primaryReply = xcb_randr_get_output_primary_reply(xcbConnection, primaryCookie, null)
+
     if (resourcesReply == null) {
         println("::handleRandrEvent::no RANDR extension found")
         return
@@ -303,6 +305,9 @@ fun handleRandrEvent(
     xcb_flush(xcbConnection)
 
     nativeHeap.free(resourcesReply)
+    if (primaryReply != null) {
+        nativeHeap.free(primaryReply)
+    }
 }
 
 private fun addMeasurementToMonitor(

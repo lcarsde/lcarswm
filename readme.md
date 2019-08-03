@@ -9,20 +9,16 @@ Thank you very much to the creators of the following resources:
 * 
 
 ## Functionality
-* The window manager can be started.
-* The window manager can be closed using the left or right mouse button.
-* Using the middle mouse button opens a terminal.
+* Windows-key + Q closes the window manager
+* Windows-key + T opens a terminal
 * Windows-key + Tab toggles through the windows
 * Windows-key + Up/Down moves the active window to other monitors
 * Windows-key + M toggles the display mode between normal, maximized and fullscreen
-* Windows are resized when the screen resolution is changed.
-
-## UI?
-Not yet, but there are some concept pictures in the doc folder.
+* Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
 
 ## Required
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
-* header files and libraries for xcb, xcb-util, randr and xcb-icccm. Check the travis yaml file to see the install routines for Ubuntu.
+* header files and libraries for xcb, X11, randr and xpm. Check the travis yaml file to see the install routines for Ubuntu.
 
 ## Notes to myself :-)
 * The main method needs to be outside of any packages so that the compiler can find it.
