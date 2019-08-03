@@ -20,13 +20,17 @@ fun toggleScreenMode(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
     windowManagerState.updateScreenMode(screenMode)
     { measurements, windowId -> adjustWindowPositionAndSize(xcbConnection, measurements, windowId, false) }
 
-    val drawFunction = DRAW_FUNCTIONS[windowManagerState.screenMode]!!
-    drawFunction(
-        xcbConnection,
-        windowManagerState,
-        display,
-        image
-    )
+    windowManagerState.monitors.forEach {monitor ->
+        val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
+        val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
+        drawFunction(
+            xcbConnection,
+            windowManagerState,
+            display,
+            monitor,
+            image
+        )
+    }
 
     xcb_flush(xcbConnection)
 }

@@ -68,7 +68,7 @@ class WindowManagerState(
         this.monitors.addAll(monitors)
 
         monitors.forEach { monitor ->
-            val windowMeasurements = monitor.getCurrentWindowMeasurements(this.screenMode)
+            val windowMeasurements = monitor.getCurrentWindowMeasurements(getScreenModeForMonitor(monitor))
             monitor.windows.keys.forEach { updateWindowFcn(windowMeasurements, it) }
         }
     }
@@ -77,7 +77,7 @@ class WindowManagerState(
         this.screenMode = screenMode
 
         this.monitors.forEach { monitor ->
-            val measurements = monitor.getCurrentWindowMeasurements(screenMode)
+            val measurements = monitor.getCurrentWindowMeasurements(getScreenModeForMonitor(monitor))
             monitor.windows.keys.forEach { windowId ->
                 updateWindowFcn(measurements, windowId)
             }
@@ -121,5 +121,11 @@ class WindowManagerState(
         newMonitor.windows[window.id] = window
 
         return newMonitor
+    }
+
+    fun getScreenModeForMonitor(monitor: Monitor): ScreenMode = when {
+        this.screenMode != ScreenMode.NORMAL -> this.screenMode
+        monitor.isPrimary -> ScreenMode.NORMAL
+        else -> ScreenMode.MAXIMIZED
     }
 }

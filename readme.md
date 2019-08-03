@@ -6,7 +6,9 @@ Thank you very much to the creators of the following resources:
 * [Chuan Ji - How X Window Managers Work, And How To Write One](https://jichu4n.com/posts/how-x-window-managers-work-and-how-to-write-one-part-i/)
 * [mcwm on GitHub](https://github.com/mchackorg/mcwm)
 * [XCB implementation of TinyWM on GitHub](https://github.com/stefanbidi/tinywm-xcb)
-* 
+* [XCB tutorial](https://www.x.org/releases/X11R7.7/doc/libxcb/tutorial/index.html)
+* [How to read XPM files and draw them in a window](http://www.dis.uniroma1.it/~liberato/screensaver/image.html)
+* [libXpm API](https://fossies.org/dox/libXpm-4.7/files.html)
 
 ## Functionality
 * Windows-key + Q closes the window manager

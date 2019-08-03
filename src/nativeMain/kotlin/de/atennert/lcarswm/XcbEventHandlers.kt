@@ -124,13 +124,17 @@ private fun handleMapNotify(
     )
 
     if (windowId == windowManagerState.lcarsWindowId) {
-        val drawFunction = DRAW_FUNCTIONS[windowManagerState.screenMode]!!
-        drawFunction(
-            xcbConnection,
-            windowManagerState,
-            display,
-            image
-        )
+        windowManagerState.monitors.forEach { monitor ->
+            val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
+            val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
+            drawFunction(
+                xcbConnection,
+                windowManagerState,
+                display,
+                monitor,
+                image
+            )
+        }
     }
 
     xcb_flush(xcbConnection)
@@ -153,7 +157,7 @@ private fun handleConfigureRequest(
     if (windowMonitor != null) {
         adjustWindowPositionAndSize(
             xcbConnection,
-            windowMonitor.getCurrentWindowMeasurements(windowManagerState.screenMode),
+            windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor)),
             configureEvent.window,
             true
         )
@@ -238,6 +242,8 @@ fun handleRandrEvent(
     val outputCount = xcb_randr_get_screen_resources_current_outputs_length(resourcesReply)
     val outputs = xcb_randr_get_screen_resources_current_outputs(resourcesReply)!!
 
+    val primaryMonitor = primaryReply?.pointed?.output ?: outputs[0]
+
     val sortedMonitors = Array(outputCount)
     { i -> Pair(outputs[i], xcb_randr_get_output_info(xcbConnection, outputs[i], timestamp)) }
         .asSequence()
@@ -251,7 +257,7 @@ fun handleRandrEvent(
             Triple(outputId, outputObject!!, getOutputName(outputObject))
         }
         .map { (outputId, outputObject, outputName) ->
-            Triple(Monitor(outputId, outputName), outputObject.pointed.crtc, outputObject)
+            Triple(Monitor(outputId, outputName, outputId == primaryMonitor), outputObject.pointed.crtc, outputObject)
         }
         .onEach { (monitor, c, _) ->
             println("::printOutput::name: ${monitor.name}, id: ${monitor.id} crtc: $c")
@@ -294,13 +300,17 @@ fun handleRandrEvent(
     windowManagerState.updateMonitors(activeMonitors)
     { measurements, windowId -> adjustWindowPositionAndSize(xcbConnection, measurements, windowId, false) }
 
-    val drawFunction = DRAW_FUNCTIONS[windowManagerState.screenMode]!!
-    drawFunction(
-        xcbConnection,
-        windowManagerState,
-        display,
-        image
-    )
+    windowManagerState.monitors.forEach { monitor ->
+        val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
+        val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
+        drawFunction(
+            xcbConnection,
+            windowManagerState,
+            display,
+            monitor,
+            image
+        )
+    }
 
     xcb_flush(xcbConnection)
 
@@ -334,7 +344,7 @@ private fun getOutputName(outputObject: CPointer<xcb_randr_get_output_info_reply
     val nameLength = xcb_randr_get_output_info_name_length(outputObject)
     val namePointer = xcb_randr_get_output_info_name(outputObject)!!
 
-    val nameArray = ByteArray(nameLength) { i -> namePointer[i].toByte() }
+    val nameArray = ByteArray(nameLength) { i -> namePointer[i].convert() }
 
     return nameArray.decodeToString()
 }
@@ -346,10 +356,11 @@ private fun moveActiveWindow(
     windowMoveFunction: Function1<Window, Monitor>
 ) {
     val activeWindow = windowManagerState.activeWindow ?: return
+    val newMonitor = windowMoveFunction(activeWindow)
 
     adjustWindowPositionAndSize(
         xcbConnection,
-        windowMoveFunction(activeWindow).getCurrentWindowMeasurements(windowManagerState.screenMode),
+        newMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(newMonitor)),
         activeWindow.id,
         true
     )

@@ -22,7 +22,7 @@ fun addWindow(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: Win
 
     adjustWindowPositionAndSize(
         xcbConnection,
-        windowMonitor.getCurrentWindowMeasurements(windowManagerState.screenMode),
+        windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor)),
         windowId,
         false
     )

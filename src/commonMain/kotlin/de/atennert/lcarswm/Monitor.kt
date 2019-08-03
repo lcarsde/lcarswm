@@ -3,7 +3,7 @@ package de.atennert.lcarswm
 /**
  * Resource representing a physical monitor and its settings.
  */
-data class Monitor(val id: UInt, val name: String) {
+data class Monitor(val id: UInt, val name: String, val isPrimary: Boolean) {
 
     var x = 0
         private set
