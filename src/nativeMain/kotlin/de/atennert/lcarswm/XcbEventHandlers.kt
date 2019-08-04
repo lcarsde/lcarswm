@@ -21,8 +21,6 @@ val EVENT_HANDLERS =
         Pair(XcbEvent.XCB_UNMAP_NOTIFY, { x, w, e, _, _ -> handleUnmapNotify(x, w, e) })
     )
 
-private val ROOT_WINDOW_ID = 0.toUInt()
-
 private fun handleKeyPress(
     xcbConnection: CPointer<xcb_connection_t>,
     windowManagerState: WindowManagerState,
@@ -67,7 +65,7 @@ private fun handleKeyRelease(
 private fun handleButtonPress(xEvent: CPointer<xcb_generic_event_t>): Boolean {
     @Suppress("UNCHECKED_CAST")
     val pressEvent = (xEvent as CPointer<xcb_button_press_event_t>).pointed
-    val button = pressEvent.detail.toInt()
+    val button = pressEvent.detail
 
     println("::handleButtonPress::Button pressed: $button")
     return false
@@ -76,7 +74,7 @@ private fun handleButtonPress(xEvent: CPointer<xcb_generic_event_t>): Boolean {
 private fun handleButtonRelease(xEvent: CPointer<xcb_generic_event_t>): Boolean {
     @Suppress("UNCHECKED_CAST")
     val releaseEvent = (xEvent as CPointer<xcb_button_release_event_t>).pointed
-    val button = releaseEvent.detail.toInt()
+    val button = releaseEvent.detail
 
     println("::handleButtonRelease::Button released: $button")
     return false
@@ -211,6 +209,9 @@ private fun handleUnmapNotify(
     @Suppress("UNCHECKED_CAST")
     val unmapEvent = (xEvent as CPointer<xcb_unmap_notify_event_t>).pointed
     // only the active window can be closed, so make a new window active
+    xcb_reparent_window(xcbConnection, unmapEvent.window, windowManagerState.screenRoot, 0, 0)
+    xcb_change_save_set(xcbConnection, XCB_SET_MODE_DELETE.convert(), unmapEvent.window)
+
     windowManagerState.removeWindow(unmapEvent.window)
     moveNextWindowToTopOfStack(xcbConnection, windowManagerState)
     return false

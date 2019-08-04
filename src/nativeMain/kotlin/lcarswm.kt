@@ -43,7 +43,7 @@ fun main() {
 
         val logoImage = allocArrayOfPointersTo(alloc<XImage>())
 
-        XpmReadFileToImage(display, "logo.xpm", logoImage, null, null)
+        XpmReadFileToImage(display, "/usr/share/pixmaps/lcarswm.xpm", logoImage, null, null)
 
         val randrBase = setupRandr(xcbConnection, windowManagerConfig, display, logoImage[0]!!)
 
@@ -71,9 +71,6 @@ fun main() {
             )
         }
 
-        // FIXME this needs be removed once RANDR development is finished. In the meantime it's here for convenience
-        runProgram("VBoxClient-all")
-
         // event loop
         eventLoop(xcbConnection, windowManagerConfig, randrBase, display, logoImage[0]!!)
 
@@ -93,19 +90,8 @@ fun setupScreen(xcbConnection: CPointer<xcb_connection_t>, windowManagerConfig: 
 
     UIntArray(childWindowCount) { childWindows[it] }
         .filter { childId -> childId != windowManagerConfig.lcarsWindowId }
-        .map { childId ->
-            val attributesRef = xcb_get_window_attributes(xcbConnection, childId)
-            val attributes = xcb_get_window_attributes_reply(xcbConnection, attributesRef, null)
-            Pair(childId, attributes)
-        }
-        .filter { (_, attributes) -> attributes != null }
-        .forEach { (childId, attributes) ->
-            if (attributes!!.pointed.override_redirect.toInt() == 0 &&
-                attributes.pointed.map_state.toUInt() == XCB_MAP_STATE_VIEWABLE
-            ) {
-                addWindow(xcbConnection, windowManagerConfig, childId)
-            }
-            nativeHeap.free(attributes)
+        .forEach { childId ->
+            addWindow(xcbConnection, windowManagerConfig, childId)
         }
 
     xcb_flush(xcbConnection)

@@ -1,15 +1,20 @@
 package de.atennert.lcarswm
 
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.toCValues
+import kotlinx.cinterop.*
 import xcb.*
 
 /**
  *
  */
 fun addWindow(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: WindowManagerState, windowId: UInt) {
-    // TODO reparent window
+    val windowAttributeCookie = xcb_get_window_attributes(xcbConnection, windowId)
+    val windowAttributes = xcb_get_window_attributes_reply(xcbConnection, windowAttributeCookie, null)!!
+
+    if (windowAttributes.pointed.override_redirect.toInt() != 0) {
+        nativeHeap.free(windowAttributes)
+        return
+    }
+
     val windowMonitor = windowManagerState.addWindow(Window(windowId))
 
     println(
@@ -20,9 +25,13 @@ fun addWindow(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: Win
 
     xcb_change_save_set(xcbConnection, XCB_SET_MODE_INSERT.convert(), windowId)
 
+    val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))
+
+    xcb_reparent_window(xcbConnection, windowId, windowManagerState.lcarsWindowId, measurements[0].convert(), measurements[1].convert())
+
     adjustWindowPositionAndSize(
         xcbConnection,
-        windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor)),
+        measurements,
         windowId,
         false
     )
@@ -38,4 +47,5 @@ fun addWindow(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: Win
     )
 
     xcb_flush(xcbConnection)
+    nativeHeap.free(windowAttributes)
 }
