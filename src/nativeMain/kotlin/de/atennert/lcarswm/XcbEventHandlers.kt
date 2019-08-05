@@ -56,6 +56,9 @@ private fun handleKeyRelease(
     when (windowManagerState.keyboardKeys[key]) {
         XK_M -> toggleScreenMode(xcbConnection, windowManagerState, display, image)
         XK_T -> runProgram("/usr/bin/xterm")
+        XK_B -> runProgram("/usr/bin/firefox")
+        XK_I -> runProgram("/usr/bin/idea")
+        XK_L -> runProgram("/usr/bin/lxterminal")
         XK_Q -> return true
         else -> println("::handleKeyRelease::unknown key: $key")
     }

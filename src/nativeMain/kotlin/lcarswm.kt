@@ -13,7 +13,10 @@ private val LCARS_WM_KEY_SYMS = listOf(
     XK_Down, // move windows down the monitor list
     XK_M, // toggle screen mode
     XK_Q, // quit
-    XK_T // terminal
+    XK_T, // terminal
+    XK_B, // browser
+    XK_I, // IntelliJ
+    XK_L  // LXTerminal
 )
 
 fun main() {
@@ -70,6 +73,8 @@ fun main() {
                         "Another window manager running? Exiting."
             )
         }
+
+        runProgram("/usr/bin/VBoxClient-all")
 
         // event loop
         eventLoop(xcbConnection, windowManagerConfig, randrBase, display, logoImage[0]!!)
