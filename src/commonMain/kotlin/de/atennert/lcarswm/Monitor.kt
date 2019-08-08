@@ -32,8 +32,6 @@ data class Monitor(val id: UInt, val name: String, val isPrimary: Boolean) {
     var isFullyInitialized = false
         private set
 
-    val windows = hashMapOf<UInt, Window>()
-
     override fun hashCode(): Int {
         return id.toInt()
     }
