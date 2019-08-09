@@ -58,11 +58,9 @@ class WindowManagerState(
             .filterNot { (_, windowEntry) -> monitors.contains(windowEntry.second) }
             .forEach { (i, windowEntry) -> this.windows[i] = Pair(windowEntry.first, monitors[0]) }
 
-        val reversedWindows = windows.reversed()
-
         monitors.forEach { monitor ->
             val windowMeasurements = monitor.getCurrentWindowMeasurements(getScreenModeForMonitor(monitor))
-            reversedWindows
+            this.windows
                 .filter { (_, windowMonitor) -> monitor == windowMonitor }
                 .forEach { (window, _) -> updateWindowFcn(windowMeasurements, window.id) }
         }
@@ -70,11 +68,10 @@ class WindowManagerState(
 
     fun updateScreenMode(screenMode: ScreenMode, updateWindowFcn: Function2<List<Int>, UInt, Unit>) {
         this.screenMode = screenMode
-        val reversedWindows = windows.reversed()
 
         this.monitors.forEach { monitor ->
             val measurements = monitor.getCurrentWindowMeasurements(getScreenModeForMonitor(monitor))
-            reversedWindows.forEach { (window, _) ->
+            this.windows.forEach { (window, _) ->
                 updateWindowFcn(measurements, window.id)
             }
         }
