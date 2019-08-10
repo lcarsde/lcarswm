@@ -18,8 +18,25 @@ val EVENT_HANDLERS =
         Pair(XcbEvent.XCB_MAP_REQUEST, { x, w, e, _, _ -> handleMapRequest(x, w, e) }),
         Pair(XcbEvent.XCB_MAP_NOTIFY, ::handleMapNotify),
         Pair(XcbEvent.XCB_DESTROY_NOTIFY, { _, w, e, _, _ -> handleDestroyNotify(w, e) }),
-        Pair(XcbEvent.XCB_UNMAP_NOTIFY, { x, w, e, _, _ -> handleUnmapNotify(x, w, e) })
+        Pair(XcbEvent.XCB_UNMAP_NOTIFY, { x, w, e, _, _ -> handleUnmapNotify(x, w, e) }),
+        Pair(XcbEvent.XCB_REPARENT_NOTIFY, { _, _, e, _, _ -> handleReparentNotify(e) }),
+        Pair(XcbEvent.XCB_CREATE_NOTIFY, { _, _, e, _, _ -> handleCreateNotify(e) }),
+        Pair(XcbEvent.XCB_CONFIGURE_NOTIFY, { _, _, e, _, _ -> handleConfigureNotify(e) })
     )
+
+private fun handleCreateNotify(xEvent: CPointer<xcb_generic_event_t>): Boolean {
+    @Suppress("UNCHECKED_CAST")
+    val createEvent = (xEvent as CPointer<xcb_create_notify_event_t>).pointed
+    println("::handleCreate::window ${createEvent.window}, o r: ${createEvent.override_redirect}")
+    return false
+}
+
+private fun handleConfigureNotify(xEvent: CPointer<xcb_generic_event_t>): Boolean {
+    @Suppress("UNCHECKED_CAST")
+    val configureEvent = (xEvent as CPointer<xcb_configure_notify_event_t>).pointed
+    println("::handleConfigureNotify::window ${configureEvent.window}, o r: ${configureEvent.override_redirect}, above ${configureEvent.above_sibling}, event ${configureEvent.event}")
+    return false
+}
 
 private fun handleKeyPress(
     xcbConnection: CPointer<xcb_connection_t>,
@@ -91,13 +108,14 @@ private fun handleMapRequest(
     @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent as CPointer<xcb_map_request_event_t>
     val windowId = mapEvent.pointed.window
+    val mp = mapEvent.pointed
 
-    println("::handleMapRequest::map request for window $windowId")
+    println("::handleMapRequest::map request for window $windowId, pad: ${mp.pad0}, parent: ${mp.parent}, sequence: ${mp.sequence}")
     if (windowManagerState.getWindowMonitor(windowId) != null) {
         return false
     }
 
-    addWindow(xcbConnection, windowManagerState, windowId)
+    addWindow(xcbConnection, windowManagerState, windowId, false)
 
     xcb_map_window(xcbConnection, mapEvent.pointed.window)
 
@@ -142,6 +160,13 @@ private fun handleMapNotify(
     return false
 }
 
+private fun handleReparentNotify(xEvent: CPointer<xcb_generic_event_t>): Boolean {
+    @Suppress("UNCHECKED_CAST")
+    val reparentEvent = (xEvent as CPointer<xcb_reparent_notify_event_t>).pointed
+    println("::handleReparentNotify::reparented window ${reparentEvent.window} to ${reparentEvent.parent}")
+    return false
+}
+
 /**
  * Filter the values that lcarswm requires and send the configuration to X.
  */
@@ -153,7 +178,7 @@ private fun handleConfigureRequest(
     @Suppress("UNCHECKED_CAST")
     val configureEvent = (xEvent as CPointer<xcb_configure_request_event_t>).pointed
 
-    println("::handleConfigureRequest::configure request for window ${configureEvent.window}")
+    println("::handleConfigureRequest::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.stack_mode}, sibling: ${configureEvent.sibling}")
     val windowMonitor = windowManagerState.getWindowMonitor(configureEvent.window)
     if (windowMonitor != null) {
         adjustWindowPositionAndSize(
@@ -197,6 +222,7 @@ private fun handleDestroyNotify(
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val destroyEvent = (xEvent as CPointer<xcb_destroy_notify_event_t>).pointed
+    println("::handleDestroyNotify::destroy window: ${destroyEvent.window}")
     windowManagerState.removeWindow(destroyEvent.window)
     return false
 }
@@ -211,6 +237,7 @@ private fun handleUnmapNotify(
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val unmapEvent = (xEvent as CPointer<xcb_unmap_notify_event_t>).pointed
+    println("::handleUnmapNotify::unmapped window: ${unmapEvent.window}")
     // only the active window can be closed, so make a new window active
     xcb_reparent_window(xcbConnection, unmapEvent.window, windowManagerState.screenRoot, 0, 0)
     xcb_change_save_set(xcbConnection, XCB_SET_MODE_DELETE.convert(), unmapEvent.window)
@@ -229,6 +256,7 @@ fun handleRandrEvent(
     display: CPointer<Display>,
     image: CPointer<XImage>
 ) {
+    println("::handleRandrEvent::handle randr")
     // TODO check if we can optimize a little in here, current size change on single monitor is ~2s
     val resourcesCookie = xcb_randr_get_screen_resources_current(xcbConnection, windowManagerState.screenRoot)
     val resourcesReply = xcb_randr_get_screen_resources_current_reply(xcbConnection, resourcesCookie, null)

@@ -13,7 +13,7 @@ fun moveNextWindowToTopOfStack(xcbConnection: CPointer<xcb_connection_t>, window
     val activeWindow = windowManagerState.toggleActiveWindow()
     println("::moveNextWindowToTopOfStack::activate window $activeWindow")
     if (activeWindow != null) {
-        val params = UIntArray(1) { XCB_STACK_MODE_TOP_IF }
+        val params = UIntArray(1) { XCB_STACK_MODE_ABOVE }
 
         xcb_configure_window(
             xcbConnection, activeWindow.id,

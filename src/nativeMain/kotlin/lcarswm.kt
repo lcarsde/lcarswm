@@ -96,7 +96,7 @@ fun setupScreen(xcbConnection: CPointer<xcb_connection_t>, windowManagerConfig: 
     UIntArray(childWindowCount) { childWindows[it] }
         .filter { childId -> childId != windowManagerConfig.lcarsWindowId }
         .forEach { childId ->
-            addWindow(xcbConnection, windowManagerConfig, childId)
+            addWindow(xcbConnection, windowManagerConfig, childId, true)
         }
 
     xcb_flush(xcbConnection)
