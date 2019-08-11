@@ -3,7 +3,7 @@ package de.atennert.lcarswm
 /**
  * Resource representing a physical monitor and its settings.
  */
-data class Monitor(val id: UInt, val name: String, val isPrimary: Boolean) {
+data class Monitor(val id: ULong, val name: String, val isPrimary: Boolean) {
 
     var x = 0
         private set
@@ -51,13 +51,13 @@ data class Monitor(val id: UInt, val name: String, val isPrimary: Boolean) {
      * Update the monitor measurement settings.
      * @return true if any setting changed, false otherwise
      */
-    fun setMeasurements(x: Short, y: Short, width: UShort, height: UShort) {
+    fun setMeasurements(x: Int, y: Int, width: UInt, height: UInt) {
         if (this.isFullyInitialized) {
             throw IllegalStateException("Tried to set values on monitor ${this.id}:$this.name but values are already set!")
         }
 
-        this.x = x.toInt()
-        this.y = y.toInt()
+        this.x = x
+        this.y = y
         this.width = width.toInt()
         this.height = height.toInt()
 

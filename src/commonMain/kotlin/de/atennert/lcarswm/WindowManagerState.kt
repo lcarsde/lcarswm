@@ -4,10 +4,7 @@ package de.atennert.lcarswm
  * Container class for the state of the window manager.
  */
 class WindowManagerState(
-    val screenRoot: UInt,
-    val lcarsWindowId: UInt,
-    val graphicsContexts: List<UInt>,
-    private val atomProvider: Function1<String, UInt>
+    private val atomProvider: Function1<String, ULong>
 ) {
     val wmState = atomProvider("WM_STATE")
 
@@ -17,10 +14,7 @@ class WindowManagerState(
         private set
 
     /** map that holds the key sym to all registered key codes */
-    val keyboardKeys = HashMap<UByte, Int>()
-
-    /** List that holds all key codes for our used modifier key */
-    val modifierKeys = ArrayList<UByte>(8)
+    val keyboardKeys = HashMap<UInt, Int>()
 
     val activeWindow: Window?
         get() = this.windows.lastOrNull()?.first
@@ -40,17 +34,17 @@ class WindowManagerState(
         return monitors[0]
     }
 
-    fun removeWindow(windowId: UInt) {
+    fun removeWindow(windowId: ULong) {
         this.windows.removeAll { (window, _) -> window.id == windowId }
     }
 
-    fun getWindowMonitor(windowId: UInt): Monitor? {
+    fun getWindowMonitor(windowId: ULong): Monitor? {
         return this.windows
             .find { (window, _) -> window.id == windowId }
             ?.second
     }
 
-    fun updateMonitors(monitors: List<Monitor>, updateWindowFcn: Function2<List<Int>, UInt, Unit>) {
+    fun updateMonitors(monitors: List<Monitor>, updateWindowFcn: Function2<List<Int>, ULong, Unit>) {
         this.monitors.clear()
         this.monitors.addAll(monitors)
 
@@ -66,7 +60,7 @@ class WindowManagerState(
         }
     }
 
-    fun updateScreenMode(screenMode: ScreenMode, updateWindowFcn: Function2<List<Int>, UInt, Unit>) {
+    fun updateScreenMode(screenMode: ScreenMode, updateWindowFcn: Function2<List<Int>, ULong, Unit>) {
         this.screenMode = screenMode
 
         this.monitors.forEach { monitor ->
@@ -110,4 +104,6 @@ class WindowManagerState(
         monitor.isPrimary -> ScreenMode.NORMAL
         else -> ScreenMode.MAXIMIZED
     }
+
+    fun hasWindow(window: ULong) = this.windows.find { (w, _) -> w.id == window } != null
 }

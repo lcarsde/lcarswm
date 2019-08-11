@@ -1,267 +1,156 @@
-import cnames.structs.xcb_connection_t
 import de.atennert.lcarswm.*
 import kotlinx.cinterop.*
-import xcb.*
+import xlib.*
 
-private const val NO_RANDR_BASE = -1
-
-private val WM_MODIFIER_KEY = XCB_MOD_MASK_4 // should be windows key
-
-private val LCARS_WM_KEY_SYMS = listOf(
-    XK_Tab, // toggle through windows
-    XK_Up, // move windows up the monitor list
-    XK_Down, // move windows down the monitor list
-    XK_M, // toggle screen mode
-    XK_Q, // quit
-    XK_T, // terminal
-    XK_B, // browser
-    XK_I, // IntelliJ
-    XK_L  // LXTerminal
-)
+private var wmDetected = false
 
 fun main() {
     println("::main::start lcarswm initialization")
 
     memScoped {
         val display = XOpenDisplay(null) ?: error("::main::display from setup")
+        val screen = XDefaultScreenOfDisplay(display)?.pointed ?: error("::main::got no screen")
+        val rootWindow = screen.root
 
-        val xcbConnection = XGetXCBConnection(display) ?: error("::main::no XCB connection from setup")
+        XSetErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
-        val setup = xcb_get_setup(xcbConnection)
-        val screen = xcb_setup_roots_iterator(setup).ptr.pointed.data?.pointed ?: error("::main::got no screen")
-        println("::main::Screen size: ${screen.width_in_pixels}/${screen.height_in_pixels}, root: ${screen.root}")
+        XSelectInput(display, rootWindow, SubstructureRedirectMask or SubstructureNotifyMask)
+        XSync(display, X_FALSE)
 
-        val colorMap = allocateColorMap(xcbConnection, screen.root_visual, screen.root)
-        val graphicsContexts = getGraphicContexts(xcbConnection, screen.root, colorMap.second)
+        if (wmDetected) {
+            println("::main::Detected another active window manager")
+            return
+        }
 
-        val windowManagerConfig = WindowManagerState(
-            screen.root, xcb_generate_id(xcbConnection), graphicsContexts
-        ) { getAtom(xcbConnection, it) }
+        XSetErrorHandler(staticCFunction { _, err -> println("::main::error code: ${err?.pointed?.error_code}"); 0 })
 
-        setupLcarsWindow(xcbConnection, screen, windowManagerConfig.lcarsWindowId)
+        println("::main::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
-        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 1) // left mouse button
-        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 2) // middle mouse button
-        registerButton(xcbConnection, windowManagerConfig.lcarsWindowId, 3) // right mouse button
+        val colorMap = allocateColorMap(display, screen.root_visual, rootWindow)
+        val graphicsContexts = getGraphicContexts(display, rootWindow, colorMap.second)
+
+        println("::main::graphics loaded")
+
+        val windowManagerConfig = WindowManagerState { XInternAtom(display, it, X_FALSE) }
+
+        println("::main::wm state initialized")
+
+        val lcarsWindow = setupLcarsWindow(display, screen, windowManagerConfig)
+
+        println("::main::wm window initialized: $lcarsWindow")
 
         val logoImage = allocArrayOfPointersTo(alloc<XImage>())
 
         XpmReadFileToImage(display, "/usr/share/pixmaps/lcarswm.xpm", logoImage, null, null)
 
-        val randrBase = setupRandr(xcbConnection, windowManagerConfig, display, logoImage[0]!!)
+        println("::main::logo loaded")
 
-        setupScreen(xcbConnection, windowManagerConfig)
+        val randrBase = setupRandr(display, windowManagerConfig, logoImage[0]!!, rootWindow, lcarsWindow, graphicsContexts)
 
-        setupKeys(xcbConnection, windowManagerConfig)
+        println("::main::set up randr")
 
-        val values = UIntArray(2)
-        values[0] = XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT or
-                XCB_EVENT_MASK_STRUCTURE_NOTIFY or
-                XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
+        setupScreen(display, rootWindow, lcarsWindow, windowManagerConfig)
 
-        val cookie =
-            xcb_change_window_attributes_checked(xcbConnection, screen.root, XCB_CW_EVENT_MASK, values.toCValues())
-        val error = xcb_request_check(xcbConnection, cookie)
-
-        xcb_flush(xcbConnection)
-
-        if (error != null) {
-            cleanupColorMap(xcbConnection, colorMap)
-            xcb_disconnect(xcbConnection)
-            error(
-                "::main::Can't get SUBSTRUCTURE REDIRECT. Error code: ${error.pointed.error_code}\n" +
-                        "Another window manager running? Exiting."
-            )
-        }
+        println("::main::loaded window tree")
 
         runProgram("/usr/bin/VBoxClient-all")
 
-        // event loop
-        eventLoop(xcbConnection, windowManagerConfig, randrBase, display, logoImage[0]!!)
+        println("::main::started vbox client")
 
-        cleanupColorMap(xcbConnection, colorMap)
-        xcb_disconnect(xcbConnection)
+        eventLoop(display, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, lcarsWindow, graphicsContexts)
+
+        cleanupColorMap(display, colorMap)
     }
 
     println("::main::lcarswm stopped")
 }
 
-fun setupScreen(xcbConnection: CPointer<xcb_connection_t>, windowManagerConfig: WindowManagerState) {
-    val queryTree = xcb_query_tree(xcbConnection, windowManagerConfig.screenRoot)
-    val queryTreeReply = xcb_query_tree_reply(xcbConnection, queryTree, null) ?: return
+fun setupScreen(display: CPointer<Display>, rootWindow: ULong, lcarsWindow: ULong, windowManagerConfig: WindowManagerState) {
+    XGrabServer(display)
 
-    val childWindowCount = xcb_query_tree_children_length(queryTreeReply)
-    val childWindows = xcb_query_tree_children(queryTreeReply)!!
+    val returnedWindows = ULongArray(1)
+    val returnedParent = ULongArray(1)
+    val topLevelWindows = nativeHeap.allocPointerTo<ULongVarOf<ULong>>()
+    val topLevelWindowCount = UIntArray(1)
 
-    UIntArray(childWindowCount) { childWindows[it] }
-        .filter { childId -> childId != windowManagerConfig.lcarsWindowId }
+    XQueryTree(display, rootWindow, returnedWindows.toCValues(), returnedParent.toCValues(),
+        topLevelWindows.ptr,
+        topLevelWindowCount.toCValues())
+
+    ULongArray(topLevelWindowCount[0].toInt()) {topLevelWindows.value!![it]}
+        .filter { childId -> childId != lcarsWindow }
         .forEach { childId ->
-            addWindow(xcbConnection, windowManagerConfig, childId, true)
+            addWindow(display, windowManagerConfig, lcarsWindow, childId, true)
         }
 
-    xcb_flush(xcbConnection)
-    nativeHeap.free(queryTreeReply)
-}
-
-/**
- * Setup keyboard handling. Keys without key code for the key sym will not be working.
- */
-fun setupKeys(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: WindowManagerState) {
-    val keySyms = xcb_key_symbols_alloc(xcbConnection)
-    val windowId = windowManagerState.screenRoot
-
-    // get all key codes for our modifier key and grab them
-    windowManagerState.modifierKeys.addAll(getModifierKeys(xcbConnection, WM_MODIFIER_KEY))
-    windowManagerState.modifierKeys
-        .onEach { keyCode ->
-            xcb_grab_key(
-                xcbConnection, 1.convert(), windowId, XCB_MOD_MASK_ANY.convert(), keyCode,
-                XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert()
-            )
-        }
-
-    // get and grab all key codes for the short cut keys
-    LCARS_WM_KEY_SYMS
-        .map { keySym -> Pair(keySym, getKeyCodeFromKeySym(keySym, keySyms)) }
-        .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
-        .onEach { (keySym, keyCode) -> windowManagerState.keyboardKeys[keyCode] = keySym }
-        .forEach { (_, keyCode) ->
-            xcb_grab_key(
-                xcbConnection, 1.convert(), windowId, WM_MODIFIER_KEY.convert(), keyCode,
-                XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert()
-            )
-        }
-
-    xcb_flush(xcbConnection)
-    xcb_key_symbols_free(keySyms)
-    return
-}
-
-fun getModifierKeys(
-    xcbConnection: CPointer<xcb_connection_t>,
-    modifierKey: UInt
-): Collection<UByte> {
-    // the order determines the placing of what we look for in the result and comes from X
-    val modifierIndex = arrayOf(
-        XCB_MOD_MASK_SHIFT,
-        XCB_MOD_MASK_LOCK,
-        XCB_MOD_MASK_CONTROL,
-        XCB_MOD_MASK_1,
-        XCB_MOD_MASK_2,
-        XCB_MOD_MASK_3,
-        XCB_MOD_MASK_4,
-        XCB_MOD_MASK_5
-    ).indexOf(modifierKey)
-
-    val modCookie = xcb_get_modifier_mapping_unchecked(xcbConnection)
-    val modReply = xcb_get_modifier_mapping_reply(xcbConnection, modCookie, null) ?: return emptyList()
-    val modMap = xcb_get_modifier_mapping_keycodes(modReply)!!
-
-    val startPosition = modifierIndex * modReply.pointed.keycodes_per_modifier.toInt()
-    val endPosition = startPosition + modReply.pointed.keycodes_per_modifier.toInt()
-    val modKeys = ArrayList<UByte>(modReply.pointed.keycodes_per_modifier.toInt())
-
-    for (i in startPosition until endPosition) {
-        modKeys.add(modMap[i])
-    }
-
-    nativeHeap.free(modReply)
-
-    return modKeys
-}
-
-/**
- * Get the key code for a key symbol for registration.
- */
-fun getKeyCodeFromKeySym(keySym: Int, keySyms: CPointer<xcb_key_symbols_t>?): xcb_keycode_t {
-    val keyPointer = xcb_key_symbols_get_keycode(keySyms, keySym.convert())
-
-    if (keyPointer == null) {
-        println("::getKeyCodeFromKeySym::unable to get key code for $keySym")
-        return 0.convert()
-    }
-
-    val key = keyPointer.pointed.value
-    nativeHeap.free(keyPointer)
-    return key
-}
-
-private fun registerButton(xcbConnection: CPointer<xcb_connection_t>, window: xcb_window_t, buttonId: Int) {
-    xcb_grab_button(
-        xcbConnection, 0.convert(), window,
-        (XCB_EVENT_MASK_BUTTON_PRESS or XCB_EVENT_MASK_BUTTON_RELEASE).convert(),
-        XCB_GRAB_MODE_ASYNC.convert(), XCB_GRAB_MODE_ASYNC.convert(), window,
-        XCB_NONE.convert(), buttonId.convert(), XCB_NONE.convert()
-    )
+    nativeHeap.free(topLevelWindows)
+    XUngrabServer(display)
 }
 
 /**
  * @return RANDR base value
  */
 private fun setupRandr(
-    xcbConnection: CPointer<xcb_connection_t>,
-    windowManagerState: WindowManagerState,
     display: CPointer<Display>,
-    image: CPointer<XImage>
+    windowManagerState: WindowManagerState,
+    image: CPointer<XImage>,
+    rootWindow: ULong,
+    lcarsWindow: ULong,
+    graphicsContexts: List<GC>
 ): Int {
-    val extension = xcb_get_extension_data(xcbConnection, xcb_randr_id.ptr)!!.pointed
+    val eventBase = IntArray(1)
+    val errorBase = IntArray(1)
 
-    if (extension.present.toInt() == 0) {
+    if (XRRQueryExtension(display, eventBase.toCValues(), errorBase.toCValues()) == X_FALSE) {
         println("::setupRandr::no RANDR extension")
         return NO_RANDR_BASE
     }
 
-    handleRandrEvent(xcbConnection, windowManagerState, display, image)
+    handleRandrEvent(display, windowManagerState, image, rootWindow, lcarsWindow, graphicsContexts)
 
-    xcb_randr_select_input(
-        xcbConnection, windowManagerState.screenRoot.convert(),
-        (XCB_RANDR_NOTIFY_MASK_SCREEN_CHANGE or
-                XCB_RANDR_NOTIFY_MASK_OUTPUT_CHANGE or
-                XCB_RANDR_NOTIFY_CRTC_CHANGE or
-                XCB_RANDR_NOTIFY_MASK_OUTPUT_PROPERTY).convert()
-    )
+    XRRSelectInput(display, rootWindow,
+        (RRScreenChangeNotifyMask or
+                RROutputChangeNotifyMask or
+                RRCrtcChangeNotifyMask or
+                RROutputPropertyNotifyMask).convert() )
 
-    xcb_flush(xcbConnection)
+    XSync(display, X_FALSE)
 
-    println("::setupRandr::RANDR base: ${extension.first_event}")
+    println("::setupRandr::RANDR base: ${eventBase[0]}")
 
-    return extension.first_event.toInt()
+    return eventBase[0]
 }
 
 private fun eventLoop(
-    xcbConnection: CPointer<xcb_connection_t>,
+    display: CPointer<Display>,
     windowManagerState: WindowManagerState,
     randrBase: Int,
-    display: CPointer<Display>,
-    image: CPointer<XImage>
+    image: CPointer<XImage>,
+    rootWindow: ULong,
+    lcarsWindow: ULong,
+    graphicsContexts: List<GC>
 ) {
-    val randrEventValue = randrBase + XCB_RANDR_SCREEN_CHANGE_NOTIFY
+    val randrEventValue = randrBase + RRScreenChangeNotify
 
     while (true) {
-        val xEvent = xcb_wait_for_event(xcbConnection) ?: continue // TODO check for connection error
-        val eventValue = xEvent.pointed.response_type.toInt()
-        val eventId = eventValue and (0x08.inv())
+        val xEvent = nativeHeap.alloc<XEvent>()
+        XNextEvent(display, xEvent.ptr)
+        val eventValue = xEvent.type
 
         if (eventValue == randrEventValue) {
             println("::eventLoop::received randr event")
-            handleRandrEvent(xcbConnection, windowManagerState, display, image)
+            handleRandrEvent(display, windowManagerState, image, rootWindow, lcarsWindow, graphicsContexts)
             nativeHeap.free(xEvent)
             continue
         }
 
-        try {
-            val eventType = XcbEvent.getEventTypeForCode(eventId) // throws IllegalArgumentException
-
-            if (EVENT_HANDLERS.containsKey(eventType)) {
-                val stop = EVENT_HANDLERS[eventType]!!.invoke(xcbConnection, windowManagerState, xEvent, display, image)
-                if (stop) {
-                    break
-                }
-            } else {
-                println("::eventLoop::unhandled event: $eventType > $eventId")
+        if (EVENT_HANDLERS.containsKey(xEvent.type)) {
+            val stop = EVENT_HANDLERS[xEvent.type]!!.invoke(display, windowManagerState, xEvent, image, rootWindow, lcarsWindow, graphicsContexts)
+            if (stop) {
+                break
             }
-        } catch (ex: IllegalArgumentException) {
-            println("WARN: " + ex.message)
+        } else {
+            println("::eventLoop::unhandled event: ${xEvent.type}")
         }
 
         nativeHeap.free(xEvent)

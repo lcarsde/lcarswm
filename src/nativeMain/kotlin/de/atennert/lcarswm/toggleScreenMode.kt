@@ -1,16 +1,20 @@
 package de.atennert.lcarswm
 
-import cnames.structs.xcb_connection_t
 import kotlinx.cinterop.CPointer
-import xcb.Display
-import xcb.XImage
-import xcb.xcb_flush
+import xlib.Display
+import xlib.GC
+import xlib.XImage
 
 /**
  * Toggle screen mode including window resizing/repositioning
  */
-fun toggleScreenMode(xcbConnection: CPointer<xcb_connection_t>, windowManagerState: WindowManagerState,
-                     display: CPointer<Display>, image: CPointer<XImage>) {
+fun toggleScreenMode(
+    display: CPointer<Display>,
+    windowManagerState: WindowManagerState,
+    image: CPointer<XImage>,
+    lcarsWindow: ULong,
+    graphicsContexts: List<GC>
+) {
     val screenMode = when (windowManagerState.screenMode) {
         ScreenMode.NORMAL -> ScreenMode.MAXIMIZED
         ScreenMode.MAXIMIZED -> ScreenMode.FULLSCREEN
@@ -18,19 +22,17 @@ fun toggleScreenMode(xcbConnection: CPointer<xcb_connection_t>, windowManagerSta
     }
 
     windowManagerState.updateScreenMode(screenMode)
-    { measurements, windowId -> adjustWindowPositionAndSize(xcbConnection, measurements, windowId, false) }
+    { measurements, windowId -> adjustWindowPositionAndSize(display, measurements, windowId) }
 
     windowManagerState.monitors.forEach {monitor ->
         val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
         val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
         drawFunction(
-            xcbConnection,
-            windowManagerState,
+            graphicsContexts,
+            lcarsWindow,
             display,
             monitor,
             image
         )
     }
-
-    xcb_flush(xcbConnection)
 }

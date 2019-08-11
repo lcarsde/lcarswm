@@ -12,7 +12,7 @@ repositories {
 kotlin {
     linuxX64("native") {
         compilations.main.cinterops {
-            xcb
+            xlib
         }
         binaries {
             executable()
