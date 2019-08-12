@@ -8,16 +8,15 @@ import xlib.*
  */
 val EVENT_HANDLERS =
     hashMapOf<Int, Function7<CPointer<Display>, WindowManagerState, XEvent, CPointer<XImage>, ULong, ULong, List<GC>, Boolean>>(
-        // TODO handle create
         Pair(KeyPress, { d, w, e, _, _, _, _ -> handleKeyPress(d, w, e) }),
         Pair(KeyRelease, { d, w, e, l, _, lw, gc -> handleKeyRelease(d, w, e, l, lw, gc) }),
         Pair(ButtonPress, { _, _, e, _, _, _, _ -> handleButtonPress(e) }),
         Pair(ButtonRelease, { _, _, e, _, _, _, _ -> handleButtonRelease(e) }),
         Pair(ConfigureRequest, { d, w, e, _, _, _, _ -> handleConfigureRequest(d, w, e) }),
         Pair(MapRequest, { d, w, e, _, _, lw, _ -> handleMapRequest(d, w, e, lw) }),
-        Pair(MapNotify, { d, w, e, l, _, lw, gc -> handleMapNotify(d, w, e, l, lw, gc) }),
+        Pair(MapNotify, { _, _, e, _, _, _, _ -> handleMapNotify(e) }),
         Pair(DestroyNotify, { _, w, e, _, _, _, _ -> handleDestroyNotify(w, e) }),
-        Pair(UnmapNotify, { d, w, e, _, rw, _, _ -> handleUnmapNotify(d, w, e, rw) }),
+        Pair(UnmapNotify, ::handleUnmapNotify),
         Pair(ReparentNotify, { _, _, e, _, _, _, _ -> handleReparentNotify(e) }),
         Pair(CreateNotify, { _, _, e, _, _, _, _ -> handleCreateNotify(e) }),
         Pair(ConfigureNotify, { _, _, e, _, _, _, _ -> handleConfigureNotify(e) })
@@ -122,32 +121,11 @@ private fun handleMapRequest(
     return false
 }
 
-private fun handleMapNotify(
-    display: CPointer<Display>,
-    windowManagerState: WindowManagerState,
-    xEvent: XEvent,
-    image: CPointer<XImage>,
-    lcarsWindow: ULong,
-    graphicsContexts: List<GC>
-): Boolean {
+private fun handleMapNotify(xEvent: XEvent): Boolean {
     @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent.xmap
     val window = mapEvent.window
     println("::handleMapNotify::map notify for window $window")
-
-    if (window == lcarsWindow) {
-        windowManagerState.monitors.forEach { monitor ->
-            val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
-            val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
-            drawFunction(
-                graphicsContexts,
-                lcarsWindow,
-                display,
-                monitor,
-                image
-            )
-        }
-    }
 
     return false
 }
@@ -173,11 +151,6 @@ private fun handleConfigureRequest(
     println("::handleConfigureRequest::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}")
     val windowMonitor = windowManagerState.getWindowMonitor(configureEvent.window)
     if (windowMonitor != null) {
-        adjustWindowPositionAndSize(
-            display,
-            windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor)),
-            configureEvent.window
-        )
         return false
     }
 
@@ -216,7 +189,10 @@ private fun handleUnmapNotify(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
-    rootWindow: ULong
+    image: CPointer<XImage>,
+    rootWindow: ULong,
+    lcarsWindow: ULong,
+    graphicsContexts: List<GC>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val unmapEvent = xEvent.xunmap
@@ -230,6 +206,18 @@ private fun handleUnmapNotify(
         moveNextWindowToTopOfStack(display, windowManagerState)
     }
 
+    windowManagerState.monitors.forEach { monitor ->
+        val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
+        val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
+        println("::handleRandrEvent::draw monitor ${monitor.id} :: ${monitor.name}")
+        drawFunction(
+            graphicsContexts,
+            lcarsWindow,
+            display,
+            monitor,
+            image
+        )
+    }
     return false
 }
 

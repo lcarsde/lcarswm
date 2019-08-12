@@ -60,6 +60,8 @@ fun main() {
         eventLoop(display, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, lcarsWindow, graphicsContexts)
 
         cleanupColorMap(display, colorMap)
+
+        XCloseDisplay(display)
     }
 
     println("::main::lcarswm stopped")
@@ -98,10 +100,10 @@ private fun setupRandr(
     lcarsWindow: ULong,
     graphicsContexts: List<GC>
 ): Int {
-    val eventBase = IntArray(1)
-    val errorBase = IntArray(1)
+    val eventBase = IntArray(1).pin()
+    val errorBase = IntArray(1).pin()
 
-    if (XRRQueryExtension(display, eventBase.toCValues(), errorBase.toCValues()) == X_FALSE) {
+    if (XRRQueryExtension(display, eventBase.addressOf(0), errorBase.addressOf(0)) == X_FALSE) {
         println("::setupRandr::no RANDR extension")
         return NO_RANDR_BASE
     }
@@ -114,11 +116,9 @@ private fun setupRandr(
                 RRCrtcChangeNotifyMask or
                 RROutputPropertyNotifyMask).convert() )
 
-    XSync(display, X_FALSE)
+    println("::setupRandr::RANDR base: ${eventBase.get()[0]}, error base: ${errorBase.get()[0]}")
 
-    println("::setupRandr::RANDR base: ${eventBase[0]}")
-
-    return eventBase[0]
+    return eventBase.get()[0]
 }
 
 private fun eventLoop(
