@@ -20,13 +20,13 @@ Thank you very much to the creators of the following resources:
 
 ## Required
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
-* header files and libraries for xcb, X11, randr and xpm. Check the travis yaml file to see the install routines for Ubuntu.
+* header files and libraries for XLib, randr and xpm. Check the travis yaml file to see the install routines for Ubuntu.
 
 ## Notes to myself :-)
 * The main method needs to be outside of any packages so that the compiler can find it.
 
 ## Sources
-There are common* and native* source directories under `src`. Everything that interacts with XCB or other native resources is in native. Everything that has no native dependency is in the common* directories. The goal is to keep the native code as small as possible and put as much as possible in the common part.
+There are common* and native* source directories under `src`. Everything that interacts with XLib or other native resources is in native. Everything that has no native dependency is in the common* directories. The goal is to keep the native code as small as possible and put as much as possible in the common part.
 
 ## Automated testing
 Automated tests are set up using Travis CI. It's working well except for the fact, that the whole environment is downloaded again for every test run. That means downloads of over 500MB, which takes time. However, it's working and that's good enough for me for now.
