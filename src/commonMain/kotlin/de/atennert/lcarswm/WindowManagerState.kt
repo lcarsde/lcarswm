@@ -68,9 +68,11 @@ class WindowManagerState(
 
         this.monitors.forEach { monitor ->
             val measurements = monitor.getCurrentWindowMeasurements(getScreenModeForMonitor(monitor))
-            this.windows.forEach { (window, _) ->
-                updateWindowFcn(measurements, window.id)
-            }
+            this.windows
+                .filter { (_, windowMonitor) -> windowMonitor == monitor }
+                .forEach { (window, _) ->
+                    updateWindowFcn(measurements, window.id)
+                }
         }
     }
 
