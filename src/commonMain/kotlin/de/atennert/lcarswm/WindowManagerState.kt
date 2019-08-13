@@ -16,6 +16,9 @@ class WindowManagerState(
     /** map that holds the key sym to all registered key codes */
     val keyboardKeys = HashMap<UInt, Int>()
 
+    /** List that holds all key codes for our used modifier key */
+    val modifierKeys = ArrayList<UByte>(8)
+
     val activeWindow: Window?
         get() = this.windows.lastOrNull()?.first
 

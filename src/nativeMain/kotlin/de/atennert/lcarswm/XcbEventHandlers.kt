@@ -209,7 +209,6 @@ private fun handleUnmapNotify(
     windowManagerState.monitors.forEach { monitor ->
         val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
         val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
-        println("::handleRandrEvent::draw monitor ${monitor.id} :: ${monitor.name}")
         drawFunction(
             graphicsContexts,
             lcarsWindow,
@@ -269,8 +268,6 @@ fun handleRandrEvent(
         }
         .filter { it.isFullyInitialized }
 
-    println("::handleRandrEvent::used monitors: ${sortedMonitors[true]?.size}, unused monitors: ${sortedMonitors[false]?.size}")
-
     val (width, height) = activeMonitors
         .fold(Pair(0, 0)) { (width, height), monitor ->
             var newWidth = width
@@ -293,7 +290,6 @@ fun handleRandrEvent(
     windowManagerState.monitors.forEach { monitor ->
         val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
         val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
-        println("::handleRandrEvent::draw monitor ${monitor.id} :: ${monitor.name}")
         drawFunction(
             graphicsContexts,
             lcarsWindow,
