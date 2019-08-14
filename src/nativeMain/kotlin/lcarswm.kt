@@ -36,6 +36,13 @@ fun main() {
         println("::main::wm state initialized")
 
         val lcarsWindow = setupLcarsWindow(display, screen, windowManagerConfig)
+        windowManagerConfig.setActiveWindowListener { activeWindow ->
+            if (activeWindow != null) {
+                XSetInputFocus(display, activeWindow.id, RevertToParent, CurrentTime.convert())
+            } else {
+                XSetInputFocus(display, lcarsWindow, RevertToPointerRoot, CurrentTime.convert())
+            }
+        }
 
         println("::main::wm window initialized: $lcarsWindow")
 

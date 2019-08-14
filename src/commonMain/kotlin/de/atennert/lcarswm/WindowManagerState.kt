@@ -22,6 +22,8 @@ class WindowManagerState(
     val activeWindow: Window?
         get() = this.windows.lastOrNull()?.first
 
+    private var activeWindowListener: (Window?) -> Unit = {}
+
     var screenSize = Pair(0, 0)
 
     val monitors = ArrayList<Monitor>(3)
@@ -33,12 +35,14 @@ class WindowManagerState(
      */
     fun addWindow(window: Window): Monitor {
         this.windows.add(Pair(window, monitors[0]))
+        this.activeWindowListener(this.activeWindow)
 
         return monitors[0]
     }
 
     fun removeWindow(windowId: ULong) {
         this.windows.removeAll { (window, _) -> window.id == windowId }
+        this.activeWindowListener(this.activeWindow)
     }
 
     fun getWindowMonitor(windowId: ULong): Monitor? {
@@ -81,6 +85,7 @@ class WindowManagerState(
             val currentActiveWindow = windows.removeAt(windows.lastIndex)
             windows.add(0, currentActiveWindow)
         }
+        this.activeWindowListener(this.activeWindow)
         return this.activeWindow
     }
 
@@ -111,4 +116,9 @@ class WindowManagerState(
     }
 
     fun hasWindow(window: ULong) = this.windows.find { (w, _) -> w.id == window } != null
+
+    fun setActiveWindowListener(activeWindowListener: (Window?) -> Unit) {
+        this.activeWindowListener = activeWindowListener
+        activeWindowListener(this.activeWindow)
+    }
 }

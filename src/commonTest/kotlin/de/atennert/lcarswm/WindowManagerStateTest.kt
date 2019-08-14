@@ -3,6 +3,7 @@ package de.atennert.lcarswm
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Tests for the WindowManagerState class
@@ -242,5 +243,73 @@ class WindowManagerStateTest {
         val windowManagerState = WindowManagerState { 1.toULong() }
 
         assertEquals(ScreenMode.MAXIMIZED, windowManagerState.getScreenModeForMonitor(monitor))
+    }
+
+    @Test
+    fun `get update with null for active window when no window is registered`() {
+        val windowManagerState = WindowManagerState { 1.toULong() }
+
+        var activeWindow: Window? = null
+        var activeWindowSet = false
+        windowManagerState.setActiveWindowListener {activeWindowSet = true; activeWindow = it}
+
+        assertTrue(activeWindowSet, "The active window listener wasn't called")
+        assertNull(activeWindow, "The active window should be null but wasn't")
+    }
+
+    @Test
+    fun `get update for active window when a window is added`() {
+        val monitor = Monitor(1.toULong(), "name", false)
+        val windowManagerState = WindowManagerState { 1.toULong() }
+        val window = Window(1.toULong())
+
+        windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
+
+        var activeWindow: Window? = null
+        windowManagerState.setActiveWindowListener {activeWindow = it}
+
+        windowManagerState.addWindow(window)
+
+        assertEquals(activeWindow, window, "No update for active window received")
+    }
+
+    @Test
+    fun `get update for active window when a window is removed`() {
+        val monitor = Monitor(1.toULong(), "name", false)
+        val windowManagerState = WindowManagerState { 1.toULong() }
+        val window1 = Window(1.toULong())
+        val window2 = Window(2.toULong())
+
+        windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
+
+        var activeWindow: Window? = null
+        windowManagerState.setActiveWindowListener {activeWindow = it}
+
+        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window2)
+
+        windowManagerState.removeWindow(window2.id)
+
+        assertEquals(activeWindow, window1, "No update for active window received")
+    }
+
+    @Test
+    fun `get update for active window when the active window is toggled`() {
+        val monitor = Monitor(1.toULong(), "name", false)
+        val windowManagerState = WindowManagerState { 1.toULong() }
+        val window1 = Window(1.toULong())
+        val window2 = Window(2.toULong())
+
+        windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
+
+        var activeWindow: Window? = null
+        windowManagerState.setActiveWindowListener {activeWindow = it}
+
+        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window2)
+
+        windowManagerState.toggleActiveWindow()
+
+        assertEquals(activeWindow, window1, "No update for active window received")
     }
 }
