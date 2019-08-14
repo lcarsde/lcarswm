@@ -210,28 +210,28 @@ private fun drawNormalFrame(
     bigBars[1].height = 40.toUShort()
 
     val middleBars = nativeHeap.allocArray<XRectangle>(4)
-    val middleSegmentWidth = (monitor.width - 280) / 5
+    val middleSegmentWidth = (monitor.width - 280) / 8
 
     // upper middle bars
     middleBars[0].x = (monitor.x + 240).toShort()
     middleBars[0].y = (monitor.y + 176).toShort()
-    middleBars[0].width = (middleSegmentWidth * 4 - 8).toUShort()
+    middleBars[0].width = (middleSegmentWidth * 6 - 8).toUShort()
     middleBars[0].height = 16.toUShort()
 
-    middleBars[1].x = (monitor.x + 240 + middleSegmentWidth * 4).toShort()
+    middleBars[1].x = (monitor.x + 240 + middleSegmentWidth * 6).toShort()
     middleBars[1].y = (monitor.y + 176).toShort()
-    middleBars[1].width = (middleSegmentWidth).toUShort()
+    middleBars[1].width = (middleSegmentWidth * 2).toUShort()
     middleBars[1].height = 16.toUShort()
 
     // lower middle bars
     middleBars[2].x = (monitor.x + 240).toShort()
     middleBars[2].y = (monitor.y + 200).toShort()
-    middleBars[2].width = (middleSegmentWidth * 2).toUShort()
+    middleBars[2].width = (middleSegmentWidth * 3 - 8).toUShort()
     middleBars[2].height = 16.toUShort()
 
-    middleBars[3].x = (monitor.x + 248 + middleSegmentWidth * 2).toShort()
+    middleBars[3].x = (monitor.x + 240 + middleSegmentWidth * 3).toShort()
     middleBars[3].y = (monitor.y + 200).toShort()
-    middleBars[3].width = (middleSegmentWidth * 3 - 8).toUShort()
+    middleBars[3].width = (middleSegmentWidth * 5).toUShort()
     middleBars[3].height = 16.toUShort()
 
     val sideBars = nativeHeap.allocArray<XRectangle>(2)
