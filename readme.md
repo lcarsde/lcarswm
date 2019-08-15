@@ -73,4 +73,3 @@ The logo is a xpm file. It needs to be located in /usr/share/pixmaps and must be
 ## Known issues
 * Some popups don't render (noticed on IntelliJ startup tips popup)
 * Popups probably shouldn't be scaled, but instead centered in the window area
-* IntelliJ: when coding hints popup and the window closes then the input focus is lost

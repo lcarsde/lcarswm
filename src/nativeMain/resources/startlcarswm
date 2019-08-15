@@ -33,4 +33,4 @@ fi
 #export XDG_CURRENT_DESKTOP="LCARSWM"
 
 # Start the LXDE session
-exec /path/to/lcarswm.kexe
+exec /usr/bin/lcarswm.kexe

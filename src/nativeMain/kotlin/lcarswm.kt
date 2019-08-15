@@ -38,7 +38,7 @@ fun main() {
         val lcarsWindow = setupLcarsWindow(display, screen, windowManagerConfig)
         windowManagerConfig.setActiveWindowListener { activeWindow ->
             if (activeWindow != null) {
-                XSetInputFocus(display, activeWindow.id, RevertToParent, CurrentTime.convert())
+                XSetInputFocus(display, activeWindow.id, RevertToNone, CurrentTime.convert())
             } else {
                 XSetInputFocus(display, lcarsWindow, RevertToPointerRoot, CurrentTime.convert())
             }
