@@ -60,10 +60,6 @@ fun main() {
 
         println("::main::loaded window tree")
 
-//        runProgram("/usr/bin/VBoxClient-all")
-
-//        println("::main::started vbox client")
-
         eventLoop(display, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, lcarsWindow, graphicsContexts)
 
         cleanupColorMap(display, colorMap)

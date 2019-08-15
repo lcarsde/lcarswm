@@ -12,11 +12,22 @@ Thank you very much to the creators of the following resources:
 
 ## Functionality
 * Windows-key + Q closes the window manager
-* Windows-key + T opens a terminal
+* Windows-key + T opens xterm
+* Windows-key + B (Browser) opens Firefox
+* Windows-key + I opens IDEA (chosen because it has some popup windows when opening tha application and they don't render correctly yet)
 * Windows-key + Tab toggles through the windows
 * Windows-key + Up/Down moves the active window to other monitors
 * Windows-key + M toggles the display mode between normal, maximized and fullscreen
 * Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
+
+## Pictures
+Yay, it's starting to get somewhat usable. So here are some pictures from the VirtualBox test environment.
+
+![lcarswm in normal mode](doc/screen-normal-mode.png)
+
+![lcarswm in normal mode](doc/screen-maximized-mode.png)
+
+![lcarswm in normal mode](doc/screen-fullscreen-mode.png)
 
 ## Required
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
