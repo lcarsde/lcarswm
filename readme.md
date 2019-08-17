@@ -39,6 +39,8 @@ Fullscreen mode
 ## Known issues
 * Some popups don't render (noticed on IntelliJ startup tips popup)
 * Popups probably shouldn't be scaled, but instead centered in the window area
+* lxterminal doesn't render until it went through a switch of the active application
+* App internal popup windows have a large offset and so do mouse resize pointers on window internal borders
 
 ## To do
 * Configuration for application key bindings
