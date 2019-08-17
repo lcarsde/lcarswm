@@ -7,9 +7,11 @@ const val X_TRUE = 1
 
 const val NO_RANDR_BASE = -1
 
+const val KEY_CONFIG_FILE = "key-config.properties"
+
 const val WM_MODIFIER_KEY = Mod4Mask // should be windows key
 
-const val ALT_MODIFIER_KAY = Mod1Mask
+const val ALT_MODIFIER_KEY = Mod1Mask
 
 val LCARS_WM_KEY_SYMS = listOf(
     XK_Tab, // toggle through windows
@@ -19,6 +21,5 @@ val LCARS_WM_KEY_SYMS = listOf(
     XK_Q, // quit
     XK_T, // terminal
     XK_B, // browser
-    XK_I, // IntelliJ
-    XK_L  // LXTerminal
+    XK_I // IntelliJ
 )

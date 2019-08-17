@@ -71,10 +71,9 @@ private fun handleKeyRelease(
 
     when (windowManagerState.keyboardKeys[key]) {
         XK_M -> toggleScreenMode(display, windowManagerState, image, lcarsWindow, graphicsContexts)
-        XK_T -> runProgram("/usr/bin/xterm")
-        XK_B -> runProgram("/usr/bin/firefox")
-        XK_I -> runProgram("/usr/bin/idea")
-        XK_L -> runProgram("/usr/bin/lxterminal")
+        XK_T -> loadAppFromKeyBinding("Win+T")
+        XK_B -> loadAppFromKeyBinding("Win+B")
+        XK_I -> loadAppFromKeyBinding("Win+I")
         XK_Q -> return true
         else -> println("::handleKeyRelease::unknown key: $key")
     }
@@ -345,4 +344,11 @@ private fun moveActiveWindow(
         newMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(newMonitor)),
         activeWindow.id
     )
+}
+
+
+private fun loadAppFromKeyBinding(keyBinding: String) {
+    val program = readFromConfig(KEY_CONFIG_FILE, keyBinding) ?: return
+    println("::loadAppFromKeyBinding::loading app $program")
+    runProgram(program)
 }

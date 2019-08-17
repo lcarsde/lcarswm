@@ -82,7 +82,7 @@ private fun getModifierKeys(display: CValuesRef<Display>, modifierKey: Int): Col
 
 private fun grabButton(display: CPointer<Display>, window: ULong, buttonId: Int) {
     XGrabButton(
-        display, buttonId.convert(), WM_MODIFIER_KEY.convert(), window, X_TRUE,
+        display, buttonId.convert(), WM_MODIFIER_KEY.convert(), window, X_FALSE,
         (ButtonPressMask or ButtonMotionMask or ButtonReleaseMask).convert(),
         GrabModeAsync, GrabModeAsync, None.convert(), None.convert()
     )
