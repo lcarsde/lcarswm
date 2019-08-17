@@ -23,16 +23,51 @@ Thank you very much to the creators of the following resources:
 ## Pictures
 Yay, it's starting to get somewhat usable. So here are some pictures from the VirtualBox test environment.
 
+Normal mode
 ![lcarswm in normal mode](doc/screen-normal-mode.png)
 
+Maximized mode
 ![lcarswm in normal mode](doc/screen-maximized-mode.png)
 
+Fullscreen mode
 ![lcarswm in normal mode](doc/screen-fullscreen-mode.png)
 
 ## Required
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
-* header files and libraries for XLib, randr and xpm. Check the travis yaml file to see the install routines for Ubuntu.
+* header files and libraries for XLib, randr and xpm. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
 
+## Known issues
+* Some popups don't render (noticed on IntelliJ startup tips popup)
+* Popups probably shouldn't be scaled, but instead centered in the window area
+
+## To do
+* Configuration for application key bindings
+* Application selector
+* Content for the data bar (empty upper area in normal mode)
+  * Time
+  * Master volume
+  * Heat signature
+  * Processor usage
+  * Memory usage
+  * ...
+* Key bindings for
+  * Volume keys
+  * Application selection
+* GTK-Theme (if I can't find one)
+
+## Optional to do
+* Configuration for the colors
+
+## Some definitions
+* Height of top and bottom bar: 40px
+* Width of height and bottom bar ends: 32px
+* Width of bar gaps: 8px
+* Corner pieces have an inner corner with radius: 10px
+* Random data area height: 100px
+* Width of normal mode side bar: 184px
+
+## Logo
+The logo is a xpm file. It needs to be located in /usr/share/pixmaps and must be named lcarswm.xpm. It can be exchanged. The only restriction is that the logo height needs to be 40px. The bars will adjust to the width.
 ## Notes to myself :-)
 * The main method needs to be outside of any packages so that the compiler can find it.
 
@@ -58,18 +93,3 @@ startx /path/to/executable/lcarswm.kexe
 ```
 
 Probably one of the most interesting features in using a VM and RANDR is screen resizing. For me this works with using VBoxVGA as graphics controller and `VBoxClient-all` needs to be called after the activation of X to allow for resizing detection and all other things VBoxClient offers. Alternatively, VBoxClient can be called with specific flags.
-
-## Some definitions
-* Height of top and bottom bar: 40px
-* Width of height and bottom bar ends: 32px
-* Width of bar gaps: 8px
-* Corner pieces have an inner corner with radius: 10px
-* Random data area height: 100px
-* Width of normal mode side bar: 184px
-
-## Logo
-The logo is a xpm file. It needs to be located in /usr/share/pixmaps and must be named lcarswm.xpm. It can be exchanged. The only restriction is that the logo height needs to be 40px. The bars will adjust to the width.
-
-## Known issues
-* Some popups don't render (noticed on IntelliJ startup tips popup)
-* Popups probably shouldn't be scaled, but instead centered in the window area
