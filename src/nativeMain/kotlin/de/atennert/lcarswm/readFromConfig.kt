@@ -15,15 +15,14 @@ fun readFromConfig(fileName: String, key: String): String? {
 
     val configFile = fopen(configFilePath, "r") ?: return null
 
-    val entry = ByteArray(50).pin()
+    val entry = ByteArray(60).pin()
 
     var value: String? = null
-    while (fscanf(configFile, "%s", entry.addressOf(0)) != EOF) {
-        val entryString = entry.get().decodeToString()
+    while (fscanf(configFile,"%s", entry.addressOf(0)) != EOF) {
+        val entryString = entry.get().decodeToString().trim()
 
         val entryPair = entryString.split('=')
         if (entryPair[0] == key) {
-            listOf<String>()
             value = entryPair[1]
             break
         }

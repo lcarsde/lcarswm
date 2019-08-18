@@ -89,12 +89,12 @@ class WindowManagerState(
         return this.activeWindow
     }
 
-    fun moveWindowToNextMonitor(window: Window): Monitor {
-        return moveWindowToNewMonitor(window, 1)
-    }
-
     fun moveWindowToPreviousMonitor(window: Window): Monitor {
         return moveWindowToNewMonitor(window, -1)
+    }
+
+    fun moveWindowToNextMonitor(window: Window): Monitor {
+        return moveWindowToNewMonitor(window, 1)
     }
 
     private fun moveWindowToNewMonitor(window: Window, direction: Int): Monitor {

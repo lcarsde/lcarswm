@@ -47,8 +47,8 @@ private fun handleKeyPress(
     println("::handleKeyPress::Key pressed: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
-        XK_Up -> moveActiveWindow(display, windowManagerState, windowManagerState::moveWindowToPreviousMonitor)
-        XK_Down -> moveActiveWindow(display, windowManagerState, windowManagerState::moveWindowToNextMonitor)
+        XK_Up -> moveActiveWindow(display, windowManagerState, windowManagerState::moveWindowToNextMonitor)
+        XK_Down -> moveActiveWindow(display, windowManagerState, windowManagerState::moveWindowToPreviousMonitor)
         XK_Tab -> moveNextWindowToTopOfStack(display, windowManagerState)
         else -> println("::handleKeyRelease::unknown key: $key")
     }
@@ -338,10 +338,11 @@ private fun moveActiveWindow(
 ) {
     val activeWindow = windowManagerState.activeWindow ?: return
     val newMonitor = windowMoveFunction(activeWindow)
+    val measurements = newMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(newMonitor))
 
     adjustWindowPositionAndSize(
         display,
-        newMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(newMonitor)),
+        measurements,
         activeWindow.id
     )
 }
@@ -349,6 +350,6 @@ private fun moveActiveWindow(
 
 private fun loadAppFromKeyBinding(keyBinding: String) {
     val program = readFromConfig(KEY_CONFIG_FILE, keyBinding) ?: return
-    println("::loadAppFromKeyBinding::loading app $program")
+    println("::loadAppFromKeyBinding::loading app bb ${program}aa")
     runProgram(program)
 }
