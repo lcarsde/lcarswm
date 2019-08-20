@@ -33,7 +33,7 @@ class WindowManagerStateTest {
         val windowManagerState = WindowManagerState {1.toULong()}
 
         var receivedWindowId: ULong? = null
-        val windowUpdateFcn: Function2<List<Int>, ULong, Unit> = {_, windowId -> receivedWindowId = windowId}
+        val windowUpdateFcn: Function2<List<Int>, Window, Unit> = {_, window -> receivedWindowId = window.id}
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2), windowUpdateFcn)
 

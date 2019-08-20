@@ -13,6 +13,6 @@ fun moveNextWindowToTopOfStack(display: CPointer<Display>, windowManagerState: W
         val windowChanges = nativeHeap.alloc<XWindowChanges>()
         windowChanges.stack_mode = Above
 
-        XConfigureWindow(display, activeWindow.id, CWStackMode, windowChanges.ptr)
+        XConfigureWindow(display, activeWindow.frame, CWStackMode, windowChanges.ptr)
     }
 }

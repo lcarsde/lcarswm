@@ -9,13 +9,20 @@ import xlib.*
 fun adjustWindowPositionAndSize(
     display: CPointer<Display>,
     windowMeasurements: List<Int>,
-    window: ULong
+    window: Window
 ) {
     XMoveResizeWindow(
         display,
-        window,
+        window.frame,
         windowMeasurements[0],
         windowMeasurements[1],
+        windowMeasurements[2].convert(),
+        windowMeasurements[3].convert()
+    )
+
+    XResizeWindow(
+        display,
+        window.id,
         windowMeasurements[2].convert(),
         windowMeasurements[3].convert()
     )
@@ -23,8 +30,8 @@ fun adjustWindowPositionAndSize(
     val e = nativeHeap.alloc<XEvent>()
     e.type = ConfigureNotify
     e.xconfigure.display = display
-    e.xconfigure.event = window
-    e.xconfigure.window = window
+    e.xconfigure.event = window.id
+    e.xconfigure.window = window.id
     e.xconfigure.x = windowMeasurements[0]
     e.xconfigure.y = windowMeasurements[1]
     e.xconfigure.width = windowMeasurements[2]
@@ -32,5 +39,5 @@ fun adjustWindowPositionAndSize(
     e.xconfigure.border_width = 0
     e.xconfigure.above = None.convert()
     e.xconfigure.override_redirect = X_FALSE
-    XSendEvent(display, window, X_FALSE, StructureNotifyMask, e.ptr)
+    XSendEvent(display, window.id, X_FALSE, StructureNotifyMask, e.ptr)
 }

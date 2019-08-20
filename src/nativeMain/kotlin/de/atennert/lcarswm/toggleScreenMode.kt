@@ -22,7 +22,7 @@ fun toggleScreenMode(
     }
 
     windowManagerState.updateScreenMode(screenMode)
-    { measurements, windowId -> adjustWindowPositionAndSize(display, measurements, windowId) }
+    { measurements, window -> adjustWindowPositionAndSize(display, measurements, window) }
 
     windowManagerState.monitors.forEach {monitor ->
         val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)

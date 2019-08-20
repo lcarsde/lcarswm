@@ -158,6 +158,21 @@ private fun handleConfigureRequest(
     println("::handleConfigureRequest::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}")
     val windowMonitor = windowManagerState.getWindowMonitor(configureEvent.window)
     if (windowMonitor != null) {
+//        val window = windowManagerState.windows.map { it.first }.single { it.id == configureEvent.window }
+//        if ((configureEvent.value_mask and CWStackMode.toULong()) != 0.toULong()) {
+//            val windowChanges = nativeHeap.alloc<XWindowChanges>()
+//            windowChanges.stack_mode = configureEvent.detail
+//
+//            XConfigureWindow(display, window.frame, CWStackMode, windowChanges.ptr)
+//            XConfigureWindow(display, configureEvent.window, CWStackMode, windowChanges.ptr)
+//        }
+//        if ((configureEvent.value_mask and CWSibling.toULong()) != 0.toULong()) {
+//            val windowChanges = nativeHeap.alloc<XWindowChanges>()
+//            windowChanges.sibling = configureEvent.above
+//
+//            XConfigureWindow(display, window.frame, CWSibling, windowChanges.ptr)
+//            XConfigureWindow(display, configureEvent.window, CWSibling, windowChanges.ptr)
+//        }
         return false
     }
 
@@ -206,11 +221,16 @@ private fun handleUnmapNotify(
     println("::handleUnmapNotify::unmapped window: ${unmapEvent.window}")
     // only the active window can be closed, so make a new window active
     if (windowManagerState.hasWindow(unmapEvent.window) && unmapEvent.event != rootWindow) {
+        val window = windowManagerState.windows.map { it.first }.single { it.id == unmapEvent.window }
+        XUnmapWindow(display, window.frame)
         XReparentWindow(display, unmapEvent.window, rootWindow, 0, 0)
         XRemoveFromSaveSet(display, unmapEvent.window)
+        XDestroyWindow(display, window.frame)
 
         windowManagerState.removeWindow(unmapEvent.window)
         moveNextWindowToTopOfStack(display, windowManagerState)
+    } else if (windowManagerState.activeWindow != null) {
+        XSetInputFocus(display, windowManagerState.activeWindow!!.id, RevertToNone, CurrentTime.convert())
     }
 
     windowManagerState.monitors.forEach { monitor ->
@@ -292,7 +312,7 @@ fun handleRandrEvent(
 
     windowManagerState.screenSize = Pair(width, height)
     windowManagerState.updateMonitors(activeMonitors)
-    { measurements, windowId -> adjustWindowPositionAndSize(display, measurements, windowId) }
+    { measurements, window -> adjustWindowPositionAndSize(display, measurements, window) }
 
     windowManagerState.monitors.forEach { monitor ->
         val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
@@ -343,13 +363,13 @@ private fun moveActiveWindow(
     adjustWindowPositionAndSize(
         display,
         measurements,
-        activeWindow.id
+        activeWindow
     )
 }
 
 
 private fun loadAppFromKeyBinding(keyBinding: String) {
     val program = readFromConfig(KEY_CONFIG_FILE, keyBinding) ?: return
-    println("::loadAppFromKeyBinding::loading app bb ${program}aa")
+    println("::loadAppFromKeyBinding::loading app for $keyBinding")
     runProgram(program)
 }

@@ -28,7 +28,8 @@ class WindowManagerState(
 
     val monitors = ArrayList<Monitor>(3)
 
-    private var windows = mutableListOf<Pair<Window, Monitor>>()
+    var windows = mutableListOf<Pair<Window, Monitor>>()
+        private set
 
     /**
      * @return the monitor to which the window was added
@@ -51,7 +52,7 @@ class WindowManagerState(
             ?.second
     }
 
-    fun updateMonitors(monitors: List<Monitor>, updateWindowFcn: Function2<List<Int>, ULong, Unit>) {
+    fun updateMonitors(monitors: List<Monitor>, updateWindowFcn: Function2<List<Int>, Window, Unit>) {
         this.monitors.clear()
         this.monitors.addAll(monitors)
 
@@ -63,11 +64,11 @@ class WindowManagerState(
             val windowMeasurements = monitor.getCurrentWindowMeasurements(getScreenModeForMonitor(monitor))
             this.windows
                 .filter { (_, windowMonitor) -> monitor == windowMonitor }
-                .forEach { (window, _) -> updateWindowFcn(windowMeasurements, window.id) }
+                .forEach { (window, _) -> updateWindowFcn(windowMeasurements, window) }
         }
     }
 
-    fun updateScreenMode(screenMode: ScreenMode, updateWindowFcn: Function2<List<Int>, ULong, Unit>) {
+    fun updateScreenMode(screenMode: ScreenMode, updateWindowFcn: Function2<List<Int>, Window, Unit>) {
         this.screenMode = screenMode
 
         this.monitors.forEach { monitor ->
@@ -75,7 +76,7 @@ class WindowManagerState(
             this.windows
                 .filter { (_, windowMonitor) -> windowMonitor == monitor }
                 .forEach { (window, _) ->
-                    updateWindowFcn(measurements, window.id)
+                    updateWindowFcn(measurements, window)
                 }
         }
     }
