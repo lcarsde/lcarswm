@@ -13,10 +13,10 @@ USER_APPS_DIR="$XDG_DATA_HOME/applications"
 mkdir -p "$USER_APPS_DIR"
 
 # Clean up after GDM (GDM sets the number of desktops to one)
-#xprop -root -remove _NET_NUMBER_OF_DESKTOPS -remove _NET_DESKTOP_NAMES -remove _NET_CURRENT_DESKTOP 2> /dev/null
+xprop -root -remove _NET_NUMBER_OF_DESKTOPS -remove _NET_DESKTOP_NAMES -remove _NET_CURRENT_DESKTOP 2> /dev/null
 
 # Enable GTK+2 integration for OpenOffice.org, if available.
-#export SAL_USE_VCLPLUGIN=gtk
+export SAL_USE_VCLPLUGIN=gtk
 
 # Launch DBus if needed
 if test -z "$DBUS_SESSION_BUS_ADDRESS"; then
@@ -29,8 +29,8 @@ else
 	fi
 fi
 
-#export XDG_MENU_PREFIX="lcarswm-"
-#export XDG_CURRENT_DESKTOP="LCARSWM"
+export XDG_MENU_PREFIX="lcarswm-"
+export XDG_CURRENT_DESKTOP="LCARSWM"
 
 # Start the LXDE session
 exec /usr/bin/lcarswm.kexe
