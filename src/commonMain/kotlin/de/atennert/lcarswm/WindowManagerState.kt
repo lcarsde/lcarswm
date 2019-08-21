@@ -6,9 +6,9 @@ package de.atennert.lcarswm
 class WindowManagerState(
     private val atomProvider: Function1<String, ULong>
 ) {
-    val wmState = atomProvider("WM_STATE")
+    val wmDeleteWindow = atomProvider("WM_DELETE_WINDOW")
 
-    val wmName = atomProvider("WM_NAME")
+    val wmProtocols = atomProvider("WM_PROTOCOLS")
 
     var screenMode = ScreenMode.NORMAL
         private set

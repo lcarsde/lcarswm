@@ -8,7 +8,7 @@ import platform.posix.*
 /**
  *
  */
-fun readFromConfig(fileName: String, key: String): String? {
+fun readFromConfig(fileName: String, key: String): List<String>? {
     val configPathBytes = getenv("XDG_CONFIG_HOME")
     val configPath = configPathBytes?.toKString() ?: return null
     val configFilePath = "$configPath/lcarswm/$fileName"
@@ -17,13 +17,14 @@ fun readFromConfig(fileName: String, key: String): String? {
 
     val entry = ByteArray(60).pin()
 
-    var value: String? = null
-    while (fscanf(configFile,"%s", entry.addressOf(0)) != EOF) {
-        val entryString = entry.get().decodeToString().trim()
+    var value: List<String>? = null
+    while (fgets(entry.addressOf(0), entry.get().size, configFile) != null) {
+        val entryString = entry.get().takeWhile { it > 0 }.fold("") {acc, b -> acc + b.toChar()}.trim()
+        println("::readFromConfig::entry: $entryString")
 
         val entryPair = entryString.split('=')
         if (entryPair[0] == key) {
-            value = entryPair[1]
+            value = entryPair[1].split(' ')
             break
         }
     }

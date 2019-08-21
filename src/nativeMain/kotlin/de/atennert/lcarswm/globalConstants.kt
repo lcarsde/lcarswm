@@ -19,7 +19,14 @@ val LCARS_WM_KEY_SYMS = listOf(
     XK_Down, // move windows down the monitor list
     XK_M, // toggle screen mode
     XK_Q, // quit
+    XK_F4, // close window
     XK_T, // terminal
     XK_B, // browser
     XK_I // IntelliJ
+)
+
+val LCARS_NO_MASK_KEY_SYMS = listOf(
+    XF86XK_AudioMute,
+    XF86XK_AudioLowerVolume,
+    XF86XK_AudioRaiseVolume
 )

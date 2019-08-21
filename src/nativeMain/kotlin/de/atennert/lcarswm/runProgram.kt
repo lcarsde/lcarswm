@@ -7,7 +7,7 @@ import platform.posix.*
  * Run a given program.
  * @param programPath the path to the program
  */
-fun runProgram(programPath: String): Boolean {
+fun runProgram(programPath: String, args: List<String>): Boolean {
     when (fork()) {
         -1 -> return false
         0 -> {
@@ -16,13 +16,12 @@ fun runProgram(programPath: String): Boolean {
                 exit(1)
             }
 
-            programPath.encodeToByteArray().usePinned { pinnedProgram ->
-                val argv = listOf(pinnedProgram.addressOf(0))
+            programPath.encodeToByteArray().pin()
+            val argv = args.map { it.encodeToByteArray().pin().addressOf(0) }
 
-                if (execvp(programPath, argv.toCValues()) == -1) {
-                    perror("execvp failed")
-                    exit(1)
-                }
+            if (execvp(programPath, argv.toCValues()) == -1) {
+                perror("execvp failed")
+                exit(1)
             }
 
             exit(0)

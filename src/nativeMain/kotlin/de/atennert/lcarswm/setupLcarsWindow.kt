@@ -53,6 +53,14 @@ private fun grabKeys(display: CPointer<Display>, window: ULong, windowManagerSta
                 X_FALSE, GrabModeAsync, GrabModeAsync
             )
         }
+
+    LCARS_NO_MASK_KEY_SYMS
+        .map { keySym -> Pair(keySym, XKeysymToKeycode(display, keySym.convert())) }
+        .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
+        .onEach { (keySym, keyCode) -> windowManagerState.keyboardKeys[keyCode.toUInt()] = keySym }
+        .forEach { (_, keyCode) ->
+            XGrabKey(display, keyCode.convert(), 0.convert(), window, X_FALSE, GrabModeAsync, GrabModeAsync)
+        }
 }
 
 private fun getModifierKeys(display: CValuesRef<Display>, modifierKey: Int): Collection<UByte> {

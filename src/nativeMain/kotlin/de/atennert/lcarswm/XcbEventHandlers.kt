@@ -74,6 +74,10 @@ private fun handleKeyRelease(
         XK_T -> loadAppFromKeyBinding("Win+T")
         XK_B -> loadAppFromKeyBinding("Win+B")
         XK_I -> loadAppFromKeyBinding("Win+I")
+        XF86XK_AudioMute -> loadAppFromKeyBinding("XF86AudioMute")
+        XF86XK_AudioLowerVolume -> loadAppFromKeyBinding("XF86AudioLowerVolume")
+        XF86XK_AudioRaiseVolume -> loadAppFromKeyBinding("XF86AudioRaiseVolume")
+        XK_F4 -> closeActiveWindow(display, windowManagerState)
         XK_Q -> return true
         else -> println("::handleKeyRelease::unknown key: $key")
     }
@@ -369,7 +373,35 @@ private fun moveActiveWindow(
 
 
 private fun loadAppFromKeyBinding(keyBinding: String) {
-    val program = readFromConfig(KEY_CONFIG_FILE, keyBinding) ?: return
-    println("::loadAppFromKeyBinding::loading app for $keyBinding")
-    runProgram(program)
+    val programConfig = readFromConfig(KEY_CONFIG_FILE, keyBinding) ?: return
+    println("::loadAppFromKeyBinding::loading app for $keyBinding ${programConfig.size}")
+    runProgram(programConfig[0], programConfig)
 }
+
+private fun closeActiveWindow(
+    display: CPointer<Display>,
+    windowManagerState: WindowManagerState
+) {
+    val activeWindow = windowManagerState.activeWindow ?: return
+
+    val supportedProtocols = nativeHeap.allocPointerTo<ULongVarOf<ULong>>()
+    val numSupportedProtocols = IntArray(1).pin()
+
+    val protocolsResult = XGetWMProtocols(display, activeWindow.id, supportedProtocols.ptr, numSupportedProtocols.addressOf(0))
+    val min = supportedProtocols.pointed!!.value
+    val max = min + numSupportedProtocols.get()[0].toULong()
+
+    if (protocolsResult != 0 && (windowManagerState.wmDeleteWindow in (min .. max))) {
+        val msg = nativeHeap.alloc<XEvent>()
+        msg.xclient.type = ClientMessage
+        msg.xclient.message_type = windowManagerState.wmProtocols
+        msg.xclient.window = activeWindow.id
+        msg.xclient.format = 32
+        msg.xclient.data.l[0] = windowManagerState.wmDeleteWindow.convert()
+        XSendEvent(display, activeWindow.id, X_FALSE, 0, msg.ptr)
+    } else {
+        XKillClient(display, activeWindow.id)
+    }
+}
+
+private fun isBetween(min: ULong, max: ULong, value: ULong) = value in min..max
