@@ -119,8 +119,6 @@ private fun handleMapRequest(
 
     addWindow(display, windowManagerState, lcarsWindow, window, false)
 
-    XMapWindow(display, window)
-
     return false
 }
 

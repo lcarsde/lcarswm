@@ -11,19 +11,15 @@ fun setupLcarsWindow(
     screen: Screen,
     windowManagerState: WindowManagerState
 ): ULong {
-    val lcarsWindow = XCreateSimpleWindow(display, screen.root, 0, 0, screen.width.convert(), screen.height.convert(), 0.convert(), screen.black_pixel, screen.black_pixel)
+    windowManagerState.modifierKeys.addAll(getModifierKeys(display, WM_MODIFIER_KEY))
 
-    XSelectInput(display, lcarsWindow, SubstructureRedirectMask or SubstructureNotifyMask)
+    listOf(Button1, Button2, Button3).forEach { grabButton(display, screen.root, it) }
 
-    XMapWindow(display, lcarsWindow)
-
-    listOf(Button1, Button2, Button3).forEach { grabButton(display, lcarsWindow, it) }
-
-    grabKeys(display, lcarsWindow, windowManagerState)
+    grabKeys(display, screen.root, windowManagerState)
 
     XSync(display, X_FALSE)
 
-    return lcarsWindow
+    return screen.root
 }
 
 
@@ -31,8 +27,6 @@ fun setupLcarsWindow(
  * Setup keyboard handling. Keys without key code for the key sym will not be working.
  */
 private fun grabKeys(display: CPointer<Display>, window: ULong, windowManagerState: WindowManagerState) {
-
-    windowManagerState.modifierKeys.addAll(getModifierKeys(display, WM_MODIFIER_KEY))
     windowManagerState.modifierKeys
         .onEach { keyCode ->
             XGrabKey(

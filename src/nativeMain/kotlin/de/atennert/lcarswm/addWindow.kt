@@ -35,13 +35,15 @@ fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState
 
     XReparentWindow(display, windowId, window.frame, 0, 0)
 
-    XMapWindow(display, window.frame)
-
     adjustWindowPositionAndSize(
         display,
         measurements,
         window
     )
+
+    XMapWindow(display, window.frame)
+
+    XMapWindow(display, window.id)
 
     nativeHeap.free(windowAttributes)
 }
