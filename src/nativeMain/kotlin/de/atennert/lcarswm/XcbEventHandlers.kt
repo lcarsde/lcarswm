@@ -8,7 +8,7 @@ import xlib.*
  */
 val EVENT_HANDLERS =
     hashMapOf<Int, Function7<CPointer<Display>, WindowManagerState, XEvent, CPointer<XImage>, ULong, ULong, List<GC>, Boolean>>(
-        Pair(KeyPress, { d, w, e, _, _, _, _ -> handleKeyPress(d, w, e) }),
+        Pair(KeyPress, { d, w, e, i, _, lw, gc -> handleKeyPress(d, w, e, i, lw, gc) }),
         Pair(KeyRelease, { d, w, e, l, _, lw, gc -> handleKeyRelease(d, w, e, l, lw, gc) }),
         Pair(ButtonPress, { _, _, e, _, _, _, _ -> handleButtonPress(e) }),
         Pair(ButtonRelease, { _, _, e, _, _, _, _ -> handleButtonRelease(e) }),
@@ -39,7 +39,10 @@ private fun handleConfigureNotify(xEvent: XEvent): Boolean {
 private fun handleKeyPress(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
-    xEvent: XEvent
+    xEvent: XEvent,
+    image: CPointer<XImage>,
+    lcarsWindow: ULong,
+    graphicsContexts: List<GC>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val pressEvent = xEvent.xkey
@@ -47,8 +50,8 @@ private fun handleKeyPress(
     println("::handleKeyPress::Key pressed: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
-        XK_Up -> moveActiveWindow(display, windowManagerState, windowManagerState::moveWindowToNextMonitor)
-        XK_Down -> moveActiveWindow(display, windowManagerState, windowManagerState::moveWindowToPreviousMonitor)
+        XK_Up -> moveActiveWindow(display, windowManagerState, image, lcarsWindow, graphicsContexts, windowManagerState::moveWindowToNextMonitor)
+        XK_Down -> moveActiveWindow(display, windowManagerState, image, lcarsWindow, graphicsContexts, windowManagerState::moveWindowToPreviousMonitor)
         XK_Tab -> moveNextWindowToTopOfStack(display, windowManagerState)
         else -> println("::handleKeyRelease::unknown key: $key")
     }
@@ -158,25 +161,6 @@ private fun handleConfigureRequest(
     val configureEvent = xEvent.xconfigurerequest
 
     println("::handleConfigureRequest::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}")
-    val windowMonitor = windowManagerState.getWindowMonitor(configureEvent.window)
-    if (windowMonitor != null) {
-//        val window = windowManagerState.windows.map { it.first }.single { it.id == configureEvent.window }
-//        if ((configureEvent.value_mask and CWStackMode.toULong()) != 0.toULong()) {
-//            val windowChanges = nativeHeap.alloc<XWindowChanges>()
-//            windowChanges.stack_mode = configureEvent.detail
-//
-//            XConfigureWindow(display, window.frame, CWStackMode, windowChanges.ptr)
-//            XConfigureWindow(display, configureEvent.window, CWStackMode, windowChanges.ptr)
-//        }
-//        if ((configureEvent.value_mask and CWSibling.toULong()) != 0.toULong()) {
-//            val windowChanges = nativeHeap.alloc<XWindowChanges>()
-//            windowChanges.sibling = configureEvent.above
-//
-//            XConfigureWindow(display, window.frame, CWSibling, windowChanges.ptr)
-//            XConfigureWindow(display, configureEvent.window, CWSibling, windowChanges.ptr)
-//        }
-        return false
-    }
 
     val windowChanges = nativeHeap.alloc<XWindowChanges>()
     windowChanges.x = configureEvent.x
@@ -186,6 +170,23 @@ private fun handleConfigureRequest(
     windowChanges.sibling = configureEvent.above
     windowChanges.stack_mode = configureEvent.detail
     windowChanges.border_width = 0
+
+    if (windowManagerState.hasWindow(configureEvent.window)) {
+        val window = windowManagerState.windows.map { it.first }.single { it.id == configureEvent.window }
+        val windowChanges2 = nativeHeap.alloc<XWindowChanges>()
+        windowChanges2.x = configureEvent.x
+        windowChanges2.y = configureEvent.y
+        windowChanges2.width = configureEvent.width
+        windowChanges2.height = configureEvent.height
+        windowChanges2.sibling = configureEvent.above
+        windowChanges2.stack_mode = configureEvent.detail
+        windowChanges2.border_width = 0
+
+        XConfigureWindow(display, window.frame, configureEvent.value_mask.convert(), windowChanges2.ptr)
+
+        windowChanges.x = 0
+        windowChanges.y = 0
+    }
 
     XConfigureWindow(display, configureEvent.window, configureEvent.value_mask.convert(), windowChanges.ptr)
 
@@ -356,6 +357,9 @@ private fun getOutputName(outputObject: CPointer<XRROutputInfo>): String {
 private fun moveActiveWindow(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
+    image: CPointer<XImage>,
+    lcarsWindow: ULong,
+    graphicsContexts: List<GC>,
     windowMoveFunction: Function1<Window, Monitor>
 ) {
     val activeWindow = windowManagerState.activeWindow ?: return
@@ -367,6 +371,18 @@ private fun moveActiveWindow(
         measurements,
         activeWindow
     )
+
+    windowManagerState.monitors.forEach { monitor ->
+        val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
+        val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
+        drawFunction(
+            graphicsContexts,
+            lcarsWindow,
+            display,
+            monitor,
+            image
+        )
+    }
 }
 
 
