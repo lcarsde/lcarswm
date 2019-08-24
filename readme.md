@@ -12,13 +12,18 @@ Thank you very much to the creators of the following resources:
 
 ## Functionality
 * Windows-key + Q closes the window manager
-* Windows-key + T opens xterm
-* Windows-key + B (Browser) opens Firefox
-* Windows-key + I opens IDEA (chosen because it has some popup windows when opening tha application and they don't render correctly yet)
+correctly yet)
 * Windows-key + Tab toggles through the windows
 * Windows-key + Up/Down moves the active window to other monitors
 * Windows-key + M toggles the display mode between normal, maximized and fullscreen
 * Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
+* The following keys can be configured via a key configuration file:
+  * Windows-key + T
+  * Windows-key + B
+  * Windows-key + I
+  * XF86AudioMute
+  * XF86AudioRaiseVolume
+  * XF86AudioLowerVolume
 
 ## Pictures
 Yay, it's starting to get somewhat usable. So here are some pictures from the VirtualBox test environment.
@@ -37,9 +42,7 @@ Fullscreen mode
 * header files and libraries for XLib, randr and xpm. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
 
 ## Known issues
-* Some popups don't render (noticed on IntelliJ startup tips popup)
-* Popups probably shouldn't be scaled, but instead centered in the window area
-* lxterminal doesn't render until it went through a switch of the active application
+* IntelliJ doesn't render until move or screen mode toggle
 
 ## To do
 * Configuration for application key bindings
