@@ -43,6 +43,8 @@ Fullscreen mode
 
 ## Known issues
 * IntelliJ doesn't render until move or screen mode toggle
+* Some menus are not displayed or rather flicker only for a short time
+* The frame window is drawing over the background and not scaling with popups
 
 ## To do
 * Configuration for application key bindings
