@@ -30,8 +30,7 @@ private fun grabKeys(display: CPointer<Display>, window: ULong, windowManagerSta
     windowManagerState.modifierKeys
         .onEach { keyCode ->
             XGrabKey(
-                display, keyCode.convert(), AnyModifier.convert(), window,
-                X_FALSE, GrabModeAsync, GrabModeAsync
+                display, keyCode.convert(), AnyModifier, window, X_FALSE, GrabModeAsync, GrabModeAsync
             )
         }
 
@@ -53,7 +52,7 @@ private fun grabKeys(display: CPointer<Display>, window: ULong, windowManagerSta
         .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
         .onEach { (keySym, keyCode) -> windowManagerState.keyboardKeys[keyCode.toUInt()] = keySym }
         .forEach { (_, keyCode) ->
-            XGrabKey(display, keyCode.convert(), 0.convert(), window, X_FALSE, GrabModeAsync, GrabModeAsync)
+            XGrabKey(display, keyCode.convert(), AnyModifier, window, X_FALSE, GrabModeAsync, GrabModeAsync)
         }
 }
 
