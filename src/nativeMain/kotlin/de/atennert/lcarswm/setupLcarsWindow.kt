@@ -13,7 +13,7 @@ fun setupLcarsWindow(
 ): ULong {
     windowManagerState.modifierKeys.addAll(getModifierKeys(display, WM_MODIFIER_KEY))
 
-    listOf(Button1, Button2, Button3).forEach { grabButton(display, screen.root, it) }
+    //listOf(Button1, Button2, Button3).forEach { grabButton(display, screen.root, it) }
 
     grabKeys(display, screen.root, windowManagerState)
 

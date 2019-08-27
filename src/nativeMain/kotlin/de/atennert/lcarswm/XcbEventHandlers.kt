@@ -135,9 +135,9 @@ private fun handleMapNotify(
     val window = mapEvent.window
     println("::handleMapNotify::map notify for window $window")
 
-    if (windowManagerState.activeWindow?.id != window) {
-        XSetInputFocus(display, window, RevertToNone, CurrentTime.convert())
-    }
+//    if (windowManagerState.activeWindow?.id != window) {
+//        XSetInputFocus(display, window, RevertToNone, CurrentTime.convert())
+//    }
 
     return false
 }
