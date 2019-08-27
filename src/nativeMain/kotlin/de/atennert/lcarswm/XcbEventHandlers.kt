@@ -14,7 +14,7 @@ val EVENT_HANDLERS =
         Pair(ButtonRelease, { _, _, e, _, _, _, _ -> handleButtonRelease(e) }),
         Pair(ConfigureRequest, { d, w, e, _, _, _, _ -> handleConfigureRequest(d, w, e) }),
         Pair(MapRequest, { d, w, e, _, _, lw, _ -> handleMapRequest(d, w, e, lw) }),
-        Pair(MapNotify, { d, w, e, _, _, _, _ -> handleMapNotify(d, w, e) }),
+        Pair(MapNotify, { _, _, e, _, _, _, _ -> handleMapNotify(e) }),
         Pair(DestroyNotify, { _, w, e, _, _, _, _ -> handleDestroyNotify(w, e) }),
         Pair(UnmapNotify, ::handleUnmapNotify),
         Pair(ReparentNotify, { _, _, e, _, _, _, _ -> handleReparentNotify(e) }),
@@ -125,19 +125,11 @@ private fun handleMapRequest(
     return false
 }
 
-private fun handleMapNotify(
-    display: CPointer<Display>,
-    windowManagerState: WindowManagerState,
-    xEvent: XEvent
-): Boolean {
+private fun handleMapNotify(xEvent: XEvent): Boolean {
     @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent.xmap
     val window = mapEvent.window
     println("::handleMapNotify::map notify for window $window")
-
-//    if (windowManagerState.activeWindow?.id != window) {
-//        XSetInputFocus(display, window, RevertToNone, CurrentTime.convert())
-//    }
 
     return false
 }
