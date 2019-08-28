@@ -164,20 +164,24 @@ private fun handleConfigureRequest(
     windowChanges.border_width = 0
 
     if (windowManagerState.hasWindow(configureEvent.window)) {
-        val window = windowManagerState.windows.map { it.first }.single { it.id == configureEvent.window }
-        val windowChanges2 = nativeHeap.alloc<XWindowChanges>()
-        windowChanges2.x = configureEvent.x
-        windowChanges2.y = configureEvent.y
-        windowChanges2.width = configureEvent.width
-        windowChanges2.height = configureEvent.height
-        windowChanges2.sibling = configureEvent.above
-        windowChanges2.stack_mode = configureEvent.detail
-        windowChanges2.border_width = 0
+        val windowPair = windowManagerState.windows.single {it.first.id == configureEvent.window}
+        val measurements = windowPair.second.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowPair.second))
 
-        XConfigureWindow(display, window.frame, configureEvent.value_mask.convert(), windowChanges2.ptr)
-
-        windowChanges.x = 0
-        windowChanges.y = 0
+        val window = windowPair.first
+        val e = nativeHeap.alloc<XEvent>()
+        e.type = ConfigureNotify
+        e.xconfigure.display = display
+        e.xconfigure.event = window.id
+        e.xconfigure.window = window.id
+        e.xconfigure.x = measurements[0]
+        e.xconfigure.y = measurements[1]
+        e.xconfigure.width = measurements[2]
+        e.xconfigure.height = measurements[3]
+        e.xconfigure.border_width = 0
+        e.xconfigure.above = None.convert()
+        e.xconfigure.override_redirect = X_FALSE
+        XSendEvent(display, window.id, X_FALSE, StructureNotifyMask, e.ptr)
+        return false
     }
 
     XConfigureWindow(display, configureEvent.window, configureEvent.value_mask.convert(), windowChanges.ptr)

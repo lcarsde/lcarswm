@@ -22,10 +22,6 @@ fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState
 
     val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))
 
-    println(
-        "::addWindow::monitor: ${windowMonitor.name}, setup: $isSetup, position: $measurements, class: ${windowAttributes.`class`}, b-grav: ${windowAttributes.bit_gravity}, propagate mask: ${windowAttributes.do_not_propagate_mask}, map state: ${windowAttributes.map_state}, redirect: ${windowAttributes.override_redirect}, map installed: ${windowAttributes.map_installed}, visual: ${windowAttributes.visual}, w-grav: ${windowAttributes.win_gravity}"
-    )
-
     window.frame = XCreateSimpleWindow(display, lcarsWindow, measurements[0], measurements[1],
         measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
 
@@ -35,10 +31,11 @@ fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState
 
     XReparentWindow(display, windowId, window.frame, 0, 0)
 
-    adjustWindowPositionAndSize(
+    XResizeWindow(
         display,
-        measurements,
-        window
+        window.id,
+        measurements[2].convert(),
+        measurements[3].convert()
     )
 
     XMapWindow(display, window.frame)
