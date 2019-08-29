@@ -53,9 +53,10 @@ Fullscreen mode
   * Heat signature
   * Processor usage
   * Memory usage
+  * Connection state of network interfaces
+  * Data throughput of network interfaces
   * ...
 * Key bindings for
-  * Volume keys
   * Application selection
 * GTK-Theme (if I can't find one)
 
