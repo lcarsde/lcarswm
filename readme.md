@@ -42,7 +42,6 @@ Fullscreen mode
 * header files and libraries for XLib, randr and xpm. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
 
 ## Known issues
-* IntelliJ doesn't render until move or screen mode toggle
 * The frame window is drawing over the background and not scaling with popups
 
 ## To do
