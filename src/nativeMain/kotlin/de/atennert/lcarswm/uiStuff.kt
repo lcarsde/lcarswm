@@ -274,7 +274,7 @@ private fun drawNormalFrame(
     val cornerRects = nativeHeap.allocArray<XRectangle>(8)
     for (i in 0 until 4) {
         cornerRects[i].x = monitor.x.toShort()
-        cornerRects[i].width = 199.toUShort()
+        cornerRects[i].width = 200.toUShort()
         cornerRects[i].height = 16.toUShort()
     }
     cornerRects[0].y = (monitor.y + 40).toShort()
@@ -301,7 +301,7 @@ private fun drawNormalFrame(
 
     val cornerInnerArcs = nativeHeap.allocArray<XArc>(4)
     for (i in 0 until 4) {
-        cornerInnerArcs[i].x = (monitor.x + 183).toShort()
+        cornerInnerArcs[i].x = (monitor.x + 184).toShort()
         cornerInnerArcs[i].width = 32.toUShort()
         cornerInnerArcs[i].height = 32.toUShort()
         cornerInnerArcs[i].angle2 = 90.shl(6)
