@@ -43,6 +43,7 @@ Fullscreen mode
 
 ## Known issues
 * The frame window is drawing over the background and not scaling with popups
+* VLC crashes displaylink driver when using lcarswm (possibly only with video)
 
 ## To do
 * Configuration for application key bindings
