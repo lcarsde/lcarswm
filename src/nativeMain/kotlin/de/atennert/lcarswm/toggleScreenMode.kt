@@ -12,7 +12,7 @@ fun toggleScreenMode(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
-    lcarsWindow: ULong,
+    rootWindow: ULong,
     graphicsContexts: List<GC>
 ) {
     val screenMode = when (windowManagerState.screenMode) {
@@ -29,7 +29,7 @@ fun toggleScreenMode(
         val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
         drawFunction(
             graphicsContexts,
-            lcarsWindow,
+            rootWindow,
             display,
             monitor,
             image

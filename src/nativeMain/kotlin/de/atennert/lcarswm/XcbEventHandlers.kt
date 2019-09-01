@@ -7,19 +7,19 @@ import xlib.*
  * Map of event types to event handlers. DON'T EDIT THE MAPS CONTENT!!!
  */
 val EVENT_HANDLERS =
-    hashMapOf<Int, Function7<CPointer<Display>, WindowManagerState, XEvent, CPointer<XImage>, ULong, ULong, List<GC>, Boolean>>(
-        Pair(KeyPress, { d, w, e, i, _, lw, gc -> handleKeyPress(d, w, e, i, lw, gc) }),
-        Pair(KeyRelease, { d, w, e, l, _, lw, gc -> handleKeyRelease(d, w, e, l, lw, gc) }),
-        Pair(ButtonPress, { _, _, e, _, _, _, _ -> handleButtonPress(e) }),
-        Pair(ButtonRelease, { _, _, e, _, _, _, _ -> handleButtonRelease(e) }),
-        Pair(ConfigureRequest, { d, w, e, _, _, _, _ -> handleConfigureRequest(d, w, e) }),
-        Pair(MapRequest, { d, w, e, _, _, lw, _ -> handleMapRequest(d, w, e, lw) }),
-        Pair(MapNotify, { _, _, e, _, _, _, _ -> handleMapNotify(e) }),
-        Pair(DestroyNotify, { _, w, e, _, _, _, _ -> handleDestroyNotify(w, e) }),
+    hashMapOf<Int, Function6<CPointer<Display>, WindowManagerState, XEvent, CPointer<XImage>, ULong, List<GC>, Boolean>>(
+        Pair(KeyPress, { d, w, e, i, rw, gc -> handleKeyPress(d, w, e, i, rw, gc) }),
+        Pair(KeyRelease, { d, w, e, l, rw, gc -> handleKeyRelease(d, w, e, l, rw, gc) }),
+        Pair(ButtonPress, { _, _, e, _, _, _ -> handleButtonPress(e) }),
+        Pair(ButtonRelease, { _, _, e, _, _, _ -> handleButtonRelease(e) }),
+        Pair(ConfigureRequest, { d, w, e, _, _, _ -> handleConfigureRequest(d, w, e) }),
+        Pair(MapRequest, { d, w, e, _, rw, _ -> handleMapRequest(d, w, e, rw) }),
+        Pair(MapNotify, { _, _, e, _, _, _ -> handleMapNotify(e) }),
+        Pair(DestroyNotify, { _, w, e, _, _, _ -> handleDestroyNotify(w, e) }),
         Pair(UnmapNotify, ::handleUnmapNotify),
-        Pair(ReparentNotify, { _, _, e, _, _, _, _ -> handleReparentNotify(e) }),
-        Pair(CreateNotify, { _, _, e, _, _, _, _ -> handleCreateNotify(e) }),
-        Pair(ConfigureNotify, { _, _, e, _, _, _, _ -> handleConfigureNotify(e) })
+        Pair(ReparentNotify, { _, _, e, _, _, _ -> handleReparentNotify(e) }),
+        Pair(CreateNotify, { _, _, e, _, _, _ -> handleCreateNotify(e) }),
+        Pair(ConfigureNotify, { _, _, e, _, _, _ -> handleConfigureNotify(e) })
     )
 
 private fun handleCreateNotify(xEvent: XEvent): Boolean {
@@ -41,7 +41,7 @@ private fun handleKeyPress(
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
     image: CPointer<XImage>,
-    lcarsWindow: ULong,
+    rootWindow: ULong,
     graphicsContexts: List<GC>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
@@ -50,8 +50,8 @@ private fun handleKeyPress(
     println("::handleKeyPress::Key pressed: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
-        XK_Up -> moveActiveWindow(display, windowManagerState, image, lcarsWindow, graphicsContexts, windowManagerState::moveWindowToNextMonitor)
-        XK_Down -> moveActiveWindow(display, windowManagerState, image, lcarsWindow, graphicsContexts, windowManagerState::moveWindowToPreviousMonitor)
+        XK_Up -> moveActiveWindow(display, windowManagerState, image, rootWindow, graphicsContexts, windowManagerState::moveWindowToNextMonitor)
+        XK_Down -> moveActiveWindow(display, windowManagerState, image, rootWindow, graphicsContexts, windowManagerState::moveWindowToPreviousMonitor)
         XK_Tab -> moveNextWindowToTopOfStack(display, windowManagerState)
         else -> println("::handleKeyRelease::unknown key: $key")
     }
@@ -64,7 +64,7 @@ private fun handleKeyRelease(
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
     image: CPointer<XImage>,
-    lcarsWindow: ULong,
+    rootWindow: ULong,
     graphicsContexts: List<GC>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
@@ -73,7 +73,7 @@ private fun handleKeyRelease(
     println("::handleKeyRelease::Key released: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
-        XK_M -> toggleScreenMode(display, windowManagerState, image, lcarsWindow, graphicsContexts)
+        XK_M -> toggleScreenMode(display, windowManagerState, image, rootWindow, graphicsContexts)
         XK_T -> loadAppFromKeyBinding("Win+T")
         XK_B -> loadAppFromKeyBinding("Win+B")
         XK_I -> loadAppFromKeyBinding("Win+I")
@@ -109,7 +109,7 @@ private fun handleMapRequest(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
-    lcarsWindow: ULong
+    rootWindow: ULong
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent.xmaprequest
@@ -120,7 +120,7 @@ private fun handleMapRequest(
         return false
     }
 
-    addWindow(display, windowManagerState, lcarsWindow, window, false)
+    addWindow(display, windowManagerState, rootWindow, window, false)
 
     return false
 }
@@ -212,7 +212,6 @@ private fun handleUnmapNotify(
     xEvent: XEvent,
     image: CPointer<XImage>,
     rootWindow: ULong,
-    lcarsWindow: ULong,
     graphicsContexts: List<GC>
 ): Boolean {
     @Suppress("UNCHECKED_CAST")
@@ -237,7 +236,7 @@ private fun handleUnmapNotify(
         val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
         drawFunction(
             graphicsContexts,
-            lcarsWindow,
+            rootWindow,
             display,
             monitor,
             image
@@ -254,7 +253,6 @@ fun handleRandrEvent(
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
     rootWindow: ULong,
-    lcarsWindow: ULong,
     graphicsContexts: List<GC>
 ) {
     println("::handleRandrEvent::handle randr")
@@ -307,7 +305,7 @@ fun handleRandrEvent(
             Pair(newWidth, newHeight)
         }
 
-    XResizeWindow(display, lcarsWindow, width.convert(), height.convert())
+    XResizeWindow(display, rootWindow, width.convert(), height.convert())
 
     windowManagerState.screenSize = Pair(width, height)
     windowManagerState.updateMonitors(activeMonitors)
@@ -318,7 +316,7 @@ fun handleRandrEvent(
         val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
         drawFunction(
             graphicsContexts,
-            lcarsWindow,
+            rootWindow,
             display,
             monitor,
             image
@@ -354,7 +352,7 @@ private fun moveActiveWindow(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
-    lcarsWindow: ULong,
+    rootWindow: ULong,
     graphicsContexts: List<GC>,
     windowMoveFunction: Function1<Window, Monitor>
 ) {
@@ -373,7 +371,7 @@ private fun moveActiveWindow(
         val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
         drawFunction(
             graphicsContexts,
-            lcarsWindow,
+            rootWindow,
             display,
             monitor,
             image

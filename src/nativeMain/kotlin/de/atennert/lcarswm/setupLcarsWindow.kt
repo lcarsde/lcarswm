@@ -10,7 +10,7 @@ fun setupLcarsWindow(
     display: CPointer<Display>,
     screen: Screen,
     windowManagerState: WindowManagerState
-): ULong {
+) {
     windowManagerState.modifierKeys.addAll(getModifierKeys(display, WM_MODIFIER_KEY))
 
     //listOf(Button1, Button2, Button3).forEach { grabButton(display, screen.root, it) }
@@ -18,8 +18,6 @@ fun setupLcarsWindow(
     grabKeys(display, screen.root, windowManagerState)
 
     XSync(display, X_FALSE)
-
-    return screen.root
 }
 
 

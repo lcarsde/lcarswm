@@ -6,7 +6,7 @@ import xlib.*
 /**
  *
  */
-fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState, lcarsWindow: ULong, windowId: ULong, isSetup: Boolean) {
+fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState, rootWindow: ULong, windowId: ULong, isSetup: Boolean) {
     val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
     XGetWindowAttributes(display, windowId, windowAttributes.ptr)
 
@@ -22,7 +22,7 @@ fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState
 
     val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))
 
-    window.frame = XCreateSimpleWindow(display, lcarsWindow, measurements[0], measurements[1],
+    window.frame = XCreateSimpleWindow(display, rootWindow, measurements[0], measurements[1],
         measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
 
     XSelectInput(display, window.frame, SubstructureRedirectMask or SubstructureNotifyMask)

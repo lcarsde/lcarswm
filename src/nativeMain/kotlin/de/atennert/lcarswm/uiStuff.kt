@@ -70,16 +70,16 @@ fun cleanupColorMap(
 
 private fun drawMaximizedFrame(
     graphicsContexts: List<GC>,
-    lcarsWindow: ULong,
+    rootWindow: ULong,
     display: CPointer<Display>,
     monitor: Monitor,
     image: CPointer<XImage>
 ) {
-    clearScreen(graphicsContexts, lcarsWindow, display, monitor, image)
+    clearScreen(graphicsContexts, rootWindow, display, monitor, image)
 
     val gcPurple2 = graphicsContexts[6]
     val gcOrchid = graphicsContexts[2]
-    val gcCopyImage = XCreateGC(display, lcarsWindow, 0.convert(), null)
+    val gcCopyImage = XCreateGC(display, rootWindow, 0.convert(), null)
 
     // TODO create bar ends as pixmaps
     val arcs = nativeHeap.allocArray<XArc>(4)
@@ -135,11 +135,11 @@ private fun drawMaximizedFrame(
     bars[1].width = (monitor.width - 80).toUShort()
     bars[1].height = 40.toUShort()
 
-    XFillArcs(display, lcarsWindow, gcPurple2, arcs, 4)
-    XFillRectangles(display, lcarsWindow, gcPurple2, rects, 4)
-    XFillRectangles(display, lcarsWindow, gcOrchid, bars, 2)
+    XFillArcs(display, rootWindow, gcPurple2, arcs, 4)
+    XFillRectangles(display, rootWindow, gcPurple2, rects, 4)
+    XFillRectangles(display, rootWindow, gcOrchid, bars, 2)
 
-    XPutImage(display, lcarsWindow, gcCopyImage,
+    XPutImage(display, rootWindow, gcCopyImage,
         image, 0, 0, monitor.x + 40, 0,
         image.pointed.width.convert(), image.pointed.height.convert())
 
@@ -151,19 +151,19 @@ private fun drawMaximizedFrame(
 
 private fun drawNormalFrame(
     graphicsContexts: List<GC>,
-    lcarsWindow: ULong,
+    rootWindow: ULong,
     display: CPointer<Display>,
     monitor: Monitor,
     image: CPointer<XImage>
 ) {
-    clearScreen(graphicsContexts, lcarsWindow, display, monitor, image)
+    clearScreen(graphicsContexts, rootWindow, display, monitor, image)
 
     val gcBlack = graphicsContexts[0]
     val gcPurple2 = graphicsContexts[6]
     val gcOrchid = graphicsContexts[2]
     val gcPurple1 = graphicsContexts[3]
     val gcBrick = graphicsContexts[4]
-    val gcCopyImage = XCreateGC(display, lcarsWindow, 0.convert(), null)
+    val gcCopyImage = XCreateGC(display, rootWindow, 0.convert(), null)
 
     // TODO create bar ends as pixmaps
     val arcs = nativeHeap.allocArray<XArc>(3)
@@ -318,25 +318,25 @@ private fun drawNormalFrame(
     cornerInnerArcs[3].y = (monitor.y + monitor.height - 72).toShort()
     cornerInnerArcs[3].angle1 = 180.shl(6)
 
-    XFillArcs(display, lcarsWindow, gcPurple2, arcs, 3)
-    XFillRectangles(display, lcarsWindow, gcPurple2, rects, 3)
-    XFillRectangles(display, lcarsWindow, gcPurple2, bigBars, 2)
+    XFillArcs(display, rootWindow, gcPurple2, arcs, 3)
+    XFillRectangles(display, rootWindow, gcPurple2, rects, 3)
+    XFillRectangles(display, rootWindow, gcPurple2, bigBars, 2)
 
     // middle bars
-    XFillRectangles(display, lcarsWindow, gcPurple1, middleBars[0].ptr, 1)
-    XFillRectangles(display, lcarsWindow, gcBrick, middleBars[1].ptr, 1)
-    XFillRectangles(display, lcarsWindow, gcPurple2, middleBars[2].ptr, 1)
-    XFillRectangles(display, lcarsWindow, gcOrchid, middleBars[3].ptr, 1)
+    XFillRectangles(display, rootWindow, gcPurple1, middleBars[0].ptr, 1)
+    XFillRectangles(display, rootWindow, gcBrick, middleBars[1].ptr, 1)
+    XFillRectangles(display, rootWindow, gcPurple2, middleBars[2].ptr, 1)
+    XFillRectangles(display, rootWindow, gcOrchid, middleBars[3].ptr, 1)
 
     // side bars
-    XFillRectangles(display, lcarsWindow, gcPurple1, sideBars, 2)
+    XFillRectangles(display, rootWindow, gcPurple1, sideBars, 2)
 
     // corner pieces
-    XFillArcs(display, lcarsWindow, gcOrchid, cornerOuterArcs, 4)
-    XFillRectangles(display, lcarsWindow, gcOrchid, cornerRects, 8)
-    XFillArcs(display, lcarsWindow, gcBlack, cornerInnerArcs, 4)
+    XFillArcs(display, rootWindow, gcOrchid, cornerOuterArcs, 4)
+    XFillRectangles(display, rootWindow, gcOrchid, cornerRects, 8)
+    XFillArcs(display, rootWindow, gcBlack, cornerInnerArcs, 4)
 
-    XPutImage(display, lcarsWindow, gcCopyImage,
+    XPutImage(display, rootWindow, gcCopyImage,
         image, 0, 0, monitor.x + monitor.width - 40 - image.pointed.width, 0,
         image.pointed.width.convert(), image.pointed.height.convert())
 
@@ -354,10 +354,10 @@ private fun drawNormalFrame(
 
 private fun clearScreen(
     graphicsContexts: List<GC>,
-    lcarsWindow: ULong,
+    rootWindow: ULong,
     display: CPointer<Display>,
     monitor: Monitor,
     image: CPointer<XImage>
 ) {
-    XFillRectangle(display, lcarsWindow, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
+    XFillRectangle(display, rootWindow, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
 }

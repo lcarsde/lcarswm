@@ -35,16 +35,16 @@ fun main() {
 
         println("::main::wm state initialized")
 
-        val lcarsWindow = setupLcarsWindow(display, screen, windowManagerConfig)
+        setupLcarsWindow(display, screen, windowManagerConfig)
         windowManagerConfig.setActiveWindowListener { activeWindow ->
             if (activeWindow != null) {
                 XSetInputFocus(display, activeWindow.id, RevertToNone, CurrentTime.convert())
             } else {
-                XSetInputFocus(display, lcarsWindow, RevertToPointerRoot, CurrentTime.convert())
+                XSetInputFocus(display, rootWindow, RevertToPointerRoot, CurrentTime.convert())
             }
         }
 
-        println("::main::wm window initialized: $lcarsWindow")
+        println("::main::wm window initialized: $rootWindow")
 
         val logoImage = allocArrayOfPointersTo(alloc<XImage>())
 
@@ -52,15 +52,15 @@ fun main() {
 
         println("::main::logo loaded")
 
-        val randrBase = setupRandr(display, windowManagerConfig, logoImage[0]!!, rootWindow, lcarsWindow, graphicsContexts)
+        val randrBase = setupRandr(display, windowManagerConfig, logoImage[0]!!, rootWindow, graphicsContexts)
 
         println("::main::set up randr")
 
-        setupScreen(display, rootWindow, lcarsWindow, windowManagerConfig)
+        setupScreen(display, rootWindow, windowManagerConfig)
 
         println("::main::loaded window tree")
 
-        eventLoop(display, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, lcarsWindow, graphicsContexts)
+        eventLoop(display, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, graphicsContexts)
 
         cleanupColorMap(display, colorMap)
 
@@ -70,7 +70,7 @@ fun main() {
     println("::main::lcarswm stopped")
 }
 
-fun setupScreen(display: CPointer<Display>, rootWindow: ULong, lcarsWindow: ULong, windowManagerConfig: WindowManagerState) {
+fun setupScreen(display: CPointer<Display>, rootWindow: ULong, windowManagerConfig: WindowManagerState) {
     XGrabServer(display)
 
     val returnedWindows = ULongArray(1)
@@ -83,9 +83,9 @@ fun setupScreen(display: CPointer<Display>, rootWindow: ULong, lcarsWindow: ULon
         topLevelWindowCount.toCValues())
 
     ULongArray(topLevelWindowCount[0].toInt()) {topLevelWindows.value!![it]}
-        .filter { childId -> childId != lcarsWindow }
+        .filter { childId -> childId != rootWindow }
         .forEach { childId ->
-            addWindow(display, windowManagerConfig, lcarsWindow, childId, true)
+            addWindow(display, windowManagerConfig, rootWindow, childId, true)
         }
 
     nativeHeap.free(topLevelWindows)
@@ -100,7 +100,6 @@ private fun setupRandr(
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
     rootWindow: ULong,
-    lcarsWindow: ULong,
     graphicsContexts: List<GC>
 ): Int {
     val eventBase = IntArray(1).pin()
@@ -111,7 +110,7 @@ private fun setupRandr(
         return NO_RANDR_BASE
     }
 
-    handleRandrEvent(display, windowManagerState, image, rootWindow, lcarsWindow, graphicsContexts)
+    handleRandrEvent(display, windowManagerState, image, rootWindow, graphicsContexts)
 
     XRRSelectInput(display, rootWindow,
         (RRScreenChangeNotifyMask or
@@ -130,7 +129,6 @@ private fun eventLoop(
     randrBase: Int,
     image: CPointer<XImage>,
     rootWindow: ULong,
-    lcarsWindow: ULong,
     graphicsContexts: List<GC>
 ) {
     val randrEventValue = randrBase + RRScreenChangeNotify
@@ -142,13 +140,13 @@ private fun eventLoop(
 
         if (eventValue == randrEventValue) {
             println("::eventLoop::received randr event")
-            handleRandrEvent(display, windowManagerState, image, rootWindow, lcarsWindow, graphicsContexts)
+            handleRandrEvent(display, windowManagerState, image, rootWindow, graphicsContexts)
             nativeHeap.free(xEvent)
             continue
         }
 
         if (EVENT_HANDLERS.containsKey(xEvent.type)) {
-            val stop = EVENT_HANDLERS[xEvent.type]!!.invoke(display, windowManagerState, xEvent, image, rootWindow, lcarsWindow, graphicsContexts)
+            val stop = EVENT_HANDLERS[xEvent.type]!!.invoke(display, windowManagerState, xEvent, image, rootWindow, graphicsContexts)
             if (stop) {
                 break
             }
