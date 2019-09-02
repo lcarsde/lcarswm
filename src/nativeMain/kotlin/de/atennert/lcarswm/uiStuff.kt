@@ -1,6 +1,6 @@
 package de.atennert.lcarswm
 
-import cnames.structs.xcb_connection_t
+import de.atennert.lcarswm.system.SystemProxy
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -27,7 +27,7 @@ fun allocateColorMap(
     visual: CPointer<Visual>?,
     windowId: ULong
 ): Pair<Colormap, List<ULong>> {
-    val colorMapId = XCreateColormap(display, windowId, visual, AllocNone)
+    val colorMapId = SystemProxy.getInstance().createColormap(display, windowId, visual, AllocNone)
 
     val colorReplies = COLORS
         .asSequence()
@@ -36,7 +36,7 @@ fun allocateColorMap(
             color.red = red.convert()
             color.green = green.convert()
             color.blue = blue.convert()
-            XAllocColor(display, colorMapId, color.ptr)
+            SystemProxy.getInstance().allocColor(display, colorMapId, color.ptr)
             color.pixel
         }
         .filterNotNull()
@@ -56,7 +56,8 @@ fun getGraphicContexts(
         gcValues.graphics_exposures = 0
         gcValues.arc_mode = ArcPieSlice
 
-        XCreateGC(display, window, (GCForeground or GCGraphicsExposures or GCArcMode).convert(), gcValues.ptr)!!
+        val mask = GCForeground or GCGraphicsExposures or GCArcMode
+        SystemProxy.getInstance().createGC(display, window, mask.convert(), gcValues.ptr)!!
     }
 
 fun cleanupColorMap(
@@ -64,8 +65,8 @@ fun cleanupColorMap(
     colorMap: Pair<Colormap, List<ULong>>
 ) {
     val colorPixels = ULongArray(colorMap.second.size) {colorMap.second[it]}
-    XFreeColors(display, colorMap.first, colorPixels.toCValues(), colorPixels.size, 0.convert())
-    XFreeColormap(display, colorMap.first)
+    SystemProxy.getInstance().freeColors(display, colorMap.first, colorPixels.toCValues(), colorPixels.size)
+    SystemProxy.getInstance().freeColormap(display, colorMap.first)
 }
 
 private fun drawMaximizedFrame(
@@ -79,7 +80,7 @@ private fun drawMaximizedFrame(
 
     val gcPurple2 = graphicsContexts[6]
     val gcOrchid = graphicsContexts[2]
-    val gcCopyImage = XCreateGC(display, rootWindow, 0.convert(), null)
+    val gcCopyImage = SystemProxy.getInstance().createGC(display, rootWindow, 0.convert(), null)
 
     // TODO create bar ends as pixmaps
     val arcs = nativeHeap.allocArray<XArc>(4)
@@ -135,18 +136,18 @@ private fun drawMaximizedFrame(
     bars[1].width = (monitor.width - 80).toUShort()
     bars[1].height = 40.toUShort()
 
-    XFillArcs(display, rootWindow, gcPurple2, arcs, 4)
-    XFillRectangles(display, rootWindow, gcPurple2, rects, 4)
-    XFillRectangles(display, rootWindow, gcOrchid, bars, 2)
+    SystemProxy.getInstance().fillArcs(display, rootWindow, gcPurple2, arcs, 4)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcPurple2, rects, 4)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcOrchid, bars, 2)
 
-    XPutImage(display, rootWindow, gcCopyImage,
-        image, 0, 0, monitor.x + 40, 0,
+    SystemProxy.getInstance().putImage(display, rootWindow, gcCopyImage,
+        image, monitor.x + 40, 0,
         image.pointed.width.convert(), image.pointed.height.convert())
 
     nativeHeap.free(arcs)
     nativeHeap.free(rects)
 
-    XFreeGC(display, gcCopyImage)
+    SystemProxy.getInstance().freeGC(display, gcCopyImage)
 }
 
 private fun drawNormalFrame(
@@ -163,7 +164,7 @@ private fun drawNormalFrame(
     val gcOrchid = graphicsContexts[2]
     val gcPurple1 = graphicsContexts[3]
     val gcBrick = graphicsContexts[4]
-    val gcCopyImage = XCreateGC(display, rootWindow, 0.convert(), null)
+    val gcCopyImage = SystemProxy.getInstance().createGC(display, rootWindow, 0.convert(), null)
 
     // TODO create bar ends as pixmaps
     val arcs = nativeHeap.allocArray<XArc>(3)
@@ -318,26 +319,26 @@ private fun drawNormalFrame(
     cornerInnerArcs[3].y = (monitor.y + monitor.height - 72).toShort()
     cornerInnerArcs[3].angle1 = 180.shl(6)
 
-    XFillArcs(display, rootWindow, gcPurple2, arcs, 3)
-    XFillRectangles(display, rootWindow, gcPurple2, rects, 3)
-    XFillRectangles(display, rootWindow, gcPurple2, bigBars, 2)
+    SystemProxy.getInstance().fillArcs(display, rootWindow, gcPurple2, arcs, 3)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcPurple2, rects, 3)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcPurple2, bigBars, 2)
 
     // middle bars
-    XFillRectangles(display, rootWindow, gcPurple1, middleBars[0].ptr, 1)
-    XFillRectangles(display, rootWindow, gcBrick, middleBars[1].ptr, 1)
-    XFillRectangles(display, rootWindow, gcPurple2, middleBars[2].ptr, 1)
-    XFillRectangles(display, rootWindow, gcOrchid, middleBars[3].ptr, 1)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcPurple1, middleBars[0].ptr, 1)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcBrick, middleBars[1].ptr, 1)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcPurple2, middleBars[2].ptr, 1)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcOrchid, middleBars[3].ptr, 1)
 
     // side bars
-    XFillRectangles(display, rootWindow, gcPurple1, sideBars, 2)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcPurple1, sideBars, 2)
 
     // corner pieces
-    XFillArcs(display, rootWindow, gcOrchid, cornerOuterArcs, 4)
-    XFillRectangles(display, rootWindow, gcOrchid, cornerRects, 8)
-    XFillArcs(display, rootWindow, gcBlack, cornerInnerArcs, 4)
+    SystemProxy.getInstance().fillArcs(display, rootWindow, gcOrchid, cornerOuterArcs, 4)
+    SystemProxy.getInstance().fillRectangles(display, rootWindow, gcOrchid, cornerRects, 8)
+    SystemProxy.getInstance().fillArcs(display, rootWindow, gcBlack, cornerInnerArcs, 4)
 
-    XPutImage(display, rootWindow, gcCopyImage,
-        image, 0, 0, monitor.x + monitor.width - 40 - image.pointed.width, 0,
+    SystemProxy.getInstance().putImage(display, rootWindow, gcCopyImage,
+        image, monitor.x + monitor.width - 40 - image.pointed.width, 0,
         image.pointed.width.convert(), image.pointed.height.convert())
 
     nativeHeap.free(arcs)
@@ -349,7 +350,7 @@ private fun drawNormalFrame(
     nativeHeap.free(cornerRects)
     nativeHeap.free(cornerInnerArcs)
 
-    XFreeGC(display, gcCopyImage)
+    SystemProxy.getInstance().freeGC(display, gcCopyImage)
 }
 
 private fun clearScreen(
@@ -359,5 +360,5 @@ private fun clearScreen(
     monitor: Monitor,
     image: CPointer<XImage>
 ) {
-    XFillRectangle(display, rootWindow, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
+    SystemProxy.getInstance().fillRectangle(display, rootWindow, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
 }
