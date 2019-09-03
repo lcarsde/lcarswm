@@ -2,16 +2,13 @@ package de.atennert.lcarswm.system
 
 import de.atennert.lcarswm.system.api.SystemDrawApi
 
-/**
- * Proxy for accessing system functions.
- */
-class SystemProxy private constructor() {
+class SystemAccess private constructor() {
 
     companion object {
         private var instance: SystemDrawApi? = null
 
         /**
-         * Access the proxy implementation.
+         * Access the system facade.
          */
         fun getInstance(): SystemDrawApi {
             if (this.instance == null) {
@@ -24,7 +21,7 @@ class SystemProxy private constructor() {
         /**
          * This method is for testing purposes only
          */
-        fun testOverrideInstance(instance: SystemDrawApi) {
+        fun overrideInstanceForTesting(instance: SystemDrawApi) {
             this.instance = instance
         }
 

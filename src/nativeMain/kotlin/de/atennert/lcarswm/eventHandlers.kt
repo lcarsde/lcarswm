@@ -8,8 +8,8 @@ import xlib.*
  */
 val EVENT_HANDLERS =
     hashMapOf<Int, Function6<CPointer<Display>, WindowManagerState, XEvent, CPointer<XImage>, ULong, List<GC>, Boolean>>(
-        Pair(KeyPress, { d, w, e, i, rw, gc -> handleKeyPress(d, w, e, i, rw, gc) }),
-        Pair(KeyRelease, { d, w, e, l, rw, gc -> handleKeyRelease(d, w, e, l, rw, gc) }),
+        Pair(KeyPress, ::handleKeyPress),
+        Pair(KeyRelease, ::handleKeyRelease),
         Pair(ButtonPress, { _, _, e, _, _, _ -> handleButtonPress(e) }),
         Pair(ButtonRelease, { _, _, e, _, _, _ -> handleButtonRelease(e) }),
         Pair(ConfigureRequest, { d, w, e, _, _, _ -> handleConfigureRequest(d, w, e) }),
@@ -23,14 +23,12 @@ val EVENT_HANDLERS =
     )
 
 private fun handleCreateNotify(xEvent: XEvent): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val createEvent = xEvent.xcreatewindow
     println("::handleCreate::window ${createEvent.window}, o r: ${createEvent.override_redirect}")
     return false
 }
 
 private fun handleConfigureNotify(xEvent: XEvent): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val configureEvent = xEvent.xconfigure
     println("::handleConfigureNotify::window ${configureEvent.window}, o r: ${configureEvent.override_redirect}, above ${configureEvent.above}, event ${configureEvent.event}")
     return false
@@ -44,7 +42,6 @@ private fun handleKeyPress(
     rootWindow: ULong,
     graphicsContexts: List<GC>
 ): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val pressEvent = xEvent.xkey
     val key = pressEvent.keycode
     println("::handleKeyPress::Key pressed: $key")
@@ -67,7 +64,6 @@ private fun handleKeyRelease(
     rootWindow: ULong,
     graphicsContexts: List<GC>
 ): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val releasedEvent = xEvent.xkey
     val key = releasedEvent.keycode
     println("::handleKeyRelease::Key released: $key")
@@ -88,7 +84,6 @@ private fun handleKeyRelease(
 }
 
 private fun handleButtonPress(xEvent: XEvent): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val pressEvent = xEvent.xbutton
     val button = pressEvent.button
 
@@ -97,7 +92,6 @@ private fun handleButtonPress(xEvent: XEvent): Boolean {
 }
 
 private fun handleButtonRelease(xEvent: XEvent): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val pressEvent = xEvent.xbutton
     val button = pressEvent.button
 
@@ -111,7 +105,6 @@ private fun handleMapRequest(
     xEvent: XEvent,
     rootWindow: ULong
 ): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent.xmaprequest
     val window = mapEvent.window
 
@@ -126,7 +119,6 @@ private fun handleMapRequest(
 }
 
 private fun handleMapNotify(xEvent: XEvent): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val mapEvent = xEvent.xmap
     val window = mapEvent.window
     println("::handleMapNotify::map notify for window $window")
@@ -135,7 +127,6 @@ private fun handleMapNotify(xEvent: XEvent): Boolean {
 }
 
 private fun handleReparentNotify(xEvent: XEvent): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val reparentEvent = xEvent.xreparent
     println("::handleReparentNotify::reparented window ${reparentEvent.window} to ${reparentEvent.parent}")
     return false
@@ -149,7 +140,6 @@ private fun handleConfigureRequest(
     windowManagerState: WindowManagerState,
     xEvent: XEvent
 ): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val configureEvent = xEvent.xconfigurerequest
 
     println("::handleConfigureRequest::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}")
@@ -196,7 +186,6 @@ private fun handleDestroyNotify(
     windowManagerState: WindowManagerState,
     xEvent: XEvent
 ): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val destroyEvent = xEvent.xdestroywindow
     println("::handleDestroyNotify::destroy window: ${destroyEvent.window}")
     windowManagerState.removeWindow(destroyEvent.window)
@@ -214,7 +203,6 @@ private fun handleUnmapNotify(
     rootWindow: ULong,
     graphicsContexts: List<GC>
 ): Boolean {
-    @Suppress("UNCHECKED_CAST")
     val unmapEvent = xEvent.xunmap
     println("::handleUnmapNotify::unmapped window: ${unmapEvent.window}")
     // only the active window can be closed, so make a new window active
@@ -411,5 +399,3 @@ private fun closeActiveWindow(
         XKillClient(display, activeWindow.id)
     }
 }
-
-private fun isBetween(min: ULong, max: ULong, value: ULong) = value in min..max

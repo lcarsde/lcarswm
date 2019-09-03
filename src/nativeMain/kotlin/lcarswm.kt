@@ -1,5 +1,5 @@
 import de.atennert.lcarswm.*
-import de.atennert.lcarswm.system.SystemProxy
+import de.atennert.lcarswm.system.SystemAccess
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -68,7 +68,7 @@ fun main() {
         XCloseDisplay(display)
     }
 
-    SystemProxy.clear()
+    SystemAccess.clear()
 
     println("::main::lcarswm stopped")
 }
