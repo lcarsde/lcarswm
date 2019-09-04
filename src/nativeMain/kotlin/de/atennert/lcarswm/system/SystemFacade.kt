@@ -1,15 +1,49 @@
 package de.atennert.lcarswm.system
 
-import de.atennert.lcarswm.system.api.SystemDrawApi
-import kotlinx.cinterop.CValuesRef
-import kotlinx.cinterop.ULongVar
-import kotlinx.cinterop.convert
+import de.atennert.lcarswm.system.api.SystemApi
+import kotlinx.cinterop.*
 import xlib.*
 
 /**
  * This is the facade for accessing system functions.
  */
-class SystemFacade : SystemDrawApi {
+class SystemFacade : SystemApi {
+    override fun rQueryExtension(
+        display: CValuesRef<Display>,
+        eventBase: CValuesRef<IntVar>,
+        errorBase: CValuesRef<IntVar>
+    ): Int {
+        return XRRQueryExtension(display, eventBase, errorBase)
+    }
+
+    override fun rSelectInput(display: CValuesRef<Display>, window: Window, mask: Int) {
+        XRRSelectInput(display, window, mask)
+    }
+
+    override fun rGetScreenResources(display: CValuesRef<Display>, window: Window): CPointer<XRRScreenResources>? {
+        return XRRGetScreenResources(display, window)
+    }
+
+    override fun rGetOutputPrimary(display: CValuesRef<Display>, window: Window): RROutput {
+        return XRRGetOutputPrimary(display, window)
+    }
+
+    override fun rGetOutputInfo(
+        display: CValuesRef<Display>,
+        resources: CPointer<XRRScreenResources>,
+        output: RROutput
+    ): CPointer<XRROutputInfo>? {
+        return XRRGetOutputInfo(display, resources, output)
+    }
+
+    override fun rGetCrtcInfo(
+        display: CValuesRef<Display>,
+        resources: CPointer<XRRScreenResources>,
+        crtc: RRCrtc
+    ): CPointer<XRRCrtcInfo>? {
+        return XRRGetCrtcInfo(display, resources, crtc)
+    }
+
     override fun fillArcs(
         display: CValuesRef<Display>,
         drawable: Drawable,

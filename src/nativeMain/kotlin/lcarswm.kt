@@ -108,14 +108,14 @@ private fun setupRandr(
     val eventBase = IntArray(1).pin()
     val errorBase = IntArray(1).pin()
 
-    if (XRRQueryExtension(display, eventBase.addressOf(0), errorBase.addressOf(0)) == X_FALSE) {
+    if (SystemAccess.getInstance().rQueryExtension(display, eventBase.addressOf(0), errorBase.addressOf(0)) == X_FALSE) {
         println("::setupRandr::no RANDR extension")
         return NO_RANDR_BASE
     }
 
     handleRandrEvent(display, windowManagerState, image, rootWindow, graphicsContexts)
 
-    XRRSelectInput(display, rootWindow,
+    SystemAccess.getInstance().rSelectInput(display, rootWindow,
         (RRScreenChangeNotifyMask or
                 RROutputChangeNotifyMask or
                 RRCrtcChangeNotifyMask or

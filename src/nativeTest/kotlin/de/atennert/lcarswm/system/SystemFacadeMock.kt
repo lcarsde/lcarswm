@@ -1,12 +1,34 @@
 package de.atennert.lcarswm.system
 
-import de.atennert.lcarswm.system.api.SystemDrawApi
-import kotlinx.cinterop.CValuesRef
-import kotlinx.cinterop.ULongVar
-import kotlinx.cinterop.convert
+import de.atennert.lcarswm.system.api.SystemApi
+import kotlinx.cinterop.*
 import xlib.*
 
-class SystemFacadeMock : SystemDrawApi {
+class SystemFacadeMock : SystemApi {
+    override fun rQueryExtension(
+        display: CValuesRef<Display>,
+        eventBase: CValuesRef<IntVar>,
+        errorBase: CValuesRef<IntVar>
+    ): Int = 0
+
+    override fun rSelectInput(display: CValuesRef<Display>, window: Window, mask: Int) {}
+
+    override fun rGetScreenResources(display: CValuesRef<Display>, window: Window): CPointer<XRRScreenResources>? = null
+
+    override fun rGetOutputPrimary(display: CValuesRef<Display>, window: Window): RROutput = 0.convert()
+
+    override fun rGetOutputInfo(
+        display: CValuesRef<Display>,
+        resources: CPointer<XRRScreenResources>,
+        output: RROutput
+    ): CPointer<XRROutputInfo>? = null
+
+    override fun rGetCrtcInfo(
+        display: CValuesRef<Display>,
+        resources: CPointer<XRRScreenResources>,
+        crtc: RRCrtc
+    ): CPointer<XRRCrtcInfo>? = null
+
     override fun fillArcs(
         display: CValuesRef<Display>,
         drawable: Drawable,
@@ -51,9 +73,7 @@ class SystemFacadeMock : SystemDrawApi {
         gcValues: CValuesRef<XGCValues>?
     ): GC? = null
 
-    override fun freeGC(display: CValuesRef<Display>, graphicsContext: GC?): Int {
-        return 0
-    }
+    override fun freeGC(display: CValuesRef<Display>, graphicsContext: GC?): Int = 0
 
     override fun createColormap(
         display: CValuesRef<Display>,

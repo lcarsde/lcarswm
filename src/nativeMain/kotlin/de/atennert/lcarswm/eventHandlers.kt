@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.system.SystemAccess
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -245,13 +246,13 @@ fun handleRandrEvent(
 ) {
     println("::handleRandrEvent::handle randr")
 
-    val resources = XRRGetScreenResources(display, rootWindow)!!
-    val primary = XRRGetOutputPrimary(display, rootWindow)
+    val resources = SystemAccess.getInstance().rGetScreenResources(display, rootWindow)!!
+    val primary = SystemAccess.getInstance().rGetOutputPrimary(display, rootWindow)
 
     val outputs = resources.pointed.outputs
 
     val sortedMonitors = Array(resources.pointed.noutput)
-    { i -> Pair(outputs!![i], XRRGetOutputInfo(display, resources, outputs[i])) }
+    { i -> Pair(outputs!![i], SystemAccess.getInstance().rGetOutputInfo(display, resources, outputs[i])) }
         .asSequence()
         .filter { (_, outputObject) ->
             outputObject != null
@@ -318,7 +319,7 @@ private fun addMeasurementToMonitor(
     crtcReference: RRCrtc,
     resources: CPointer<XRRScreenResources>
 ): Monitor {
-    val crtcInfo = XRRGetCrtcInfo(display, resources, crtcReference)!!.pointed
+    val crtcInfo = SystemAccess.getInstance().rGetCrtcInfo(display, resources, crtcReference)!!.pointed
 
     monitor.setMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
 

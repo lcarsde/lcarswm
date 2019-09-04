@@ -7,7 +7,7 @@ import xlib.*
 /**
  *
  */
-interface SystemDrawApi {
+interface DrawApi {
     fun fillArcs(display: CValuesRef<Display>, drawable: Drawable, graphicsContext: GC, arcs: CValuesRef<XArc>, arcCount: Int): Int
 
     fun fillRectangle(display: CValuesRef<Display>, drawable: Drawable, graphicsContext: GC, x: Int, y: Int, width: UInt, height: UInt): Int

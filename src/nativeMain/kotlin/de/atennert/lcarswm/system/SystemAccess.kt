@@ -1,16 +1,16 @@
 package de.atennert.lcarswm.system
 
-import de.atennert.lcarswm.system.api.SystemDrawApi
+import de.atennert.lcarswm.system.api.SystemApi
 
 class SystemAccess private constructor() {
 
     companion object {
-        private var instance: SystemDrawApi? = null
+        private var instance: SystemApi? = null
 
         /**
          * Access the system facade.
          */
-        fun getInstance(): SystemDrawApi {
+        fun getInstance(): SystemApi {
             if (this.instance == null) {
                 this.instance = SystemFacade()
             }
@@ -21,7 +21,7 @@ class SystemAccess private constructor() {
         /**
          * This method is for testing purposes only
          */
-        fun overrideInstanceForTesting(instance: SystemDrawApi) {
+        fun overrideInstanceForTesting(instance: SystemApi) {
             this.instance = instance
         }
 
