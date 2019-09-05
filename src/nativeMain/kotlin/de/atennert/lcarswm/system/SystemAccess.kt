@@ -1,5 +1,8 @@
 package de.atennert.lcarswm.system
 
+import de.atennert.lcarswm.system.api.DrawApi
+import de.atennert.lcarswm.system.api.InputApi
+import de.atennert.lcarswm.system.api.RandrApi
 import de.atennert.lcarswm.system.api.SystemApi
 
 class SystemAccess private constructor() {
@@ -33,3 +36,9 @@ class SystemAccess private constructor() {
         }
     }
 }
+
+fun xDrawApi(): DrawApi = SystemAccess.getInstance()
+
+fun xInputApi(): InputApi = SystemAccess.getInstance()
+
+fun xRandrApi(): RandrApi = SystemAccess.getInstance()

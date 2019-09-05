@@ -1,6 +1,8 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.SystemAccess
+import de.atennert.lcarswm.system.xInputApi
+import de.atennert.lcarswm.system.xRandrApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -217,7 +219,7 @@ private fun handleUnmapNotify(
         windowManagerState.removeWindow(unmapEvent.window)
         moveNextWindowToTopOfStack(display, windowManagerState)
     } else if (windowManagerState.activeWindow != null) {
-        XSetInputFocus(display, windowManagerState.activeWindow!!.id, RevertToNone, CurrentTime.convert())
+        xInputApi().setInputFocus(display, windowManagerState.activeWindow!!.id, RevertToNone, CurrentTime.convert())
     }
 
     windowManagerState.monitors.forEach { monitor ->
@@ -246,8 +248,8 @@ fun handleRandrEvent(
 ) {
     println("::handleRandrEvent::handle randr")
 
-    val resources = SystemAccess.getInstance().rGetScreenResources(display, rootWindow)!!
-    val primary = SystemAccess.getInstance().rGetOutputPrimary(display, rootWindow)
+    val resources = xRandrApi().rGetScreenResources(display, rootWindow)!!
+    val primary = xRandrApi().rGetOutputPrimary(display, rootWindow)
 
     val outputs = resources.pointed.outputs
 
@@ -319,7 +321,7 @@ private fun addMeasurementToMonitor(
     crtcReference: RRCrtc,
     resources: CPointer<XRRScreenResources>
 ): Monitor {
-    val crtcInfo = SystemAccess.getInstance().rGetCrtcInfo(display, resources, crtcReference)!!.pointed
+    val crtcInfo = xRandrApi().rGetCrtcInfo(display, resources, crtcReference)!!.pointed
 
     monitor.setMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
 

@@ -1,5 +1,7 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.system.SystemAccess
+import de.atennert.lcarswm.system.xInputApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -25,7 +27,7 @@ fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState
     window.frame = XCreateSimpleWindow(display, rootWindow, measurements[0], measurements[1],
         measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
 
-    XSelectInput(display, window.frame, SubstructureRedirectMask or SubstructureNotifyMask)
+    xInputApi().selectInput(display, window.frame, SubstructureRedirectMask or SubstructureNotifyMask)
 
     XAddToSaveSet(display, windowId)
 

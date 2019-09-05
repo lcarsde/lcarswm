@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.system.api
 
+import kotlinx.cinterop.CPointerVar
 import kotlinx.cinterop.CValuesRef
 import kotlinx.cinterop.ULongVar
 import xlib.*
@@ -28,4 +29,6 @@ interface DrawApi {
     fun freeColors(display: CValuesRef<Display>, colorMap: Colormap, pixels: CValuesRef<ULongVar>, pixelCount: Int): Int
 
     fun freeColormap(display: CValuesRef<Display>, colorMap: Colormap): Int
+
+    fun readXpmFileToImage(display: CValuesRef<Display>, imagePath: String, imageBuffer: CValuesRef<CPointerVar<XImage>>): Int
 }

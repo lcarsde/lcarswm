@@ -1,5 +1,7 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.system.SystemAccess
+import de.atennert.lcarswm.system.xInputApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -27,30 +29,30 @@ fun setupLcarsWindow(
 private fun grabKeys(display: CPointer<Display>, window: ULong, windowManagerState: WindowManagerState) {
     windowManagerState.modifierKeys
         .onEach { keyCode ->
-            XGrabKey(
-                display, keyCode.convert(), AnyModifier, window, X_FALSE, GrabModeAsync, GrabModeAsync
+            xInputApi().grabKey(
+                display, keyCode.convert(), AnyModifier.convert(), window, false, GrabModeAsync, GrabModeAsync
             )
         }
 
 
     // get and grab all key codes for the short cut keys
     LCARS_WM_KEY_SYMS
-        .map { keySym -> Pair(keySym, XKeysymToKeycode(display, keySym.convert())) }
+        .map { keySym -> Pair(keySym, xInputApi().keysymToKeycode(display, keySym.convert())) }
         .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
         .onEach { (keySym, keyCode) -> windowManagerState.keyboardKeys[keyCode.toUInt()] = keySym }
         .forEach { (_, keyCode) ->
-            XGrabKey(
+            xInputApi().grabKey(
                 display, keyCode.convert(), WM_MODIFIER_KEY.convert(), window,
-                X_FALSE, GrabModeAsync, GrabModeAsync
+                false, GrabModeAsync, GrabModeAsync
             )
         }
 
     LCARS_NO_MASK_KEY_SYMS
-        .map { keySym -> Pair(keySym, XKeysymToKeycode(display, keySym.convert())) }
+        .map { keySym -> Pair(keySym, xInputApi().keysymToKeycode(display, keySym.convert())) }
         .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
         .onEach { (keySym, keyCode) -> windowManagerState.keyboardKeys[keyCode.toUInt()] = keySym }
         .forEach { (_, keyCode) ->
-            XGrabKey(display, keyCode.convert(), AnyModifier, window, X_FALSE, GrabModeAsync, GrabModeAsync)
+            xInputApi().grabKey(display, keyCode.convert(), AnyModifier.convert(), window, false, GrabModeAsync, GrabModeAsync)
         }
 }
 
@@ -66,7 +68,7 @@ private fun getModifierKeys(display: CValuesRef<Display>, modifierKey: Int): Col
         Mod5Mask
     ).indexOf(modifierKey)
 
-    val modifierKeymap = XGetModifierMapping(display)?.pointed ?: return emptyList()
+    val modifierKeymap = xInputApi().getModifierMapping(display)?.pointed ?: return emptyList()
 
     val startPosition = modifierIndex * modifierKeymap.max_keypermod
     val endPosition = startPosition + modifierKeymap.max_keypermod
@@ -80,8 +82,8 @@ private fun getModifierKeys(display: CValuesRef<Display>, modifierKey: Int): Col
 }
 
 private fun grabButton(display: CPointer<Display>, window: ULong, buttonId: Int) {
-    XGrabButton(
-        display, buttonId.convert(), WM_MODIFIER_KEY.convert(), window, X_FALSE,
+    xInputApi().grabButton(
+        display, buttonId.convert(), WM_MODIFIER_KEY.convert(), window, false,
         (ButtonPressMask or ButtonMotionMask or ButtonReleaseMask).convert(),
         GrabModeAsync, GrabModeAsync, None.convert(), None.convert()
     )

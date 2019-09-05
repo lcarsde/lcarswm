@@ -5,6 +5,37 @@ import kotlinx.cinterop.*
 import xlib.*
 
 class SystemFacadeMock : SystemApi {
+    override fun selectInput(display: CValuesRef<Display>, window: Window, mask: Long): Int = 0
+
+    override fun setInputFocus(display: CValuesRef<Display>, window: Window, revertTo: Int, time: Time): Int = 0
+
+    override fun grabKey(
+        display: CValuesRef<Display>,
+        keyCode: Int,
+        modifiers: UInt,
+        window: Window,
+        ownerEvents: Boolean,
+        pointerMode: Int,
+        keyboardMode: Int
+    ): Int = 0
+
+    override fun grabButton(
+        display: CValuesRef<Display>,
+        button: UInt,
+        modifiers: UInt,
+        window: Window,
+        ownerEvents: Boolean,
+        mask: UInt,
+        pointerMode: Int,
+        keyboardMode: Int,
+        confineWindow: Window,
+        cursor: Cursor
+    ): Int = 0
+
+    override fun getModifierMapping(display: CValuesRef<Display>): CPointer<XModifierKeymap>? = null
+
+    override fun keysymToKeycode(display: CValuesRef<Display>, keySym: KeySym): KeyCode = 0.convert()
+
     override fun rQueryExtension(
         display: CValuesRef<Display>,
         eventBase: CValuesRef<IntVar>,
@@ -92,4 +123,10 @@ class SystemFacadeMock : SystemApi {
     ): Int = 0
 
     override fun freeColormap(display: CValuesRef<Display>, colorMap: Colormap): Int = 0
+
+    override fun readXpmFileToImage(
+        display: CValuesRef<Display>,
+        imagePath: String,
+        imageBuffer: CValuesRef<CPointerVar<XImage>>
+    ): Int = 0
 }

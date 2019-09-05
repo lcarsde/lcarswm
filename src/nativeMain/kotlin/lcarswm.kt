@@ -1,5 +1,8 @@
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.system.SystemAccess
+import de.atennert.lcarswm.system.xDrawApi
+import de.atennert.lcarswm.system.xInputApi
+import de.atennert.lcarswm.system.xRandrApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -15,7 +18,7 @@ fun main() {
 
         XSetErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
-        XSelectInput(display, rootWindow, SubstructureRedirectMask or SubstructureNotifyMask)
+        xInputApi().selectInput(display, rootWindow, SubstructureRedirectMask or SubstructureNotifyMask)
         XSync(display, X_FALSE)
 
         if (wmDetected) {
@@ -39,9 +42,9 @@ fun main() {
         setupLcarsWindow(display, screen, windowManagerConfig)
         windowManagerConfig.setActiveWindowListener { activeWindow ->
             if (activeWindow != null) {
-                XSetInputFocus(display, activeWindow.id, RevertToNone, CurrentTime.convert())
+                xInputApi().setInputFocus(display, activeWindow.id, RevertToNone, CurrentTime.convert())
             } else {
-                XSetInputFocus(display, rootWindow, RevertToPointerRoot, CurrentTime.convert())
+                xInputApi().setInputFocus(display, rootWindow, RevertToPointerRoot, CurrentTime.convert())
             }
         }
 
@@ -49,7 +52,7 @@ fun main() {
 
         val logoImage = allocArrayOfPointersTo(alloc<XImage>())
 
-        XpmReadFileToImage(display, "/usr/share/pixmaps/lcarswm.xpm", logoImage, null, null)
+        xDrawApi().readXpmFileToImage(display, "/usr/share/pixmaps/lcarswm.xpm", logoImage)
 
         println("::main::logo loaded")
 
@@ -108,14 +111,14 @@ private fun setupRandr(
     val eventBase = IntArray(1).pin()
     val errorBase = IntArray(1).pin()
 
-    if (SystemAccess.getInstance().rQueryExtension(display, eventBase.addressOf(0), errorBase.addressOf(0)) == X_FALSE) {
+    if (xRandrApi().rQueryExtension(display, eventBase.addressOf(0), errorBase.addressOf(0)) == X_FALSE) {
         println("::setupRandr::no RANDR extension")
         return NO_RANDR_BASE
     }
 
     handleRandrEvent(display, windowManagerState, image, rootWindow, graphicsContexts)
 
-    SystemAccess.getInstance().rSelectInput(display, rootWindow,
+    xRandrApi().rSelectInput(display, rootWindow,
         (RRScreenChangeNotifyMask or
                 RROutputChangeNotifyMask or
                 RRCrtcChangeNotifyMask or

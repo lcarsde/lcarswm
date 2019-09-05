@@ -1,5 +1,7 @@
 package de.atennert.lcarswm.system
 
+import de.atennert.lcarswm.X_FALSE
+import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -8,6 +10,49 @@ import xlib.*
  * This is the facade for accessing system functions.
  */
 class SystemFacade : SystemApi {
+    override fun selectInput(display: CValuesRef<Display>, window: Window, mask: Long): Int {
+        return XSelectInput(display, window, mask)
+    }
+
+    override fun setInputFocus(display: CValuesRef<Display>, window: Window, revertTo: Int, time: Time): Int {
+        return XSetInputFocus(display, window, revertTo, time)
+    }
+
+    override fun grabKey(
+        display: CValuesRef<Display>,
+        keyCode: Int,
+        modifiers: UInt,
+        window: Window,
+        ownerEvents: Boolean,
+        pointerMode: Int,
+        keyboardMode: Int
+    ): Int {
+        return XGrabKey(display, keyCode, modifiers, window, convertOwnerEvents(ownerEvents), pointerMode, keyboardMode)
+    }
+
+    override fun grabButton(
+        display: CValuesRef<Display>,
+        button: UInt,
+        modifiers: UInt,
+        window: Window,
+        ownerEvents: Boolean,
+        mask: UInt,
+        pointerMode: Int,
+        keyboardMode: Int,
+        windowToConfineTo: Window,
+        cursor: Cursor
+    ): Int {
+        return XGrabButton(display, button, modifiers, window, convertOwnerEvents(ownerEvents), mask, pointerMode, keyboardMode, windowToConfineTo, cursor)
+    }
+
+    override fun getModifierMapping(display: CValuesRef<Display>): CPointer<XModifierKeymap>? {
+        return XGetModifierMapping(display)
+    }
+
+    override fun keysymToKeycode(display: CValuesRef<Display>, keySym: KeySym): KeyCode {
+        return XKeysymToKeycode(display, keySym)
+    }
+
     override fun rQueryExtension(
         display: CValuesRef<Display>,
         eventBase: CValuesRef<IntVar>,
@@ -126,5 +171,18 @@ class SystemFacade : SystemApi {
 
     override fun freeColormap(display: CValuesRef<Display>, colorMap: Colormap): Int {
         return XFreeColormap(display, colorMap)
+    }
+
+    override fun readXpmFileToImage(
+        display: CValuesRef<Display>,
+        imagePath: String,
+        imageBuffer: CValuesRef<CPointerVar<XImage>>
+    ): Int {
+        return XpmReadFileToImage(display, imagePath, imageBuffer, null, null)
+    }
+
+    private fun convertOwnerEvents(ownerEvents: Boolean): Int = when (ownerEvents) {
+        true  -> X_TRUE
+        false -> X_FALSE
     }
 }
