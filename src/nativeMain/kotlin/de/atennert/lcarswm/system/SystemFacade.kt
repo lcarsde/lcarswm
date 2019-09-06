@@ -4,12 +4,50 @@ import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
+import platform.posix.FILE
+import platform.posix.__pid_t
 import xlib.*
 
 /**
  * This is the facade for accessing system functions.
  */
 class SystemFacade : SystemApi {
+    override fun getenv(name: String): CPointer<ByteVar>? {
+        return platform.posix.getenv(name)
+    }
+
+    override fun fopen(fileName: String, modes: String): CPointer<FILE>? {
+        return platform.posix.fopen(fileName, modes)
+    }
+
+    override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CValuesRef<FILE>): CPointer<ByteVar>? {
+        return platform.posix.fgets(buffer, bufferSize, file)
+    }
+
+    override fun fclose(file: CValuesRef<FILE>): Int {
+        return platform.posix.fclose(file)
+    }
+
+    override fun fork(): __pid_t {
+        return platform.posix.fork()
+    }
+
+    override fun setsid(): __pid_t {
+        return platform.posix.setsid()
+    }
+
+    override fun perror(s: String) {
+        platform.posix.perror(s)
+    }
+
+    override fun exit(status: Int) {
+        platform.posix.exit(status)
+    }
+
+    override fun execvp(fileName: String, args: CValuesRef<CPointerVar<ByteVar>>): Int {
+        return platform.posix.execvp(fileName, args)
+    }
+
     override fun selectInput(display: CValuesRef<Display>, window: Window, mask: Long): Int {
         return XSelectInput(display, window, mask)
     }

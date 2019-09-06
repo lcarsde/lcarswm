@@ -2,9 +2,29 @@ package de.atennert.lcarswm.system
 
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
+import platform.posix.FILE
+import platform.posix.__pid_t
 import xlib.*
 
 class SystemFacadeMock : SystemApi {
+    override fun getenv(name: String): CPointer<ByteVar>? = null
+
+    override fun fopen(fileName: String, modes: String): CPointer<FILE>? = null
+
+    override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CValuesRef<FILE>): CPointer<ByteVar>? = null
+
+    override fun fclose(file: CValuesRef<FILE>): Int = 0
+
+    override fun fork(): __pid_t = 0
+
+    override fun setsid(): __pid_t = 0
+
+    override fun perror(s: String) {}
+
+    override fun exit(status: Int) {}
+
+    override fun execvp(fileName: String, args: CValuesRef<CPointerVar<ByteVar>>): Int = 0
+
     override fun selectInput(display: CValuesRef<Display>, window: Window, mask: Long): Int = 0
 
     override fun setInputFocus(display: CValuesRef<Display>, window: Window, revertTo: Int, time: Time): Int = 0

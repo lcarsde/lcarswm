@@ -1,30 +1,32 @@
 package de.atennert.lcarswm
 
-import kotlinx.cinterop.*
-import platform.posix.*
+import de.atennert.lcarswm.system.posixApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.pin
+import kotlinx.cinterop.toCValues
 
 /**
  * Run a given program.
  * @param programPath the path to the program
  */
 fun runProgram(programPath: String, args: List<String>): Boolean {
-    when (fork()) {
+    when (posixApi().fork()) {
         -1 -> return false
         0 -> {
-            if (setsid() == -1) {
-                perror("setsid failed")
-                exit(1)
+            if (posixApi().setsid() == -1) {
+                posixApi().perror("setsid failed")
+                posixApi().exit(1)
             }
 
             programPath.encodeToByteArray().pin()
             val argv = args.map { it.encodeToByteArray().pin().addressOf(0) }
 
-            if (execvp(programPath, argv.toCValues()) == -1) {
-                perror("execvp failed")
-                exit(1)
+            if (posixApi().execvp(programPath, argv.toCValues()) == -1) {
+                posixApi().perror("execvp failed")
+                posixApi().exit(1)
             }
 
-            exit(0)
+            posixApi().exit(0)
         }
     }
     return true
