@@ -1,6 +1,7 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.SystemAccess
+import de.atennert.lcarswm.system.xEventApi
 import de.atennert.lcarswm.system.xInputApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -31,18 +32,13 @@ fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState
 
     XAddToSaveSet(display, windowId)
 
-    XReparentWindow(display, windowId, window.frame, 0, 0)
+    xEventApi().reparentWindow(display, windowId, window.frame, 0, 0)
 
-    XResizeWindow(
-        display,
-        window.id,
-        measurements[2].convert(),
-        measurements[3].convert()
-    )
+    xEventApi().resizeWindow(display, window.id, measurements[2].convert(), measurements[3].convert())
 
-    XMapWindow(display, window.frame)
+    xEventApi().mapWindow(display, window.frame)
 
-    XMapWindow(display, window.id)
+    xEventApi().mapWindow(display, window.id)
 
     nativeHeap.free(windowAttributes)
 }

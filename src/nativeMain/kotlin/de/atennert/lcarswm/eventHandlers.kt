@@ -1,6 +1,7 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.SystemAccess
+import de.atennert.lcarswm.system.xEventApi
 import de.atennert.lcarswm.system.xInputApi
 import de.atennert.lcarswm.system.xRandrApi
 import kotlinx.cinterop.*
@@ -173,11 +174,11 @@ private fun handleConfigureRequest(
         e.xconfigure.border_width = 0
         e.xconfigure.above = None.convert()
         e.xconfigure.override_redirect = X_FALSE
-        XSendEvent(display, window.id, X_FALSE, StructureNotifyMask, e.ptr)
+        xEventApi().sendEvent(display, window.id, false, StructureNotifyMask, e.ptr)
         return false
     }
 
-    XConfigureWindow(display, configureEvent.window, configureEvent.value_mask.convert(), windowChanges.ptr)
+    xEventApi().configureWindow(display, configureEvent.window, configureEvent.value_mask.convert(), windowChanges.ptr)
 
     return false
 }
@@ -211,10 +212,10 @@ private fun handleUnmapNotify(
     // only the active window can be closed, so make a new window active
     if (windowManagerState.hasWindow(unmapEvent.window) && unmapEvent.event != rootWindow) {
         val window = windowManagerState.windows.map { it.first }.single { it.id == unmapEvent.window }
-        XUnmapWindow(display, window.frame)
-        XReparentWindow(display, unmapEvent.window, rootWindow, 0, 0)
+        xEventApi().unmapWindow(display, window.frame)
+        xEventApi().reparentWindow(display, unmapEvent.window, rootWindow, 0, 0)
         XRemoveFromSaveSet(display, unmapEvent.window)
-        XDestroyWindow(display, window.frame)
+        xEventApi().destroyWindow(display, window.frame)
 
         windowManagerState.removeWindow(unmapEvent.window)
         moveNextWindowToTopOfStack(display, windowManagerState)
@@ -296,7 +297,7 @@ fun handleRandrEvent(
             Pair(newWidth, newHeight)
         }
 
-    XResizeWindow(display, rootWindow, width.convert(), height.convert())
+    xEventApi().resizeWindow(display, rootWindow, width.convert(), height.convert())
 
     windowManagerState.screenSize = Pair(width, height)
     windowManagerState.updateMonitors(activeMonitors)
@@ -397,7 +398,7 @@ private fun closeActiveWindow(
         msg.xclient.window = activeWindow.id
         msg.xclient.format = 32
         msg.xclient.data.l[0] = windowManagerState.wmDeleteWindow.convert()
-        XSendEvent(display, activeWindow.id, X_FALSE, 0, msg.ptr)
+        xEventApi().sendEvent(display, activeWindow.id, false, 0, msg.ptr)
     } else {
         XKillClient(display, activeWindow.id)
     }

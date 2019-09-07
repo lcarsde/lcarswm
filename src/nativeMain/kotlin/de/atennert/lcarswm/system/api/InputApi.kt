@@ -16,7 +16,7 @@ interface InputApi {
                 pointerMode: Int, keyboardMode: Int): Int
 
     fun grabButton(display: CValuesRef<Display>, button: UInt, modifiers: UInt, window: Window, ownerEvents: Boolean,
-                   mask: UInt, pointerMode: Int, keyboardMode: Int, confineWindow: Window, cursor: Cursor): Int
+                   mask: UInt, pointerMode: Int, keyboardMode: Int, windowToConfineTo: Window, cursor: Cursor): Int
 
     fun getModifierMapping(display: CValuesRef<Display>): CPointer<XModifierKeymap>?
 

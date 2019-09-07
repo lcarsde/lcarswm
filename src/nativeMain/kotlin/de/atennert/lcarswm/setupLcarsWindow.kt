@@ -1,6 +1,6 @@
 package de.atennert.lcarswm
 
-import de.atennert.lcarswm.system.SystemAccess
+import de.atennert.lcarswm.system.xEventApi
 import de.atennert.lcarswm.system.xInputApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -19,7 +19,7 @@ fun setupLcarsWindow(
 
     grabKeys(display, screen.root, windowManagerState)
 
-    XSync(display, X_FALSE)
+    xEventApi().sync(display, false)
 }
 
 

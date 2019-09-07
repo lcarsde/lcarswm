@@ -1,8 +1,5 @@
 import de.atennert.lcarswm.*
-import de.atennert.lcarswm.system.SystemAccess
-import de.atennert.lcarswm.system.xDrawApi
-import de.atennert.lcarswm.system.xInputApi
-import de.atennert.lcarswm.system.xRandrApi
+import de.atennert.lcarswm.system.*
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -19,7 +16,7 @@ fun main() {
         XSetErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
         xInputApi().selectInput(display, rootWindow, SubstructureRedirectMask or SubstructureNotifyMask)
-        XSync(display, X_FALSE)
+        xEventApi().sync(display, false)
 
         if (wmDetected) {
             println("::main::Detected another active window manager")
@@ -141,7 +138,7 @@ private fun eventLoop(
 
     while (true) {
         val xEvent = nativeHeap.alloc<XEvent>()
-        XNextEvent(display, xEvent.ptr)
+        xEventApi().nextEvent(display, xEvent.ptr)
         val eventValue = xEvent.type
 
         if (eventValue == randrEventValue) {

@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.system.xEventApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -11,7 +12,7 @@ fun adjustWindowPositionAndSize(
     windowMeasurements: List<Int>,
     window: Window
 ) {
-    XMoveResizeWindow(
+    xEventApi().moveResizeWindow(
         display,
         window.frame,
         windowMeasurements[0],
@@ -20,7 +21,7 @@ fun adjustWindowPositionAndSize(
         windowMeasurements[3].convert()
     )
 
-    XResizeWindow(
+    xEventApi().resizeWindow(
         display,
         window.id,
         windowMeasurements[2].convert(),
@@ -39,5 +40,5 @@ fun adjustWindowPositionAndSize(
     e.xconfigure.border_width = 0
     e.xconfigure.above = None.convert()
     e.xconfigure.override_redirect = X_FALSE
-    XSendEvent(display, window.id, X_FALSE, StructureNotifyMask, e.ptr)
+    xEventApi().sendEvent(display, window.id, false, StructureNotifyMask, e.ptr)
 }

@@ -7,6 +7,44 @@ import platform.posix.__pid_t
 import xlib.*
 
 class SystemFacadeMock : SystemApi {
+    override fun sync(display: CValuesRef<Display>, discardQueuedEvents: Boolean): Int = 0
+
+    override fun sendEvent(
+        display: CValuesRef<Display>,
+        window: Window,
+        propagate: Boolean,
+        eventMask: Long,
+        event: CValuesRef<XEvent>
+    ): Int = 0
+
+    override fun nextEvent(display: CValuesRef<Display>, event: CValuesRef<XEvent>): Int = 0
+
+    override fun configureWindow(
+        display: CValuesRef<Display>,
+        window: Window,
+        configurationMask: UInt,
+        configuration: CValuesRef<XWindowChanges>
+    ): Int = 0
+
+    override fun reparentWindow(display: CValuesRef<Display>, window: Window, parent: Window, x: Int, y: Int): Int = 0
+
+    override fun resizeWindow(display: CValuesRef<Display>, window: Window, width: UInt, height: UInt): Int = 0
+
+    override fun moveResizeWindow(
+        display: CValuesRef<Display>,
+        window: Window,
+        x: Int,
+        y: Int,
+        width: UInt,
+        height: UInt
+    ): Int = 0
+
+    override fun mapWindow(display: CValuesRef<Display>, window: Window): Int = 0
+
+    override fun unmapWindow(display: CValuesRef<Display>, window: Window): Int = 0
+
+    override fun destroyWindow(display: CValuesRef<Display>, window: Window): Int = 0
+
     override fun getenv(name: String): CPointer<ByteVar>? = null
 
     override fun fopen(fileName: String, modes: String): CPointer<FILE>? = null
@@ -48,7 +86,7 @@ class SystemFacadeMock : SystemApi {
         mask: UInt,
         pointerMode: Int,
         keyboardMode: Int,
-        confineWindow: Window,
+        windowToConfineTo: Window,
         cursor: Cursor
     ): Int = 0
 

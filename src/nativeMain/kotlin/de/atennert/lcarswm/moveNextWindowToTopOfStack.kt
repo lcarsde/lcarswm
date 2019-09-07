@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.system.xEventApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -13,6 +14,6 @@ fun moveNextWindowToTopOfStack(display: CPointer<Display>, windowManagerState: W
         val windowChanges = nativeHeap.alloc<XWindowChanges>()
         windowChanges.stack_mode = Above
 
-        XConfigureWindow(display, activeWindow.frame, CWStackMode, windowChanges.ptr)
+        xEventApi().configureWindow(display, activeWindow.frame, CWStackMode.convert(), windowChanges.ptr)
     }
 }

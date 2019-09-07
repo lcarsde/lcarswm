@@ -12,6 +12,64 @@ import xlib.*
  * This is the facade for accessing system functions.
  */
 class SystemFacade : SystemApi {
+    override fun sync(display: CValuesRef<Display>, discardQueuedEvents: Boolean): Int {
+        return XSync(display, convertToXBoolean(discardQueuedEvents))
+    }
+
+    override fun sendEvent(
+        display: CValuesRef<Display>,
+        window: Window,
+        propagate: Boolean,
+        eventMask: Long,
+        event: CValuesRef<XEvent>
+    ): Int {
+        return XSendEvent(display, window, convertToXBoolean(propagate), eventMask, event)
+    }
+
+    override fun nextEvent(display: CValuesRef<Display>, event: CValuesRef<XEvent>): Int {
+        return XNextEvent(display, event)
+    }
+
+    override fun configureWindow(
+        display: CValuesRef<Display>,
+        window: Window,
+        configurationMask: UInt,
+        configuration: CValuesRef<XWindowChanges>
+    ): Int {
+        return XConfigureWindow(display, window, configurationMask, configuration)
+    }
+
+    override fun reparentWindow(display: CValuesRef<Display>, window: Window, parent: Window, x: Int, y: Int): Int {
+        return XReparentWindow(display, window, parent, x, y)
+    }
+
+    override fun resizeWindow(display: CValuesRef<Display>, window: Window, width: UInt, height: UInt): Int {
+        return XResizeWindow(display, window, width, height)
+    }
+
+    override fun moveResizeWindow(
+        display: CValuesRef<Display>,
+        window: Window,
+        x: Int,
+        y: Int,
+        width: UInt,
+        height: UInt
+    ): Int {
+        return XMoveResizeWindow(display, window, x, y, width, height)
+    }
+
+    override fun mapWindow(display: CValuesRef<Display>, window: Window): Int {
+        return XMapWindow(display, window)
+    }
+
+    override fun unmapWindow(display: CValuesRef<Display>, window: Window): Int {
+        return XUnmapWindow(display, window)
+    }
+
+    override fun destroyWindow(display: CValuesRef<Display>, window: Window): Int {
+        return XDestroyWindow(display, window)
+    }
+
     override fun getenv(name: String): CPointer<ByteVar>? {
         return platform.posix.getenv(name)
     }
@@ -65,7 +123,7 @@ class SystemFacade : SystemApi {
         pointerMode: Int,
         keyboardMode: Int
     ): Int {
-        return XGrabKey(display, keyCode, modifiers, window, convertOwnerEvents(ownerEvents), pointerMode, keyboardMode)
+        return XGrabKey(display, keyCode, modifiers, window, convertToXBoolean(ownerEvents), pointerMode, keyboardMode)
     }
 
     override fun grabButton(
@@ -80,7 +138,7 @@ class SystemFacade : SystemApi {
         windowToConfineTo: Window,
         cursor: Cursor
     ): Int {
-        return XGrabButton(display, button, modifiers, window, convertOwnerEvents(ownerEvents), mask, pointerMode, keyboardMode, windowToConfineTo, cursor)
+        return XGrabButton(display, button, modifiers, window, convertToXBoolean(ownerEvents), mask, pointerMode, keyboardMode, windowToConfineTo, cursor)
     }
 
     override fun getModifierMapping(display: CValuesRef<Display>): CPointer<XModifierKeymap>? {
@@ -219,7 +277,7 @@ class SystemFacade : SystemApi {
         return XpmReadFileToImage(display, imagePath, imageBuffer, null, null)
     }
 
-    private fun convertOwnerEvents(ownerEvents: Boolean): Int = when (ownerEvents) {
+    private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE
     }

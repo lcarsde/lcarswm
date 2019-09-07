@@ -40,4 +40,6 @@ fun xInputApi(): InputApi = SystemAccess.getInstance()
 
 fun xRandrApi(): RandrApi = SystemAccess.getInstance()
 
+fun xEventApi(): EventApi = SystemAccess.getInstance()
+
 fun posixApi(): PosixApi = SystemAccess.getInstance()
