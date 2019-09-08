@@ -1,9 +1,6 @@
 package de.atennert.lcarswm
 
-import de.atennert.lcarswm.system.SystemAccess
-import de.atennert.lcarswm.system.xEventApi
-import de.atennert.lcarswm.system.xInputApi
-import de.atennert.lcarswm.system.xRandrApi
+import de.atennert.lcarswm.system.*
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -214,7 +211,7 @@ private fun handleUnmapNotify(
         val window = windowManagerState.windows.map { it.first }.single { it.id == unmapEvent.window }
         xEventApi().unmapWindow(display, window.frame)
         xEventApi().reparentWindow(display, unmapEvent.window, rootWindow, 0, 0)
-        XRemoveFromSaveSet(display, unmapEvent.window)
+        xWindowUtilApi().removeFromSaveSet(display, unmapEvent.window)
         xEventApi().destroyWindow(display, window.frame)
 
         windowManagerState.removeWindow(unmapEvent.window)
@@ -255,7 +252,7 @@ fun handleRandrEvent(
     val outputs = resources.pointed.outputs
 
     val sortedMonitors = Array(resources.pointed.noutput)
-    { i -> Pair(outputs!![i], SystemAccess.getInstance().rGetOutputInfo(display, resources, outputs[i])) }
+    { i -> Pair(outputs!![i], xRandrApi().rGetOutputInfo(display, resources, outputs[i])) }
         .asSequence()
         .filter { (_, outputObject) ->
             outputObject != null
@@ -387,7 +384,7 @@ private fun closeActiveWindow(
     val supportedProtocols = nativeHeap.allocPointerTo<ULongVarOf<ULong>>()
     val numSupportedProtocols = IntArray(1).pin()
 
-    val protocolsResult = XGetWMProtocols(display, activeWindow.id, supportedProtocols.ptr, numSupportedProtocols.addressOf(0))
+    val protocolsResult = xWindowUtilApi().getWMProtocols(display, activeWindow.id, supportedProtocols.ptr, numSupportedProtocols.addressOf(0))
     val min = supportedProtocols.pointed!!.value
     val max = min + numSupportedProtocols.get()[0].toULong()
 
@@ -400,6 +397,6 @@ private fun closeActiveWindow(
         msg.xclient.data.l[0] = windowManagerState.wmDeleteWindow.convert()
         xEventApi().sendEvent(display, activeWindow.id, false, 0, msg.ptr)
     } else {
-        XKillClient(display, activeWindow.id)
+        xWindowUtilApi().killClient(display, activeWindow.id)
     }
 }

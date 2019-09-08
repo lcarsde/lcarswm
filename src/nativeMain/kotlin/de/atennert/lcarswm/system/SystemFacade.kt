@@ -12,6 +12,74 @@ import xlib.*
  * This is the facade for accessing system functions.
  */
 class SystemFacade : SystemApi {
+    override fun openDisplay(name: String?): CPointer<Display>? {
+        return XOpenDisplay(name)
+    }
+
+    override fun closeDisplay(display: CValuesRef<Display>): Int {
+        return XCloseDisplay(display)
+    }
+
+    override fun defaultScreenOfDisplay(display: CValuesRef<Display>): CPointer<Screen>? {
+        return XDefaultScreenOfDisplay(display)
+    }
+
+    override fun grabServer(display: CValuesRef<Display>): Int {
+        return XGrabServer(display)
+    }
+
+    override fun ungrabServer(display: CValuesRef<Display>): Int {
+        return XUngrabServer(display)
+    }
+
+    override fun addToSaveSet(display: CValuesRef<Display>, window: Window): Int {
+        return XAddToSaveSet(display, window)
+    }
+
+    override fun removeFromSaveSet(display: CValuesRef<Display>, window: Window): Int {
+        return XRemoveFromSaveSet(display, window)
+    }
+
+    override fun queryTree(
+        display: CValuesRef<Display>,
+        window: Window,
+        rootReturn: CValuesRef<WindowVar>,
+        parentReturn: CValuesRef<WindowVar>,
+        childrenReturn: CValuesRef<CPointerVar<WindowVar>>,
+        childrenReturnCounts: CValuesRef<UIntVar>
+    ): Int {
+        return XQueryTree(display, window, rootReturn, parentReturn, childrenReturn, childrenReturnCounts)
+    }
+
+    override fun getWindowAttributes(
+        display: CValuesRef<Display>,
+        window: Window,
+        attributes: CValuesRef<XWindowAttributes>
+    ): Int {
+        return XGetWindowAttributes(display, window, attributes)
+    }
+
+    override fun getWMProtocols(
+        display: CValuesRef<Display>,
+        window: Window,
+        protocolsReturn: CValuesRef<CPointerVar<AtomVar>>,
+        protocolCountReturn: CValuesRef<IntVar>
+    ): Int {
+        return XGetWMProtocols(display, window, protocolsReturn, protocolCountReturn)
+    }
+
+    override fun setErrorHandler(handler: XErrorHandler): XErrorHandler? {
+        return XSetErrorHandler(handler)
+    }
+
+    override fun internAtom(display: CValuesRef<Display>, name: String, onlyIfExists: Boolean): Atom {
+        return XInternAtom(display, name, convertToXBoolean(onlyIfExists))
+    }
+
+    override fun killClient(display: CValuesRef<Display>, window: Window): Int {
+        return XKillClient(display, window)
+    }
+
     override fun sync(display: CValuesRef<Display>, discardQueuedEvents: Boolean): Int {
         return XSync(display, convertToXBoolean(discardQueuedEvents))
     }

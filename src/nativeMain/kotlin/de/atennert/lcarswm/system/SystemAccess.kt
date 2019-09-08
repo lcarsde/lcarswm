@@ -42,4 +42,6 @@ fun xRandrApi(): RandrApi = SystemAccess.getInstance()
 
 fun xEventApi(): EventApi = SystemAccess.getInstance()
 
+fun xWindowUtilApi(): WindowUtilApi = SystemAccess.getInstance()
+
 fun posixApi(): PosixApi = SystemAccess.getInstance()

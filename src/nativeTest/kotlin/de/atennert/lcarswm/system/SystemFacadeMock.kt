@@ -7,6 +7,48 @@ import platform.posix.__pid_t
 import xlib.*
 
 class SystemFacadeMock : SystemApi {
+    override fun openDisplay(name: String?): CPointer<Display>? = null
+
+    override fun closeDisplay(display: CValuesRef<Display>): Int = 0
+
+    override fun defaultScreenOfDisplay(display: CValuesRef<Display>): CPointer<Screen>? = null
+
+    override fun grabServer(display: CValuesRef<Display>): Int = 0
+
+    override fun ungrabServer(display: CValuesRef<Display>): Int = 0
+
+    override fun addToSaveSet(display: CValuesRef<Display>, window: Window): Int = 0
+
+    override fun removeFromSaveSet(display: CValuesRef<Display>, window: Window): Int = 0
+
+    override fun queryTree(
+        display: CValuesRef<Display>,
+        window: Window,
+        rootReturn: CValuesRef<WindowVar>,
+        parentReturn: CValuesRef<WindowVar>,
+        childrenReturn: CValuesRef<CPointerVar<WindowVar>>,
+        childrenReturnCounts: CValuesRef<UIntVar>
+    ): Int = 0
+
+    override fun getWindowAttributes(
+        display: CValuesRef<Display>,
+        window: Window,
+        attributes: CValuesRef<XWindowAttributes>
+    ): Int = 0
+
+    override fun getWMProtocols(
+        display: CValuesRef<Display>,
+        window: Window,
+        protocolsReturn: CValuesRef<CPointerVar<AtomVar>>,
+        protocolCountReturn: CValuesRef<IntVar>
+    ): Int = 0
+
+    override fun setErrorHandler(handler: XErrorHandler): XErrorHandler? = null
+
+    override fun internAtom(display: CValuesRef<Display>, name: String, onlyIfExists: Boolean): Atom = 0.convert()
+
+    override fun killClient(display: CValuesRef<Display>, window: Window): Int = 0
+
     override fun sync(display: CValuesRef<Display>, discardQueuedEvents: Boolean): Int = 0
 
     override fun sendEvent(

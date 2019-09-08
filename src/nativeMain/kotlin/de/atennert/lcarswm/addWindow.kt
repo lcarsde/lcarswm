@@ -3,6 +3,7 @@ package de.atennert.lcarswm
 import de.atennert.lcarswm.system.SystemAccess
 import de.atennert.lcarswm.system.xEventApi
 import de.atennert.lcarswm.system.xInputApi
+import de.atennert.lcarswm.system.xWindowUtilApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -11,7 +12,7 @@ import xlib.*
  */
 fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState, rootWindow: ULong, windowId: ULong, isSetup: Boolean) {
     val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
-    XGetWindowAttributes(display, windowId, windowAttributes.ptr)
+    xWindowUtilApi().getWindowAttributes(display, windowId, windowAttributes.ptr)
 
     if (windowAttributes.override_redirect != 0 || (isSetup &&
             windowAttributes.map_state != IsViewable)) {
@@ -30,7 +31,7 @@ fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState
 
     xInputApi().selectInput(display, window.frame, SubstructureRedirectMask or SubstructureNotifyMask)
 
-    XAddToSaveSet(display, windowId)
+    xWindowUtilApi().addToSaveSet(display, windowId)
 
     xEventApi().reparentWindow(display, windowId, window.frame, 0, 0)
 

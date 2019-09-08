@@ -9,11 +9,11 @@ fun main() {
     println("::main::start lcarswm initialization")
 
     memScoped {
-        val display = XOpenDisplay(null) ?: error("::main::display from setup")
-        val screen = XDefaultScreenOfDisplay(display)?.pointed ?: error("::main::got no screen")
+        val display = xWindowUtilApi().openDisplay(null) ?: error("::main::display from setup")
+        val screen = xWindowUtilApi().defaultScreenOfDisplay(display)?.pointed ?: error("::main::got no screen")
         val rootWindow = screen.root
 
-        XSetErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
+        xWindowUtilApi().setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
         xInputApi().selectInput(display, rootWindow, SubstructureRedirectMask or SubstructureNotifyMask)
         xEventApi().sync(display, false)
@@ -23,7 +23,7 @@ fun main() {
             return
         }
 
-        XSetErrorHandler(staticCFunction { _, err -> println("::main::error code: ${err?.pointed?.error_code}"); 0 })
+        xWindowUtilApi().setErrorHandler(staticCFunction { _, err -> println("::main::error code: ${err?.pointed?.error_code}"); 0 })
 
         println("::main::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
@@ -32,7 +32,7 @@ fun main() {
 
         println("::main::graphics loaded")
 
-        val windowManagerConfig = WindowManagerState { XInternAtom(display, it, X_FALSE) }
+        val windowManagerConfig = WindowManagerState { xWindowUtilApi().internAtom(display, it, false) }
 
         println("::main::wm state initialized")
 
@@ -65,7 +65,7 @@ fun main() {
 
         cleanupColorMap(display, colorMap)
 
-        XCloseDisplay(display)
+        xWindowUtilApi().closeDisplay(display)
     }
 
     SystemAccess.clear()
@@ -74,14 +74,14 @@ fun main() {
 }
 
 fun setupScreen(display: CPointer<Display>, rootWindow: ULong, windowManagerConfig: WindowManagerState) {
-    XGrabServer(display)
+    xWindowUtilApi().grabServer(display)
 
     val returnedWindows = ULongArray(1)
     val returnedParent = ULongArray(1)
     val topLevelWindows = nativeHeap.allocPointerTo<ULongVarOf<ULong>>()
     val topLevelWindowCount = UIntArray(1)
 
-    XQueryTree(display, rootWindow, returnedWindows.toCValues(), returnedParent.toCValues(),
+    xWindowUtilApi().queryTree(display, rootWindow, returnedWindows.toCValues(), returnedParent.toCValues(),
         topLevelWindows.ptr,
         topLevelWindowCount.toCValues())
 
@@ -92,7 +92,7 @@ fun setupScreen(display: CPointer<Display>, rootWindow: ULong, windowManagerConf
         }
 
     nativeHeap.free(topLevelWindows)
-    XUngrabServer(display)
+    xWindowUtilApi().ungrabServer(display)
 }
 
 /**
