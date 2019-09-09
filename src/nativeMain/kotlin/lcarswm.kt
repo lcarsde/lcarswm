@@ -1,4 +1,6 @@
 import de.atennert.lcarswm.*
+import de.atennert.lcarswm.events.EVENT_HANDLERS
+import de.atennert.lcarswm.events.handleRandrEvent
 import de.atennert.lcarswm.system.*
 import kotlinx.cinterop.*
 import xlib.*

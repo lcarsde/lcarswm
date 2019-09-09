@@ -1,5 +1,6 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.system.*
 import kotlinx.cinterop.*
 import xlib.*
@@ -32,28 +33,6 @@ private fun handleCreateNotify(xEvent: XEvent): Boolean {
 private fun handleConfigureNotify(xEvent: XEvent): Boolean {
     val configureEvent = xEvent.xconfigure
     println("::handleConfigureNotify::window ${configureEvent.window}, o r: ${configureEvent.override_redirect}, above ${configureEvent.above}, event ${configureEvent.event}")
-    return false
-}
-
-private fun handleKeyPress(
-    display: CPointer<Display>,
-    windowManagerState: WindowManagerState,
-    xEvent: XEvent,
-    image: CPointer<XImage>,
-    rootWindow: ULong,
-    graphicsContexts: List<GC>
-): Boolean {
-    val pressEvent = xEvent.xkey
-    val key = pressEvent.keycode
-    println("::handleKeyPress::Key pressed: $key")
-
-    when (windowManagerState.keyboardKeys[key]) {
-        XK_Up -> moveActiveWindow(display, windowManagerState, image, rootWindow, graphicsContexts, windowManagerState::moveWindowToNextMonitor)
-        XK_Down -> moveActiveWindow(display, windowManagerState, image, rootWindow, graphicsContexts, windowManagerState::moveWindowToPreviousMonitor)
-        XK_Tab -> moveNextWindowToTopOfStack(display, windowManagerState)
-        else -> println("::handleKeyRelease::unknown key: $key")
-    }
-
     return false
 }
 
@@ -335,39 +314,6 @@ private fun getOutputName(outputObject: CPointer<XRROutputInfo>): String {
 
     return nameArray.decodeToString()
 }
-
-
-private fun moveActiveWindow(
-    display: CPointer<Display>,
-    windowManagerState: WindowManagerState,
-    image: CPointer<XImage>,
-    rootWindow: ULong,
-    graphicsContexts: List<GC>,
-    windowMoveFunction: Function1<Window, Monitor>
-) {
-    val activeWindow = windowManagerState.activeWindow ?: return
-    val newMonitor = windowMoveFunction(activeWindow)
-    val measurements = newMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(newMonitor))
-
-    adjustWindowPositionAndSize(
-        display,
-        measurements,
-        activeWindow
-    )
-
-    windowManagerState.monitors.forEach { monitor ->
-        val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
-        val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
-        drawFunction(
-            graphicsContexts,
-            rootWindow,
-            display,
-            monitor,
-            image
-        )
-    }
-}
-
 
 private fun loadAppFromKeyBinding(keyBinding: String) {
     val programConfig = readFromConfig(KEY_CONFIG_FILE, keyBinding) ?: return
