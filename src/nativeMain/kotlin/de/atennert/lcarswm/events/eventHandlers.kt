@@ -12,29 +12,17 @@ val EVENT_HANDLERS =
     hashMapOf<Int, Function6<CPointer<Display>, WindowManagerState, XEvent, CPointer<XImage>, ULong, List<GC>, Boolean>>(
         Pair(KeyPress, ::handleKeyPress),
         Pair(KeyRelease, ::handleKeyRelease),
-        Pair(ButtonPress, { _, _, e, _, _, _ -> handleButtonPress(e) }),
-        Pair(ButtonRelease, { _, _, e, _, _, _ -> handleButtonRelease(e) }),
+        Pair(ButtonPress, { _, _, e, _, _, _ -> logButtonPress(e) }),
+        Pair(ButtonRelease, { _, _, e, _, _, _ -> logButtonRelease(e) }),
         Pair(ConfigureRequest, { d, w, e, _, _, _ -> handleConfigureRequest(d, w, e) }),
         Pair(MapRequest, { d, w, e, _, rw, _ -> handleMapRequest(d, w, e, rw) }),
-        Pair(MapNotify, { _, _, e, _, _, _ -> handleMapNotify(e) }),
+        Pair(MapNotify, { _, _, e, _, _, _ -> logMapNotify(e) }),
         Pair(DestroyNotify, { _, w, e, _, _, _ -> handleDestroyNotify(w, e) }),
         Pair(UnmapNotify, ::handleUnmapNotify),
-        Pair(ReparentNotify, { _, _, e, _, _, _ -> handleReparentNotify(e) }),
-        Pair(CreateNotify, { _, _, e, _, _, _ -> handleCreateNotify(e) }),
-        Pair(ConfigureNotify, { _, _, e, _, _, _ -> handleConfigureNotify(e) })
+        Pair(ReparentNotify, { _, _, e, _, _, _ -> logReparentNotify(e) }),
+        Pair(CreateNotify, { _, _, e, _, _, _ -> logCreateNotify(e) }),
+        Pair(ConfigureNotify, { _, _, e, _, _, _ -> logConfigureNotify(e) })
     )
-
-private fun handleCreateNotify(xEvent: XEvent): Boolean {
-    val createEvent = xEvent.xcreatewindow
-    println("::handleCreate::window ${createEvent.window}, o r: ${createEvent.override_redirect}")
-    return false
-}
-
-private fun handleConfigureNotify(xEvent: XEvent): Boolean {
-    val configureEvent = xEvent.xconfigure
-    println("::handleConfigureNotify::window ${configureEvent.window}, o r: ${configureEvent.override_redirect}, above ${configureEvent.above}, event ${configureEvent.event}")
-    return false
-}
 
 private fun handleKeyRelease(
     display: CPointer<Display>,
@@ -63,22 +51,6 @@ private fun handleKeyRelease(
     return false
 }
 
-private fun handleButtonPress(xEvent: XEvent): Boolean {
-    val pressEvent = xEvent.xbutton
-    val button = pressEvent.button
-
-    println("::handleButtonPress::Button pressed: $button")
-    return false
-}
-
-private fun handleButtonRelease(xEvent: XEvent): Boolean {
-    val pressEvent = xEvent.xbutton
-    val button = pressEvent.button
-
-    println("::handleButtonRelease::Button released: $button")
-    return false
-}
-
 private fun handleMapRequest(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
@@ -95,20 +67,6 @@ private fun handleMapRequest(
 
     addWindow(display, windowManagerState, rootWindow, window, false)
 
-    return false
-}
-
-private fun handleMapNotify(xEvent: XEvent): Boolean {
-    val mapEvent = xEvent.xmap
-    val window = mapEvent.window
-    println("::handleMapNotify::map notify for window $window")
-
-    return false
-}
-
-private fun handleReparentNotify(xEvent: XEvent): Boolean {
-    val reparentEvent = xEvent.xreparent
-    println("::handleReparentNotify::reparented window ${reparentEvent.window} to ${reparentEvent.parent}")
     return false
 }
 
