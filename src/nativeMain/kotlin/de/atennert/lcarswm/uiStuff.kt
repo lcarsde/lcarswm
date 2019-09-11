@@ -3,6 +3,7 @@ package de.atennert.lcarswm
 import de.atennert.lcarswm.system.xDrawApi
 import kotlinx.cinterop.*
 import xlib.*
+import xlib.Window
 
 val COLORS = listOf(
     Triple(0, 0, 0),
@@ -16,16 +17,16 @@ val COLORS = listOf(
     Triple(0xCCCC, 0x6666, 0x9999)
 )
 
-val DRAW_FUNCTIONS = hashMapOf(
+val DRAW_FUNCTIONS = hashMapOf<ScreenMode, Function5<List<GC>, Window, CPointer<Display>, Monitor, CPointer<XImage>, Unit>>(
     Pair(ScreenMode.NORMAL, ::drawNormalFrame),
     Pair(ScreenMode.MAXIMIZED, ::drawMaximizedFrame),
-    Pair(ScreenMode.FULLSCREEN, ::clearScreen)
+    Pair(ScreenMode.FULLSCREEN, {gc, w, d, m, _ -> clearScreen(gc, w, d, m)})
 )
 
 fun allocateColorMap(
     display: CPointer<Display>,
     visual: CPointer<Visual>?,
-    windowId: ULong
+    windowId: Window
 ): Pair<Colormap, List<ULong>> {
     val colorMapId = xDrawApi().createColormap(display, windowId, visual, AllocNone)
 
@@ -47,7 +48,7 @@ fun allocateColorMap(
 
 fun getGraphicContexts(
     display: CPointer<Display>,
-    window: ULong,
+    window: Window,
     colors: List<ULong>
 ): List<GC> = colors
     .map { color ->
@@ -71,12 +72,12 @@ fun cleanupColorMap(
 
 private fun drawMaximizedFrame(
     graphicsContexts: List<GC>,
-    rootWindow: ULong,
+    rootWindow: Window,
     display: CPointer<Display>,
     monitor: Monitor,
     image: CPointer<XImage>
 ) {
-    clearScreen(graphicsContexts, rootWindow, display, monitor, image)
+    clearScreen(graphicsContexts, rootWindow, display, monitor)
 
     val gcPurple2 = graphicsContexts[6]
     val gcOrchid = graphicsContexts[2]
@@ -152,12 +153,12 @@ private fun drawMaximizedFrame(
 
 private fun drawNormalFrame(
     graphicsContexts: List<GC>,
-    rootWindow: ULong,
+    rootWindow: Window,
     display: CPointer<Display>,
     monitor: Monitor,
     image: CPointer<XImage>
 ) {
-    clearScreen(graphicsContexts, rootWindow, display, monitor, image)
+    clearScreen(graphicsContexts, rootWindow, display, monitor)
 
     val gcBlack = graphicsContexts[0]
     val gcPurple2 = graphicsContexts[6]
@@ -355,10 +356,9 @@ private fun drawNormalFrame(
 
 private fun clearScreen(
     graphicsContexts: List<GC>,
-    rootWindow: ULong,
+    rootWindow: Window,
     display: CPointer<Display>,
-    monitor: Monitor,
-    image: CPointer<XImage>
+    monitor: Monitor
 ) {
     xDrawApi().fillRectangle(display, rootWindow, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
 }
