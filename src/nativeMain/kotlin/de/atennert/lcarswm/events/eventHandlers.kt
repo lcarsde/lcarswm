@@ -2,6 +2,7 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.system.*
+import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -157,17 +158,7 @@ private fun handleUnmapNotify(
         xInputApi().setInputFocus(display, windowManagerState.activeWindow!!.id, RevertToNone, CurrentTime.convert())
     }
 
-    windowManagerState.monitors.forEach { monitor ->
-        val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
-        val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
-        drawFunction(
-            graphicsContexts,
-            rootWindow,
-            display,
-            monitor,
-            image
-        )
-    }
+    redrawRootWindow(windowManagerState, graphicsContexts, rootWindow, display, image)
     return false
 }
 

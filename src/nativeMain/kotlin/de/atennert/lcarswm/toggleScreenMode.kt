@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.CPointer
 import xlib.Display
 import xlib.GC
@@ -24,15 +25,5 @@ fun toggleScreenMode(
     windowManagerState.updateScreenMode(screenMode)
     { measurements, window -> adjustWindowPositionAndSize(display, measurements, window) }
 
-    windowManagerState.monitors.forEach {monitor ->
-        val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
-        val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
-        drawFunction(
-            graphicsContexts,
-            rootWindow,
-            display,
-            monitor,
-            image
-        )
-    }
+    redrawRootWindow(windowManagerState, graphicsContexts, rootWindow, display, image)
 }

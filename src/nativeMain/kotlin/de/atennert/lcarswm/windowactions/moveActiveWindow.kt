@@ -24,15 +24,5 @@ fun moveActiveWindow(
         activeWindow
     )
 
-    windowManagerState.monitors.forEach { monitor ->
-        val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
-        val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
-        drawFunction(
-            graphicsContexts,
-            rootWindow,
-            display,
-            monitor,
-            image
-        )
-    }
+    redrawRootWindow(windowManagerState, graphicsContexts, rootWindow, display, image)
 }

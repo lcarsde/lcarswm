@@ -6,6 +6,7 @@ import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.adjustWindowPositionAndSize
 import de.atennert.lcarswm.system.xEventApi
 import de.atennert.lcarswm.system.xRandrApi
+import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -75,17 +76,7 @@ fun handleRandrEvent(
     windowManagerState.updateMonitors(activeMonitors)
     { measurements, window -> adjustWindowPositionAndSize(display, measurements, window) }
 
-    windowManagerState.monitors.forEach { monitor ->
-        val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
-        val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
-        drawFunction(
-            graphicsContexts,
-            rootWindow,
-            display,
-            monitor,
-            image
-        )
-    }
+    redrawRootWindow(windowManagerState, graphicsContexts, rootWindow, display, image)
 }
 
 /**
