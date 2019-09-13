@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.*
+import de.atennert.lcarswm.Window
 import de.atennert.lcarswm.system.*
 import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.*
@@ -97,19 +98,7 @@ private fun handleConfigureRequest(
         val measurements = windowPair.second.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowPair.second))
 
         val window = windowPair.first
-        val e = nativeHeap.alloc<XEvent>()
-        e.type = ConfigureNotify
-        e.xconfigure.display = display
-        e.xconfigure.event = window.id
-        e.xconfigure.window = window.id
-        e.xconfigure.x = measurements[0]
-        e.xconfigure.y = measurements[1]
-        e.xconfigure.width = measurements[2]
-        e.xconfigure.height = measurements[3]
-        e.xconfigure.border_width = 0
-        e.xconfigure.above = None.convert()
-        e.xconfigure.override_redirect = X_FALSE
-        xEventApi().sendEvent(display, window.id, false, StructureNotifyMask, e.ptr)
+        sendConfigureNotify(display, window.id, measurements)
         return false
     }
 
