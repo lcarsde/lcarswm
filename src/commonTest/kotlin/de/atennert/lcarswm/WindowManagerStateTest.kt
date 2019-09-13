@@ -13,8 +13,8 @@ class WindowManagerStateTest {
     fun `new added windows become active`() {
         val windowManagerState = WindowManagerState {1.toULong()}
         val monitor = Monitor(1.toULong(), "name", false)
-        val window1 = Window(1.toULong())
-        val window2 = Window(2.toULong())
+        val window1 = WindowContainer(1.toULong())
+        val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
@@ -33,7 +33,7 @@ class WindowManagerStateTest {
         val windowManagerState = WindowManagerState {1.toULong()}
 
         var receivedWindowId: ULong? = null
-        val windowUpdateFcn: Function2<List<Int>, Window, Unit> = {_, window -> receivedWindowId = window.id}
+        val windowUpdateFcn: Function2<List<Int>, WindowContainer, Unit> = { _, window -> receivedWindowId = window.id}
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2), windowUpdateFcn)
 
@@ -44,7 +44,7 @@ class WindowManagerStateTest {
         assertNull(windowManagerState.getWindowMonitor(1.toULong()))
 
         // windows are added to the first monitor
-        val windowMonitor = windowManagerState.addWindow(Window(1.toULong()))
+        val windowMonitor = windowManagerState.addWindow(WindowContainer(1.toULong()))
         assertEquals(windowMonitor, monitor1)
 
         // we can now get the monitor with getWindowMonitor
@@ -69,7 +69,7 @@ class WindowManagerStateTest {
         val monitor1 = Monitor(1.toULong(), "name1", false)
         val monitor2 = Monitor(2.toULong(), "name2", false)
         val monitor3 = Monitor(3.toULong(), "name3", false)
-        val window1 = Window(1.toULong())
+        val window1 = WindowContainer(1.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2, monitor3)) { _, _ -> }
 
@@ -88,7 +88,7 @@ class WindowManagerStateTest {
         val monitor1 = Monitor(1.toULong(), "name1", false)
         val monitor2 = Monitor(2.toULong(), "name2", false)
         val monitor3 = Monitor(3.toULong(), "name3", false)
-        val window1 = Window(1.toULong())
+        val window1 = WindowContainer(1.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2, monitor3)) { _, _ -> }
 
@@ -105,8 +105,8 @@ class WindowManagerStateTest {
     fun `toggle active window`() {
         val windowManagerState = WindowManagerState { 1.toULong() }
         val monitor = Monitor(1.toULong(), "name", false)
-        val window1 = Window(1.toULong())
-        val window2 = Window(2.toULong())
+        val window1 = WindowContainer(1.toULong())
+        val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
@@ -124,8 +124,8 @@ class WindowManagerStateTest {
     fun `toggle away from removed window`() {
         val windowManagerState = WindowManagerState { 1.toULong() }
         val monitor = Monitor(1.toULong(), "name", false)
-        val window1 = Window(1.toULong())
-        val window2 = Window(2.toULong())
+        val window1 = WindowContainer(1.toULong())
+        val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
@@ -145,8 +145,8 @@ class WindowManagerStateTest {
         val windowManagerState = WindowManagerState { 1.toULong() }
         val monitor1 = Monitor(1.toULong(), "name1", false)
         val monitor2 = Monitor(2.toULong(), "name2", false)
-        val window1 = Window(1.toULong())
-        val window2 = Window(2.toULong())
+        val window1 = WindowContainer(1.toULong())
+        val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2)) {_, _ ->}
         windowManagerState.addWindow(window1)
@@ -172,8 +172,8 @@ class WindowManagerStateTest {
         val windowManagerState = WindowManagerState { 1.toULong() }
         val monitor1 = Monitor(1.toULong(), "name1", false)
         val monitor2 = Monitor(2.toULong(), "name2", false)
-        val window1 = Window(1.toULong())
-        val window2 = Window(2.toULong())
+        val window1 = WindowContainer(1.toULong())
+        val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2)) {_, _ ->}
         windowManagerState.addWindow(window1)
@@ -192,8 +192,8 @@ class WindowManagerStateTest {
         val monitor1 = Monitor(1.toULong(), "name1", false)
         val monitor2 = Monitor(2.toULong(), "name2", false)
         val monitor3 = Monitor(3.toULong(), "name3", false)
-        val window1 = Window(1.toULong())
-        val window2 = Window(2.toULong())
+        val window1 = WindowContainer(1.toULong())
+        val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2, monitor3)) {_, _ ->}
         windowManagerState.addWindow(window1)
@@ -249,7 +249,7 @@ class WindowManagerStateTest {
     fun `get update with null for active window when no window is registered`() {
         val windowManagerState = WindowManagerState { 1.toULong() }
 
-        var activeWindow: Window? = null
+        var activeWindow: WindowContainer? = null
         var activeWindowSet = false
         windowManagerState.setActiveWindowListener {activeWindowSet = true; activeWindow = it}
 
@@ -261,11 +261,11 @@ class WindowManagerStateTest {
     fun `get update for active window when a window is added`() {
         val monitor = Monitor(1.toULong(), "name", false)
         val windowManagerState = WindowManagerState { 1.toULong() }
-        val window = Window(1.toULong())
+        val window = WindowContainer(1.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
-        var activeWindow: Window? = null
+        var activeWindow: WindowContainer? = null
         windowManagerState.setActiveWindowListener {activeWindow = it}
 
         windowManagerState.addWindow(window)
@@ -277,12 +277,12 @@ class WindowManagerStateTest {
     fun `get update for active window when a window is removed`() {
         val monitor = Monitor(1.toULong(), "name", false)
         val windowManagerState = WindowManagerState { 1.toULong() }
-        val window1 = Window(1.toULong())
-        val window2 = Window(2.toULong())
+        val window1 = WindowContainer(1.toULong())
+        val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
-        var activeWindow: Window? = null
+        var activeWindow: WindowContainer? = null
         windowManagerState.setActiveWindowListener {activeWindow = it}
 
         windowManagerState.addWindow(window1)
@@ -297,12 +297,12 @@ class WindowManagerStateTest {
     fun `get update for active window when the active window is toggled`() {
         val monitor = Monitor(1.toULong(), "name", false)
         val windowManagerState = WindowManagerState { 1.toULong() }
-        val window1 = Window(1.toULong())
-        val window2 = Window(2.toULong())
+        val window1 = WindowContainer(1.toULong())
+        val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
-        var activeWindow: Window? = null
+        var activeWindow: WindowContainer? = null
         windowManagerState.setActiveWindowListener {activeWindow = it}
 
         windowManagerState.addWindow(window1)

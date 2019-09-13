@@ -1,6 +1,5 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.DRAW_FUNCTIONS
 import de.atennert.lcarswm.Monitor
 import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.adjustWindowPositionAndSize
@@ -17,7 +16,7 @@ fun handleRandrEvent(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
-    rootWindow: ULong,
+    rootWindow: Window,
     graphicsContexts: List<GC>
 ) {
     println("::handleRandrEvent::handle randr")

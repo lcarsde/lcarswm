@@ -1,6 +1,5 @@
 package de.atennert.lcarswm
 
-import de.atennert.lcarswm.system.SystemAccess
 import de.atennert.lcarswm.system.xEventApi
 import de.atennert.lcarswm.system.xInputApi
 import de.atennert.lcarswm.system.xWindowUtilApi
@@ -10,7 +9,7 @@ import xlib.*
 /**
  *
  */
-fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState, rootWindow: ULong, windowId: ULong, isSetup: Boolean) {
+fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState, rootWindow: Window, windowId: Window, isSetup: Boolean) {
     val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
     xWindowUtilApi().getWindowAttributes(display, windowId, windowAttributes.ptr)
 
@@ -21,7 +20,7 @@ fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState
         return
     }
 
-    val window = Window(windowId)
+    val window = WindowContainer(windowId)
     val windowMonitor = windowManagerState.addWindow(window)
 
     val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))

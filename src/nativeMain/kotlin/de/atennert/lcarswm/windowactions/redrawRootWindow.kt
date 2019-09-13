@@ -5,6 +5,7 @@ import de.atennert.lcarswm.WindowManagerState
 import kotlinx.cinterop.CPointer
 import xlib.Display
 import xlib.GC
+import xlib.Window
 import xlib.XImage
 
 /**
@@ -13,7 +14,7 @@ import xlib.XImage
 fun redrawRootWindow(
     windowManagerState: WindowManagerState,
     graphicsContexts: List<GC>,
-    rootWindow: ULong,
+    rootWindow: Window,
     display: CPointer<Display>,
     image: CPointer<XImage>
 ) {

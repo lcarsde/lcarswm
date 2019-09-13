@@ -11,7 +11,7 @@ import xlib.*
 fun adjustWindowPositionAndSize(
     display: CPointer<Display>,
     windowMeasurements: List<Int>,
-    window: Window
+    window: WindowContainer
 ) {
     xEventApi().moveResizeWindow(
         display,

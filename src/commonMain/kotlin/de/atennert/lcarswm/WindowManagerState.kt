@@ -19,22 +19,22 @@ class WindowManagerState(
     /** List that holds all key codes for our used modifier key */
     val modifierKeys = ArrayList<UByte>(8)
 
-    val activeWindow: Window?
+    val activeWindow: WindowContainer?
         get() = this.windows.lastOrNull()?.first
 
-    private var activeWindowListener: (Window?) -> Unit = {}
+    private var activeWindowListener: (WindowContainer?) -> Unit = {}
 
     var screenSize = Pair(0, 0)
 
     val monitors = ArrayList<Monitor>(3)
 
-    var windows = mutableListOf<Pair<Window, Monitor>>()
+    var windows = mutableListOf<Pair<WindowContainer, Monitor>>()
         private set
 
     /**
      * @return the monitor to which the window was added
      */
-    fun addWindow(window: Window): Monitor {
+    fun addWindow(window: WindowContainer): Monitor {
         this.windows.add(Pair(window, monitors[0]))
         this.activeWindowListener(this.activeWindow)
 
@@ -52,7 +52,7 @@ class WindowManagerState(
             ?.second
     }
 
-    fun updateMonitors(monitors: List<Monitor>, updateWindowFcn: Function2<List<Int>, Window, Unit>) {
+    fun updateMonitors(monitors: List<Monitor>, updateWindowFcn: Function2<List<Int>, WindowContainer, Unit>) {
         this.monitors.clear()
         this.monitors.addAll(monitors)
 
@@ -68,7 +68,7 @@ class WindowManagerState(
         }
     }
 
-    fun updateScreenMode(screenMode: ScreenMode, updateWindowFcn: Function2<List<Int>, Window, Unit>) {
+    fun updateScreenMode(screenMode: ScreenMode, updateWindowFcn: Function2<List<Int>, WindowContainer, Unit>) {
         this.screenMode = screenMode
 
         this.monitors.forEach { monitor ->
@@ -81,7 +81,7 @@ class WindowManagerState(
         }
     }
 
-    fun toggleActiveWindow(): Window? {
+    fun toggleActiveWindow(): WindowContainer? {
         if (windows.isNotEmpty()) {
             val currentActiveWindow = windows.removeAt(windows.lastIndex)
             windows.add(0, currentActiveWindow)
@@ -90,15 +90,15 @@ class WindowManagerState(
         return this.activeWindow
     }
 
-    fun moveWindowToPreviousMonitor(window: Window): Monitor {
+    fun moveWindowToPreviousMonitor(window: WindowContainer): Monitor {
         return moveWindowToNewMonitor(window, -1)
     }
 
-    fun moveWindowToNextMonitor(window: Window): Monitor {
+    fun moveWindowToNextMonitor(window: WindowContainer): Monitor {
         return moveWindowToNewMonitor(window, 1)
     }
 
-    private fun moveWindowToNewMonitor(window: Window, direction: Int): Monitor {
+    private fun moveWindowToNewMonitor(window: WindowContainer, direction: Int): Monitor {
         val windowEntryIndex = this.windows.indexOfFirst { (listWindow, _) -> window == listWindow }
         val windowEntry = this.windows[windowEntryIndex]
         val currentMonitor = windowEntry.second
@@ -118,7 +118,7 @@ class WindowManagerState(
 
     fun hasWindow(window: ULong) = this.windows.find { (w, _) -> w.id == window } != null
 
-    fun setActiveWindowListener(activeWindowListener: (Window?) -> Unit) {
+    fun setActiveWindowListener(activeWindowListener: (WindowContainer?) -> Unit) {
         this.activeWindowListener = activeWindowListener
         activeWindowListener(this.activeWindow)
     }

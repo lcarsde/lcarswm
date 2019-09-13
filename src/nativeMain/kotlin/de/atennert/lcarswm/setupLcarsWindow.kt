@@ -26,7 +26,7 @@ fun setupLcarsWindow(
 /**
  * Setup keyboard handling. Keys without key code for the key sym will not be working.
  */
-private fun grabKeys(display: CPointer<Display>, window: ULong, windowManagerState: WindowManagerState) {
+private fun grabKeys(display: CPointer<Display>, window: Window, windowManagerState: WindowManagerState) {
     windowManagerState.modifierKeys
         .onEach { keyCode ->
             xInputApi().grabKey(
@@ -81,7 +81,7 @@ private fun getModifierKeys(display: CValuesRef<Display>, modifierKey: Int): Col
     return modKeys
 }
 
-private fun grabButton(display: CPointer<Display>, window: ULong, buttonId: Int) {
+private fun grabButton(display: CPointer<Display>, window: Window, buttonId: Int) {
     xInputApi().grabButton(
         display, buttonId.convert(), WM_MODIFIER_KEY.convert(), window, false,
         (ButtonPressMask or ButtonMotionMask or ButtonReleaseMask).convert(),

@@ -11,7 +11,7 @@ fun handleKeyPress(
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
     image: CPointer<XImage>,
-    rootWindow: ULong,
+    rootWindow: Window,
     graphicsContexts: List<GC>
 ): Boolean {
     val pressEvent = xEvent.xkey

@@ -4,6 +4,7 @@ import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.CPointer
 import xlib.Display
 import xlib.GC
+import xlib.Window
 import xlib.XImage
 
 /**
@@ -13,7 +14,7 @@ fun toggleScreenMode(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
-    rootWindow: ULong,
+    rootWindow: Window,
     graphicsContexts: List<GC>
 ) {
     val screenMode = when (windowManagerState.screenMode) {

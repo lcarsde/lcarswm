@@ -75,12 +75,12 @@ fun main() {
     println("::main::lcarswm stopped")
 }
 
-fun setupScreen(display: CPointer<Display>, rootWindow: ULong, windowManagerConfig: WindowManagerState) {
+fun setupScreen(display: CPointer<Display>, rootWindow: Window, windowManagerConfig: WindowManagerState) {
     xWindowUtilApi().grabServer(display)
 
     val returnedWindows = ULongArray(1)
     val returnedParent = ULongArray(1)
-    val topLevelWindows = nativeHeap.allocPointerTo<ULongVarOf<ULong>>()
+    val topLevelWindows = nativeHeap.allocPointerTo<ULongVarOf<Window>>()
     val topLevelWindowCount = UIntArray(1)
 
     xWindowUtilApi().queryTree(display, rootWindow, returnedWindows.toCValues(), returnedParent.toCValues(),
@@ -104,7 +104,7 @@ private fun setupRandr(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
-    rootWindow: ULong,
+    rootWindow: Window,
     graphicsContexts: List<GC>
 ): Int {
     val eventBase = IntArray(1).pin()
@@ -133,7 +133,7 @@ private fun eventLoop(
     windowManagerState: WindowManagerState,
     randrBase: Int,
     image: CPointer<XImage>,
-    rootWindow: ULong,
+    rootWindow: Window,
     graphicsContexts: List<GC>
 ) {
     val randrEventValue = randrBase + RRScreenChangeNotify

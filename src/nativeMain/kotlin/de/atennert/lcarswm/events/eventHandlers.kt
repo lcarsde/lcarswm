@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.*
-import de.atennert.lcarswm.Window
 import de.atennert.lcarswm.system.*
 import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.*
@@ -11,7 +10,7 @@ import xlib.*
  * Map of event types to event handlers. DON'T EDIT THE MAPS CONTENT!!!
  */
 val EVENT_HANDLERS =
-    hashMapOf<Int, Function6<CPointer<Display>, WindowManagerState, XEvent, CPointer<XImage>, ULong, List<GC>, Boolean>>(
+    hashMapOf<Int, Function6<CPointer<Display>, WindowManagerState, XEvent, CPointer<XImage>, Window, List<GC>, Boolean>>(
         Pair(KeyPress, ::handleKeyPress),
         Pair(KeyRelease, ::handleKeyRelease),
         Pair(ButtonPress, { _, _, e, _, _, _ -> logButtonPress(e) }),
@@ -31,7 +30,7 @@ private fun handleKeyRelease(
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
     image: CPointer<XImage>,
-    rootWindow: ULong,
+    rootWindow: Window,
     graphicsContexts: List<GC>
 ): Boolean {
     val releasedEvent = xEvent.xkey
@@ -57,7 +56,7 @@ private fun handleMapRequest(
     display: CPointer<Display>,
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
-    rootWindow: ULong
+    rootWindow: Window
 ): Boolean {
     val mapEvent = xEvent.xmaprequest
     val window = mapEvent.window
@@ -128,7 +127,7 @@ private fun handleUnmapNotify(
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
     image: CPointer<XImage>,
-    rootWindow: ULong,
+    rootWindow: Window,
     graphicsContexts: List<GC>
 ): Boolean {
     val unmapEvent = xEvent.xunmap
