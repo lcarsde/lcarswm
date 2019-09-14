@@ -1,5 +1,7 @@
 package de.atennert.lcarswm
 
+import xlib.Window
+
 /**
  * Container class for the state of the window manager.
  */
@@ -41,12 +43,12 @@ class WindowManagerState(
         return monitors[0]
     }
 
-    fun removeWindow(windowId: ULong) {
+    fun removeWindow(windowId: Window) {
         this.windows.removeAll { (window, _) -> window.id == windowId }
         this.activeWindowListener(this.activeWindow)
     }
 
-    fun getWindowMonitor(windowId: ULong): Monitor? {
+    fun getWindowMonitor(windowId: Window): Monitor? {
         return this.windows
             .find { (window, _) -> window.id == windowId }
             ?.second
@@ -116,7 +118,7 @@ class WindowManagerState(
         else -> ScreenMode.MAXIMIZED
     }
 
-    fun hasWindow(window: ULong) = this.windows.find { (w, _) -> w.id == window } != null
+    fun hasWindow(windowId: Window) = this.windows.find { (w, _) -> w.id == windowId } != null
 
     fun setActiveWindowListener(activeWindowListener: (WindowContainer?) -> Unit) {
         this.activeWindowListener = activeWindowListener

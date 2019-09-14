@@ -1,9 +1,11 @@
 package de.atennert.lcarswm
 
+import xlib.RROutput
+
 /**
  * Resource representing a physical monitor and its settings.
  */
-data class Monitor(val id: ULong, val name: String, val isPrimary: Boolean) {
+data class Monitor(val id: RROutput, val name: String, val isPrimary: Boolean) {
 
     var x = 0
         private set
