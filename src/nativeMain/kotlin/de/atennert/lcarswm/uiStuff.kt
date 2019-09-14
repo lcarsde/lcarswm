@@ -19,7 +19,7 @@ val COLORS = listOf(
 val DRAW_FUNCTIONS = hashMapOf<ScreenMode, Function5<List<GC>, Window, CPointer<Display>, Monitor, CPointer<XImage>, Unit>>(
     Pair(ScreenMode.NORMAL, ::drawNormalFrame),
     Pair(ScreenMode.MAXIMIZED, ::drawMaximizedFrame),
-    Pair(ScreenMode.FULLSCREEN, {gc, w, d, m, _ -> clearScreen(gc, w, d, m)})
+    Pair(ScreenMode.FULLSCREEN, { gc, w, d, m, _ -> clearScreen(gc, w, d, m)})
 )
 
 fun allocateColorMap(

@@ -34,7 +34,8 @@ fun main() {
 
         println("::main::graphics loaded")
 
-        val windowManagerConfig = WindowManagerState { xWindowUtilApi().internAtom(display, it, false) }
+        val windowManagerConfig =
+            WindowManagerState { xWindowUtilApi().internAtom(display, it, false) }
 
         println("::main::wm state initialized")
 

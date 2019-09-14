@@ -4,7 +4,7 @@ package de.atennert.lcarswm
  * Container class for the state of the window manager.
  */
 class WindowManagerState(
-    private val atomProvider: Function1<String, ULong>
+    atomProvider: Function1<String, ULong>
 ) {
     val wmDeleteWindow = atomProvider("WM_DELETE_WINDOW")
 

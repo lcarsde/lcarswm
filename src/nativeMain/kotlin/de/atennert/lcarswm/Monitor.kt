@@ -83,9 +83,18 @@ data class Monitor(val id: ULong, val name: String, val isPrimary: Boolean) {
      * @return the current window measurements in the form [x, y, width, height], depending on the current screenMode
      */
     fun getCurrentWindowMeasurements(screenMode: ScreenMode): List<Int> = when (screenMode) {
-            ScreenMode.NORMAL -> windowMeasurementsToList(this.defaultWindowPosition, this.defaultWindowSize)
-            ScreenMode.MAXIMIZED -> windowMeasurementsToList(this.maximizedWindowPosition, this.maximizedWindowSize)
-            ScreenMode.FULLSCREEN -> windowMeasurementsToList(this.fullscreenWindowPosition, this.fullscreenWindowSize)
+            ScreenMode.NORMAL -> windowMeasurementsToList(
+                this.defaultWindowPosition,
+                this.defaultWindowSize
+            )
+            ScreenMode.MAXIMIZED -> windowMeasurementsToList(
+                this.maximizedWindowPosition,
+                this.maximizedWindowSize
+            )
+            ScreenMode.FULLSCREEN -> windowMeasurementsToList(
+                this.fullscreenWindowPosition,
+                this.fullscreenWindowSize
+            )
         }
 
     companion object {

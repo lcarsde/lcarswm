@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 class WindowManagerStateTest {
     @Test
     fun `new added windows become active`() {
-        val windowManagerState = WindowManagerState {1.toULong()}
+        val windowManagerState = WindowManagerState { 1.toULong() }
         val monitor = Monitor(1.toULong(), "name", false)
         val window1 = WindowContainer(1.toULong())
         val window2 = WindowContainer(2.toULong())
@@ -30,7 +30,7 @@ class WindowManagerStateTest {
         val monitor1 = Monitor(1.toULong(), "name", false)
         val monitor2 = Monitor(2.toULong(), "name", false)
 
-        val windowManagerState = WindowManagerState {1.toULong()}
+        val windowManagerState = WindowManagerState { 1.toULong() }
 
         var receivedWindowId: ULong? = null
         val windowUpdateFcn: Function2<List<Int>, WindowContainer, Unit> = { _, window -> receivedWindowId = window.id}
