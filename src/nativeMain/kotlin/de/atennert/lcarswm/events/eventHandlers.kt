@@ -106,18 +106,6 @@ private fun handleConfigureRequest(
     return false
 }
 
-/**
- * Remove window from the wm data on window destroy.
- */
-private fun handleDestroyNotify(
-    windowManagerState: WindowManagerState,
-    xEvent: XEvent
-): Boolean {
-    val destroyEvent = xEvent.xdestroywindow
-    println("::handleDestroyNotify::destroy window: ${destroyEvent.window}")
-    windowManagerState.removeWindow(destroyEvent.window)
-    return false
-}
 
 /**
  * Remove the window from the wm data on window unmap.
