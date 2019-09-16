@@ -52,25 +52,6 @@ private fun handleKeyRelease(
     return false
 }
 
-private fun handleMapRequest(
-    display: CPointer<Display>,
-    windowManagerState: WindowManagerState,
-    xEvent: XEvent,
-    rootWindow: Window
-): Boolean {
-    val mapEvent = xEvent.xmaprequest
-    val window = mapEvent.window
-
-    println("::handleMapRequest::map request for window $window, parent: ${mapEvent.parent}")
-    if (windowManagerState.getWindowMonitor(window) != null) {
-        return false
-    }
-
-    addWindow(display, windowManagerState, rootWindow, window, false)
-
-    return false
-}
-
 /**
  * Filter the values that lcarswm requires and send the configuration to X.
  */
