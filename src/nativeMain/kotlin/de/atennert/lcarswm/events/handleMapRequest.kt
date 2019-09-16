@@ -28,4 +28,3 @@ fun handleMapRequest(
 
     return false
 }
-
