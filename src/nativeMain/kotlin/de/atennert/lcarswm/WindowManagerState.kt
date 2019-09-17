@@ -7,7 +7,7 @@ import xlib.Window
  */
 class WindowManagerState(
     atomProvider: Function1<String, ULong>
-) {
+) : WindowManagerStateHandler {
     val wmDeleteWindow = atomProvider("WM_DELETE_WINDOW")
 
     val wmProtocols = atomProvider("WM_PROTOCOLS")
@@ -43,7 +43,7 @@ class WindowManagerState(
         return monitors[0]
     }
 
-    fun removeWindow(windowId: Window) {
+    override fun removeWindow(windowId: Window) {
         this.windows.removeAll { (window, _) -> window.id == windowId }
         this.activeWindowListener(this.activeWindow)
     }
