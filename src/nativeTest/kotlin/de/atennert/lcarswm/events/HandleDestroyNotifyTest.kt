@@ -25,12 +25,12 @@ class HandleDestroyNotifyTest {
         assertEquals(1, windowManagerState.removedWindowIds.size, "There wasn't exactly one window removal")
         assertEquals(windowId, windowManagerState.removedWindowIds[0], "Window was not removed from state management")
     }
-}
 
-private class WindowManagerStateTestImpl : WindowManagerStateMock() {
-    val removedWindowIds = mutableListOf<Window>()
+    private class WindowManagerStateTestImpl : WindowManagerStateMock() {
+        val removedWindowIds = mutableListOf<Window>()
 
-    override fun removeWindow(windowId: Window) {
-        this.removedWindowIds.add(windowId)
+        override fun removeWindow(windowId: Window) {
+            this.removedWindowIds.add(windowId)
+        }
     }
 }
