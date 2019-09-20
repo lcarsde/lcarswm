@@ -1,19 +1,19 @@
 package de.atennert.lcarswm
 
-import de.atennert.lcarswm.system.xEventApi
+import de.atennert.lcarswm.system.api.EventApi
 import kotlinx.cinterop.*
 import xlib.*
 
 /**
  *
  */
-fun moveNextWindowToTopOfStack(display: CPointer<Display>, windowManagerState: WindowManagerState) {
+fun moveNextWindowToTopOfStack(eventApi: EventApi, windowManagerState: WindowManagerState) {
     val activeWindow = windowManagerState.toggleActiveWindow()
     println("::moveNextWindowToTopOfStack::activate window $activeWindow")
     if (activeWindow != null) {
         val windowChanges = nativeHeap.alloc<XWindowChanges>()
         windowChanges.stack_mode = Above
 
-        xEventApi().configureWindow(display, activeWindow.frame, CWStackMode.convert(), windowChanges.ptr)
+        eventApi.configureWindow(activeWindow.frame, CWStackMode.convert(), windowChanges.ptr)
     }
 }

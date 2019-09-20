@@ -2,8 +2,8 @@ package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.DRAW_FUNCTIONS
 import de.atennert.lcarswm.WindowManagerState
+import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.CPointer
-import xlib.Display
 import xlib.GC
 import xlib.Window
 import xlib.XImage
@@ -15,7 +15,7 @@ fun redrawRootWindow(
     windowManagerState: WindowManagerState,
     graphicsContexts: List<GC>,
     rootWindow: Window,
-    display: CPointer<Display>,
+    drawApi: DrawApi,
     image: CPointer<XImage>
 ) {
     windowManagerState.monitors.forEach { monitor ->
@@ -24,7 +24,7 @@ fun redrawRootWindow(
         drawFunction(
             graphicsContexts,
             rootWindow,
-            display,
+            drawApi,
             monitor,
             image
         )

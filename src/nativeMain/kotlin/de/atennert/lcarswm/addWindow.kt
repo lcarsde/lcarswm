@@ -1,17 +1,15 @@
 package de.atennert.lcarswm
 
-import de.atennert.lcarswm.system.xEventApi
-import de.atennert.lcarswm.system.xInputApi
-import de.atennert.lcarswm.system.xWindowUtilApi
+import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
 
 /**
  *
  */
-fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState, rootWindow: Window, windowId: Window, isSetup: Boolean) {
+fun addWindow(system: SystemApi, windowManagerState: WindowManagerState, rootWindow: Window, windowId: Window, isSetup: Boolean) {
     val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
-    xWindowUtilApi().getWindowAttributes(display, windowId, windowAttributes.ptr)
+    system.getWindowAttributes(windowId, windowAttributes.ptr)
 
     if (windowAttributes.override_redirect != 0 || (isSetup &&
             windowAttributes.map_state != IsViewable)) {
@@ -25,20 +23,19 @@ fun addWindow(display: CPointer<Display>, windowManagerState: WindowManagerState
 
     val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))
 
-    window.frame = XCreateSimpleWindow(display, rootWindow, measurements[0], measurements[1],
-        measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
+    window.frame = system.createSimpleWindow(rootWindow, measurements)
 
-    xInputApi().selectInput(display, window.frame, SubstructureRedirectMask or SubstructureNotifyMask)
+    system.selectInput(window.frame, SubstructureRedirectMask or SubstructureNotifyMask)
 
-    xWindowUtilApi().addToSaveSet(display, windowId)
+    system.addToSaveSet(windowId)
 
-    xEventApi().reparentWindow(display, windowId, window.frame, 0, 0)
+    system.reparentWindow(windowId, window.frame, 0, 0)
 
-    xEventApi().resizeWindow(display, window.id, measurements[2].convert(), measurements[3].convert())
+    system.resizeWindow(window.id, measurements[2].convert(), measurements[3].convert())
 
-    xEventApi().mapWindow(display, window.frame)
+    system.mapWindow(window.frame)
 
-    xEventApi().mapWindow(display, window.id)
+    system.mapWindow(window.id)
 
     nativeHeap.free(windowAttributes)
 }

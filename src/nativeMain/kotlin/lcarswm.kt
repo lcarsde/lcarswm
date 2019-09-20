@@ -1,7 +1,8 @@
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.events.EVENT_HANDLERS
 import de.atennert.lcarswm.events.handleRandrEvent
-import de.atennert.lcarswm.system.*
+import de.atennert.lcarswm.system.SystemFacade
+import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -11,40 +12,40 @@ fun main() {
     println("::main::start lcarswm initialization")
 
     memScoped {
-        val display = xWindowUtilApi().openDisplay(null) ?: error("::main::display from setup")
-        val screen = xWindowUtilApi().defaultScreenOfDisplay(display)?.pointed ?: error("::main::got no screen")
+        val system = SystemFacade()
+        val screen = system.defaultScreenOfDisplay()?.pointed ?: error("::main::got no screen")
         val rootWindow = screen.root
 
-        xWindowUtilApi().setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
+        system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
-        xInputApi().selectInput(display, rootWindow, SubstructureRedirectMask or SubstructureNotifyMask)
-        xEventApi().sync(display, false)
+        system.selectInput(rootWindow, SubstructureRedirectMask or SubstructureNotifyMask)
+        system.sync(false)
 
         if (wmDetected) {
             println("::main::Detected another active window manager")
             return
         }
 
-        xWindowUtilApi().setErrorHandler(staticCFunction { _, err -> println("::main::error code: ${err?.pointed?.error_code}"); 0 })
+        system.setErrorHandler(staticCFunction { _, err -> println("::main::error code: ${err?.pointed?.error_code}"); 0 })
 
         println("::main::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
-        val colorMap = allocateColorMap(display, screen.root_visual, rootWindow)
-        val graphicsContexts = getGraphicContexts(display, rootWindow, colorMap.second)
+        val colorMap = allocateColorMap(system, screen.root_visual, rootWindow)
+        val graphicsContexts = getGraphicContexts(system, rootWindow, colorMap.second)
 
         println("::main::graphics loaded")
 
         val windowManagerConfig =
-            WindowManagerState { xWindowUtilApi().internAtom(display, it, false) }
+            WindowManagerState { system.internAtom(it, false) }
 
         println("::main::wm state initialized")
 
-        setupLcarsWindow(display, screen, windowManagerConfig)
+        setupLcarsWindow(system, screen, windowManagerConfig)
         windowManagerConfig.setActiveWindowListener { activeWindow ->
             if (activeWindow != null) {
-                xInputApi().setInputFocus(display, activeWindow.id, RevertToNone, CurrentTime.convert())
+                system.setInputFocus(activeWindow.id, RevertToNone, CurrentTime.convert())
             } else {
-                xInputApi().setInputFocus(display, rootWindow, RevertToPointerRoot, CurrentTime.convert())
+                system.setInputFocus(rootWindow, RevertToPointerRoot, CurrentTime.convert())
             }
         }
 
@@ -52,57 +53,55 @@ fun main() {
 
         val logoImage = allocArrayOfPointersTo(alloc<XImage>())
 
-        xDrawApi().readXpmFileToImage(display, "/usr/share/pixmaps/lcarswm.xpm", logoImage)
+        system.readXpmFileToImage("/usr/share/pixmaps/lcarswm.xpm", logoImage)
 
         println("::main::logo loaded")
 
-        val randrBase = setupRandr(display, windowManagerConfig, logoImage[0]!!, rootWindow, graphicsContexts)
+        val randrBase = setupRandr(system, windowManagerConfig, logoImage[0]!!, rootWindow, graphicsContexts)
 
         println("::main::set up randr")
 
-        setupScreen(display, rootWindow, windowManagerConfig)
+        setupScreen(system, rootWindow, windowManagerConfig)
 
         println("::main::loaded window tree")
 
-        eventLoop(display, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, graphicsContexts)
+        eventLoop(system, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, graphicsContexts)
 
-        cleanupColorMap(display, colorMap)
+        cleanupColorMap(system, colorMap)
 
-        xWindowUtilApi().closeDisplay(display)
+        system.closeDisplay()
     }
-
-    SystemAccess.clear()
 
     println("::main::lcarswm stopped")
 }
 
-fun setupScreen(display: CPointer<Display>, rootWindow: Window, windowManagerConfig: WindowManagerState) {
-    xWindowUtilApi().grabServer(display)
+fun setupScreen(system: SystemApi, rootWindow: Window, windowManagerConfig: WindowManagerState) {
+    system.grabServer()
 
     val returnedWindows = ULongArray(1)
     val returnedParent = ULongArray(1)
     val topLevelWindows = nativeHeap.allocPointerTo<ULongVarOf<Window>>()
     val topLevelWindowCount = UIntArray(1)
 
-    xWindowUtilApi().queryTree(display, rootWindow, returnedWindows.toCValues(), returnedParent.toCValues(),
+    system.queryTree(rootWindow, returnedWindows.toCValues(), returnedParent.toCValues(),
         topLevelWindows.ptr,
         topLevelWindowCount.toCValues())
 
     ULongArray(topLevelWindowCount[0].toInt()) {topLevelWindows.value!![it]}
         .filter { childId -> childId != rootWindow }
         .forEach { childId ->
-            addWindow(display, windowManagerConfig, rootWindow, childId, true)
+            addWindow(system, windowManagerConfig, rootWindow, childId, true)
         }
 
     nativeHeap.free(topLevelWindows)
-    xWindowUtilApi().ungrabServer(display)
+    system.ungrabServer()
 }
 
 /**
  * @return RANDR base value
  */
 private fun setupRandr(
-    display: CPointer<Display>,
+    system: SystemApi,
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
     rootWindow: Window,
@@ -111,14 +110,14 @@ private fun setupRandr(
     val eventBase = IntArray(1).pin()
     val errorBase = IntArray(1).pin()
 
-    if (xRandrApi().rQueryExtension(display, eventBase.addressOf(0), errorBase.addressOf(0)) == X_FALSE) {
+    if (system.rQueryExtension(eventBase.addressOf(0), errorBase.addressOf(0)) == X_FALSE) {
         println("::setupRandr::no RANDR extension")
         return NO_RANDR_BASE
     }
 
-    handleRandrEvent(display, windowManagerState, image, rootWindow, graphicsContexts)
+    handleRandrEvent(system, windowManagerState, image, rootWindow, graphicsContexts)
 
-    xRandrApi().rSelectInput(display, rootWindow,
+    system.rSelectInput(rootWindow,
         (RRScreenChangeNotifyMask or
                 RROutputChangeNotifyMask or
                 RRCrtcChangeNotifyMask or
@@ -130,7 +129,7 @@ private fun setupRandr(
 }
 
 private fun eventLoop(
-    display: CPointer<Display>,
+    system: SystemApi,
     windowManagerState: WindowManagerState,
     randrBase: Int,
     image: CPointer<XImage>,
@@ -141,18 +140,18 @@ private fun eventLoop(
 
     while (true) {
         val xEvent = nativeHeap.alloc<XEvent>()
-        xEventApi().nextEvent(display, xEvent.ptr)
+        system.nextEvent(xEvent.ptr)
         val eventValue = xEvent.type
 
         if (eventValue == randrEventValue) {
             println("::eventLoop::received randr event")
-            handleRandrEvent(display, windowManagerState, image, rootWindow, graphicsContexts)
+            handleRandrEvent(system, windowManagerState, image, rootWindow, graphicsContexts)
             nativeHeap.free(xEvent)
             continue
         }
 
         if (EVENT_HANDLERS.containsKey(xEvent.type)) {
-            val stop = EVENT_HANDLERS[xEvent.type]!!.invoke(display, windowManagerState, xEvent, image, rootWindow, graphicsContexts)
+            val stop = EVENT_HANDLERS[xEvent.type]!!.invoke(system, windowManagerState, xEvent, image, rootWindow, graphicsContexts)
             if (stop) {
                 break
             }

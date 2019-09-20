@@ -3,8 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.Monitor
 import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.adjustWindowPositionAndSize
-import de.atennert.lcarswm.system.xEventApi
-import de.atennert.lcarswm.system.xRandrApi
+import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.*
 import xlib.*
@@ -13,7 +12,7 @@ import xlib.*
  * Get RANDR information and update window management accordingly.
  */
 fun handleRandrEvent(
-    display: CPointer<Display>,
+    system: SystemApi,
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
     rootWindow: Window,
@@ -21,13 +20,13 @@ fun handleRandrEvent(
 ) {
     println("::handleRandrEvent::handle randr")
 
-    val resources = xRandrApi().rGetScreenResources(display, rootWindow)!!
-    val primary = xRandrApi().rGetOutputPrimary(display, rootWindow)
+    val resources = system.rGetScreenResources(rootWindow)!!
+    val primary = system.rGetOutputPrimary(rootWindow)
 
     val outputs = resources.pointed.outputs
 
     val sortedMonitors = Array(resources.pointed.noutput)
-    { i -> Pair(outputs!![i], xRandrApi().rGetOutputInfo(display, resources, outputs[i])) }
+    { i -> Pair(outputs!![i], system.rGetOutputInfo(resources, outputs[i])) }
         .asSequence()
         .filter { (_, outputObject) ->
             outputObject != null
@@ -52,7 +51,7 @@ fun handleRandrEvent(
 
     val activeMonitors = sortedMonitors[true].orEmpty()
         .map { (monitor, crtcReference) ->
-            addMeasurementToMonitor(display, monitor, crtcReference, resources)
+            addMeasurementToMonitor(system, monitor, crtcReference, resources)
         }
         .filter { it.isFullyInitialized }
 
@@ -69,13 +68,13 @@ fun handleRandrEvent(
             Pair(newWidth, newHeight)
         }
 
-    xEventApi().resizeWindow(display, rootWindow, width.convert(), height.convert())
+    system.resizeWindow(rootWindow, width.convert(), height.convert())
 
     windowManagerState.screenSize = Pair(width, height)
     windowManagerState.updateMonitors(activeMonitors)
-    { measurements, window -> adjustWindowPositionAndSize(display, measurements, window) }
+    { measurements, window -> adjustWindowPositionAndSize(system, measurements, window) }
 
-    redrawRootWindow(windowManagerState, graphicsContexts, rootWindow, display, image)
+    redrawRootWindow(windowManagerState, graphicsContexts, rootWindow, system, image)
 }
 
 /**
@@ -89,12 +88,12 @@ private fun getOutputName(outputObject: CPointer<XRROutputInfo>): String {
 }
 
 private fun addMeasurementToMonitor(
-    display: CPointer<Display>,
+    system: SystemApi,
     monitor: Monitor,
     crtcReference: RRCrtc,
     resources: CPointer<XRRScreenResources>
 ): Monitor {
-    val crtcInfo = xRandrApi().rGetCrtcInfo(display, resources, crtcReference)!!.pointed
+    val crtcInfo = system.rGetCrtcInfo(resources, crtcReference)!!.pointed
 
     monitor.setMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
 

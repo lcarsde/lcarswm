@@ -1,8 +1,8 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.*
-import de.atennert.lcarswm.system.*
-import de.atennert.lcarswm.windowactions.redrawRootWindow
+import de.atennert.lcarswm.system.api.PosixApi
+import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -10,7 +10,7 @@ import xlib.*
  * Map of event types to event handlers. DON'T EDIT THE MAPS CONTENT!!!
  */
 val EVENT_HANDLERS =
-    hashMapOf<Int, Function6<CPointer<Display>, WindowManagerState, XEvent, CPointer<XImage>, Window, List<GC>, Boolean>>(
+    hashMapOf<Int, Function6<SystemApi, WindowManagerState, XEvent, CPointer<XImage>, Window, List<GC>, Boolean>>(
         Pair(KeyPress, ::handleKeyPress),
         Pair(KeyRelease, ::handleKeyRelease),
         Pair(ButtonPress, { _, _, e, _, _, _ -> logButtonPress(e) }),
@@ -26,7 +26,7 @@ val EVENT_HANDLERS =
     )
 
 private fun handleKeyRelease(
-    display: CPointer<Display>,
+    system: SystemApi,
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
     image: CPointer<XImage>,
@@ -38,14 +38,14 @@ private fun handleKeyRelease(
     println("::handleKeyRelease::Key released: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
-        XK_M -> toggleScreenMode(display, windowManagerState, image, rootWindow, graphicsContexts)
-        XK_T -> loadAppFromKeyBinding("Win+T")
-        XK_B -> loadAppFromKeyBinding("Win+B")
-        XK_I -> loadAppFromKeyBinding("Win+I")
-        XF86XK_AudioMute -> loadAppFromKeyBinding("XF86AudioMute")
-        XF86XK_AudioLowerVolume -> loadAppFromKeyBinding("XF86AudioLowerVolume")
-        XF86XK_AudioRaiseVolume -> loadAppFromKeyBinding("XF86AudioRaiseVolume")
-        XK_F4 -> closeActiveWindow(display, windowManagerState)
+        XK_M -> toggleScreenMode(system, windowManagerState, image, rootWindow, graphicsContexts)
+        XK_T -> loadAppFromKeyBinding(system, "Win+T")
+        XK_B -> loadAppFromKeyBinding(system, "Win+B")
+        XK_I -> loadAppFromKeyBinding(system, "Win+I")
+        XF86XK_AudioMute -> loadAppFromKeyBinding(system, "XF86AudioMute")
+        XF86XK_AudioLowerVolume -> loadAppFromKeyBinding(system, "XF86AudioLowerVolume")
+        XF86XK_AudioRaiseVolume -> loadAppFromKeyBinding(system, "XF86AudioRaiseVolume")
+        XK_F4 -> closeActiveWindow(system, windowManagerState)
         XK_Q -> return true
         else -> println("::handleKeyRelease::unknown key: $key")
     }
@@ -53,22 +53,22 @@ private fun handleKeyRelease(
 }
 
 
-private fun loadAppFromKeyBinding(keyBinding: String) {
-    val programConfig = readFromConfig(KEY_CONFIG_FILE, keyBinding) ?: return
+private fun loadAppFromKeyBinding(posixApi: PosixApi, keyBinding: String) {
+    val programConfig = readFromConfig(posixApi, KEY_CONFIG_FILE, keyBinding) ?: return
     println("::loadAppFromKeyBinding::loading app for $keyBinding ${programConfig.size}")
-    runProgram(programConfig[0], programConfig)
+    runProgram(posixApi, programConfig[0], programConfig)
 }
 
 private fun closeActiveWindow(
-    display: CPointer<Display>,
+    system: SystemApi,
     windowManagerState: WindowManagerState
 ) {
     val activeWindow = windowManagerState.activeWindow ?: return
 
-    val supportedProtocols = nativeHeap.allocPointerTo<ULongVarOf<ULong>>()
+    val supportedProtocols = nativeHeap.allocPointerTo<ULongVar>()
     val numSupportedProtocols = IntArray(1).pin()
 
-    val protocolsResult = xWindowUtilApi().getWMProtocols(display, activeWindow.id, supportedProtocols.ptr, numSupportedProtocols.addressOf(0))
+    val protocolsResult = system.getWMProtocols(activeWindow.id, supportedProtocols.ptr, numSupportedProtocols.addressOf(0))
     val min = supportedProtocols.pointed!!.value
     val max = min + numSupportedProtocols.get()[0].toULong()
 
@@ -79,8 +79,8 @@ private fun closeActiveWindow(
         msg.xclient.window = activeWindow.id
         msg.xclient.format = 32
         msg.xclient.data.l[0] = windowManagerState.wmDeleteWindow.convert()
-        xEventApi().sendEvent(display, activeWindow.id, false, 0, msg.ptr)
+        system.sendEvent(activeWindow.id, false, 0, msg.ptr)
     } else {
-        xWindowUtilApi().killClient(display, activeWindow.id)
+        system.killClient(activeWindow.id)
     }
 }

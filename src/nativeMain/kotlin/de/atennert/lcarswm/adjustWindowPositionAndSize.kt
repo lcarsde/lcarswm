@@ -1,20 +1,18 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.events.sendConfigureNotify
-import de.atennert.lcarswm.system.xEventApi
-import kotlinx.cinterop.*
-import xlib.*
+import de.atennert.lcarswm.system.api.EventApi
+import kotlinx.cinterop.convert
 
 /**
  * Adjust window position and size according to the current window manager setting.
  */
 fun adjustWindowPositionAndSize(
-    display: CPointer<Display>,
+    eventApi: EventApi,
     windowMeasurements: List<Int>,
     window: WindowContainer
 ) {
-    xEventApi().moveResizeWindow(
-        display,
+    eventApi.moveResizeWindow(
         window.frame,
         windowMeasurements[0],
         windowMeasurements[1],
@@ -22,12 +20,11 @@ fun adjustWindowPositionAndSize(
         windowMeasurements[3].convert()
     )
 
-    xEventApi().resizeWindow(
-        display,
+    eventApi.resizeWindow(
         window.id,
         windowMeasurements[2].convert(),
         windowMeasurements[3].convert()
     )
 
-    sendConfigureNotify(display, window.id, windowMeasurements)
+    sendConfigureNotify(eventApi, window.id, windowMeasurements)
 }

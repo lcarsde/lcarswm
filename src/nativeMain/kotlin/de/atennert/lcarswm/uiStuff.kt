@@ -1,6 +1,6 @@
 package de.atennert.lcarswm
 
-import de.atennert.lcarswm.system.xDrawApi
+import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -16,18 +16,18 @@ val COLORS = listOf(
     Triple(0xCCCC, 0x6666, 0x9999)
 )
 
-val DRAW_FUNCTIONS = hashMapOf<ScreenMode, Function5<List<GC>, Window, CPointer<Display>, Monitor, CPointer<XImage>, Unit>>(
+val DRAW_FUNCTIONS = hashMapOf<ScreenMode, Function5<List<GC>, Window, DrawApi, Monitor, CPointer<XImage>, Unit>>(
     Pair(ScreenMode.NORMAL, ::drawNormalFrame),
     Pair(ScreenMode.MAXIMIZED, ::drawMaximizedFrame),
     Pair(ScreenMode.FULLSCREEN, { gc, w, d, m, _ -> clearScreen(gc, w, d, m)})
 )
 
 fun allocateColorMap(
-    display: CPointer<Display>,
+    drawApi: DrawApi,
     visual: CPointer<Visual>?,
     windowId: Window
 ): Pair<Colormap, List<ULong>> {
-    val colorMapId = xDrawApi().createColormap(display, windowId, visual, AllocNone)
+    val colorMapId = drawApi.createColormap(windowId, visual, AllocNone)
 
     val colorReplies = COLORS
         .asSequence()
@@ -36,7 +36,7 @@ fun allocateColorMap(
             color.red = red.convert()
             color.green = green.convert()
             color.blue = blue.convert()
-            xDrawApi().allocColor(display, colorMapId, color.ptr)
+            drawApi.allocColor(colorMapId, color.ptr)
             color.pixel
         }
         .filterNotNull()
@@ -46,7 +46,7 @@ fun allocateColorMap(
 }
 
 fun getGraphicContexts(
-    display: CPointer<Display>,
+    drawApi: DrawApi,
     window: Window,
     colors: List<ULong>
 ): List<GC> = colors
@@ -57,30 +57,30 @@ fun getGraphicContexts(
         gcValues.arc_mode = ArcPieSlice
 
         val mask = GCForeground or GCGraphicsExposures or GCArcMode
-        xDrawApi().createGC(display, window, mask.convert(), gcValues.ptr)!!
+        drawApi.createGC(window, mask.convert(), gcValues.ptr)!!
     }
 
 fun cleanupColorMap(
-    display: CPointer<Display>,
+    drawApi: DrawApi,
     colorMap: Pair<Colormap, List<ULong>>
 ) {
     val colorPixels = ULongArray(colorMap.second.size) {colorMap.second[it]}
-    xDrawApi().freeColors(display, colorMap.first, colorPixels.toCValues(), colorPixels.size)
-    xDrawApi().freeColormap(display, colorMap.first)
+    drawApi.freeColors(colorMap.first, colorPixels.toCValues(), colorPixels.size)
+    drawApi.freeColormap(colorMap.first)
 }
 
 private fun drawMaximizedFrame(
     graphicsContexts: List<GC>,
     rootWindow: Window,
-    display: CPointer<Display>,
+    drawApi: DrawApi,
     monitor: Monitor,
     image: CPointer<XImage>
 ) {
-    clearScreen(graphicsContexts, rootWindow, display, monitor)
+    clearScreen(graphicsContexts, rootWindow, drawApi, monitor)
 
     val gcPurple2 = graphicsContexts[6]
     val gcOrchid = graphicsContexts[2]
-    val gcCopyImage = xDrawApi().createGC(display, rootWindow, 0.convert(), null)
+    val gcCopyImage = drawApi.createGC(rootWindow, 0.convert(), null)
 
     // TODO create bar ends as pixmaps
     val arcs = nativeHeap.allocArray<XArc>(4)
@@ -136,35 +136,35 @@ private fun drawMaximizedFrame(
     bars[1].width = (monitor.width - 80).convert()
     bars[1].height = 40.convert()
 
-    xDrawApi().fillArcs(display, rootWindow, gcPurple2, arcs, 4)
-    xDrawApi().fillRectangles(display, rootWindow, gcPurple2, rects, 4)
-    xDrawApi().fillRectangles(display, rootWindow, gcOrchid, bars, 2)
+    drawApi.fillArcs(rootWindow, gcPurple2, arcs, 4)
+    drawApi.fillRectangles(rootWindow, gcPurple2, rects, 4)
+    drawApi.fillRectangles(rootWindow, gcOrchid, bars, 2)
 
-    xDrawApi().putImage(display, rootWindow, gcCopyImage,
+    drawApi.putImage(rootWindow, gcCopyImage,
         image, monitor.x + 40, 0,
         image.pointed.width.convert(), image.pointed.height.convert())
 
     nativeHeap.free(arcs)
     nativeHeap.free(rects)
 
-    xDrawApi().freeGC(display, gcCopyImage)
+    drawApi.freeGC(gcCopyImage)
 }
 
 private fun drawNormalFrame(
     graphicsContexts: List<GC>,
     rootWindow: Window,
-    display: CPointer<Display>,
+    drawApi: DrawApi,
     monitor: Monitor,
     image: CPointer<XImage>
 ) {
-    clearScreen(graphicsContexts, rootWindow, display, monitor)
+    clearScreen(graphicsContexts, rootWindow, drawApi, monitor)
 
     val gcBlack = graphicsContexts[0]
     val gcPurple2 = graphicsContexts[6]
     val gcOrchid = graphicsContexts[2]
     val gcPurple1 = graphicsContexts[3]
     val gcBrick = graphicsContexts[4]
-    val gcCopyImage = xDrawApi().createGC(display, rootWindow, 0.convert(), null)
+    val gcCopyImage = drawApi.createGC(rootWindow, 0.convert(), null)
 
     // TODO create bar ends as pixmaps
     val arcs = nativeHeap.allocArray<XArc>(3)
@@ -319,25 +319,25 @@ private fun drawNormalFrame(
     cornerInnerArcs[3].y = (monitor.y + monitor.height - 72).convert()
     cornerInnerArcs[3].angle1 = 180.shl(6)
 
-    xDrawApi().fillArcs(display, rootWindow, gcPurple2, arcs, 3)
-    xDrawApi().fillRectangles(display, rootWindow, gcPurple2, rects, 3)
-    xDrawApi().fillRectangles(display, rootWindow, gcPurple2, bigBars, 2)
+    drawApi.fillArcs(rootWindow, gcPurple2, arcs, 3)
+    drawApi.fillRectangles(rootWindow, gcPurple2, rects, 3)
+    drawApi.fillRectangles(rootWindow, gcPurple2, bigBars, 2)
 
     // middle bars
-    xDrawApi().fillRectangles(display, rootWindow, gcPurple1, middleBars[0].ptr, 1)
-    xDrawApi().fillRectangles(display, rootWindow, gcBrick, middleBars[1].ptr, 1)
-    xDrawApi().fillRectangles(display, rootWindow, gcPurple2, middleBars[2].ptr, 1)
-    xDrawApi().fillRectangles(display, rootWindow, gcOrchid, middleBars[3].ptr, 1)
+    drawApi.fillRectangles(rootWindow, gcPurple1, middleBars[0].ptr, 1)
+    drawApi.fillRectangles(rootWindow, gcBrick, middleBars[1].ptr, 1)
+    drawApi.fillRectangles(rootWindow, gcPurple2, middleBars[2].ptr, 1)
+    drawApi.fillRectangles(rootWindow, gcOrchid, middleBars[3].ptr, 1)
 
     // side bars
-    xDrawApi().fillRectangles(display, rootWindow, gcPurple1, sideBars, 2)
+    drawApi.fillRectangles(rootWindow, gcPurple1, sideBars, 2)
 
     // corner pieces
-    xDrawApi().fillArcs(display, rootWindow, gcOrchid, cornerOuterArcs, 4)
-    xDrawApi().fillRectangles(display, rootWindow, gcOrchid, cornerRects, 8)
-    xDrawApi().fillArcs(display, rootWindow, gcBlack, cornerInnerArcs, 4)
+    drawApi.fillArcs(rootWindow, gcOrchid, cornerOuterArcs, 4)
+    drawApi.fillRectangles(rootWindow, gcOrchid, cornerRects, 8)
+    drawApi.fillArcs(rootWindow, gcBlack, cornerInnerArcs, 4)
 
-    xDrawApi().putImage(display, rootWindow, gcCopyImage,
+    drawApi.putImage(rootWindow, gcCopyImage,
         image, monitor.x + monitor.width - 40 - image.pointed.width, 0,
         image.pointed.width.convert(), image.pointed.height.convert())
 
@@ -350,14 +350,14 @@ private fun drawNormalFrame(
     nativeHeap.free(cornerRects)
     nativeHeap.free(cornerInnerArcs)
 
-    xDrawApi().freeGC(display, gcCopyImage)
+    drawApi.freeGC(gcCopyImage)
 }
 
 private fun clearScreen(
     graphicsContexts: List<GC>,
     rootWindow: Window,
-    display: CPointer<Display>,
+    drawApi: DrawApi,
     monitor: Monitor
 ) {
-    xDrawApi().fillRectangle(display, rootWindow, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
+    drawApi.fillRectangle(rootWindow, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
 }

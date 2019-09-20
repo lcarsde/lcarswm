@@ -12,36 +12,33 @@ import xlib.*
  * This is the facade for accessing system functions.
  */
 class SystemFacade : SystemApi {
-    override fun openDisplay(name: String?): CPointer<Display>? {
-        return XOpenDisplay(name)
-    }
+    private val display: CPointer<Display> = XOpenDisplay(null) ?: error("SystemFacade::::got no display")
 
-    override fun closeDisplay(display: CValuesRef<Display>): Int {
+    override fun closeDisplay(): Int {
         return XCloseDisplay(display)
     }
 
-    override fun defaultScreenOfDisplay(display: CValuesRef<Display>): CPointer<Screen>? {
+    override fun defaultScreenOfDisplay(): CPointer<Screen>? {
         return XDefaultScreenOfDisplay(display)
     }
 
-    override fun grabServer(display: CValuesRef<Display>): Int {
+    override fun grabServer(): Int {
         return XGrabServer(display)
     }
 
-    override fun ungrabServer(display: CValuesRef<Display>): Int {
+    override fun ungrabServer(): Int {
         return XUngrabServer(display)
     }
 
-    override fun addToSaveSet(display: CValuesRef<Display>, window: Window): Int {
+    override fun addToSaveSet(window: Window): Int {
         return XAddToSaveSet(display, window)
     }
 
-    override fun removeFromSaveSet(display: CValuesRef<Display>, window: Window): Int {
+    override fun removeFromSaveSet(window: Window): Int {
         return XRemoveFromSaveSet(display, window)
     }
 
     override fun queryTree(
-        display: CValuesRef<Display>,
         window: Window,
         rootReturn: CValuesRef<WindowVar>,
         parentReturn: CValuesRef<WindowVar>,
@@ -52,7 +49,6 @@ class SystemFacade : SystemApi {
     }
 
     override fun getWindowAttributes(
-        display: CValuesRef<Display>,
         window: Window,
         attributes: CValuesRef<XWindowAttributes>
     ): Int {
@@ -60,7 +56,6 @@ class SystemFacade : SystemApi {
     }
 
     override fun getWMProtocols(
-        display: CValuesRef<Display>,
         window: Window,
         protocolsReturn: CValuesRef<CPointerVar<AtomVar>>,
         protocolCountReturn: CValuesRef<IntVar>
@@ -72,51 +67,55 @@ class SystemFacade : SystemApi {
         return XSetErrorHandler(handler)
     }
 
-    override fun internAtom(display: CValuesRef<Display>, name: String, onlyIfExists: Boolean): Atom {
+    override fun internAtom(name: String, onlyIfExists: Boolean): Atom {
         return XInternAtom(display, name, convertToXBoolean(onlyIfExists))
     }
 
-    override fun killClient(display: CValuesRef<Display>, window: Window): Int {
+    override fun killClient(window: Window): Int {
         return XKillClient(display, window)
     }
 
-    override fun sync(display: CValuesRef<Display>, discardQueuedEvents: Boolean): Int {
+    override fun createSimpleWindow(rootWindow: Window, measurements: List<Int>): Window {
+        return XCreateSimpleWindow(display, rootWindow, measurements[0], measurements[1],
+            measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
+    }
+
+    override fun sync(discardQueuedEvents: Boolean): Int {
         return XSync(display, convertToXBoolean(discardQueuedEvents))
     }
 
     override fun sendEvent(
-        display: CValuesRef<Display>,
         window: Window,
         propagate: Boolean,
         eventMask: Long,
-        event: CValuesRef<XEvent>
+        event: CPointer<XEvent>
     ): Int {
         return XSendEvent(display, window, convertToXBoolean(propagate), eventMask, event)
     }
 
-    override fun nextEvent(display: CValuesRef<Display>, event: CValuesRef<XEvent>): Int {
+    override fun nextEvent(event: CPointer<XEvent>): Int {
         return XNextEvent(display, event)
     }
 
+    override fun getDisplay(): CPointer<Display>? = this.display
+
     override fun configureWindow(
-        display: CValuesRef<Display>,
         window: Window,
         configurationMask: UInt,
-        configuration: CValuesRef<XWindowChanges>
+        configuration: CPointer<XWindowChanges>
     ): Int {
         return XConfigureWindow(display, window, configurationMask, configuration)
     }
 
-    override fun reparentWindow(display: CValuesRef<Display>, window: Window, parent: Window, x: Int, y: Int): Int {
+    override fun reparentWindow(window: Window, parent: Window, x: Int, y: Int): Int {
         return XReparentWindow(display, window, parent, x, y)
     }
 
-    override fun resizeWindow(display: CValuesRef<Display>, window: Window, width: UInt, height: UInt): Int {
+    override fun resizeWindow(window: Window, width: UInt, height: UInt): Int {
         return XResizeWindow(display, window, width, height)
     }
 
     override fun moveResizeWindow(
-        display: CValuesRef<Display>,
         window: Window,
         x: Int,
         y: Int,
@@ -126,15 +125,15 @@ class SystemFacade : SystemApi {
         return XMoveResizeWindow(display, window, x, y, width, height)
     }
 
-    override fun mapWindow(display: CValuesRef<Display>, window: Window): Int {
+    override fun mapWindow(window: Window): Int {
         return XMapWindow(display, window)
     }
 
-    override fun unmapWindow(display: CValuesRef<Display>, window: Window): Int {
+    override fun unmapWindow(window: Window): Int {
         return XUnmapWindow(display, window)
     }
 
-    override fun destroyWindow(display: CValuesRef<Display>, window: Window): Int {
+    override fun destroyWindow(window: Window): Int {
         return XDestroyWindow(display, window)
     }
 
@@ -174,16 +173,15 @@ class SystemFacade : SystemApi {
         return platform.posix.execvp(fileName, args)
     }
 
-    override fun selectInput(display: CValuesRef<Display>, window: Window, mask: Long): Int {
+    override fun selectInput(window: Window, mask: Long): Int {
         return XSelectInput(display, window, mask)
     }
 
-    override fun setInputFocus(display: CValuesRef<Display>, window: Window, revertTo: Int, time: Time): Int {
+    override fun setInputFocus(window: Window, revertTo: Int, time: Time): Int {
         return XSetInputFocus(display, window, revertTo, time)
     }
 
     override fun grabKey(
-        display: CValuesRef<Display>,
         keyCode: Int,
         modifiers: UInt,
         window: Window,
@@ -195,7 +193,6 @@ class SystemFacade : SystemApi {
     }
 
     override fun grabButton(
-        display: CValuesRef<Display>,
         button: UInt,
         modifiers: UInt,
         window: Window,
@@ -209,36 +206,34 @@ class SystemFacade : SystemApi {
         return XGrabButton(display, button, modifiers, window, convertToXBoolean(ownerEvents), mask, pointerMode, keyboardMode, windowToConfineTo, cursor)
     }
 
-    override fun getModifierMapping(display: CValuesRef<Display>): CPointer<XModifierKeymap>? {
+    override fun getModifierMapping(): CPointer<XModifierKeymap>? {
         return XGetModifierMapping(display)
     }
 
-    override fun keysymToKeycode(display: CValuesRef<Display>, keySym: KeySym): KeyCode {
+    override fun keysymToKeycode(keySym: KeySym): KeyCode {
         return XKeysymToKeycode(display, keySym)
     }
 
     override fun rQueryExtension(
-        display: CValuesRef<Display>,
         eventBase: CValuesRef<IntVar>,
         errorBase: CValuesRef<IntVar>
     ): Int {
         return XRRQueryExtension(display, eventBase, errorBase)
     }
 
-    override fun rSelectInput(display: CValuesRef<Display>, window: Window, mask: Int) {
+    override fun rSelectInput(window: Window, mask: Int) {
         XRRSelectInput(display, window, mask)
     }
 
-    override fun rGetScreenResources(display: CValuesRef<Display>, window: Window): CPointer<XRRScreenResources>? {
+    override fun rGetScreenResources(window: Window): CPointer<XRRScreenResources>? {
         return XRRGetScreenResources(display, window)
     }
 
-    override fun rGetOutputPrimary(display: CValuesRef<Display>, window: Window): RROutput {
+    override fun rGetOutputPrimary(window: Window): RROutput {
         return XRRGetOutputPrimary(display, window)
     }
 
     override fun rGetOutputInfo(
-        display: CValuesRef<Display>,
         resources: CPointer<XRRScreenResources>,
         output: RROutput
     ): CPointer<XRROutputInfo>? {
@@ -246,7 +241,6 @@ class SystemFacade : SystemApi {
     }
 
     override fun rGetCrtcInfo(
-        display: CValuesRef<Display>,
         resources: CPointer<XRRScreenResources>,
         crtc: RRCrtc
     ): CPointer<XRRCrtcInfo>? {
@@ -254,7 +248,6 @@ class SystemFacade : SystemApi {
     }
 
     override fun fillArcs(
-        display: CValuesRef<Display>,
         drawable: Drawable,
         graphicsContext: GC,
         arcs: CValuesRef<XArc>,
@@ -264,7 +257,6 @@ class SystemFacade : SystemApi {
     }
 
     override fun fillRectangle(
-        display: CValuesRef<Display>,
         drawable: Drawable,
         graphicsContext: GC,
         x: Int,
@@ -276,7 +268,6 @@ class SystemFacade : SystemApi {
     }
 
     override fun fillRectangles(
-        display: CValuesRef<Display>,
         drawable: Drawable,
         graphicsContext: GC,
         rects: CValuesRef<XRectangle>,
@@ -286,7 +277,6 @@ class SystemFacade : SystemApi {
     }
 
     override fun putImage(
-        display: CValuesRef<Display>,
         drawable: Drawable,
         graphicsContext: GC?,
         image: CValuesRef<XImage>,
@@ -299,7 +289,6 @@ class SystemFacade : SystemApi {
     }
 
     override fun createGC(
-        display: CValuesRef<Display>,
         drawable: Drawable,
         mask: ULong,
         gcValues: CValuesRef<XGCValues>?
@@ -307,12 +296,11 @@ class SystemFacade : SystemApi {
         return XCreateGC(display, drawable, mask, gcValues)
     }
 
-    override fun freeGC(display: CValuesRef<Display>, graphicsContext: GC?): Int {
+    override fun freeGC(graphicsContext: GC?): Int {
         return XFreeGC(display, graphicsContext)
     }
 
     override fun createColormap(
-        display: CValuesRef<Display>,
         window: Window,
         visual: CValuesRef<Visual>?,
         alloc: Int
@@ -320,12 +308,11 @@ class SystemFacade : SystemApi {
         return XCreateColormap(display, window, visual, alloc)
     }
 
-    override fun allocColor(display: CValuesRef<Display>, colorMap: Colormap, color: CValuesRef<XColor>): Int {
+    override fun allocColor(colorMap: Colormap, color: CValuesRef<XColor>): Int {
         return XAllocColor(display, colorMap, color)
     }
 
     override fun freeColors(
-        display: CValuesRef<Display>,
         colorMap: Colormap,
         pixels: CValuesRef<ULongVar>,
         pixelCount: Int
@@ -333,12 +320,11 @@ class SystemFacade : SystemApi {
         return XFreeColors(display, colorMap, pixels, pixelCount, 0.convert())
     }
 
-    override fun freeColormap(display: CValuesRef<Display>, colorMap: Colormap): Int {
+    override fun freeColormap(colorMap: Colormap): Int {
         return XFreeColormap(display, colorMap)
     }
 
     override fun readXpmFileToImage(
-        display: CValuesRef<Display>,
         imagePath: String,
         imageBuffer: CValuesRef<CPointerVar<XImage>>
     ): Int {

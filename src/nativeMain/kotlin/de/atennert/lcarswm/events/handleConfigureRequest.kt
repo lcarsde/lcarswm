@@ -1,9 +1,11 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.WindowManagerState
-import de.atennert.lcarswm.system.xEventApi
-import kotlinx.cinterop.*
-import xlib.Display
+import de.atennert.lcarswm.system.api.EventApi
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.nativeHeap
+import kotlinx.cinterop.ptr
 import xlib.XEvent
 import xlib.XWindowChanges
 
@@ -11,7 +13,7 @@ import xlib.XWindowChanges
  * Filter the values that lcarswm requires and send the configuration to X.
  */
 fun handleConfigureRequest(
-    display: CPointer<Display>,
+    eventApi: EventApi,
     windowManagerState: WindowManagerState,
     xEvent: XEvent
 ): Boolean {
@@ -24,7 +26,7 @@ fun handleConfigureRequest(
         val measurements = windowPair.second.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowPair.second))
 
         val window = windowPair.first
-        sendConfigureNotify(display, window.id, measurements)
+        sendConfigureNotify(eventApi, window.id, measurements)
         return false
     }
 
@@ -37,7 +39,7 @@ fun handleConfigureRequest(
     windowChanges.stack_mode = configureEvent.detail
     windowChanges.border_width = 0
 
-    xEventApi().configureWindow(display, configureEvent.window, configureEvent.value_mask.convert(), windowChanges.ptr)
+    eventApi.configureWindow(configureEvent.window, configureEvent.value_mask.convert(), windowChanges.ptr)
 
     return false
 }

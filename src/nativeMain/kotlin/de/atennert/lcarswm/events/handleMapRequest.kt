@@ -2,8 +2,7 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.addWindow
-import kotlinx.cinterop.CPointer
-import xlib.Display
+import de.atennert.lcarswm.system.api.SystemApi
 import xlib.Window
 import xlib.XEvent
 
@@ -11,7 +10,7 @@ import xlib.XEvent
  *
  */
 fun handleMapRequest(
-    display: CPointer<Display>,
+    system: SystemApi,
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
     rootWindow: Window
@@ -24,7 +23,7 @@ fun handleMapRequest(
         return false
     }
 
-    addWindow(display, windowManagerState, rootWindow, window, false)
+    addWindow(system, windowManagerState, rootWindow, window, false)
 
     return false
 }

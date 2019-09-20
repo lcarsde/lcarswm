@@ -1,8 +1,8 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.CPointer
-import xlib.Display
 import xlib.GC
 import xlib.Window
 import xlib.XImage
@@ -11,7 +11,7 @@ import xlib.XImage
  * Toggle screen mode including window resizing/repositioning
  */
 fun toggleScreenMode(
-    display: CPointer<Display>,
+    system: SystemApi,
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
     rootWindow: Window,
@@ -24,7 +24,7 @@ fun toggleScreenMode(
     }
 
     windowManagerState.updateScreenMode(screenMode)
-    { measurements, window -> adjustWindowPositionAndSize(display, measurements, window) }
+    { measurements, window -> adjustWindowPositionAndSize(system, measurements, window) }
 
-    redrawRootWindow(windowManagerState, graphicsContexts, rootWindow, display, image)
+    redrawRootWindow(windowManagerState, graphicsContexts, rootWindow, system, image)
 }
