@@ -3,6 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.system.api.PosixApi
 import de.atennert.lcarswm.system.api.SystemApi
+import de.atennert.lcarswm.windowactions.closeWindow
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -45,7 +46,12 @@ private fun handleKeyRelease(
         XF86XK_AudioMute -> loadAppFromKeyBinding(system, "XF86AudioMute")
         XF86XK_AudioLowerVolume -> loadAppFromKeyBinding(system, "XF86AudioLowerVolume")
         XF86XK_AudioRaiseVolume -> loadAppFromKeyBinding(system, "XF86AudioRaiseVolume")
-        XK_F4 -> closeActiveWindow(system, windowManagerState)
+        XK_F4 -> {
+            val window = windowManagerState.activeWindow
+            if (window != null) {
+                closeWindow(window.id, system, windowManagerState)
+            }
+        }
         XK_Q -> return true
         else -> println("::handleKeyRelease::unknown key: $key")
     }
@@ -57,30 +63,4 @@ private fun loadAppFromKeyBinding(posixApi: PosixApi, keyBinding: String) {
     val programConfig = readFromConfig(posixApi, KEY_CONFIG_FILE, keyBinding) ?: return
     println("::loadAppFromKeyBinding::loading app for $keyBinding ${programConfig.size}")
     runProgram(posixApi, programConfig[0], programConfig)
-}
-
-private fun closeActiveWindow(
-    system: SystemApi,
-    windowManagerState: WindowManagerState
-) {
-    val activeWindow = windowManagerState.activeWindow ?: return
-
-    val supportedProtocols = nativeHeap.allocPointerTo<ULongVar>()
-    val numSupportedProtocols = IntArray(1).pin()
-
-    val protocolsResult = system.getWMProtocols(activeWindow.id, supportedProtocols.ptr, numSupportedProtocols.addressOf(0))
-    val min = supportedProtocols.pointed!!.value
-    val max = min + numSupportedProtocols.get()[0].toULong()
-
-    if (protocolsResult != 0 && (windowManagerState.wmDeleteWindow in (min .. max))) {
-        val msg = nativeHeap.alloc<XEvent>()
-        msg.xclient.type = ClientMessage
-        msg.xclient.message_type = windowManagerState.wmProtocols
-        msg.xclient.window = activeWindow.id
-        msg.xclient.format = 32
-        msg.xclient.data.l[0] = windowManagerState.wmDeleteWindow.convert()
-        system.sendEvent(activeWindow.id, false, 0, msg.ptr)
-    } else {
-        system.killClient(activeWindow.id)
-    }
 }
