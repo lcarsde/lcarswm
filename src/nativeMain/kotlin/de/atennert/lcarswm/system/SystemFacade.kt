@@ -145,11 +145,15 @@ class SystemFacade : SystemApi {
         return platform.posix.fopen(fileName, modes)
     }
 
-    override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CValuesRef<FILE>): CPointer<ByteVar>? {
+    override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
         return platform.posix.fgets(buffer, bufferSize, file)
     }
 
-    override fun fclose(file: CValuesRef<FILE>): Int {
+    override fun fputs(s: String, file: CPointer<FILE>): Int {
+        return platform.posix.fputs(s, file)
+    }
+
+    override fun fclose(file: CPointer<FILE>): Int {
         return platform.posix.fclose(file)
     }
 

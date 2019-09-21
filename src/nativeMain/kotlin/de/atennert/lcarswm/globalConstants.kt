@@ -2,6 +2,8 @@ package de.atennert.lcarswm
 
 import xlib.*
 
+const val LOG_FILE_PATH = "/var/log/lcarswm.log"
+
 const val X_FALSE = 0
 const val X_TRUE = 1
 

@@ -7,17 +7,16 @@ import kotlinx.cinterop.CValuesRef
 import platform.posix.FILE
 import platform.posix.__pid_t
 
-/**
- *
- */
 interface PosixApi {
     fun getenv(name: String): CPointer<ByteVar>?
 
     fun fopen(fileName: String, modes: String): CPointer<FILE>?
 
-    fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CValuesRef<FILE>): CPointer<ByteVar>?
+    fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>?
 
-    fun fclose(file: CValuesRef<FILE>): Int
+    fun fputs(s: String, file: CPointer<FILE>): Int
+
+    fun fclose(file: CPointer<FILE>): Int
 
     fun fork(): __pid_t
 

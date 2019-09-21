@@ -87,9 +87,11 @@ open class SystemFacadeMock : SystemApi {
 
     override fun fopen(fileName: String, modes: String): CPointer<FILE>? = null
 
-    override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CValuesRef<FILE>): CPointer<ByteVar>? = null
+    override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? = null
 
-    override fun fclose(file: CValuesRef<FILE>): Int = 0
+    override fun fputs(s: String, file: CPointer<FILE>): Int = 0
+
+    override fun fclose(file: CPointer<FILE>): Int = 0
 
     override fun fork(): __pid_t = 0
 
