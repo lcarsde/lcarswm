@@ -30,7 +30,7 @@ class FileLoggerTest {
         val fileLogger = FileLogger(posixApi, "")
 
         fileLogger.printLn(text)
-        assertEquals("$text\n", posixApi.fputsText)
+        assertEquals("$text\n", posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
         assertEquals(filePointer, posixApi.fputsFile, "doesn't write output to given file")
     }
 
