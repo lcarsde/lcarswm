@@ -22,14 +22,27 @@ class FileLoggerTest {
     }
 
     @Test
-    fun `write to file`() {
+    fun `log info to file`() {
         val filePointer = nativeHeap.alloc<FILE>().ptr
         val posixApi= PosixApiMock(filePointer)
         val text = "this is my text"
 
         val fileLogger = FileLogger(posixApi, "")
 
-        fileLogger.printLn(text)
+        fileLogger.logInfo(text)
+        assertEquals("$text\n", posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
+        assertEquals(filePointer, posixApi.fputsFile, "doesn't write output to given file")
+    }
+
+    @Test
+    fun `log error to file`() {
+        val filePointer = nativeHeap.alloc<FILE>().ptr
+        val posixApi= PosixApiMock(filePointer)
+        val text = "this is my error"
+
+        val fileLogger = FileLogger(posixApi, "")
+
+        fileLogger.logError(text)
         assertEquals("$text\n", posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
         assertEquals(filePointer, posixApi.fputsFile, "doesn't write output to given file")
     }

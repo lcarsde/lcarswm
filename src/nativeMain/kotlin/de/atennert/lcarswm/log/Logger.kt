@@ -1,7 +1,9 @@
 package de.atennert.lcarswm.log
 
 interface Logger {
-    fun printLn(text: String)
+    fun logInfo(text: String)
+
+    fun logError(text: String)
 
     fun close()
 }

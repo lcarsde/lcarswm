@@ -8,7 +8,11 @@ class FileLogger(private val posixApi: PosixApi, logFilePath: String) : Logger {
     private val file: CPointer<FILE> = posixApi.fopen(logFilePath, "w")
         ?: error("FileLogger::init::unable to get the log file $logFilePath")
 
-    override fun printLn(text: String) {
+    override fun logInfo(text: String) {
+        posixApi.fputs("$text\n", file)
+    }
+
+    override fun logError(text: String) {
         posixApi.fputs("$text\n", file)
     }
 
