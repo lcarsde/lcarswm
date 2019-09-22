@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.WindowManagerStateMock
+import de.atennert.lcarswm.log.LoggerMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.nativeHeap
 import xlib.Window
@@ -19,7 +20,7 @@ class HandleDestroyNotifyTest {
 
         val windowManagerState = WindowManagerStateTestImpl()
 
-        val requestShutdown = handleDestroyNotify(windowManagerState, destroyNotifyEvent)
+        val requestShutdown = handleDestroyNotify(LoggerMock(), windowManagerState, destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")
         assertEquals(1, windowManagerState.removedWindowIds.size, "There wasn't exactly one window removal")
