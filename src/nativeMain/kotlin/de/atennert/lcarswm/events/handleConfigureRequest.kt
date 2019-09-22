@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.WindowManagerState
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.EventApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
@@ -14,12 +15,13 @@ import xlib.XWindowChanges
  */
 fun handleConfigureRequest(
     eventApi: EventApi,
+    logger: Logger,
     windowManagerState: WindowManagerState,
     xEvent: XEvent
 ): Boolean {
     val configureEvent = xEvent.xconfigurerequest
 
-    println("::handleConfigureRequest::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}")
+    logger.logDebug("::handleConfigureRequest::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}")
 
     if (windowManagerState.hasWindow(configureEvent.window)) {
         val windowPair = windowManagerState.windows.single {it.first.id == configureEvent.window}

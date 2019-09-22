@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.pin
@@ -8,7 +9,7 @@ import kotlinx.cinterop.toKString
 /**
  *
  */
-fun readFromConfig(posixApi: PosixApi, fileName: String, key: String): List<String>? {
+fun readFromConfig(posixApi: PosixApi, logger: Logger, fileName: String, key: String): List<String>? {
     val configPathBytes = posixApi.getenv("XDG_CONFIG_HOME") ?: return null
     val configPath = configPathBytes.toKString()
     val configFilePath = "$configPath/lcarswm/$fileName"
@@ -20,7 +21,7 @@ fun readFromConfig(posixApi: PosixApi, fileName: String, key: String): List<Stri
     var value: List<String>? = null
     while (posixApi.fgets(entry.addressOf(0), entry.get().size, configFile) != null) {
         val entryString = entry.get().takeWhile { it > 0 }.fold("") {acc, b -> acc + b.toChar()}.trim()
-        println("::readFromConfig::entry: $entryString")
+        logger.logDebug("::readFromConfig::entry: $entryString")
 
         val entryPair = entryString.split('=')
         if (entryPair[0] == key) {

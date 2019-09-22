@@ -3,6 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.Monitor
 import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.adjustWindowPositionAndSize
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.*
@@ -13,12 +14,13 @@ import xlib.*
  */
 fun handleRandrEvent(
     system: SystemApi,
+    logger: Logger,
     windowManagerState: WindowManagerState,
     image: CPointer<XImage>,
     rootWindow: Window,
     graphicsContexts: List<GC>
 ) {
-    println("::handleRandrEvent::handle randr")
+    logger.logDebug("::handleRandrEvent::handle randr")
 
     val resources = system.rGetScreenResources(rootWindow)!!
     val primary = system.rGetOutputPrimary(rootWindow)
@@ -38,7 +40,7 @@ fun handleRandrEvent(
             Triple(Monitor(outputId, outputName, outputId == primary), outputObject.pointed.crtc, outputObject)
         }
         .onEach { (monitor, c, _) ->
-            println("::printOutput::name: ${monitor.name}, id: ${monitor.id} crtc: $c")
+            logger.logInfo("::printOutput::name: ${monitor.name}, id: ${monitor.id} crtc: $c")
         }
         .map { (monitor, crtc, outputObject) ->
             nativeHeap.free(outputObject)

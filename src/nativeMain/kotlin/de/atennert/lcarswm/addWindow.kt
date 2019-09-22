@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -7,13 +8,13 @@ import xlib.*
 /**
  *
  */
-fun addWindow(system: SystemApi, windowManagerState: WindowManagerState, rootWindow: Window, windowId: Window, isSetup: Boolean) {
+fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManagerState, rootWindow: Window, windowId: Window, isSetup: Boolean) {
     val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
     system.getWindowAttributes(windowId, windowAttributes.ptr)
 
     if (windowAttributes.override_redirect != 0 || (isSetup &&
             windowAttributes.map_state != IsViewable)) {
-        println("::addWindow::skipping window $windowId")
+        logger.logInfo("::addWindow::skipping window $windowId")
         nativeHeap.free(windowAttributes)
         return
     }

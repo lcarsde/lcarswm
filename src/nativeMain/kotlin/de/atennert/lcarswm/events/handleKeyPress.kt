@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.WindowManagerState
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.moveNextWindowToTopOfStack
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.moveActiveWindow
@@ -9,6 +10,7 @@ import xlib.*
 
 fun handleKeyPress(
     system: SystemApi,
+    logger: Logger,
     windowManagerState: WindowManagerState,
     xEvent: XEvent,
     image: CPointer<XImage>,
@@ -17,7 +19,7 @@ fun handleKeyPress(
 ): Boolean {
     val pressEvent = xEvent.xkey
     val key = pressEvent.keycode
-    println("::handleKeyPress::Key pressed: $key")
+    logger.logDebug("::handleKeyPress::Key pressed: $key")
 
     when (windowManagerState.keyboardKeys[key]) {
         XK_Up -> moveActiveWindow(
@@ -36,8 +38,8 @@ fun handleKeyPress(
             graphicsContexts,
             windowManagerState::moveWindowToPreviousMonitor
         )
-        XK_Tab -> moveNextWindowToTopOfStack(system, windowManagerState)
-        else -> println("::handleKeyRelease::unknown key: $key")
+        XK_Tab -> moveNextWindowToTopOfStack(system, logger, windowManagerState)
+        else -> logger.logInfo("::handleKeyRelease::unknown key: $key")
     }
 
     return false
