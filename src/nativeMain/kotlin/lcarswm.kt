@@ -29,7 +29,7 @@ fun main() {
             return
         }
 
-        system.setErrorHandler(staticCFunction { _, err -> logger.logError("::main::error code: ${err?.pointed?.error_code}"); 0 })
+        system.setErrorHandler(staticCFunction { _, err -> println("::main::error code: ${err?.pointed?.error_code}"); 0 })
 
         logger.logInfo("::main::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
