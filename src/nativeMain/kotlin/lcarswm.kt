@@ -10,12 +10,16 @@ import xlib.*
 
 private var wmDetected = false
 
+// this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
+private var staticLogger: Logger? = null
+
 fun main() {
     println("::main::start lcarswm initialization")
 
     memScoped {
         val system = SystemFacade()
         val logger: Logger = FileLogger(system, LOG_FILE_PATH)
+        staticLogger = logger
         val screen = system.defaultScreenOfDisplay()?.pointed ?: error("::main::got no screen")
         val rootWindow = screen.root
 
@@ -29,7 +33,7 @@ fun main() {
             return
         }
 
-        system.setErrorHandler(staticCFunction { _, err -> println("::main::error code: ${err?.pointed?.error_code}"); 0 })
+        system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::main::error code: ${err?.pointed?.error_code}"); 0 })
 
         logger.logInfo("::main::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
@@ -73,6 +77,7 @@ fun main() {
 
         system.closeDisplay()
 
+        staticLogger = null
         logger.logInfo("::main::lcarswm stopped")
         logger.close()
     }
