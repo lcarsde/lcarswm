@@ -51,10 +51,14 @@ private fun handleKeyRelease(
         XK_F4 -> {
             val window = windowManagerState.activeWindow
             if (window != null) {
+                logger.logDebug("::handleKeyRelease::closing window ${window.id}")
                 closeWindow(window.id, system, windowManagerState)
             }
         }
-        XK_Q -> return true
+        XK_Q -> {
+            logger.logDebug("::handlerKeyRelease::closing WM")
+            return true
+        }
         else -> logger.logInfo("::handleKeyRelease::unknown key: $key")
     }
     return false
@@ -62,7 +66,7 @@ private fun handleKeyRelease(
 
 
 private fun loadAppFromKeyBinding(posixApi: PosixApi, logger: Logger, keyBinding: String) {
-    val programConfig = readFromConfig(posixApi, logger, KEY_CONFIG_FILE, keyBinding) ?: return
-    logger.logInfo("::loadAppFromKeyBinding::loading app for $keyBinding ${programConfig.size}")
+    val programConfig = readFromConfig(posixApi, KEY_CONFIG_FILE, keyBinding) ?: return
+    logger.logInfo("::loadAppFromKeyBinding::loading app for $keyBinding - ${programConfig[0]}")
     runProgram(posixApi, programConfig[0], programConfig)
 }
