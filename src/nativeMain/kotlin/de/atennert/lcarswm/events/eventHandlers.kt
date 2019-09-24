@@ -24,7 +24,8 @@ val EVENT_HANDLERS =
         Pair(UnmapNotify, ::handleUnmapNotify),
         Pair(ReparentNotify, { _, l, _, e, _, _, _ -> logReparentNotify(l, e) }),
         Pair(CreateNotify, { _, l, _, e, _, _, _ -> logCreateNotify(l, e) }),
-        Pair(ConfigureNotify, { _, l, _, e, _, _, _ -> logConfigureNotify(l, e) })
+        Pair(ConfigureNotify, { _, l, _, e, _, _, _ -> logConfigureNotify(l, e) }),
+        Pair(ClientMessage, {_, l, _, e, _, _, _ -> logClientMessage(l, e)})
     )
 
 private fun handleKeyRelease(

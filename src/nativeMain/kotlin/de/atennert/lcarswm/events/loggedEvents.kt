@@ -1,11 +1,12 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
+import kotlinx.cinterop.get
 import xlib.XEvent
 
 fun logCreateNotify(logger: Logger, xEvent: XEvent): Boolean {
     val createEvent = xEvent.xcreatewindow
-    logger.logDebug("::logCreateNotify::window ${createEvent.window}, o r: ${createEvent.override_redirect}")
+    logger.logDebug("::logCreateNotify::window ${createEvent.window}, o-r: ${createEvent.override_redirect}, parent: ${createEvent.parent}")
     return false
 }
 
@@ -42,5 +43,11 @@ fun logMapNotify(logger: Logger, xEvent: XEvent): Boolean {
 fun logReparentNotify(logger: Logger, xEvent: XEvent): Boolean {
     val reparentEvent = xEvent.xreparent
     logger.logDebug("::logReparentNotify::reparented window ${reparentEvent.window} to ${reparentEvent.parent}")
+    return false
+}
+
+fun logClientMessage(logger: Logger, xEvent: XEvent): Boolean {
+    val clientMessage = xEvent.xclient
+    logger.logDebug("::logClientMessage::type: ${clientMessage.message_type}, format: ${clientMessage.format}, data: ${clientMessage.data.l[0]}")
     return false
 }

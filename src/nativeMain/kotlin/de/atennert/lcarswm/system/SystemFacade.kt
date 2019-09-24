@@ -6,6 +6,7 @@ import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import platform.posix.FILE
 import platform.posix.__pid_t
+import platform.posix.timeval
 import xlib.*
 
 /**
@@ -175,6 +176,14 @@ class SystemFacade : SystemApi {
 
     override fun execvp(fileName: String, args: CValuesRef<CPointerVar<ByteVar>>): Int {
         return platform.posix.execvp(fileName, args)
+    }
+
+    override fun gettimeofday(): Long {
+        val timeStruct = nativeHeap.alloc<timeval>()
+        platform.posix.gettimeofday(timeStruct.ptr, null)
+        val time = timeStruct.tv_sec
+        nativeHeap.free(timeStruct)
+        return time
     }
 
     override fun selectInput(window: Window, mask: Long): Int {

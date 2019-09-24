@@ -29,6 +29,6 @@ class FileLogger(private val posixApi: PosixApi, logFilePath: String) : Logger {
     }
 
     private fun writeLog(prefix: String, text: String) {
-        posixApi.fputs("$prefix: $text\n", file)
+        posixApi.fputs("${posixApi.gettimeofday()} - $prefix: $text\n", file)
     }
 }

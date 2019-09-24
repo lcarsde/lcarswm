@@ -27,4 +27,6 @@ interface PosixApi {
     fun exit(status: Int)
 
     fun execvp(fileName: String, args: CValuesRef<CPointerVar<ByteVar>>): Int
+
+    fun gettimeofday(): Long
 }

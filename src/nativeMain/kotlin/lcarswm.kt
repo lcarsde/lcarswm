@@ -163,6 +163,7 @@ private fun eventLoop(
         if (EVENT_HANDLERS.containsKey(xEvent.type)) {
             val stop = EVENT_HANDLERS[xEvent.type]!!.invoke(system, logger, windowManagerState, xEvent, image, rootWindow, graphicsContexts)
             if (stop) {
+                logger.logInfo("::eventLoop::received stop ... exiting loop")
                 break
             }
         } else {

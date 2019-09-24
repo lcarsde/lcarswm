@@ -38,7 +38,7 @@ class FileLoggerTest {
         val fileLogger = FileLogger(this.posixApi, this.filePath)
 
         fileLogger.logDebug(text)
-        assertEquals("DEBUG: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
+        assertEquals("0 - DEBUG: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
         assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
     }
 
@@ -49,7 +49,7 @@ class FileLoggerTest {
         val fileLogger = FileLogger(this.posixApi, this.filePath)
 
         fileLogger.logInfo(text)
-        assertEquals(" INFO: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
+        assertEquals("0 -  INFO: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
         assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
     }
 
@@ -60,7 +60,7 @@ class FileLoggerTest {
         val fileLogger = FileLogger(this.posixApi, this.filePath)
 
         fileLogger.logWarning(text)
-        assertEquals(" WARN: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
+        assertEquals("0 -  WARN: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
         assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
     }
 
@@ -71,7 +71,7 @@ class FileLoggerTest {
         val fileLogger = FileLogger(this.posixApi, this.filePath)
 
         fileLogger.logError(text)
-        assertEquals("ERROR: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
+        assertEquals("0 - ERROR: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
         assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
     }
 

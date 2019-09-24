@@ -103,6 +103,8 @@ open class SystemFacadeMock : SystemApi {
 
     override fun execvp(fileName: String, args: CValuesRef<CPointerVar<ByteVar>>): Int = 0
 
+    override fun gettimeofday(): Long = 0
+
     override fun selectInput(window: Window, mask: Long): Int = 0
 
     override fun setInputFocus(window: Window, revertTo: Int, time: Time): Int = 0
