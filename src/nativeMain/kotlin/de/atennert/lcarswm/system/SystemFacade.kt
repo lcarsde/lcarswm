@@ -76,8 +76,8 @@ class SystemFacade : SystemApi {
         return XKillClient(display, window)
     }
 
-    override fun createSimpleWindow(rootWindow: Window, measurements: List<Int>): Window {
-        return XCreateSimpleWindow(display, rootWindow, measurements[0], measurements[1],
+    override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
+        return XCreateSimpleWindow(display, parentWindow, measurements[0], measurements[1],
             measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
     }
 

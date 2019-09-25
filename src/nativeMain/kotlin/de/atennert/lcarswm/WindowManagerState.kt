@@ -33,14 +33,12 @@ class WindowManagerState(
     var windows = mutableListOf<Pair<WindowContainer, Monitor>>()
         private set
 
-    /**
-     * @return the monitor to which the window was added
-     */
-    fun addWindow(window: WindowContainer): Monitor {
-        this.windows.add(Pair(window, monitors[0]))
-        this.activeWindowListener(this.activeWindow)
+    override val initialMonitor: Monitor
+        get() = this.monitors[0]
 
-        return monitors[0]
+    override fun addWindow(window: WindowContainer, monitor: Monitor) {
+        this.windows.add(Pair(window, monitor))
+        this.activeWindowListener(this.activeWindow)
     }
 
     override fun removeWindow(windowId: Window) {
@@ -112,7 +110,7 @@ class WindowManagerState(
         return newMonitor
     }
 
-    fun getScreenModeForMonitor(monitor: Monitor): ScreenMode = when {
+    override fun getScreenModeForMonitor(monitor: Monitor): ScreenMode = when {
         this.screenMode != ScreenMode.NORMAL -> this.screenMode
         monitor.isPrimary -> ScreenMode.NORMAL
         else -> ScreenMode.MAXIMIZED

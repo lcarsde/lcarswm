@@ -18,10 +18,10 @@ class WindowManagerStateTest {
 
         windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
-        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window1, monitor)
         assertEquals(windowManagerState.activeWindow, window1, "active window is not window1")
 
-        windowManagerState.addWindow(window2)
+        windowManagerState.addWindow(window2, monitor)
         assertEquals(windowManagerState.activeWindow, window2, "active window is not window2")
     }
 
@@ -43,11 +43,13 @@ class WindowManagerStateTest {
         // no window registered yet
         assertNull(windowManagerState.getWindowMonitor(1.toULong()))
 
-        // windows are added to the first monitor
-        val windowMonitor = windowManagerState.addWindow(WindowContainer(1.toULong()))
+        // get initial monitor to add windows to
+        val windowMonitor = windowManagerState.initialMonitor
         assertEquals(windowMonitor, monitor1)
 
-        // we can now get the monitor with getWindowMonitor
+        windowManagerState.addWindow(WindowContainer(1.toULong()), windowMonitor)
+
+        // the monitor can be requested by window id
         assertEquals(windowManagerState.getWindowMonitor(1.toULong()), monitor1)
 
         // let's update the monitors
@@ -73,7 +75,7 @@ class WindowManagerStateTest {
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2, monitor3)) { _, _ -> }
 
-        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window1, monitor1)
 
         // wrap around
         assertEquals(windowManagerState.moveWindowToPreviousMonitor(window1), monitor3, "Unable to move window to 3rd monitor")
@@ -92,7 +94,7 @@ class WindowManagerStateTest {
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2, monitor3)) { _, _ -> }
 
-        windowManagerState.addWindow(window1)
+        windowManagerState.addWindow(window1, monitor1)
 
         assertEquals(windowManagerState.moveWindowToNextMonitor(window1), monitor2, "Unable to move window to 2nd monitor")
         assertEquals(windowManagerState.moveWindowToNextMonitor(window1), monitor3, "Unable to move window to 3rd monitor")
@@ -110,8 +112,8 @@ class WindowManagerStateTest {
 
         windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
-        windowManagerState.addWindow(window1)
-        windowManagerState.addWindow(window2)
+        windowManagerState.addWindow(window1, monitor)
+        windowManagerState.addWindow(window2, monitor)
 
         assertEquals(windowManagerState.toggleActiveWindow(), window1, "Unable to activate first window")
         assertEquals(windowManagerState.toggleActiveWindow(), window2, "Unable to activate second window")
@@ -129,8 +131,8 @@ class WindowManagerStateTest {
 
         windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
 
-        windowManagerState.addWindow(window1)
-        windowManagerState.addWindow(window2)
+        windowManagerState.addWindow(window1, monitor)
+        windowManagerState.addWindow(window2, monitor)
 
         assertEquals(windowManagerState.toggleActiveWindow(), window1, "Unable to activate first window")
         assertEquals(windowManagerState.toggleActiveWindow(), window2, "Unable to activate second window")
@@ -149,8 +151,8 @@ class WindowManagerStateTest {
         val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2)) {_, _ ->}
-        windowManagerState.addWindow(window1)
-        windowManagerState.addWindow(window2)
+        windowManagerState.addWindow(window1, monitor1)
+        windowManagerState.addWindow(window2, monitor1)
         windowManagerState.moveWindowToNextMonitor(window2)
 
         assertEquals(windowManagerState.toggleActiveWindow(), window1) // monitor 1
@@ -176,8 +178,8 @@ class WindowManagerStateTest {
         val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2)) {_, _ ->}
-        windowManagerState.addWindow(window1)
-        windowManagerState.addWindow(window2)
+        windowManagerState.addWindow(window1, monitor1)
+        windowManagerState.addWindow(window2, monitor1)
         windowManagerState.moveWindowToNextMonitor(window2)
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2)) {_, _ ->}
@@ -196,8 +198,8 @@ class WindowManagerStateTest {
         val window2 = WindowContainer(2.toULong())
 
         windowManagerState.updateMonitors(listOf(monitor1, monitor2, monitor3)) {_, _ ->}
-        windowManagerState.addWindow(window1)
-        windowManagerState.addWindow(window2)
+        windowManagerState.addWindow(window1, monitor1)
+        windowManagerState.addWindow(window2, monitor1)
         windowManagerState.moveWindowToNextMonitor(window2)
         windowManagerState.moveWindowToNextMonitor(window2)
 
@@ -268,7 +270,7 @@ class WindowManagerStateTest {
         var activeWindow: WindowContainer? = null
         windowManagerState.setActiveWindowListener {activeWindow = it}
 
-        windowManagerState.addWindow(window)
+        windowManagerState.addWindow(window, monitor)
 
         assertEquals(activeWindow, window, "No update for active window received")
     }
@@ -285,8 +287,8 @@ class WindowManagerStateTest {
         var activeWindow: WindowContainer? = null
         windowManagerState.setActiveWindowListener {activeWindow = it}
 
-        windowManagerState.addWindow(window1)
-        windowManagerState.addWindow(window2)
+        windowManagerState.addWindow(window1, monitor)
+        windowManagerState.addWindow(window2, monitor)
 
         windowManagerState.removeWindow(window2.id)
 
@@ -305,8 +307,8 @@ class WindowManagerStateTest {
         var activeWindow: WindowContainer? = null
         windowManagerState.setActiveWindowListener {activeWindow = it}
 
-        windowManagerState.addWindow(window1)
-        windowManagerState.addWindow(window2)
+        windowManagerState.addWindow(window1, monitor)
+        windowManagerState.addWindow(window2, monitor)
 
         windowManagerState.toggleActiveWindow()
 

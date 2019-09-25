@@ -8,7 +8,7 @@ import xlib.*
 /**
  *
  */
-fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManagerState, rootWindow: Window, windowId: Window, isSetup: Boolean) {
+fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManagerStateHandler, rootWindow: Window, windowId: Window, isSetup: Boolean) {
     val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
     system.getWindowAttributes(windowId, windowAttributes.ptr)
 
@@ -20,7 +20,7 @@ fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManag
     }
 
     val window = WindowContainer(windowId)
-    val windowMonitor = windowManagerState.addWindow(window)
+    val windowMonitor = windowManagerState.initialMonitor
 
     val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))
 
@@ -37,6 +37,8 @@ fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManag
     system.mapWindow(window.frame)
 
     system.mapWindow(window.id)
+
+    windowManagerState.addWindow(window, windowMonitor)
 
     nativeHeap.free(windowAttributes)
 }

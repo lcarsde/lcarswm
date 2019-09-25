@@ -31,5 +31,5 @@ interface WindowUtilApi {
 
     fun killClient(window: Window): Int
 
-    fun createSimpleWindow(rootWindow: Window, measurements: List<Int>): Window
+    fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window
 }
