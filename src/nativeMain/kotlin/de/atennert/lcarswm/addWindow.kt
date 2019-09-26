@@ -15,6 +15,11 @@ fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManag
     if (windowAttributes.override_redirect != 0 || (isSetup &&
             windowAttributes.map_state != IsViewable)) {
         logger.logInfo("::addWindow::skipping window $windowId")
+
+        if (!isSetup) {
+            system.mapWindow(windowId)
+        }
+
         nativeHeap.free(windowAttributes)
         return
     }
