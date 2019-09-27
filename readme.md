@@ -1,5 +1,9 @@
 # lcarswm
-It's a window manager written in Kotlin. The goal is to finish it and if that happens to happen, it will look like an LCARS interface.
+It's a window manager written in Kotlin. The goal is to finish it and if that happens to happen, it will hopefully look somewhat like an LCARS interface.
+
+LCARSWM has two kinds of monitors, one primary monitor (which maps to the X primary monitor) and "other" monitors. Only the primary screen has the upper (currently empty) information area in normal mode. The other screens normal mode looks just like the maximized mode. If there's no primary screen defined in the X server, then LCARSWM will use the first monitor it finds as primary.
+
+LCARSWM displays one window at a time per screen although that might change in the future (maybe I'll make it tiling). Windows always open on the primary monitor and can be moved to other monitors with keyboard short cuts. At some point, I'd love to have that managable via touch though, because what would an LCARS interface be without touchscreen usability.
 
 ## Acknowledgements
 Thank you very much to the creators of the following resources:
@@ -26,7 +30,7 @@ correctly yet)
   * XF86AudioLowerVolume
 
 ## Pictures
-Yay, it's starting to get somewhat usable. So here are some pictures from the VirtualBox test environment.
+Yay, it's starting to get usable. So here are some pictures from the VirtualBox test environment.
 
 Normal mode
 ![lcarswm in normal mode](doc/screen-normal-mode.png)
