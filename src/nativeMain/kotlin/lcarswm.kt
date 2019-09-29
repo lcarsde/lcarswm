@@ -49,7 +49,7 @@ fun main() {
         setupLcarsWindow(system, screen, windowManagerConfig)
         windowManagerConfig.setActiveWindowListener { activeWindow ->
             if (activeWindow != null) {
-                system.setInputFocus(activeWindow.id, RevertToNone, CurrentTime.convert())
+                system.setInputFocus(activeWindow.id, RevertToParent, CurrentTime.convert())
             } else {
                 system.setInputFocus(rootWindow, RevertToPointerRoot, CurrentTime.convert())
             }

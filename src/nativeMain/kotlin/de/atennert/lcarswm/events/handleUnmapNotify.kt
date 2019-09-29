@@ -32,7 +32,6 @@ fun handleUnmapNotify(
         system.destroyWindow(window.frame)
 
         windowManagerState.removeWindow(unmapEvent.window)
-        moveNextWindowToTopOfStack(system, logger, windowManagerState)
     } else if (windowManagerState.activeWindow != null) {
         system.setInputFocus(windowManagerState.activeWindow!!.id, RevertToNone, CurrentTime.convert())
     }
