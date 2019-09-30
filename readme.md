@@ -93,13 +93,12 @@ What's not working so far is system testing. I'd like to have tooling, that crea
 To manually test the functionality, I've set up a virtual Linux machine in VirtualBox with a shared directory to the generated executables. In this virtual environment, I run the window manager like this:
 
 ```
-startx /path/to/executable/lcarswm.kexe > logfile 2>$1
-```
-
-That runs the X window manager with the lcarswm window manager and writes all standard and error log output into the file "logfile". The window manager seems to keep hanging in initialization. I think it's the output forwarding that causes the problems, but so far I didn't check what exactly is happening. Running the window manager once without the output forwarding seems to help:
-
-```
+export XDG_CONFIG_HOME="$HOME/.config"
 startx /path/to/executable/lcarswm.kexe
 ```
+
+That runs the X window manager with the lcarswm window manager. The .config folder in the home directory should contain an lcarswm folder with a key-config.properties file with the configuration for the key bindings (see the example file in `src/nativeMain/resources/homedir/.config/lcarswm`).
+
+LCARSWM creates a log file at the path `/var/log/lcarswm.log`.
 
 Probably one of the most interesting features in using a VM and RANDR is screen resizing. For me this works with using VBoxVGA as graphics controller and `VBoxClient-all` needs to be called after the activation of X to allow for resizing detection and all other things VBoxClient offers. Alternatively, VBoxClient can be called with specific flags.
