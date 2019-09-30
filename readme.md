@@ -48,7 +48,6 @@ Fullscreen mode
 ## Known issues
 * Video players crash displaylink driver when using lcarswm
 * The frame window is drawing over the background and not scaling with popups
-* IDEA popups cause loss of keyboard focus in main window when they close
 
 ## To do
 * Configuration for application key bindings
