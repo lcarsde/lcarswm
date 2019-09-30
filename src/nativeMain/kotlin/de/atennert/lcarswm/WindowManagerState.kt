@@ -46,6 +46,8 @@ class WindowManagerState(
         this.activeWindowListener(this.activeWindow)
     }
 
+    override fun hasWindow(windowId: Window) = this.windows.find { (w, _) -> w.id == windowId } != null
+
     fun getWindowMonitor(windowId: Window): Monitor? {
         return this.windows
             .find { (window, _) -> window.id == windowId }
@@ -115,8 +117,6 @@ class WindowManagerState(
         monitor.isPrimary -> ScreenMode.NORMAL
         else -> ScreenMode.MAXIMIZED
     }
-
-    fun hasWindow(windowId: Window) = this.windows.find { (w, _) -> w.id == windowId } != null
 
     fun setActiveWindowListener(activeWindowListener: (WindowContainer?) -> Unit) {
         this.activeWindowListener = activeWindowListener

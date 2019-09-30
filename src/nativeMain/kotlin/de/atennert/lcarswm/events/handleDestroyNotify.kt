@@ -14,6 +14,8 @@ fun handleDestroyNotify(
 ): Boolean {
     val destroyEvent = xEvent.xdestroywindow
     logger.logDebug("::handleDestroyNotify::destroy window: ${destroyEvent.window}")
-    windowManagerState.removeWindow(destroyEvent.window)
+    if (windowManagerState.hasWindow(destroyEvent.window)) {
+        windowManagerState.removeWindow(destroyEvent.window)
+    }
     return false
 }

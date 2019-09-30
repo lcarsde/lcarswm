@@ -9,5 +9,7 @@ interface WindowManagerStateHandler {
 
     fun removeWindow(windowId: Window)
 
+    fun hasWindow(windowId: Window): Boolean
+
     fun getScreenModeForMonitor(monitor: Monitor): ScreenMode
 }

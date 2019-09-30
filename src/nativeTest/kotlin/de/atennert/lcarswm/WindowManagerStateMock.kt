@@ -10,6 +10,8 @@ open class WindowManagerStateMock: WindowManagerStateHandler {
 
     override fun removeWindow(windowId: Window) {}
 
+    override fun hasWindow(windowId: Window): Boolean = false
+
     override fun getScreenModeForMonitor(monitor: Monitor): ScreenMode {
         return ScreenMode.NORMAL
     }

@@ -23,7 +23,7 @@ fun handleUnmapNotify(
 ): Boolean {
     val unmapEvent = xEvent.xunmap
     logger.logDebug("::handleUnmapNotify::unmapped window: ${unmapEvent.window}")
-    // only the active window can be closed, so make a new window active
+
     if (windowManagerState.hasWindow(unmapEvent.window) && unmapEvent.event != rootWindow) {
         val window = windowManagerState.windows.map { it.first }.single { it.id == unmapEvent.window }
         system.unmapWindow(window.frame)
@@ -32,8 +32,6 @@ fun handleUnmapNotify(
         system.destroyWindow(window.frame)
 
         windowManagerState.removeWindow(unmapEvent.window)
-    } else if (windowManagerState.activeWindow != null) {
-        system.setInputFocus(windowManagerState.activeWindow!!.id, RevertToNone, CurrentTime.convert())
     }
 
     redrawRootWindow(windowManagerState, graphicsContexts, rootWindow, system, image)
