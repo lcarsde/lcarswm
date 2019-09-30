@@ -46,8 +46,9 @@ Fullscreen mode
 * header files and libraries for XLib, randr and xpm. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
 
 ## Known issues
+* Video players crash displaylink driver when using lcarswm
 * The frame window is drawing over the background and not scaling with popups
-* VLC crashes displaylink driver when using lcarswm (possibly only with video)
+* IDEA popups cause loss of keyboard focus in main window when they close
 
 ## To do
 * Configuration for application key bindings
