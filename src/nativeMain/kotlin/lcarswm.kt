@@ -25,7 +25,8 @@ fun main() {
 
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
-        system.selectInput(rootWindow, SubstructureRedirectMask or SubstructureNotifyMask)
+        system.selectInput(rootWindow, SubstructureRedirectMask or SubstructureNotifyMask or PropertyChangeMask or
+                EnterWindowMask or LeaveWindowMask or FocusChangeMask or ButtonPressMask or ButtonReleaseMask)
         system.sync(false)
 
         if (wmDetected) {

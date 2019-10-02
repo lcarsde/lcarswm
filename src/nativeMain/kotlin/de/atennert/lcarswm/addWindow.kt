@@ -31,7 +31,8 @@ fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManag
 
     window.frame = system.createSimpleWindow(rootWindow, measurements)
 
-    system.selectInput(window.frame, SubstructureRedirectMask or SubstructureNotifyMask)
+    system.selectInput(window.frame, SubstructureRedirectMask or FocusChangeMask or EnterWindowMask or
+            LeaveWindowMask or ButtonPressMask or ButtonReleaseMask)
 
     system.addToSaveSet(windowId)
 
