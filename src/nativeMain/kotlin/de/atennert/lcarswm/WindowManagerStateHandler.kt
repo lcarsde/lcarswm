@@ -3,6 +3,8 @@ package de.atennert.lcarswm
 import xlib.Window
 
 interface WindowManagerStateHandler {
+    val wmState: ULong
+
     val initialMonitor: Monitor
 
     fun addWindow(window: WindowContainer, monitor: Monitor)

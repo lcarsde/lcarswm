@@ -29,6 +29,8 @@ interface WindowUtilApi {
 
     fun internAtom(name: String, onlyIfExists: Boolean): Atom
 
+    fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?): Int
+
     fun killClient(window: Window): Int
 
     fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window

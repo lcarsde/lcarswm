@@ -12,6 +12,8 @@ class WindowManagerState(
 
     val wmProtocols = atomProvider("WM_PROTOCOLS")
 
+    override val wmState = atomProvider("WM_STATE")
+
     var screenMode = ScreenMode.NORMAL
         private set
 

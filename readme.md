@@ -60,12 +60,10 @@ Fullscreen mode
 ** WM_CLASS ?
 ** WM_TRANSIENT_FOR
 ** WM_PROTOCOLS
-*** WM_DELETE_WINDOW ✓
 *** WM_TAKE_FOCUS
 *** ...
 ** WM_COLORMAP_WINDOWS
 * Window manager properties (stuff to set)
-** WM_STATE
 ** WM_ICON_SIZE ?
 * State transitions
 ** Thinks about handling iconic states (ClientMessage)

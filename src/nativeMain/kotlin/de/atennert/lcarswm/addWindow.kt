@@ -44,6 +44,10 @@ fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManag
 
     system.mapWindow(window.id)
 
+    val wmStateDataList = listOf(NormalState, None.convert())
+    val wmStateData = UByteArray(2) { wmStateDataList[it].convert()}
+    system.changeProperty(window.id, windowManagerState.wmState, windowManagerState.wmState, wmStateData)
+
     windowManagerState.addWindow(window, windowMonitor)
 
     nativeHeap.free(windowAttributes)
