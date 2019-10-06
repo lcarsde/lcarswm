@@ -14,13 +14,18 @@ private var wmDetected = false
 private var staticLogger: Logger? = null
 
 fun main() {
-    println("::main::start lcarswm initialization")
+    val system = SystemFacade()
+    val logger: Logger = FileLogger(system, LOG_FILE_PATH)
+
+    runWindowManager(system, logger)
+}
+
+fun runWindowManager(system: SystemApi, logger: Logger) {
+    logger.logInfo("::runWindowManager::start lcarswm initialization")
 
     memScoped {
-        val system = SystemFacade()
-        val logger: Logger = FileLogger(system, LOG_FILE_PATH)
         staticLogger = logger
-        val screen = system.defaultScreenOfDisplay()?.pointed ?: error("::main::got no screen")
+        val screen = system.defaultScreenOfDisplay()?.pointed ?: error("::runWindowManager::got no screen")
         val rootWindow = screen.root
 
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
@@ -30,22 +35,22 @@ fun main() {
         system.sync(false)
 
         if (wmDetected) {
-            logger.logError("::main::Detected another active window manager")
+            logger.logError("::runWindowManager::Detected another active window manager")
             return
         }
 
-        system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::main::error code: ${err?.pointed?.error_code}"); 0 })
+        system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
-        logger.logDebug("::main::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
+        logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
         val colorMap = allocateColorMap(system, screen.root_visual, rootWindow)
         val graphicsContexts = getGraphicContexts(system, rootWindow, colorMap.second)
 
-        logger.logDebug("::main::graphics loaded")
+        logger.logDebug("::runWindowManager::graphics loaded")
 
         val windowManagerConfig = WindowManagerState { system.internAtom(it, false) }
 
-        logger.logDebug("::main::wm state initialized")
+        logger.logDebug("::runWindowManager::wm state initialized")
 
         setupLcarsWindow(system, screen, windowManagerConfig)
         windowManagerConfig.setActiveWindowListener { activeWindow ->
@@ -56,21 +61,21 @@ fun main() {
             }
         }
 
-        logger.logDebug("::main::wm window initialized: $rootWindow")
+        logger.logDebug("::runWindowManager::wm window initialized: $rootWindow")
 
         val logoImage = allocArrayOfPointersTo(alloc<XImage>())
 
         system.readXpmFileToImage("/usr/share/pixmaps/lcarswm.xpm", logoImage)
 
-        logger.logDebug("::main::logo loaded")
+        logger.logDebug("::runWindowManager::logo loaded")
 
         val randrBase = setupRandr(system, logger, windowManagerConfig, logoImage[0]!!, rootWindow, graphicsContexts)
 
-        logger.logDebug("::main::set up randr")
+        logger.logDebug("::runWindowManager::set up randr")
 
         setupScreen(system, logger, rootWindow, windowManagerConfig)
 
-        logger.logDebug("::main::loaded window tree")
+        logger.logDebug("::runWindowManager::loaded window tree")
 
         eventLoop(system, logger, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, graphicsContexts)
 
@@ -79,7 +84,7 @@ fun main() {
         system.closeDisplay()
 
         staticLogger = null
-        logger.logInfo("::main::lcarswm stopped")
+        logger.logInfo("::runWindowManager::lcarswm stopped")
         logger.close()
     }
 }
