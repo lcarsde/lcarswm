@@ -241,10 +241,7 @@ class SystemFacade : SystemApi {
         return XKeysymToKeycode(display, keySym)
     }
 
-    override fun rQueryExtension(
-        eventBase: CValuesRef<IntVar>,
-        errorBase: CValuesRef<IntVar>
-    ): Int {
+    override fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int {
         return XRRQueryExtension(display, eventBase, errorBase)
     }
 
@@ -305,7 +302,7 @@ class SystemFacade : SystemApi {
 
     override fun putImage(
         drawable: Drawable,
-        graphicsContext: GC?,
+        graphicsContext: GC,
         image: CValuesRef<XImage>,
         x: Int,
         y: Int,
@@ -323,13 +320,13 @@ class SystemFacade : SystemApi {
         return XCreateGC(display, drawable, mask, gcValues)
     }
 
-    override fun freeGC(graphicsContext: GC?): Int {
+    override fun freeGC(graphicsContext: GC): Int {
         return XFreeGC(display, graphicsContext)
     }
 
     override fun createColormap(
         window: Window,
-        visual: CValuesRef<Visual>?,
+        visual: CValuesRef<Visual>,
         alloc: Int
     ): Colormap {
         return XCreateColormap(display, window, visual, alloc)

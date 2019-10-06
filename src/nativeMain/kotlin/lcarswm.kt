@@ -47,7 +47,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
-        val colorMap = allocateColorMap(system, screen.root_visual, rootWindow)
+        val colorMap = allocateColorMap(system, screen.root_visual!!, rootWindow)
         val graphicsContexts = getGraphicContexts(system, rootWindow, colorMap.second)
 
         logger.logDebug("::runWindowManager::graphics loaded")

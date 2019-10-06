@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.system.api
 
 import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.CValuesRef
 import kotlinx.cinterop.IntVar
 import xlib.*
 
@@ -9,7 +8,7 @@ import xlib.*
  *
  */
 interface RandrApi {
-    fun rQueryExtension(eventBase: CValuesRef<IntVar>, errorBase: CValuesRef<IntVar>): Int
+    fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int
 
     fun rSelectInput(window: Window, mask: Int)
 

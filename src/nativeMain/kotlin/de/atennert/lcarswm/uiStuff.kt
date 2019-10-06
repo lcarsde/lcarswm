@@ -24,7 +24,7 @@ val DRAW_FUNCTIONS = hashMapOf<ScreenMode, Function5<List<GC>, Window, DrawApi, 
 
 fun allocateColorMap(
     drawApi: DrawApi,
-    visual: CPointer<Visual>?,
+    visual: CPointer<Visual>,
     windowId: Window
 ): Pair<Colormap, List<ULong>> {
     val colorMapId = drawApi.createColormap(windowId, visual, AllocNone)
@@ -80,7 +80,7 @@ private fun drawMaximizedFrame(
 
     val gcPurple2 = graphicsContexts[6]
     val gcOrchid = graphicsContexts[2]
-    val gcCopyImage = drawApi.createGC(rootWindow, 0.convert(), null)
+    val gcCopyImage = drawApi.createGC(rootWindow, 0.convert(), null)!!
 
     // TODO create bar ends as pixmaps
     val arcs = nativeHeap.allocArray<XArc>(4)
@@ -164,7 +164,7 @@ private fun drawNormalFrame(
     val gcOrchid = graphicsContexts[2]
     val gcPurple1 = graphicsContexts[3]
     val gcBrick = graphicsContexts[4]
-    val gcCopyImage = drawApi.createGC(rootWindow, 0.convert(), null)
+    val gcCopyImage = drawApi.createGC(rootWindow, 0.convert(), null)!!
 
     // TODO create bar ends as pixmaps
     val arcs = nativeHeap.allocArray<XArc>(3)

@@ -1,6 +1,5 @@
 package de.atennert.lcarswm
 
-import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.pin

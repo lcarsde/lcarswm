@@ -138,7 +138,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun keysymToKeycode(keySym: KeySym): KeyCode = 0.convert()
 
-    override fun rQueryExtension(eventBase: CValuesRef<IntVar>, errorBase: CValuesRef<IntVar>): Int = 0
+    override fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int = 0
 
     override fun rSelectInput(window: Window, mask: Int) {}
 
@@ -181,7 +181,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun putImage(
         drawable: Drawable,
-        graphicsContext: GC?,
+        graphicsContext: GC,
         image: CValuesRef<XImage>,
         x: Int,
         y: Int,
@@ -195,11 +195,11 @@ open class SystemFacadeMock : SystemApi {
         gcValues: CValuesRef<XGCValues>?
     ): GC? = null
 
-    override fun freeGC(graphicsContext: GC?): Int = 0
+    override fun freeGC(graphicsContext: GC): Int = 0
 
     override fun createColormap(
         window: Window,
-        visual: CValuesRef<Visual>?,
+        visual: CValuesRef<Visual>,
         alloc: Int
     ): Colormap = 0.convert()
 

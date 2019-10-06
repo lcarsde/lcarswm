@@ -15,14 +15,14 @@ interface DrawApi {
 
     fun fillRectangles(drawable: Drawable, graphicsContext: GC, rects: CValuesRef<XRectangle>, rectCount: Int): Int
 
-    fun putImage(drawable: Drawable, graphicsContext: GC?, image: CValuesRef<XImage>,
+    fun putImage(drawable: Drawable, graphicsContext: GC, image: CValuesRef<XImage>,
                   x: Int, y: Int, width: UInt, height: UInt): Int
 
     fun createGC(drawable: Drawable, mask: ULong, gcValues: CValuesRef<XGCValues>?): GC?
 
-    fun freeGC(graphicsContext: GC?): Int
+    fun freeGC(graphicsContext: GC): Int
 
-    fun createColormap(window: Window, visual: CValuesRef<Visual>?, alloc: Int): Colormap
+    fun createColormap(window: Window, visual: CValuesRef<Visual>, alloc: Int): Colormap
 
     fun allocColor(colorMap: Colormap, color: CValuesRef<XColor>): Int
 
