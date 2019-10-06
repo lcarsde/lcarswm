@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.log.LoggerMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.free
 import kotlinx.cinterop.nativeHeap
@@ -13,7 +14,7 @@ class EventManagerTest {
     @Test
     fun `handle event`() {
         val eventHandler = TestEventHandler()
-        val eventManager = EventManager.Builder()
+        val eventManager = EventManager.Builder(LoggerMock())
             .addEventHandler(eventHandler)
             .build()
 
@@ -30,7 +31,7 @@ class EventManagerTest {
     @Test
     fun `don't handle event`() {
         val eventHandler = TestEventHandler()
-        val eventManager = EventManager.Builder()
+        val eventManager = EventManager.Builder(LoggerMock())
             .addEventHandler(eventHandler)
             .build()
 
