@@ -13,7 +13,12 @@ import xlib.*
  * This is the facade for accessing system functions.
  */
 class SystemFacade : SystemApi {
-    private val display: CPointer<Display> = XOpenDisplay(null) ?: error("SystemFacade::::got no display")
+    private var display: CPointer<Display>? = null
+
+    override fun openDisplay(): Boolean {
+        this.display = XOpenDisplay(null)
+        return this.display != null
+    }
 
     override fun closeDisplay(): Int {
         return XCloseDisplay(display)

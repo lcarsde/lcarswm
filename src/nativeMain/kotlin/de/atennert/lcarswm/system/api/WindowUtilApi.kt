@@ -7,6 +7,9 @@ import xlib.*
  *
  */
 interface WindowUtilApi {
+    /** @return true on success, false otherwise */
+    fun openDisplay(): Boolean
+
     fun closeDisplay(): Int
 
     fun defaultScreenOfDisplay(): CPointer<Screen>?

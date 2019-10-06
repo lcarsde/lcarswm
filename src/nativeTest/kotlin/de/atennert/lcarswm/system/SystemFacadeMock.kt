@@ -7,6 +7,8 @@ import platform.posix.__pid_t
 import xlib.*
 
 open class SystemFacadeMock : SystemApi {
+    override fun openDisplay(): Boolean = true
+
     override fun closeDisplay(): Int = 0
 
     override fun defaultScreenOfDisplay(): CPointer<Screen>? = null

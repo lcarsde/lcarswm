@@ -15,7 +15,7 @@ private var staticLogger: Logger? = null
 
 fun main() {
     val system = SystemFacade()
-    val logger: Logger = FileLogger(system, LOG_FILE_PATH)
+    val logger = FileLogger(system, LOG_FILE_PATH)
 
     runWindowManager(system, logger)
 }
@@ -25,6 +25,10 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
     memScoped {
         staticLogger = logger
+        if (!system.openDisplay()) {
+            logger.logError("::runWindowManager::got no display")
+            return
+        }
         val screen = system.defaultScreenOfDisplay()?.pointed ?: error("::runWindowManager::got no screen")
         val rootWindow = screen.root
 
