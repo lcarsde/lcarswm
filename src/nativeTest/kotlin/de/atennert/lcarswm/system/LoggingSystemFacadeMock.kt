@@ -335,7 +335,6 @@ class LoggingSystemFacadeMock : SystemApi {
 
     override fun fputs(s: String, file: CPointer<FILE>): Int {
         // Only used for logging, which we usually don't want to check
-        //functionCalls.add(FunctionCall("fputs", file))
         return 0
     }
 
