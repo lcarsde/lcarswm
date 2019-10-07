@@ -2,6 +2,7 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.moveActiveWindowToTopOfStack
 import de.atennert.lcarswm.moveNextWindowToTopOfStack
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.redrawRootWindow
@@ -24,7 +25,7 @@ fun handleUnmapNotify(
     val unmapEvent = xEvent.xunmap
     logger.logDebug("::handleUnmapNotify::unmapped window: ${unmapEvent.window}")
 
-    if (windowManagerState.hasWindow(unmapEvent.window) && unmapEvent.event != rootWindow) {
+    if (windowManagerState.hasWindow(unmapEvent.window)) {
         val window = windowManagerState.windows.map { it.first }.single { it.id == unmapEvent.window }
         system.unmapWindow(window.frame)
         system.reparentWindow(unmapEvent.window, rootWindow, 0, 0)
