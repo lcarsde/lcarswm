@@ -2,13 +2,13 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.log.Logger
-import de.atennert.lcarswm.moveActiveWindowToTopOfStack
-import de.atennert.lcarswm.moveNextWindowToTopOfStack
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.convert
-import xlib.*
+import xlib.GC
+import xlib.Window
+import xlib.XEvent
+import xlib.XImage
 
 /**
  * Remove the window from the wm data on window unmap.
