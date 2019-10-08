@@ -45,6 +45,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         if (wmDetected) {
             logger.logError("::runWindowManager::Detected another active window manager")
+            system.closeDisplay()
             return
         }
 
