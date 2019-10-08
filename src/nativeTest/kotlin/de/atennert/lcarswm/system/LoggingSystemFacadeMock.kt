@@ -236,7 +236,10 @@ open class LoggingSystemFacadeMock : SystemApi {
 
     override fun closeDisplay(): Int {
         functionCalls.add(FunctionCall("closeDisplay"))
-        nativeHeap.free(this.display!!)
+        val currentDisplay = this.display
+        if (currentDisplay != null) {
+            nativeHeap.free(currentDisplay)
+        }
         this.display = null
         return 0
     }

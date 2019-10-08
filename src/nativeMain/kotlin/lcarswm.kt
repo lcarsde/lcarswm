@@ -29,7 +29,12 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             logger.logError("::runWindowManager::got no display")
             return
         }
-        val screen = system.defaultScreenOfDisplay()?.pointed ?: error("::runWindowManager::got no screen")
+        val screen = system.defaultScreenOfDisplay()?.pointed
+        if (screen == null) {
+            logger.logError("::runWindowManager::got no screen")
+            system.closeDisplay()
+            return
+        }
         val rootWindow = screen.root
 
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
