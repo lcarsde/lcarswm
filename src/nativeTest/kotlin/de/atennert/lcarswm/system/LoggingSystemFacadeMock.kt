@@ -6,7 +6,7 @@ import platform.posix.FILE
 import platform.posix.__pid_t
 import xlib.*
 
-class LoggingSystemFacadeMock : SystemApi {
+open class LoggingSystemFacadeMock : SystemApi {
     val functionCalls = mutableListOf<FunctionCall>()
 
     override fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int {
