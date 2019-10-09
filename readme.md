@@ -82,6 +82,7 @@ Fullscreen mode
 TODO
 
 ### Other
+* System tests
 * Configuration for application key bindings
 * Activate windows my clicking on them
 * Application selector

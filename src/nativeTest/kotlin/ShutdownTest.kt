@@ -2,9 +2,13 @@ import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.LoggingSystemFacadeMock
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.convert
 import kotlinx.cinterop.invoke
+import kotlinx.cinterop.pointed
+import xlib.KeyRelease
 import xlib.Screen
 import xlib.XErrorHandler
+import xlib.XEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -66,6 +70,20 @@ class ShutdownTest {
         assertEquals("closeDisplay", testFacade.functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
 
         assertTrue(testFacade.functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+    }
+
+    @Test
+    fun `shutdown after sending shutdown key combo`() {
+        val testFacade = object : LoggingSystemFacadeMock() {
+            override fun nextEvent(event: CPointer<XEvent>): Int {
+                super.nextEvent(event)
+                event.pointed.type = KeyRelease
+                event.pointed.xkey.keycode = 0.convert()
+                return 0
+            }
+        }
+
+        runWindowManager(testFacade, LoggerMock())
     }
 
     // TODO test when shutdown key-combo was pressed
