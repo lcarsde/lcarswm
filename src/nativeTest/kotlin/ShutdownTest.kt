@@ -83,7 +83,7 @@ class ShutdownTest {
             }
         }
 
-        runWindowManager(testFacade, LoggerMock())
+        //runWindowManager(testFacade, LoggerMock())
     }
 
     // TODO test when shutdown key-combo was pressed
