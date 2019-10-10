@@ -1,14 +1,8 @@
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.LoggingSystemFacadeMock
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.invoke
-import kotlinx.cinterop.pointed
-import xlib.KeyRelease
-import xlib.Screen
-import xlib.XErrorHandler
-import xlib.XEvent
+import kotlinx.cinterop.*
+import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -75,18 +69,55 @@ class ShutdownTest {
     @Test
     fun `shutdown after sending shutdown key combo`() {
         val testFacade = object : LoggingSystemFacadeMock() {
+            val modifiers = byteArrayOf(0, 1, 2, 4, 8, 16, 32, 64)
+
+            val winModifierPosition = 6
+
+            val KEY_SYMS = mapOf(
+                Pair(XK_Tab, 0),
+                Pair(XK_Up, 1),
+                Pair(XK_Down, 2),
+                Pair(XK_M, 3),
+                Pair(XK_Q, 4),
+                Pair(XK_F4, 5),
+                Pair(XK_T, 6),
+                Pair(XK_B, 7),
+                Pair(XK_I, 8),
+                Pair(XF86XK_AudioMute, 9),
+                Pair(XF86XK_AudioLowerVolume, 10),
+                Pair(XF86XK_AudioRaiseVolume, 11)
+            )
+
             override fun nextEvent(event: CPointer<XEvent>): Int {
                 super.nextEvent(event)
                 event.pointed.type = KeyRelease
-                event.pointed.xkey.keycode = 0.convert()
+                event.pointed.xkey.keycode = KEY_SYMS.getValue(XK_Q).convert()
+                event.pointed.xkey.state = modifiers[winModifierPosition].toUInt()
                 return 0
+            }
+
+            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+                val keymap = nativeHeap.alloc<XModifierKeymap>()
+                keymap.max_keypermod = 1
+                keymap.modifiermap = modifiers.toUByteArray().pin().addressOf(0)
+                return keymap.ptr
+            }
+
+            override fun keysymToKeycode(keySym: KeySym): KeyCode {
+                return KEY_SYMS[keySym.toInt()]?.convert() ?: error("keySym not found")
             }
         }
 
-        //runWindowManager(testFacade, LoggerMock())
-    }
+        runWindowManager(testFacade, LoggerMock())
 
-    // TODO test when shutdown key-combo was pressed
+        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "nextEvent" }.drop(1).toMutableList()
+
+        assertEquals("freeColors", functionCalls.removeAt(0).name, "the acquired colors need to be freed on shutdown")
+        assertEquals("freeColormap", functionCalls.removeAt(0).name, "the acquired color map needs to be freed on shutdown")
+        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
+
+        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+    }
 
     // TODO check for logger open and close
 }
