@@ -86,6 +86,7 @@ open class LoggingSystemFacadeMock : SystemApi {
 
     override fun createGC(drawable: Drawable, mask: ULong, gcValues: CValuesRef<XGCValues>?): GC? {
         functionCalls.add(FunctionCall("createGC", drawable, mask, gcValues))
+        // the following is really evil, but we need a pointer for testing and can't directly create a GC
         return nativeHeap.alloc<GCVar>().ptr.reinterpret()
     }
 
