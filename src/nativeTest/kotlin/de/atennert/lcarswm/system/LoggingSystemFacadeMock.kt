@@ -5,7 +5,6 @@ import kotlinx.cinterop.*
 import platform.posix.FILE
 import platform.posix.__pid_t
 import xlib.*
-import kotlin.test.assertNotNull
 
 open class LoggingSystemFacadeMock : SystemApi {
     val functionCalls = mutableListOf<FunctionCall>()
