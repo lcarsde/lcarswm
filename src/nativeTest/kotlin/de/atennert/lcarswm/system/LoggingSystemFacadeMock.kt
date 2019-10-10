@@ -5,6 +5,7 @@ import kotlinx.cinterop.*
 import platform.posix.FILE
 import platform.posix.__pid_t
 import xlib.*
+import kotlin.test.assertNotNull
 
 open class LoggingSystemFacadeMock : SystemApi {
     val functionCalls = mutableListOf<FunctionCall>()
@@ -85,7 +86,7 @@ open class LoggingSystemFacadeMock : SystemApi {
 
     override fun createGC(drawable: Drawable, mask: ULong, gcValues: CValuesRef<XGCValues>?): GC? {
         functionCalls.add(FunctionCall("createGC", drawable, mask, gcValues))
-        return nativeHeap.alloc<GCVar>().value
+        return nativeHeap.alloc<GCVar>().ptr.reinterpret()
     }
 
     override fun freeGC(graphicsContext: GC): Int {
@@ -99,8 +100,9 @@ open class LoggingSystemFacadeMock : SystemApi {
         return 0.convert()
     }
 
-    override fun allocColor(colorMap: Colormap, color: CValuesRef<XColor>): Int {
+    override fun allocColor(colorMap: Colormap, color: CPointer<XColor>): Int {
         functionCalls.add(FunctionCall("allocColor", colorMap, color))
+        color.pointed.pixel = 0.convert()
         return 0
     }
 
@@ -114,7 +116,7 @@ open class LoggingSystemFacadeMock : SystemApi {
         return 0
     }
 
-    override fun readXpmFileToImage(imagePath: String, imageBuffer: CValuesRef<CPointerVar<XImage>>): Int {
+    override fun readXpmFileToImage(imagePath: String, imageBuffer: CPointer<CPointerVar<XImage>>): Int {
         functionCalls.add(FunctionCall("readXpmFileToImage", imagePath, imageBuffer))
         return 0
     }
@@ -247,6 +249,8 @@ open class LoggingSystemFacadeMock : SystemApi {
     override fun defaultScreenOfDisplay(): CPointer<Screen>? {
         functionCalls.add(FunctionCall("defaultScreenOfDisplay"))
         val screen = nativeHeap.alloc<Screen>()
+        screen.root = 0.convert()
+        screen.root_visual = nativeHeap.alloc<Visual>().ptr
         return screen.ptr
     }
 
@@ -297,7 +301,7 @@ open class LoggingSystemFacadeMock : SystemApi {
 
     override fun setErrorHandler(handler: XErrorHandler): XErrorHandler? {
         functionCalls.add(FunctionCall("setErrorHandler", handler))
-        return null
+        return handler
     }
 
     override fun internAtom(name: String, onlyIfExists: Boolean): Atom {

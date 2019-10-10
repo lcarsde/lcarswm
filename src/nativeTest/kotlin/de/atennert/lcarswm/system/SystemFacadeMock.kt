@@ -203,7 +203,7 @@ open class SystemFacadeMock : SystemApi {
         alloc: Int
     ): Colormap = 0.convert()
 
-    override fun allocColor(colorMap: Colormap, color: CValuesRef<XColor>): Int = 0
+    override fun allocColor(colorMap: Colormap, color: CPointer<XColor>): Int = 0
 
     override fun freeColors(
         colorMap: Colormap,
@@ -215,6 +215,6 @@ open class SystemFacadeMock : SystemApi {
 
     override fun readXpmFileToImage(
         imagePath: String,
-        imageBuffer: CValuesRef<CPointerVar<XImage>>
+        imageBuffer: CPointer<CPointerVar<XImage>>
     ): Int = 0
 }

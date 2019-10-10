@@ -332,7 +332,7 @@ class SystemFacade : SystemApi {
         return XCreateColormap(display, window, visual, alloc)
     }
 
-    override fun allocColor(colorMap: Colormap, color: CValuesRef<XColor>): Int {
+    override fun allocColor(colorMap: Colormap, color: CPointer<XColor>): Int {
         return XAllocColor(display, colorMap, color)
     }
 
@@ -350,7 +350,7 @@ class SystemFacade : SystemApi {
 
     override fun readXpmFileToImage(
         imagePath: String,
-        imageBuffer: CValuesRef<CPointerVar<XImage>>
+        imageBuffer: CPointer<CPointerVar<XImage>>
     ): Int {
         return XpmReadFileToImage(display, imagePath, imageBuffer, null, null)
     }
