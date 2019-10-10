@@ -112,11 +112,11 @@ fun setupScreen(system: SystemApi, logger: Logger, rootWindow: Window, windowMan
         topLevelWindows.ptr,
         topLevelWindowCount.toCValues())
 
-//    ULongArray(topLevelWindowCount[0].toInt()) {topLevelWindows.value!![it]}
-//        .filter { childId -> childId != rootWindow }
-//        .forEach { childId ->
-//            addWindow(system, logger, windowManagerConfig, rootWindow, childId, true)
-//        }
+    ULongArray(topLevelWindowCount[0].toInt()) {topLevelWindows.value!![it]}
+        .filter { childId -> childId != rootWindow }
+        .forEach { childId ->
+            addWindow(system, logger, windowManagerConfig, rootWindow, childId, true)
+        }
 
     nativeHeap.free(topLevelWindows)
     system.ungrabServer()
@@ -141,7 +141,7 @@ private fun setupRandr(
         return NO_RANDR_BASE
     }
 
-//    handleRandrEvent(system, logger, windowManagerState, image, rootWindow, graphicsContexts)
+    handleRandrEvent(system, logger, windowManagerState, image, rootWindow, graphicsContexts)
 
     system.rSelectInput(rootWindow,
         (RRScreenChangeNotifyMask or
