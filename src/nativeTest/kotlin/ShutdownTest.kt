@@ -92,7 +92,7 @@ class ShutdownTest {
                 super.nextEvent(event)
                 event.pointed.type = KeyRelease
                 event.pointed.xkey.keycode = KEY_SYMS.getValue(XK_Q).convert()
-                event.pointed.xkey.state = modifiers[winModifierPosition].toUInt()
+                event.pointed.xkey.state = modifiers[winModifierPosition].convert()
                 return 0
             }
 
@@ -104,7 +104,7 @@ class ShutdownTest {
             }
 
             override fun keysymToKeycode(keySym: KeySym): KeyCode {
-                return KEY_SYMS[keySym.toInt()]?.convert() ?: error("keySym not found")
+                return KEY_SYMS[keySym.convert()]?.convert() ?: error("keySym not found")
             }
         }
 
