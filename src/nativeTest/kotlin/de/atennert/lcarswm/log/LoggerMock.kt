@@ -4,6 +4,8 @@ package de.atennert.lcarswm.log
  *
  */
 class LoggerMock : Logger {
+    var closed = false
+
     override fun logDebug(text: String) {}
 
     override fun logInfo(text: String) {}
@@ -12,5 +14,7 @@ class LoggerMock : Logger {
 
     override fun logError(text: String) {}
 
-    override fun close() {}
+    override fun close() {
+        this.closed = true
+    }
 }
