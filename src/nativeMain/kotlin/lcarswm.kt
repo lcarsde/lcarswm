@@ -24,15 +24,16 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
     logger.logInfo("::runWindowManager::start lcarswm initialization")
 
     memScoped {
-        staticLogger = logger
         wmDetected = false
         if (!system.openDisplay()) {
             logger.logError("::runWindowManager::got no display")
+            logger.close()
             return
         }
         val screen = system.defaultScreenOfDisplay()?.pointed
         if (screen == null) {
             logger.logError("::runWindowManager::got no screen")
+            logger.close()
             system.closeDisplay()
             return
         }
@@ -46,10 +47,12 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         if (wmDetected) {
             logger.logError("::runWindowManager::Detected another active window manager")
+            logger.close()
             system.closeDisplay()
             return
         }
 
+        staticLogger = logger
         system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
         logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")

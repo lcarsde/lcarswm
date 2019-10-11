@@ -10,28 +10,32 @@ import kotlin.test.assertTrue
 class ShutdownTest {
     @Test
     fun `shutdown when there's no display to get`() {
+        val logger = LoggerMock()
         val testFacade = object : LoggingSystemFacadeMock() {
             override fun openDisplay(): Boolean {
                 super.functionCalls.add(FunctionCall("openDisplay"))
                 return false
             }
         }
-        runWindowManager(testFacade, LoggerMock())
+        runWindowManager(testFacade, logger)
 
+        assertTrue(logger.closed, "The logger needs to be closed")
         assertEquals("openDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get display")
         assertTrue(testFacade.functionCalls.isEmpty(), "There should be no more calls to the system, when we can't get a display")
     }
 
     @Test
     fun `shutdown when there's no default screen to get`() {
+        val logger = LoggerMock()
         val testFacade = object : LoggingSystemFacadeMock() {
             override fun defaultScreenOfDisplay(): CPointer<Screen>? {
                 super.functionCalls.add(FunctionCall("defaultScreenOfDisplay"))
                 return null
             }
         }
-        runWindowManager(testFacade, LoggerMock())
+        runWindowManager(testFacade, logger)
 
+        assertTrue(logger.closed, "The logger needs to be closed")
         assertEquals("openDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get display")
         assertEquals("defaultScreenOfDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get the default screen")
         assertEquals("closeDisplay", testFacade.functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to no default screen")
@@ -41,6 +45,7 @@ class ShutdownTest {
 
     @Test
     fun `shutdown when there is an error response for select input`() {
+        val logger = LoggerMock()
         val testFacade = object : LoggingSystemFacadeMock() {
             private lateinit var errorHandler: XErrorHandler
 
@@ -54,8 +59,9 @@ class ShutdownTest {
                 return super.sync(discardQueuedEvents)
             }
         }
-        runWindowManager(testFacade, LoggerMock())
+        runWindowManager(testFacade, logger)
 
+        assertTrue(logger.closed, "The logger needs to be closed")
         assertEquals("openDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get display")
         assertEquals("defaultScreenOfDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get the default screen")
         assertEquals("setErrorHandler", testFacade.functionCalls.removeAt(0).name, "startup should set an error handler to get notified if another WM is already active (selected the input on the root window)")
@@ -68,6 +74,7 @@ class ShutdownTest {
 
     @Test
     fun `shutdown after sending shutdown key combo`() {
+        val logger = LoggerMock()
         val testFacade = object : LoggingSystemFacadeMock() {
             val modifiers = byteArrayOf(0, 1, 2, 4, 8, 16, 32, 64)
 
@@ -108,10 +115,11 @@ class ShutdownTest {
             }
         }
 
-        runWindowManager(testFacade, LoggerMock())
+        runWindowManager(testFacade, logger)
 
         val functionCalls = testFacade.functionCalls.dropWhile { it.name != "nextEvent" }.drop(1).toMutableList()
 
+        assertTrue(logger.closed, "The logger needs to be closed")
         assertEquals("freeColors", functionCalls.removeAt(0).name, "the acquired colors need to be freed on shutdown")
         assertEquals("freeColormap", functionCalls.removeAt(0).name, "the acquired color map needs to be freed on shutdown")
         assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
