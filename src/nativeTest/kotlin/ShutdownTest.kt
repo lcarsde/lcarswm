@@ -126,6 +126,4 @@ class ShutdownTest {
 
         assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
     }
-
-    // TODO check for logger open and close
 }
