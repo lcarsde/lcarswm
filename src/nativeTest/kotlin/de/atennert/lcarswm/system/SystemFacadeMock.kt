@@ -48,6 +48,14 @@ open class SystemFacadeMock : SystemApi {
 
     override fun killClient(window: Window): Int = 0
 
+    override fun createWindow(
+        parentWindow: Window,
+        measurements: List<Int>,
+        visual: CPointer<Visual>?,
+        attributeMask: ULong,
+        attributes: CPointer<XSetWindowAttributes>
+    ): Window = 0.convert()
+
     override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window = 0.convert()
 
     override fun sync(discardQueuedEvents: Boolean): Int = 0

@@ -36,5 +36,7 @@ interface WindowUtilApi {
 
     fun killClient(window: Window): Int
 
+    fun createWindow(parentWindow: Window, measurements: List<Int>, visual: CPointer<Visual>?, attributeMask: ULong, attributes: CPointer<XSetWindowAttributes>): Window
+
     fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window
 }

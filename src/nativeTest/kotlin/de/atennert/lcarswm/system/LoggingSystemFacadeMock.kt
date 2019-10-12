@@ -319,6 +319,17 @@ open class LoggingSystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun createWindow(
+        parentWindow: Window,
+        measurements: List<Int>,
+        visual: CPointer<Visual>?,
+        attributeMask: ULong,
+        attributes: CPointer<XSetWindowAttributes>
+    ): Window {
+        functionCalls.add(FunctionCall("createWindow", parentWindow, measurements, attributeMask, attributes))
+        return 0.convert()
+    }
+
     override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
         functionCalls.add(FunctionCall("createSimpleWindow", parentWindow, measurements))
         return 0.convert()

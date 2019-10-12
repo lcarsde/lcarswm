@@ -90,6 +90,16 @@ class SystemFacade : SystemApi {
         return XKillClient(display, window)
     }
 
+    override fun createWindow(
+        parentWindow: Window,
+        measurements: List<Int>,
+        visual: CPointer<Visual>?,
+        attributeMask: ULong,
+        attributes: CPointer<XSetWindowAttributes>
+    ): Window {
+        return XCreateWindow(display, parentWindow, measurements[0], measurements[1], measurements[2].convert(), measurements[3].convert(), 0.convert(), CopyFromParent.convert(), InputOutput, visual, attributeMask, attributes)
+    }
+
     override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
         return XCreateSimpleWindow(display, parentWindow, measurements[0], measurements[1],
             measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
