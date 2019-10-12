@@ -89,6 +89,8 @@ open class SystemFacadeMock : SystemApi {
         height: UInt
     ): Int = 0
 
+    override fun lowerWindow(window: Window): Int = 0
+
     override fun mapWindow(window: Window): Int = 0
 
     override fun unmapWindow(window: Window): Int = 0

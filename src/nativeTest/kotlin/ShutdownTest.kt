@@ -64,9 +64,13 @@ class ShutdownTest {
         assertTrue(logger.closed, "The logger needs to be closed")
         assertEquals("openDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get display")
         assertEquals("defaultScreenOfDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get the default screen")
+//        assertEquals("createWindow", testFacade.functionCalls.removeAt(0).name, "")
+//        assertEquals("mapWindow", testFacade.functionCalls.removeAt(0).name, "")
+//        assertEquals("", testFacade.functionCalls.removeAt(0).name, "")
         assertEquals("setErrorHandler", testFacade.functionCalls.removeAt(0).name, "startup should set an error handler to get notified if another WM is already active (selected the input on the root window)")
         assertEquals("selectInput", testFacade.functionCalls.removeAt(0).name, "startup should try to select the input on the root window")
         assertEquals("sync", testFacade.functionCalls.removeAt(0).name, "startup should sync after select input to get notified for other WMs")
+//        assertEquals("destroyWindow", testFacade.functionCalls.removeAt(0).name, "")
         assertEquals("closeDisplay", testFacade.functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
 
         assertTrue(testFacade.functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")

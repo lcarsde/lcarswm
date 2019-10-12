@@ -25,6 +25,8 @@ interface EventApi {
 
     fun moveResizeWindow(window: Window, x: Int, y: Int, width: UInt, height: UInt): Int
 
+    fun lowerWindow(window: Window): Int
+
     fun mapWindow(window: Window): Int
 
     fun unmapWindow(window: Window): Int

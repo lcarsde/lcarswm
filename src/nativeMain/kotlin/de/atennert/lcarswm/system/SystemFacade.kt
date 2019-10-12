@@ -150,6 +150,10 @@ class SystemFacade : SystemApi {
         return XMoveResizeWindow(display, window, x, y, width, height)
     }
 
+    override fun lowerWindow(window: Window): Int {
+        return XLowerWindow(display, window)
+    }
+
     override fun mapWindow(window: Window): Int {
         return XMapWindow(display, window)
     }
