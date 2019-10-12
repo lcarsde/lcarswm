@@ -39,6 +39,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         }
         val rootWindow = screen.root
 
+        val netWmSupportWindow = loadNetWmSupportWindow(system, rootWindow, screen.root_visual)
+
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
         system.selectInput(rootWindow, SubstructureRedirectMask or SubstructureNotifyMask or PropertyChangeMask or
@@ -48,6 +50,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         if (wmDetected) {
             logger.logError("::runWindowManager::Detected another active window manager")
             logger.close()
+            system.destroyWindow(netWmSupportWindow)
             system.closeDisplay()
             return
         }
@@ -95,12 +98,27 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         cleanupColorMap(system, colorMap)
 
+        system.destroyWindow(netWmSupportWindow)
+
         system.closeDisplay()
 
         staticLogger = null
         logger.logInfo("::runWindowManager::lcarswm stopped")
         logger.close()
     }
+}
+
+fun loadNetWmSupportWindow(system: SystemApi, rootWindow: Window, rootVisual: CPointer<Visual>?): Window{
+    val windowAttributes = nativeHeap.alloc<XSetWindowAttributes>()
+    windowAttributes.override_redirect = X_TRUE
+    windowAttributes.event_mask = PropertyChangeMask
+
+    val netWmSupportWindow = system.createWindow(rootWindow, listOf(-100, -100, 1, 1), rootVisual, (CWEventMask or CWOverrideRedirect).convert(), windowAttributes.ptr)
+
+    system.mapWindow(netWmSupportWindow)
+    system.lowerWindow(netWmSupportWindow)
+
+    return netWmSupportWindow
 }
 
 fun setupScreen(system: SystemApi, logger: Logger, rootWindow: Window, windowManagerConfig: WindowManagerState) {
