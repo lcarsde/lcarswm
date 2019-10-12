@@ -208,6 +208,11 @@ open class LoggingSystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun lowerWindow(window: Window): Int {
+        functionCalls.add(FunctionCall("lowerWindow", window))
+        return 0
+    }
+
     override fun mapWindow(window: Window): Int {
         functionCalls.add(FunctionCall("mapWindow", window))
         return 0
