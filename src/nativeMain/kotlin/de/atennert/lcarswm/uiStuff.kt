@@ -141,7 +141,7 @@ private fun drawMaximizedFrame(
     drawApi.fillRectangles(rootWindow, gcOrchid, bars, 2)
 
     drawApi.putImage(rootWindow, gcCopyImage,
-        image, monitor.x + 40, 0,
+        image, monitor.x + 40, monitor.y,
         image.pointed.width.convert(), image.pointed.height.convert())
 
     nativeHeap.free(arcs)
@@ -338,7 +338,7 @@ private fun drawNormalFrame(
     drawApi.fillArcs(rootWindow, gcBlack, cornerInnerArcs, 4)
 
     drawApi.putImage(rootWindow, gcCopyImage,
-        image, monitor.x + monitor.width - 40 - image.pointed.width, 0,
+        image, monitor.x + monitor.width - 40 - image.pointed.width, monitor.y,
         image.pointed.width.convert(), image.pointed.height.convert())
 
     nativeHeap.free(arcs)
