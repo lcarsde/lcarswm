@@ -35,12 +35,13 @@ class ShutdownTest {
         }
         runWindowManager(testFacade, logger)
 
-        assertTrue(logger.closed, "The logger needs to be closed")
-        assertEquals("openDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get display")
-        assertEquals("defaultScreenOfDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get the default screen")
-        assertEquals("closeDisplay", testFacade.functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to no default screen")
+        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "defaultScreenOfDisplay" }.toMutableList()
 
-        assertTrue(testFacade.functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+        assertTrue(logger.closed, "The logger needs to be closed")
+        assertEquals("defaultScreenOfDisplay", functionCalls.removeAt(0).name, "startup needs to request the default display for the screen")
+        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to no default screen")
+
+        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
     }
 
     @Test
@@ -61,19 +62,16 @@ class ShutdownTest {
         }
         runWindowManager(testFacade, logger)
 
-        assertTrue(logger.closed, "The logger needs to be closed")
-        assertEquals("openDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get display")
-        assertEquals("defaultScreenOfDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get the default screen")
-        assertEquals("createWindow", testFacade.functionCalls.removeAt(0).name, "startup should create a net wm support window")
-        assertEquals("mapWindow", testFacade.functionCalls.removeAt(0).name, "startup should map the net wm support window")
-        assertEquals("lowerWindow", testFacade.functionCalls.removeAt(0).name, "startup should lower the net wm support window")
-        assertEquals("setErrorHandler", testFacade.functionCalls.removeAt(0).name, "startup should set an error handler to get notified if another WM is already active (selected the input on the root window)")
-        assertEquals("selectInput", testFacade.functionCalls.removeAt(0).name, "startup should try to select the input on the root window")
-        assertEquals("sync", testFacade.functionCalls.removeAt(0).name, "startup should sync after select input to get notified for other WMs")
-        assertEquals("destroyWindow", testFacade.functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
-        assertEquals("closeDisplay", testFacade.functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
+        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "setErrorHandler" }.toMutableList()
 
-        assertTrue(testFacade.functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+        assertTrue(logger.closed, "The logger needs to be closed")
+        assertEquals("setErrorHandler", functionCalls.removeAt(0).name, "startup should set an error handler to get notified if another WM is already active (selected the input on the root window)")
+        assertEquals("selectInput", functionCalls.removeAt(0).name, "startup should try to select the input on the root window")
+        assertEquals("sync", functionCalls.removeAt(0).name, "startup should sync after select input to get notified for other WMs")
+        assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
+        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
+
+        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
     }
 
     @Test
@@ -121,9 +119,10 @@ class ShutdownTest {
 
         runWindowManager(testFacade, logger)
 
-        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "nextEvent" }.drop(1).toMutableList()
+        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "nextEvent" }.toMutableList()
 
         assertTrue(logger.closed, "The logger needs to be closed")
+        assertEquals("nextEvent", functionCalls.removeAt(0).name, "The window manager should react to events")
         assertEquals("freeColors", functionCalls.removeAt(0).name, "the acquired colors need to be freed on shutdown")
         assertEquals("freeColormap", functionCalls.removeAt(0).name, "the acquired color map needs to be freed on shutdown")
         assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
