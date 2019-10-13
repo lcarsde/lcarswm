@@ -340,6 +340,16 @@ open class LoggingSystemFacadeMock : SystemApi {
         return 0.convert()
     }
 
+    override fun getSelectionOwner(atom: Atom): Window {
+        functionCalls.add(FunctionCall("getSelectionOwner", atom))
+        return 0.convert()
+    }
+
+    override fun setSelectionOwner(atom: Atom, window: Window, time: Time): Int {
+        functionCalls.add(FunctionCall("setSelectionOwner", atom, window, time))
+        return 0
+    }
+
     override fun getenv(name: String): CPointer<ByteVar>? {
         functionCalls.add(FunctionCall("getenv", name))
         val envValue = ByteArray(0)

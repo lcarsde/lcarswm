@@ -58,6 +58,10 @@ open class SystemFacadeMock : SystemApi {
 
     override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window = 0.convert()
 
+    override fun getSelectionOwner(atom: Atom): Window = 0.convert()
+
+    override fun setSelectionOwner(atom: Atom, window: Window, time: Time): Int = 0
+
     override fun sync(discardQueuedEvents: Boolean): Int = 0
 
     override fun sendEvent(

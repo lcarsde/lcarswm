@@ -39,4 +39,8 @@ interface WindowUtilApi {
     fun createWindow(parentWindow: Window, measurements: List<Int>, visual: CPointer<Visual>?, attributeMask: ULong, attributes: CPointer<XSetWindowAttributes>): Window
 
     fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window
+
+    fun getSelectionOwner(atom: Atom): Window
+
+    fun setSelectionOwner(atom: Atom, window: Window, time: Time): Int
 }

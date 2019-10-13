@@ -105,6 +105,14 @@ class SystemFacade : SystemApi {
             measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
     }
 
+    override fun getSelectionOwner(atom: Atom): Window {
+        return XGetSelectionOwner(display, atom)
+    }
+
+    override fun setSelectionOwner(atom: Atom, window: Window, time: Time): Int {
+        return XSetSelectionOwner(display, atom, window, time)
+    }
+
     override fun sync(discardQueuedEvents: Boolean): Int {
         return XSync(display, convertToXBoolean(discardQueuedEvents))
     }
