@@ -259,6 +259,11 @@ open class LoggingSystemFacadeMock : SystemApi {
         return screen.ptr
     }
 
+    override fun defaultScreenNumber(): Int {
+        functionCalls.add(FunctionCall("defaultScreenOfDisplay"))
+        return 0
+    }
+
     override fun grabServer(): Int {
         functionCalls.add(FunctionCall("grabServer"))
         return 0

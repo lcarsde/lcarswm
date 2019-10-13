@@ -14,6 +14,8 @@ interface WindowUtilApi {
 
     fun defaultScreenOfDisplay(): CPointer<Screen>?
 
+    fun defaultScreenNumber(): Int
+
     fun grabServer(): Int
 
     fun ungrabServer(): Int

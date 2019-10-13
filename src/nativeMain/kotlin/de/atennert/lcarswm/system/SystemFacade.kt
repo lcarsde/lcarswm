@@ -28,6 +28,10 @@ class SystemFacade : SystemApi {
         return XDefaultScreenOfDisplay(display)
     }
 
+    override fun defaultScreenNumber(): Int {
+        return XDefaultScreen(display)
+    }
+
     override fun grabServer(): Int {
         return XGrabServer(display)
     }
