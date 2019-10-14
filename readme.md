@@ -114,8 +114,6 @@ TODO
 
 ## Logo
 The logo is a xpm file. It needs to be located in /usr/share/pixmaps and must be named lcarswm.xpm. It can be exchanged. The only restriction is that the logo height needs to be 40px. The bars will adjust to the width.
-## Notes to myself :-)
-* The main method needs to be outside of any packages so that the compiler can find it.
 
 ## Sources
 There are common* and native* source directories under `src`. Everything that interacts with XLib or other native resources is in native. Everything that has no native dependency is in the common* directories. The goal is to keep the native code as small as possible and put as much as possible in the common part.
