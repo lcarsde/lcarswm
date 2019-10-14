@@ -13,6 +13,7 @@ private var wmDetected = false
 // this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
 private var staticLogger: Logger? = null
 
+// the main method apparently must not be inside of a package so it can be compiled with Kotlin/Native
 fun main() {
     val system = SystemFacade()
     val logger = FileLogger(system, LOG_FILE_PATH)
@@ -39,7 +40,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         }
         val rootWindow = screen.root
 
-        val netWmSupportWindow = loadNetWmSupportWindow(system, rootWindow, screen.root_visual)
+        val ewmhSupportWindow = loadEwmhSupportWindow(system, rootWindow, screen.root_visual)
 
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
@@ -98,7 +99,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         cleanupColorMap(system, colorMap)
 
-        system.destroyWindow(netWmSupportWindow)
+        system.destroyWindow(ewmhSupportWindow)
 
         system.closeDisplay()
 
@@ -108,17 +109,17 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
     }
 }
 
-fun loadNetWmSupportWindow(system: SystemApi, rootWindow: Window, rootVisual: CPointer<Visual>?): Window{
+fun loadEwmhSupportWindow(system: SystemApi, rootWindow: Window, rootVisual: CPointer<Visual>?): Window{
     val windowAttributes = nativeHeap.alloc<XSetWindowAttributes>()
     windowAttributes.override_redirect = X_TRUE
     windowAttributes.event_mask = PropertyChangeMask
 
-    val netWmSupportWindow = system.createWindow(rootWindow, listOf(-100, -100, 1, 1), rootVisual, (CWEventMask or CWOverrideRedirect).convert(), windowAttributes.ptr)
+    val ewmhSupportWindow = system.createWindow(rootWindow, listOf(-100, -100, 1, 1), rootVisual, (CWEventMask or CWOverrideRedirect).convert(), windowAttributes.ptr)
 
-    system.mapWindow(netWmSupportWindow)
-    system.lowerWindow(netWmSupportWindow)
+    system.mapWindow(ewmhSupportWindow)
+    system.lowerWindow(ewmhSupportWindow)
 
-    return netWmSupportWindow
+    return ewmhSupportWindow
 }
 
 fun setupScreen(system: SystemApi, logger: Logger, rootWindow: Window, windowManagerConfig: WindowManagerState) {
