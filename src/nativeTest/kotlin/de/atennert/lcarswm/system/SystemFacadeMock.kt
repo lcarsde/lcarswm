@@ -117,6 +117,8 @@ open class SystemFacadeMock : SystemApi {
 
     override fun setsid(): __pid_t = 0
 
+    override fun setenv(name: String, value: String): Int = 0
+
     override fun perror(s: String) {}
 
     override fun exit(status: Int) {}

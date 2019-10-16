@@ -391,6 +391,11 @@ open class LoggingSystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun setenv(name: String, value: String): Int {
+        functionCalls.add(FunctionCall("setenv", name, value))
+        return 0
+    }
+
     override fun perror(s: String) {
         functionCalls.add(FunctionCall("perror", s))
     }

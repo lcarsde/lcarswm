@@ -206,6 +206,10 @@ class SystemFacade : SystemApi {
         return platform.posix.setsid()
     }
 
+    override fun setenv(name: String, value: String): Int {
+        return platform.posix.setenv(name, value, X_TRUE)
+    }
+
     override fun perror(s: String) {
         platform.posix.perror(s)
     }

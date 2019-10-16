@@ -22,6 +22,8 @@ interface PosixApi {
 
     fun setsid(): __pid_t
 
+    fun setenv(name: String, value: String): Int
+
     fun perror(s: String)
 
     fun exit(status: Int)
