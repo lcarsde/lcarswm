@@ -64,6 +64,8 @@ open class SystemFacadeMock : SystemApi {
 
     override fun setSelectionOwner(atom: Atom, window: Window, time: Time): Int = 0
 
+    override fun getDisplayString(): String = "TheDisplay"
+
     override fun sync(discardQueuedEvents: Boolean): Int = 0
 
     override fun sendEvent(

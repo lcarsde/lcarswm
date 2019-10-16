@@ -117,6 +117,10 @@ class SystemFacade : SystemApi {
         return XSetSelectionOwner(display, atom, window, time)
     }
 
+    override fun getDisplayString(): String {
+        return XDisplayString(this.display)?.toKString() ?: ""
+    }
+
     override fun sync(discardQueuedEvents: Boolean): Int {
         return XSync(display, convertToXBoolean(discardQueuedEvents))
     }

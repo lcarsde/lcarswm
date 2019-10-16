@@ -355,6 +355,11 @@ open class LoggingSystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun getDisplayString(): String {
+        functionCalls.add(FunctionCall("getDisplayString"))
+        return "TheDisplay"
+    }
+
     override fun getenv(name: String): CPointer<ByteVar>? {
         functionCalls.add(FunctionCall("getenv", name))
         val envValue = ByteArray(0)

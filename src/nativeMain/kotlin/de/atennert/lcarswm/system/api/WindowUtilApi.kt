@@ -45,4 +45,6 @@ interface WindowUtilApi {
     fun getSelectionOwner(atom: Atom): Window
 
     fun setSelectionOwner(atom: Atom, window: Window, time: Time): Int
+
+    fun getDisplayString(): String
 }
