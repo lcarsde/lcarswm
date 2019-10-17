@@ -79,7 +79,6 @@ Fullscreen mode
 ** window groups (WM_HINTS)
 ** WM_TRANSIENT_FOR
 ** override redirect
-* Set DISPLAY environment variable
 
 ### EWMH
 TODO
