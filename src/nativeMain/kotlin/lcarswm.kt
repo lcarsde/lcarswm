@@ -56,6 +56,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             return
         }
 
+        setDisplayEnvironment(system)
+
         staticLogger = logger
         system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
@@ -107,6 +109,11 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         logger.logInfo("::runWindowManager::lcarswm stopped")
         logger.close()
     }
+}
+
+fun setDisplayEnvironment(system: SystemApi) {
+    val displayString = system.getDisplayString()
+    system.setenv("DISPLAY", displayString)
 }
 
 fun loadEwmhSupportWindow(system: SystemApi, rootWindow: Window, rootVisual: CPointer<Visual>?): Window{
