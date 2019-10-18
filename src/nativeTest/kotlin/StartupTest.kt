@@ -26,7 +26,7 @@ class StartupTest {
     private class StartupFacadeMock : LoggingSystemFacadeMock() {
         val displayString = "displayString"
 
-        val modifiers = byteArrayOf(0, 1, 2, 4, 8, 16, 32, 64)
+        val modifiers = UByteArray(8) {1.shl(it).convert()}
 
         val winModifierPosition = 6
 
@@ -57,7 +57,7 @@ class StartupTest {
         override fun getModifierMapping(): CPointer<XModifierKeymap>? {
             val keymap = nativeHeap.alloc<XModifierKeymap>()
             keymap.max_keypermod = 1
-            keymap.modifiermap = modifiers.toUByteArray().pin().addressOf(0)
+            keymap.modifiermap = modifiers.pin().addressOf(0)
             return keymap.ptr
         }
 
