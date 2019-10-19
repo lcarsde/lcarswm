@@ -74,11 +74,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         val colorMap = allocateColorMap(system, screen.root_visual!!, rootWindow)
         val graphicsContexts = getGraphicContexts(system, rootWindow, colorMap.second)
 
-        logger.logDebug("::runWindowManager::graphics loaded")
-
         val windowManagerConfig = WindowManagerState { system.internAtom(it, false) }
-
-        logger.logDebug("::runWindowManager::wm state initialized")
 
         setupLcarsWindow(system, screen, windowManagerConfig)
         windowManagerConfig.setActiveWindowListener { activeWindow ->
@@ -89,21 +85,13 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             }
         }
 
-        logger.logDebug("::runWindowManager::wm window initialized: $rootWindow")
-
         val logoImage = allocArrayOfPointersTo(alloc<XImage>())
 
         system.readXpmFileToImage("/usr/share/pixmaps/lcarswm.xpm", logoImage)
 
-        logger.logDebug("::runWindowManager::logo loaded")
-
         val randrBase = setupRandr(system, logger, windowManagerConfig, logoImage[0]!!, rootWindow, graphicsContexts)
 
-        logger.logDebug("::runWindowManager::set up randr")
-
         setupScreen(system, logger, rootWindow, windowManagerConfig)
-
-        logger.logDebug("::runWindowManager::loaded window tree")
 
         eventLoop(system, logger, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, graphicsContexts)
 
