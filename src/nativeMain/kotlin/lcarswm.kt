@@ -42,6 +42,14 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val ewmhSupportWindow = loadEwmhSupportWindow(system, rootWindow, screen.root_visual)
 
+        if (!becomeScreenOwner(system)) {
+            logger.logError("::runWindowManager::Detected another active window manager")
+            logger.close()
+            system.destroyWindow(ewmhSupportWindow)
+            system.closeDisplay()
+            return
+        }
+
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
         system.selectInput(rootWindow, SubstructureRedirectMask or SubstructureNotifyMask or PropertyChangeMask or
@@ -127,6 +135,17 @@ fun loadEwmhSupportWindow(system: SystemApi, rootWindow: Window, rootVisual: CPo
     system.lowerWindow(ewmhSupportWindow)
 
     return ewmhSupportWindow
+}
+
+fun becomeScreenOwner(system: SystemApi): Boolean {
+    val wmSnName = "WM_S${system.defaultScreenNumber()}"
+    val wmSn = system.internAtom(wmSnName, false)
+
+    val currentSelectionOwner = system.getSelectionOwner(wmSn)
+    if (currentSelectionOwner != None.convert<ULong>()) {
+        return false
+    }
+    return true
 }
 
 fun setupScreen(system: SystemApi, logger: Logger, rootWindow: Window, windowManagerConfig: WindowManagerState) {

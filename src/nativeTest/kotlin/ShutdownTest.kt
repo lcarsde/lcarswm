@@ -45,6 +45,45 @@ class ShutdownTest {
     }
 
     @Test
+    fun `shutdown when the wm can not become screen owner`() {
+        val logger = LoggerMock()
+        val testFacade = object : LoggingSystemFacadeMock() {
+            override fun defaultScreenNumber(): Int {
+                return 23
+            }
+
+            override fun internAtom(name: String, onlyIfExists: Boolean): Atom {
+                val defaultResponse = super.internAtom(name, onlyIfExists)
+                return if (name == "WM_S${defaultScreenNumber()}") {
+                    42.convert()
+                } else {
+                    defaultResponse
+                }
+            }
+
+            override fun getSelectionOwner(atom: Atom): Window {
+                val defaultResponse = super.getSelectionOwner(atom)
+                return if (atom.convert<Int>() == 42) {
+                    21.convert() // this screen is taken
+                } else {
+                    defaultResponse
+                }
+            }
+        }
+
+        runWindowManager(testFacade, logger)
+
+        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "getSelectionOwner" }.toMutableList()
+
+        assertTrue(logger.closed, "The logger needs to be closed")
+        assertEquals("getSelectionOwner", functionCalls.removeAt(0).name, "should call getSelectionOwner to check if other WM is active")
+        assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
+        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to no default screen")
+
+        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+    }
+
+    @Test
     fun `shutdown when there is an error response for select input`() {
         val logger = LoggerMock()
         val testFacade = object : LoggingSystemFacadeMock() {
@@ -78,7 +117,7 @@ class ShutdownTest {
     fun `shutdown after sending shutdown key combo`() {
         val logger = LoggerMock()
         val testFacade = object : LoggingSystemFacadeMock() {
-            val modifiers = byteArrayOf(0, 1, 2, 4, 8, 16, 32, 64)
+            val modifiers = UByteArray(8) {1.shl(it).convert()}
 
             val winModifierPosition = 6
 
@@ -108,7 +147,7 @@ class ShutdownTest {
             override fun getModifierMapping(): CPointer<XModifierKeymap>? {
                 val keymap = nativeHeap.alloc<XModifierKeymap>()
                 keymap.max_keypermod = 1
-                keymap.modifiermap = modifiers.toUByteArray().pin().addressOf(0)
+                keymap.modifiermap = modifiers.pin().addressOf(0)
                 return keymap.ptr
             }
 
