@@ -83,7 +83,6 @@ Fullscreen mode
 TODO
 
 ### Other
-* Configuration for application key bindings
 * Activate windows my clicking on them
 * Application selector
 * Content for the data bar (empty upper area in normal mode)
@@ -95,8 +94,6 @@ TODO
   * Connection state of network interfaces
   * Data throughput of network interfaces
   * ...
-* Key bindings for
-  * Application selection
 * GTK-Theme (if I can't find one)
 * WM switching (WM_S*)
 
