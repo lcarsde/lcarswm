@@ -45,7 +45,7 @@ class ShutdownTest {
     }
 
     @Test
-    fun `shutdown when the wm can not become screen owner`() {
+    fun `shutdown when there is already a screen owner`() {
         val logger = LoggerMock()
         val testFacade = object : LoggingSystemFacadeMock() {
             override fun defaultScreenNumber(): Int {
@@ -77,6 +77,63 @@ class ShutdownTest {
 
         assertTrue(logger.closed, "The logger needs to be closed")
         assertEquals("getSelectionOwner", functionCalls.removeAt(0).name, "should call getSelectionOwner to check if other WM is active")
+        assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
+        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to no default screen")
+
+        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+    }
+
+    @Test
+    fun `shutdown when the wm can not become screen owner`() {
+        val logger = LoggerMock()
+        val testFacade = object : LoggingSystemFacadeMock() {
+            var selectionOwnerCounter = 0
+
+            var window: Window = 123.convert()
+
+            override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
+                return window++
+            }
+
+            override fun createWindow(
+                parentWindow: Window,
+                measurements: List<Int>,
+                visual: CPointer<Visual>?,
+                attributeMask: ULong,
+                attributes: CPointer<XSetWindowAttributes>
+            ): Window {
+                return window++
+            }
+
+            override fun defaultScreenNumber(): Int {
+                return 23
+            }
+
+            override fun internAtom(name: String, onlyIfExists: Boolean): Atom {
+                val defaultResponse = super.internAtom(name, onlyIfExists)
+                return if (name == "WM_S${defaultScreenNumber()}") {
+                    42.convert()
+                } else {
+                    defaultResponse
+                }
+            }
+
+            override fun getSelectionOwner(atom: Atom): Window {
+                return if (atom.convert<Int>() == 42) {
+                    super.functionCalls.add(FunctionCall("getSelectionOwner", atom, selectionOwnerCounter++))
+                    None.convert()
+                } else {
+                    super.getSelectionOwner(atom)
+                }
+            }
+        }
+
+        runWindowManager(testFacade, logger)
+
+        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "getSelectionOwner" || it.parameters.elementAtOrNull(1) != 1 }.toMutableList()
+
+        assertTrue(logger.closed, "The logger needs to be closed")
+        assertEquals("getSelectionOwner", functionCalls.removeAt(0).name, "should call getSelectionOwner to check if we became the active WM")
         assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
         assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to no default screen")
 

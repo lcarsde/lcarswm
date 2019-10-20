@@ -42,7 +42,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val ewmhSupportWindow = loadEwmhSupportWindow(system, rootWindow, screen.root_visual)
 
-        if (!becomeScreenOwner(system)) {
+        if (!becomeScreenOwner(system, ewmhSupportWindow)) {
             logger.logError("::runWindowManager::Detected another active window manager")
             logger.close()
             system.destroyWindow(ewmhSupportWindow)
@@ -125,14 +125,20 @@ fun loadEwmhSupportWindow(system: SystemApi, rootWindow: Window, rootVisual: CPo
     return ewmhSupportWindow
 }
 
-fun becomeScreenOwner(system: SystemApi): Boolean {
+fun becomeScreenOwner(system: SystemApi, ewmhSupportWindow: Window): Boolean {
     val wmSnName = "WM_S${system.defaultScreenNumber()}"
     val wmSn = system.internAtom(wmSnName, false)
 
-    val currentSelectionOwner = system.getSelectionOwner(wmSn)
-    if (currentSelectionOwner != None.convert<ULong>()) {
+    if (system.getSelectionOwner(wmSn) != None.convert<Window>()) {
         return false
     }
+
+    system.setSelectionOwner(wmSn, ewmhSupportWindow, CurrentTime.convert())
+
+    if (system.getSelectionOwner(wmSn) != ewmhSupportWindow) {
+        return false
+    }
+
     return true
 }
 
