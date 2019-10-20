@@ -99,6 +99,7 @@ TODO
 * Key bindings for
   * Application selection
 * GTK-Theme (if I can't find one)
+* WM switching (WM_S*)
 
 ## Optional to do
 * Configuration for the colors
