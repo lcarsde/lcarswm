@@ -96,8 +96,6 @@ TODO
   * ...
 * GTK-Theme (if I can't find one)
 * WM switching (WM_S*)
-
-## Optional to do
 * Configuration for the colors
 
 ## Some definitions
