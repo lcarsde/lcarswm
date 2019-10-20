@@ -53,7 +53,6 @@ Fullscreen mode
 
 ## To Do
 ### ICCCM
-* manage screen (WM_Sn)
 * Client properties (stuff to use)
 ** WM_NAME
 ** WM_ICON_NAME ?
