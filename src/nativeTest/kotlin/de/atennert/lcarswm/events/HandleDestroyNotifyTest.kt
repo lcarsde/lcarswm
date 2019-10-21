@@ -4,6 +4,7 @@ import de.atennert.lcarswm.Monitor
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.log.LoggerMock
+import de.atennert.lcarswm.system.LoggingSystemFacadeMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
@@ -40,11 +41,13 @@ class HandleDestroyNotifyTest {
         destroyNotifyEvent.xdestroywindow.window = windowId
 
         val windowManagerState = WindowManagerStateTestImpl(0.convert())
+        val system = LoggingSystemFacadeMock()
 
-        val requestShutdown = handleDestroyNotify(SystemFacadeMock(), LoggerMock(), windowManagerState, destroyNotifyEvent)
+        val requestShutdown = handleDestroyNotify(system, LoggerMock(), windowManagerState, destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")
         assertTrue(windowManagerState.removedWindowIds.isEmpty(), "an unknown window shouldn't be removed")
+        assertTrue(system.functionCalls.isEmpty(), "There should be no calls to system, as nothing was to do")
     }
 
     private class WindowManagerStateTestImpl(private val knownWindow: Window) : WindowManagerStateMock() {
