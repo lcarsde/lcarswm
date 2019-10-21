@@ -20,7 +20,7 @@ val EVENT_HANDLERS =
         Pair(ConfigureRequest, { s, l, w, e, _, _, _ -> handleConfigureRequest(s, l, w, e) }),
         Pair(MapRequest, { s, l, w, e, _, rw, _ -> handleMapRequest(s, l, w, e, rw) }),
         Pair(MapNotify, { _, l, _, e, _, _, _ -> logMapNotify(l, e) }),
-        Pair(DestroyNotify, { _, l, w, e, _, _, _ -> handleDestroyNotify(l, w, e) }),
+        Pair(DestroyNotify, { s, l, w, e, _, _, _ -> handleDestroyNotify(s, l, w, e) }),
         Pair(UnmapNotify, ::handleUnmapNotify),
         Pair(ReparentNotify, { _, l, _, e, _, _, _ -> logReparentNotify(l, e) }),
         Pair(CreateNotify, { _, l, _, e, _, _, _ -> logCreateNotify(l, e) }),
