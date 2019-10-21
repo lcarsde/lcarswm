@@ -25,12 +25,17 @@ class HandleDestroyNotifyTest {
         destroyNotifyEvent.xdestroywindow.window = windowId
 
         val windowManagerState = WindowManagerStateTestImpl(windowId)
+        val system = LoggingSystemFacadeMock()
 
-        val requestShutdown = handleDestroyNotify(SystemFacadeMock(), LoggerMock(), windowManagerState, destroyNotifyEvent)
+        val requestShutdown = handleDestroyNotify(system, LoggerMock(), windowManagerState, destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")
         assertEquals(1, windowManagerState.removedWindowIds.size, "There wasn't exactly one window removal")
         assertEquals(windowId, windowManagerState.removedWindowIds[0], "Window was not removed from state management")
+
+        assertEquals("unmapWindow", system.functionCalls.removeAt(0).name, "The frame needs to be unmapped")
+        assertEquals("removeFromSaveSet", system.functionCalls.removeAt(0).name, "the window needs to be removed from the save set")
+        assertEquals("destroyWindow", system.functionCalls.removeAt(0).name, "The frame needs to be destroyed")
     }
 
     @Test
