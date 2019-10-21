@@ -32,7 +32,7 @@ class WindowManagerState(
 
     val monitors = ArrayList<Monitor>(3)
 
-    var windows = mutableListOf<Pair<WindowContainer, Monitor>>()
+    override var windows = mutableListOf<Pair<WindowContainer, Monitor>>()
         private set
 
     override val initialMonitor: Monitor

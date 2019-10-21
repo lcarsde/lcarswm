@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.WindowManagerState
+import de.atennert.lcarswm.WindowManagerStateHandler
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import xlib.XEvent
@@ -11,7 +11,7 @@ import xlib.XEvent
 fun handleDestroyNotify(
     system: SystemApi,
     logger: Logger,
-    windowManagerState: WindowManagerState,
+    windowManagerState: WindowManagerStateHandler,
     xEvent: XEvent
 ): Boolean {
     val destroyEvent = xEvent.xdestroywindow

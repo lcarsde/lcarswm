@@ -7,6 +7,8 @@ interface WindowManagerStateHandler {
 
     val initialMonitor: Monitor
 
+    val windows: List<Pair<WindowContainer, Monitor>>
+
     fun addWindow(window: WindowContainer, monitor: Monitor)
 
     fun removeWindow(windowId: Window)

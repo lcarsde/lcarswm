@@ -8,6 +8,8 @@ open class WindowManagerStateMock: WindowManagerStateHandler {
 
     override val initialMonitor: Monitor = Monitor(0.convert(), "Monitor", true)
 
+    override val windows = emptyList<Pair<WindowContainer, Monitor>>()
+
     override fun addWindow(window: WindowContainer, monitor: Monitor) {}
 
     override fun removeWindow(windowId: Window) {}
