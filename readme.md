@@ -16,7 +16,6 @@ Thank you very much to the creators of the following resources:
 
 ## Functionality
 * Windows-key + Q closes the window manager
-correctly yet)
 * Windows-key + Tab toggles through the windows
 * Windows-key + Up/Down moves the active window to other monitors
 * Windows-key + M toggles the display mode between normal, maximized and fullscreen
