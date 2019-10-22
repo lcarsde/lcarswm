@@ -49,7 +49,6 @@ Fullscreen mode
 * Video players crash displaylink driver when using lcarswm
 * Softmaker office leaves shadow windows when closing
 * The frame window is drawing over the background and not scaling with popups
-* When closing a window, the next window that gets focused might not be correctly stacked
 
 ## To Do
 ### ICCCM
