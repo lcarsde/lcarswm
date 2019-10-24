@@ -85,9 +85,10 @@ class SystemFacade : SystemApi {
         window: Window,
         propertyAtom: Atom,
         typeAtom: Atom,
-        data: UByteArray?
+        data: UByteArray?,
+        format: Int
     ): Int {
-        return XChangeProperty(display, window, propertyAtom, typeAtom, 32, PropModeReplace, data?.toCValues(), data?.size ?: 0)
+        return XChangeProperty(display, window, propertyAtom, typeAtom, format, PropModeReplace, data?.toCValues(), data?.size ?: 0)
     }
 
     override fun killClient(window: Window): Int {

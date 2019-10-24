@@ -319,8 +319,8 @@ open class LoggingSystemFacadeMock : SystemApi {
         return 0.convert()
     }
 
-    override fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?): Int {
-        functionCalls.add(FunctionCall("changeProperty", window, propertyAtom, typeAtom, data))
+    override fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int): Int {
+        functionCalls.add(FunctionCall("changeProperty", window, propertyAtom, typeAtom, data, format))
         return 0
     }
 

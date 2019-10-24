@@ -62,7 +62,8 @@ class AddWindowTest {
             window: Window,
             propertyAtom: Atom,
             typeAtom: Atom,
-            data: UByteArray?
+            data: UByteArray?,
+            format: Int
         ): Int {
             commandList.add("changeProperty - $window:$propertyAtom:$typeAtom:${data?.get(0)}")
             return 0

@@ -44,7 +44,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun internAtom(name: String, onlyIfExists: Boolean): Atom = 0.convert()
 
-    override fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?): Int = 0
+    override fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int): Int = 0
 
     override fun killClient(window: Window): Int = 0
 

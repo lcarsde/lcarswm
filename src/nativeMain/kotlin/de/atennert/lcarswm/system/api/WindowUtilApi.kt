@@ -34,7 +34,7 @@ interface WindowUtilApi {
 
     fun internAtom(name: String, onlyIfExists: Boolean): Atom
 
-    fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?): Int
+    fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int): Int
 
     fun killClient(window: Window): Int
 

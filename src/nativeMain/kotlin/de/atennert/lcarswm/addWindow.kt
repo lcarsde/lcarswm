@@ -46,7 +46,7 @@ fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManag
 
     val wmStateDataList = listOf(NormalState, None.convert())
     val wmStateData = UByteArray(2) { wmStateDataList[it].convert()}
-    system.changeProperty(window.id, windowManagerState.wmState, windowManagerState.wmState, wmStateData)
+    system.changeProperty(window.id, windowManagerState.wmState, windowManagerState.wmState, wmStateData, 32)
 
     windowManagerState.addWindow(window, windowMonitor)
 
