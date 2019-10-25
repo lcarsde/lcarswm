@@ -5,6 +5,7 @@ import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.SystemApi
+import de.atennert.lcarswm.system.api.WindowUtilApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -44,9 +45,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         if (!becomeScreenOwner(system, ewmhSupportWindowHandler)) {
             logger.logError("::runWindowManager::Detected another active window manager")
-            logger.close()
-            ewmhSupportWindowHandler.destroySupportWindow()
-            system.closeDisplay()
+            cleanup(logger, system, ewmhSupportWindowHandler)
             return
         }
 
@@ -58,9 +57,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         if (wmDetected) {
             logger.logError("::runWindowManager::Detected another active window manager")
-            logger.close()
-            ewmhSupportWindowHandler.destroySupportWindow()
-            system.closeDisplay()
+            cleanup(logger, system, ewmhSupportWindowHandler)
             return
         }
 
@@ -99,14 +96,18 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         cleanupColorMap(system, colorMap)
 
-        ewmhSupportWindowHandler.destroySupportWindow()
-
-        system.closeDisplay()
-
-        staticLogger = null
-        logger.logInfo("::runWindowManager::lcarswm stopped")
-        logger.close()
+        cleanup(logger, system, ewmhSupportWindowHandler)
     }
+}
+
+fun cleanup(logger: Logger, windowUtils: WindowUtilApi, ewmhSupportWindowHandler: EwmhSupportWindowHandler) {
+    ewmhSupportWindowHandler.destroySupportWindow()
+
+    windowUtils.closeDisplay()
+
+    staticLogger = null
+    logger.logInfo("::runWindowManager::lcarswm stopped")
+    logger.close()
 }
 
 fun setDisplayEnvironment(system: SystemApi) {
