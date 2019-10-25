@@ -40,12 +40,12 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         }
         val rootWindow = screen.root
 
-        val ewmhSupportWindow = loadEwmhSupportWindow(system, rootWindow, screen.root_visual)
+        val ewmhSupportWindowHandler = EwmhSupportWindowHandler(system, rootWindow, screen.root_visual)
 
-        if (!becomeScreenOwner(system, ewmhSupportWindow)) {
+        if (!becomeScreenOwner(system, ewmhSupportWindowHandler)) {
             logger.logError("::runWindowManager::Detected another active window manager")
             logger.close()
-            system.destroyWindow(ewmhSupportWindow)
+            ewmhSupportWindowHandler.destroySupportWindow()
             system.closeDisplay()
             return
         }
@@ -59,12 +59,12 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         if (wmDetected) {
             logger.logError("::runWindowManager::Detected another active window manager")
             logger.close()
-            system.destroyWindow(ewmhSupportWindow)
+            ewmhSupportWindowHandler.destroySupportWindow()
             system.closeDisplay()
             return
         }
 
-        setSupportWindowProperties(system, rootWindow, ewmhSupportWindow)
+        ewmhSupportWindowHandler.setSupportWindowProperties()
 
         setDisplayEnvironment(system)
 
@@ -99,7 +99,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         cleanupColorMap(system, colorMap)
 
-        system.destroyWindow(ewmhSupportWindow)
+        ewmhSupportWindowHandler.destroySupportWindow()
 
         system.closeDisplay()
 
@@ -114,40 +114,7 @@ fun setDisplayEnvironment(system: SystemApi) {
     system.setenv("DISPLAY", displayString)
 }
 
-fun loadEwmhSupportWindow(system: SystemApi, rootWindow: Window, rootVisual: CPointer<Visual>?): Window{
-    val windowAttributes = nativeHeap.alloc<XSetWindowAttributes>()
-    windowAttributes.override_redirect = X_TRUE
-    windowAttributes.event_mask = PropertyChangeMask
-
-    val ewmhSupportWindow = system.createWindow(rootWindow, listOf(-100, -100, 1, 1), rootVisual, (CWEventMask or CWOverrideRedirect).convert(), windowAttributes.ptr)
-
-    system.mapWindow(ewmhSupportWindow)
-    system.lowerWindow(ewmhSupportWindow)
-
-    return ewmhSupportWindow
-}
-
-fun setSupportWindowProperties(system: SystemApi, rootWindow: Window, ewmhSupportWindow: Window) {
-    val windowAtom = system.internAtom("WINDOW", false)
-    val atomAtom = system.internAtom("ATOM", false)
-    val utf8Atom = system.internAtom("UTF8_STRING", false)
-    val netWmName = system.internAtom("_NET_WM_NAME", false)
-    val netSupportedAtom = system.internAtom("_NET_SUPPORTED", false)
-    val netSupportWmCheckAtom = system.internAtom("_NET_SUPPORTING_WM_CHECK", false)
-
-    val windowVar = nativeHeap.alloc<ULongVar>()
-    windowVar.value = ewmhSupportWindow
-    val windowInBytes = windowVar.ptr.readBytes(8).asUByteArray()
-
-    system.changeProperty(rootWindow, netSupportWmCheckAtom, windowAtom, windowInBytes, 32)
-    system.changeProperty(ewmhSupportWindow, netSupportWmCheckAtom, windowAtom, windowInBytes, 32)
-
-    system.changeProperty(ewmhSupportWindow, netWmName, utf8Atom, "LCARSWM".encodeToByteArray().asUByteArray(), 8);
-
-    system.changeProperty(rootWindow, netSupportedAtom, atomAtom, ubyteArrayOf(), 32);
-}
-
-fun becomeScreenOwner(system: SystemApi, ewmhSupportWindow: Window): Boolean {
+fun becomeScreenOwner(system: SystemApi, ewmhSupportWindowHandler: EwmhSupportWindowHandler): Boolean {
     val wmSnName = "WM_S${system.defaultScreenNumber()}"
     val wmSn = system.internAtom(wmSnName, false)
 
@@ -155,9 +122,9 @@ fun becomeScreenOwner(system: SystemApi, ewmhSupportWindow: Window): Boolean {
         return false
     }
 
-    system.setSelectionOwner(wmSn, ewmhSupportWindow, CurrentTime.convert())
+    system.setSelectionOwner(wmSn, ewmhSupportWindowHandler.ewmhSupportWindow, CurrentTime.convert())
 
-    if (system.getSelectionOwner(wmSn) != ewmhSupportWindow) {
+    if (system.getSelectionOwner(wmSn) != ewmhSupportWindowHandler.ewmhSupportWindow) {
         return false
     }
 
