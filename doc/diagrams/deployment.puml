@@ -1,0 +1,22 @@
+@startuml
+
+rectangle Linux {
+    folder "/home/user/.config/lcarswm" {
+        file "key-config.properties" as config
+    }
+    folder "/usr" {
+        folder "/bin" {
+            file "startlcarswm" as starter
+            file "lcarswm.kexe" as wm
+        }
+        folder "/share/pixmaps" {
+            file "lcarswm.xpm" as logo
+        }
+    }
+}
+
+starter .> wm : "<<run>>"
+wm ..> config : "<<use>>"
+wm ..> logo : "<<use>>"
+
+@enduml
