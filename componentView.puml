@@ -1,0 +1,34 @@
+@startuml
+skinparam useBetaStyle true
+skinparam componentStyle uml2
+
+'not working yet but hopefully soon
+<style>
+    componentDiagram {
+        LineColor #000
+
+        component {
+            LineColor #000
+        }
+    }
+</style>
+
+component LCARSWM
+
+component POSIX
+
+package "XLib" as XLibPackage {
+    component XLib
+    component XRandr
+    component XPM
+    component KeySym
+}
+
+LCARSWM ..> POSIX : read/write files\nexecute programs\nread environment variables\nget time
+
+LCARSWM ..> XRandr : handle monitor &\nscreen changes
+LCARSWM ..> XLib : get events\nmanage windows
+LCARSWM ..> XPM : load\ngraphics
+LCARSWM ..> KeySym : keyboard\nhandling
+
+@enduml
