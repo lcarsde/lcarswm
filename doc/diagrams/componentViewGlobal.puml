@@ -13,7 +13,7 @@ skinparam componentStyle uml2
     }
 </style>
 
-component LCARSWM
+component LCARSWM #5cd
 
 component POSIX
 
@@ -24,11 +24,18 @@ package "XLib" as XLibPackage {
     component KeySym
 }
 
-LCARSWM ..> POSIX : read/write files\nexecute programs\nread environment variables\nget time
+actor User
+
+User ..> XLib : open & close\nprogram windows
+User ..> XRandr : change monitor\nadjust screens
+
+User .left.> LCARSWM : Window & WM commands
+
+LCARSWM ..> POSIX : read settings\nwrite log\nexecute programs\nread environment variables\nget time
 
 LCARSWM ..> XRandr : handle monitor &\nscreen changes
 LCARSWM ..> XLib : get events\nmanage windows
 LCARSWM ..> XPM : load\ngraphics
-LCARSWM ..> KeySym : keyboard\nhandling
+LCARSWM ..> KeySym : keybinding\nhandling
 
 @enduml
