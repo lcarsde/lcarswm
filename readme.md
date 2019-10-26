@@ -32,13 +32,13 @@ Thank you very much to the creators of the following resources:
 Yay, it's starting to get usable. So here are some pictures from the VirtualBox test environment.
 
 Normal mode
-![lcarswm in normal mode](doc/screen-normal-mode.png)
+![lcarswm in normal mode](doc/images/screen-normal-mode.png)
 
 Maximized mode
-![lcarswm in normal mode](doc/screen-maximized-mode.png)
+![lcarswm in normal mode](doc/images/screen-maximized-mode.png)
 
 Fullscreen mode
-![lcarswm in normal mode](doc/screen-fullscreen-mode.png)
+![lcarswm in normal mode](doc/images/screen-fullscreen-mode.png)
 
 ## Required
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
