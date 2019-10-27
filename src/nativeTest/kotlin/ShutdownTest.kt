@@ -301,12 +301,12 @@ class ShutdownTest {
         assertEquals(
             "deleteProperty",
             deletePropertyCall.name,
-            "We need to call deleteProperty to unset _NET_SUPPORTED"
+            "We need to call deleteProperty to unset $propertyName"
         )
         assertEquals(
-            atomMap["_NET_SUPPORTED"],
+            atomMap[propertyName],
             deletePropertyCall.parameters[1],
-            "The property to delete during shutdown is _NET_SUPPORTED"
+            "The property to delete is $propertyName"
         )
     }
 
