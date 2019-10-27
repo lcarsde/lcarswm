@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -36,23 +37,21 @@ class EwmhSupportWindowHandler(
     }
 
     fun setSupportWindowProperties() {
-        val windowVar = nativeHeap.alloc<ULongVar>()
-        windowVar.value = ewmhSupportWindow
-        val windowInBytes = windowVar.ptr.readBytes(8).asUByteArray()
+        val ewmhWindowInBytes = ewmhSupportWindow.toUByteArray()
 
-        system.changeProperty(rootWindow, netSupportWmCheckAtom, windowAtom, windowInBytes, 32)
-        system.changeProperty(ewmhSupportWindow, netSupportWmCheckAtom, windowAtom, windowInBytes, 32)
+        system.changeProperty(rootWindow, netSupportWmCheckAtom, windowAtom, ewmhWindowInBytes, 32)
+        system.changeProperty(ewmhSupportWindow, netSupportWmCheckAtom, windowAtom, ewmhWindowInBytes, 32)
 
-        system.changeProperty(ewmhSupportWindow, netWmName, utf8Atom, "LCARSWM".encodeToByteArray().asUByteArray(), 8);
+        system.changeProperty(ewmhSupportWindow, netWmName, utf8Atom, "LCARSWM".toUByteArray(), 8)
 
-        system.changeProperty(rootWindow, netSupportedAtom, atomAtom, ubyteArrayOf(), 32);
-    }
-
-    fun destroySupportWindow() {
-        system.destroyWindow(ewmhSupportWindow)
+        system.changeProperty(rootWindow, netSupportedAtom, atomAtom, ubyteArrayOf(), 32)
     }
 
     fun unsetWindowProperties() {
         system.deleteProperty(rootWindow, netSupportedAtom)
+    }
+
+    fun destroySupportWindow() {
+        system.destroyWindow(ewmhSupportWindow)
     }
 }
