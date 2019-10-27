@@ -1,10 +1,7 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.log.LoggerMock
-import de.atennert.lcarswm.system.SystemFacadeMock
-import kotlinx.cinterop.CValues
-import kotlinx.cinterop.CValuesRef
-import kotlinx.cinterop.UByteVar
+import de.atennert.lcarswm.system.LoggingSystemFacadeMock
 import kotlinx.cinterop.convert
 import xlib.Atom
 import xlib.NormalState
@@ -19,9 +16,9 @@ import kotlin.test.assertTrue
 class AddWindowTest {
     @Test
     fun `check window initialization`() {
-        val rootWindowId = 2.toULong()
-        val windowId = 5.toULong()
-        val frameId = 12.toULong()
+        val rootWindowId: Window = 2.convert()
+        val windowId: Window = 5.convert()
+        val frameId: Window = 12.convert()
         val commandList = mutableListOf<String>()
 
         val systemApi = SystemApiHelper(frameId, commandList)
@@ -42,7 +39,7 @@ class AddWindowTest {
     class SystemApiHelper(
         private val frameId: Window,
         private val commandList: MutableList<String>
-    ) : SystemFacadeMock() {
+    ) : LoggingSystemFacadeMock() {
         override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
             commandList.add("createSimpleWindow-$parentWindow")
             return frameId
@@ -71,7 +68,7 @@ class AddWindowTest {
     }
 
     class WindowManagerStateHelper(private val commandList: MutableList<String>) : WindowManagerStateMock() {
-        override val wmState: ULong = 42.convert()
+        override val wmState: Atom = 42.convert()
 
         override fun addWindow(window: WindowContainer, monitor: Monitor) {
             commandList.add("addWindow-${window.id}")

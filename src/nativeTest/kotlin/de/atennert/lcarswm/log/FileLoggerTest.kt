@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.log
 
-import de.atennert.lcarswm.system.SystemFacadeMock
+import de.atennert.lcarswm.system.LoggingSystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.nativeHeap
@@ -75,7 +75,7 @@ class FileLoggerTest {
         assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
     }
 
-    private class PosixApiMock(val filePointer: CPointer<FILE>) : SystemFacadeMock() {
+    private class PosixApiMock(val filePointer: CPointer<FILE>) : LoggingSystemFacadeMock() {
         var fopenFileName: String? = null
         var fopenMode: String? = null
 

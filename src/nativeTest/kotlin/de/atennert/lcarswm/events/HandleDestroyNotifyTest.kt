@@ -5,7 +5,6 @@ import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.LoggingSystemFacadeMock
-import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
@@ -19,7 +18,7 @@ import kotlin.test.assertTrue
 class HandleDestroyNotifyTest {
     @Test
     fun `remove window on destroy notify`() {
-        val windowId = 1.toULong()
+        val windowId: Window = 1.convert()
 
         val destroyNotifyEvent = nativeHeap.alloc<XEvent>()
         destroyNotifyEvent.xdestroywindow.window = windowId
@@ -40,7 +39,7 @@ class HandleDestroyNotifyTest {
 
     @Test
     fun `don't remove unknown window`() {
-        val windowId = 1.toULong()
+        val windowId: Window = 1.convert()
 
         val destroyNotifyEvent = nativeHeap.alloc<XEvent>()
         destroyNotifyEvent.xdestroywindow.window = windowId
