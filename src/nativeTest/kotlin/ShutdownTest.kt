@@ -162,42 +162,12 @@ class ShutdownTest {
     fun `shutdown after sending shutdown key combo`() {
         val logger = LoggerMock()
         val testFacade = object : SystemFacadeMock() {
-            val modifiers = UByteArray(8) { 1.shl(it).convert() }
-
-            val winModifierPosition = 6
-
-            val KEY_SYMS = mapOf(
-                Pair(XK_Tab, 0),
-                Pair(XK_Up, 1),
-                Pair(XK_Down, 2),
-                Pair(XK_M, 3),
-                Pair(XK_Q, 4),
-                Pair(XK_F4, 5),
-                Pair(XK_T, 6),
-                Pair(XK_B, 7),
-                Pair(XK_I, 8),
-                Pair(XF86XK_AudioMute, 9),
-                Pair(XF86XK_AudioLowerVolume, 10),
-                Pair(XF86XK_AudioRaiseVolume, 11)
-            )
-
             override fun nextEvent(event: CPointer<XEvent>): Int {
                 super.nextEvent(event)
                 event.pointed.type = KeyRelease
-                event.pointed.xkey.keycode = KEY_SYMS.getValue(XK_Q).convert()
+                event.pointed.xkey.keycode = keySyms.getValue(XK_Q).convert()
                 event.pointed.xkey.state = modifiers[winModifierPosition].convert()
                 return 0
-            }
-
-            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
-                val keymap = nativeHeap.alloc<XModifierKeymap>()
-                keymap.max_keypermod = 1
-                keymap.modifiermap = modifiers.pin().addressOf(0)
-                return keymap.ptr
-            }
-
-            override fun keysymToKeycode(keySym: KeySym): KeyCode {
-                return KEY_SYMS[keySym.convert()]?.convert() ?: error("keySym not found")
             }
         }
 

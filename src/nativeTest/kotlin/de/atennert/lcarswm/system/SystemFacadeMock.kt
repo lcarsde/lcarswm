@@ -158,15 +158,34 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    val modifiers = UByteArray(8) { 1.shl(it).convert() }
+
+    val winModifierPosition = 6
+
+    val keySyms = mapOf(
+        Pair(XK_Tab, 0),
+        Pair(XK_Up, 1),
+        Pair(XK_Down, 2),
+        Pair(XK_M, 3),
+        Pair(XK_Q, 4),
+        Pair(XK_F4, 5),
+        Pair(XK_T, 6),
+        Pair(XK_B, 7),
+        Pair(XK_I, 8),
+        Pair(XF86XK_AudioMute, 9),
+        Pair(XF86XK_AudioLowerVolume, 10),
+        Pair(XF86XK_AudioRaiseVolume, 11)
+    )
+
     override fun getModifierMapping(): CPointer<XModifierKeymap>? {
-        functionCalls.add(FunctionCall("getModifierMapping"))
-        val modifierKeymap = nativeHeap.alloc<XModifierKeymap>()
-        return modifierKeymap.ptr
+        val keymap = nativeHeap.alloc<XModifierKeymap>()
+        keymap.max_keypermod = 1
+        keymap.modifiermap = modifiers.pin().addressOf(0)
+        return keymap.ptr
     }
 
     override fun keysymToKeycode(keySym: KeySym): KeyCode {
-        functionCalls.add(FunctionCall("keysymToKeycode", keySym))
-        return 0.convert()
+        return keySyms[keySym.convert()]?.convert() ?: error("keySym not found")
     }
 
     override fun sync(discardQueuedEvents: Boolean): Int {
