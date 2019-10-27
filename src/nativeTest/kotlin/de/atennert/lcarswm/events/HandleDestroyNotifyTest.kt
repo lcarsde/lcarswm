@@ -4,7 +4,7 @@ import de.atennert.lcarswm.Monitor
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.log.LoggerMock
-import de.atennert.lcarswm.system.LoggingSystemFacadeMock
+import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
@@ -24,7 +24,7 @@ class HandleDestroyNotifyTest {
         destroyNotifyEvent.xdestroywindow.window = windowId
 
         val windowManagerState = WindowManagerStateTestImpl(windowId)
-        val system = LoggingSystemFacadeMock()
+        val system = SystemFacadeMock()
 
         val requestShutdown = handleDestroyNotify(system, LoggerMock(), windowManagerState, destroyNotifyEvent)
 
@@ -45,7 +45,7 @@ class HandleDestroyNotifyTest {
         destroyNotifyEvent.xdestroywindow.window = windowId
 
         val windowManagerState = WindowManagerStateTestImpl(0.convert())
-        val system = LoggingSystemFacadeMock()
+        val system = SystemFacadeMock()
 
         val requestShutdown = handleDestroyNotify(system, LoggerMock(), windowManagerState, destroyNotifyEvent)
 

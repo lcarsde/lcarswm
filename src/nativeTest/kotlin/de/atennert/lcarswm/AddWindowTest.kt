@@ -1,7 +1,7 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.log.LoggerMock
-import de.atennert.lcarswm.system.LoggingSystemFacadeMock
+import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
 import xlib.Atom
 import xlib.NormalState
@@ -39,7 +39,7 @@ class AddWindowTest {
     class SystemApiHelper(
         private val frameId: Window,
         private val commandList: MutableList<String>
-    ) : LoggingSystemFacadeMock() {
+    ) : SystemFacadeMock() {
         override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
             commandList.add("createSimpleWindow-$parentWindow")
             return frameId

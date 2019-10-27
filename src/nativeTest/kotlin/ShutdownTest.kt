@@ -1,6 +1,6 @@
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.FunctionCall
-import de.atennert.lcarswm.system.LoggingSystemFacadeMock
+import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import xlib.*
 import kotlin.test.Test
@@ -11,7 +11,7 @@ class ShutdownTest {
     @Test
     fun `shutdown when there's no display to get`() {
         val logger = LoggerMock()
-        val testFacade = object : LoggingSystemFacadeMock() {
+        val testFacade = object : SystemFacadeMock() {
             override fun openDisplay(): Boolean {
                 super.functionCalls.add(FunctionCall("openDisplay"))
                 return false
@@ -27,7 +27,7 @@ class ShutdownTest {
     @Test
     fun `shutdown when there's no default screen to get`() {
         val logger = LoggerMock()
-        val testFacade = object : LoggingSystemFacadeMock() {
+        val testFacade = object : SystemFacadeMock() {
             override fun defaultScreenOfDisplay(): CPointer<Screen>? {
                 super.functionCalls.add(FunctionCall("defaultScreenOfDisplay"))
                 return null
@@ -47,7 +47,7 @@ class ShutdownTest {
     @Test
     fun `shutdown when there is already a screen owner`() {
         val logger = LoggerMock()
-        val testFacade = object : LoggingSystemFacadeMock() {
+        val testFacade = object : SystemFacadeMock() {
             override fun defaultScreenNumber(): Int {
                 return 23
             }
@@ -86,7 +86,7 @@ class ShutdownTest {
     @Test
     fun `shutdown when the wm can not become screen owner`() {
         val logger = LoggerMock()
-        val testFacade = object : LoggingSystemFacadeMock() {
+        val testFacade = object : SystemFacadeMock() {
             var selectionOwnerCounter = 0
 
             var window: Window = 123.convert()
@@ -143,7 +143,7 @@ class ShutdownTest {
     @Test
     fun `shutdown when there is an error response for select input`() {
         val logger = LoggerMock()
-        val testFacade = object : LoggingSystemFacadeMock() {
+        val testFacade = object : SystemFacadeMock() {
             private lateinit var errorHandler: XErrorHandler
 
             override fun setErrorHandler(handler: XErrorHandler): XErrorHandler? {
@@ -173,7 +173,7 @@ class ShutdownTest {
     @Test
     fun `shutdown after sending shutdown key combo`() {
         val logger = LoggerMock()
-        val testFacade = object : LoggingSystemFacadeMock() {
+        val testFacade = object : SystemFacadeMock() {
             val modifiers = UByteArray(8) {1.shl(it).convert()}
 
             val winModifierPosition = 6

@@ -1,11 +1,10 @@
 import de.atennert.lcarswm.log.LoggerMock
-import de.atennert.lcarswm.system.LoggingSystemFacadeMock
+import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class StartupTest {
     @Test
@@ -23,7 +22,7 @@ class StartupTest {
         assertEquals(systemFacade.displayString, setenvCall.parameters[1], "the DISPLAY environment variable should be set to the return value of getDisplayString")
     }
 
-    private class StartupFacadeMock : LoggingSystemFacadeMock() {
+    private class StartupFacadeMock : SystemFacadeMock() {
         val displayString = "displayString"
 
         val modifiers = UByteArray(8) {1.shl(it).convert()}
