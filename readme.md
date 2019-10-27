@@ -52,30 +52,30 @@ Fullscreen mode
 ## To Do
 ### ICCCM
 * Client properties (stuff to use)
-** WM_NAME
-** WM_ICON_NAME ?
-** WM_NORMAL_HINTS
-** WM_HINTS
-** WM_CLASS ?
-** WM_TRANSIENT_FOR
-** WM_PROTOCOLS
-*** WM_TAKE_FOCUS
-*** ...
-** WM_COLORMAP_WINDOWS
+  * WM_NAME
+  * WM_ICON_NAME ?
+  * WM_NORMAL_HINTS
+  * WM_HINTS
+  * WM_CLASS ?
+  * WM_TRANSIENT_FOR
+  * WM_PROTOCOLS
+    * WM_TAKE_FOCUS
+    * ...
+  * WM_COLORMAP_WINDOWS
 * Window manager properties (stuff to set)
-** WM_ICON_SIZE ?
+  * WM_ICON_SIZE ?
 * State transitions
-** Thinks about handling iconic states (ClientMessage)
+  * Thinks about handling iconic states (ClientMessage)
 * Configuration of clients
-** Fix the handling of ConfigureRequests according to defined window manager responses
+  * Fix the handling of ConfigureRequests according to defined window manager responses
 * Input handling
-** adjust handling according to WM_HINTS.inputField and WM_TAKE_FOCUS
+  * adjust handling according to WM_HINTS.inputField and WM_TAKE_FOCUS
 * Handle ColormapChanges ?
 * Icon handling ?
 * Popup handling
-** window groups (WM_HINTS)
-** WM_TRANSIENT_FOR
-** override redirect
+  * window groups (WM_HINTS)
+  * WM_TRANSIENT_FOR
+  * override redirect
 
 ### EWMH
 TODO
