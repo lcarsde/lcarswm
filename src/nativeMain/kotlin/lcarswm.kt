@@ -96,6 +96,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         cleanupColorMap(system, colorMap)
 
+        system.selectInput(rootWindow, NoEventMask)
         cleanup(logger, system, ewmhSupportWindowHandler)
     }
 }

@@ -221,6 +221,9 @@ class ShutdownTest {
         assertEquals("nextEvent", functionCalls.removeAt(0).name, "The window manager should react to events")
         assertEquals("freeColors", functionCalls.removeAt(0).name, "the acquired colors need to be freed on shutdown")
         assertEquals("freeColormap", functionCalls.removeAt(0).name, "the acquired color map needs to be freed on shutdown")
+        val selectInputCall = functionCalls.removeAt(0)
+        assertEquals("selectInput", selectInputCall.name, "selectInput needs to be called on shutdown, to unselect the input")
+        assertEquals(NoEventMask, selectInputCall.parameters[1], "selectInput must not select any input to unselect everything")
         assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
         assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
 
