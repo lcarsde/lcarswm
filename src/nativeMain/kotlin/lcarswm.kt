@@ -14,6 +14,9 @@ private var wmDetected = false
 // this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
 private var staticLogger: Logger? = null
 
+const val ROOT_WINDOW_MASK = SubstructureRedirectMask or SubstructureNotifyMask or PropertyChangeMask or
+        EnterWindowMask or LeaveWindowMask or FocusChangeMask or ButtonPressMask or ButtonReleaseMask
+
 // the main method apparently must not be inside of a package so it can be compiled with Kotlin/Native
 fun main() {
     val system = SystemFacade()
@@ -51,8 +54,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
-        system.selectInput(rootWindow, SubstructureRedirectMask or SubstructureNotifyMask or PropertyChangeMask or
-                EnterWindowMask or LeaveWindowMask or FocusChangeMask or ButtonPressMask or ButtonReleaseMask)
+        system.selectInput(rootWindow, ROOT_WINDOW_MASK)
         system.sync(false)
 
         if (wmDetected) {

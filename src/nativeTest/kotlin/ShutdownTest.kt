@@ -19,9 +19,9 @@ class ShutdownTest {
         }
         runWindowManager(testFacade, logger)
 
-        assertTrue(logger.closed, "The logger needs to be closed")
-        assertEquals("openDisplay", testFacade.functionCalls.removeAt(0).name, "startup should try to get display")
-        assertTrue(testFacade.functionCalls.isEmpty(), "There should be no more calls to the system, when we can't get a display")
+        checkThatTheLoggerIsClosed(logger)
+        checkForTryingToOpenDisplay(testFacade.functionCalls)
+        checkThatThereIsNoUnexpectedInteraction(testFacade.functionCalls)
     }
 
     @Test
@@ -35,13 +35,15 @@ class ShutdownTest {
         }
         runWindowManager(testFacade, logger)
 
-        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "defaultScreenOfDisplay" }.toMutableList()
+        val functionCalls = testFacade.functionCalls
+            .dropWhile { it.name != "defaultScreenOfDisplay" }
+            .toMutableList()
 
-        assertTrue(logger.closed, "The logger needs to be closed")
-        assertEquals("defaultScreenOfDisplay", functionCalls.removeAt(0).name, "startup needs to request the default display for the screen")
-        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to no default screen")
+        checkThatTheLoggerIsClosed(logger)
+        checkRequestForDisplaysDefaultScreen(functionCalls)
+        checkThatTheDisplayWasClosed(functionCalls)
 
-        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+        checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
 
     @Test
@@ -73,14 +75,16 @@ class ShutdownTest {
 
         runWindowManager(testFacade, logger)
 
-        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "getSelectionOwner" }.toMutableList()
+        val functionCalls = testFacade.functionCalls
+            .dropWhile { it.name != "getSelectionOwner" }
+            .toMutableList()
 
-        assertTrue(logger.closed, "The logger needs to be closed")
-        assertEquals("getSelectionOwner", functionCalls.removeAt(0).name, "should call getSelectionOwner to check if other WM is active")
-        assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
-        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to no default screen")
+        checkThatTheLoggerIsClosed(logger)
+        checkRequestForCurrentSelectionOwner(functionCalls)
+        checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatTheDisplayWasClosed(functionCalls)
 
-        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+        checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
 
     @Test
@@ -130,14 +134,16 @@ class ShutdownTest {
 
         runWindowManager(testFacade, logger)
 
-        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "getSelectionOwner" || it.parameters.elementAtOrNull(1) != 1 }.toMutableList()
+        val functionCalls = testFacade.functionCalls
+            .dropWhile { it.name != "getSelectionOwner" || it.parameters.elementAtOrNull(1) != 1 }
+            .toMutableList()
 
-        assertTrue(logger.closed, "The logger needs to be closed")
-        assertEquals("getSelectionOwner", functionCalls.removeAt(0).name, "should call getSelectionOwner to check if we became the active WM")
-        assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
-        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to no default screen")
+        checkThatTheLoggerIsClosed(logger)
+        checkRequestForCurrentSelectionOwner(functionCalls)
+        checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatTheDisplayWasClosed(functionCalls)
 
-        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+        checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
 
     @Test
@@ -158,23 +164,25 @@ class ShutdownTest {
         }
         runWindowManager(testFacade, logger)
 
-        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "setErrorHandler" }.toMutableList()
+        val functionCalls = testFacade.functionCalls
+            .dropWhile { it.name != "setErrorHandler" }
+            .toMutableList()
 
-        assertTrue(logger.closed, "The logger needs to be closed")
-        assertEquals("setErrorHandler", functionCalls.removeAt(0).name, "startup should set an error handler to get notified if another WM is already active (selected the input on the root window)")
-        assertEquals("selectInput", functionCalls.removeAt(0).name, "startup should try to select the input on the root window")
-        assertEquals("sync", functionCalls.removeAt(0).name, "startup should sync after select input to get notified for other WMs")
-        assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
-        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
+        checkThatTheLoggerIsClosed(logger)
+        checkSettingOfErrorHandler(functionCalls)
+        checkSelectInputSetting(functionCalls, ROOT_WINDOW_MASK)
+        checkSynchronizationRequest(functionCalls)
+        checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatTheDisplayWasClosed(functionCalls)
 
-        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+        checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
 
     @Test
     fun `shutdown after sending shutdown key combo`() {
         val logger = LoggerMock()
         val testFacade = object : SystemFacadeMock() {
-            val modifiers = UByteArray(8) {1.shl(it).convert()}
+            val modifiers = UByteArray(8) { 1.shl(it).convert() }
 
             val winModifierPosition = 6
 
@@ -215,21 +223,136 @@ class ShutdownTest {
 
         runWindowManager(testFacade, logger)
 
-        val functionCalls = testFacade.functionCalls.dropWhile { it.name != "nextEvent" }.toMutableList()
+        val functionCalls = testFacade.functionCalls
+            .dropWhile { it.name != "nextEvent" }
+            .toMutableList()
 
+        checkThatTheLoggerIsClosed(logger)
+        checkRequestOfNextEvent(functionCalls)
+        checkFreeingOfColors(functionCalls)
+        checkFreeingOfColorMap(functionCalls)
+        checkSelectInputSetting(functionCalls, NoEventMask)
+        checkWindowPropertyRemoval(functionCalls, testFacade.atomMap)
+        checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatTheDisplayWasClosed(functionCalls)
+
+        checkThatThereIsNoUnexpectedInteraction(functionCalls)
+    }
+
+    private fun checkThatTheLoggerIsClosed(logger: LoggerMock) {
         assertTrue(logger.closed, "The logger needs to be closed")
-        assertEquals("nextEvent", functionCalls.removeAt(0).name, "The window manager should react to events")
-        assertEquals("freeColors", functionCalls.removeAt(0).name, "the acquired colors need to be freed on shutdown")
-        assertEquals("freeColormap", functionCalls.removeAt(0).name, "the acquired color map needs to be freed on shutdown")
-        val selectInputCall = functionCalls.removeAt(0)
-        assertEquals("selectInput", selectInputCall.name, "selectInput needs to be called on shutdown, to unselect the input")
-        assertEquals(NoEventMask, selectInputCall.parameters[1], "selectInput must not select any input to unselect everything")
-        val deletePropertyCall = functionCalls.removeAt(0)
-        assertEquals("deleteProperty", deletePropertyCall.name, "We need to call deleteProperty to unset _NET_SUPPORTED")
-        assertEquals(testFacade.atomMap["_NET_SUPPORTED"], deletePropertyCall.parameters[1], "The property to delete during shutdown is _NET_SUPPORTED")
-        assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
-        assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
+    }
 
-        assertTrue(functionCalls.isEmpty(), "There should be no more calls to the system after the display is closed")
+    private fun checkForTryingToOpenDisplay(functionCalls: MutableList<FunctionCall>) {
+        assertEquals(
+            "openDisplay",
+            functionCalls.removeAt(0).name,
+            "startup should try to get display"
+        )
+    }
+
+    private fun checkRequestForDisplaysDefaultScreen(functionCalls: MutableList<FunctionCall>) {
+        assertEquals(
+            "defaultScreenOfDisplay",
+            functionCalls.removeAt(0).name,
+            "startup needs to request the default display for the screen"
+        )
+    }
+
+    private fun checkRequestForCurrentSelectionOwner(functionCalls: MutableList<FunctionCall>) {
+        assertEquals(
+            "getSelectionOwner",
+            functionCalls.removeAt(0).name,
+            "should call getSelectionOwner to check if other WM is active"
+        )
+    }
+
+    private fun checkSettingOfErrorHandler(functionCalls: MutableList<FunctionCall>) {
+        assertEquals(
+            "setErrorHandler",
+            functionCalls.removeAt(0).name,
+            "startup should set an error handler to get notified if another WM is already active (selected the input on the root window)"
+        )
+    }
+
+    private fun checkSelectInputSetting(
+        functionCalls: MutableList<FunctionCall>,
+        mask: Long
+    ) {
+        val selectInputCall = functionCalls.removeAt(0)
+        assertEquals(
+            "selectInput",
+            selectInputCall.name,
+            "selectInput needs to be called"
+        )
+        assertEquals(
+            mask,
+            selectInputCall.parameters[1],
+            "selectInput should be called with the mask $mask"
+        )
+    }
+
+    private fun checkWindowPropertyRemoval(
+        functionCalls: MutableList<FunctionCall>,
+        atomMap: Map<String, Atom>
+    ) {
+        val deletePropertyCall = functionCalls.removeAt(0)
+        assertEquals(
+            "deleteProperty",
+            deletePropertyCall.name,
+            "We need to call deleteProperty to unset _NET_SUPPORTED"
+        )
+        assertEquals(
+            atomMap["_NET_SUPPORTED"],
+            deletePropertyCall.parameters[1],
+            "The property to delete during shutdown is _NET_SUPPORTED"
+        )
+    }
+
+    private fun checkSynchronizationRequest(functionCalls: MutableList<FunctionCall>) {
+        assertEquals(
+            "sync",
+            functionCalls.removeAt(0).name,
+            "startup should sync after select input to get notified for other WMs"
+        )
+    }
+
+    private fun checkRequestOfNextEvent(functionCalls: MutableList<FunctionCall>) {
+        assertEquals("nextEvent", functionCalls.removeAt(0).name, "The window manager should react to events")
+    }
+
+    private fun checkFreeingOfColors(functionCalls: MutableList<FunctionCall>) {
+        assertEquals("freeColors", functionCalls.removeAt(0).name, "the acquired colors need to be freed on shutdown")
+    }
+
+    private fun checkFreeingOfColorMap(functionCalls: MutableList<FunctionCall>) {
+        assertEquals(
+            "freeColormap",
+            functionCalls.removeAt(0).name,
+            "the acquired color map needs to be freed on shutdown"
+        )
+    }
+
+    private fun checkThatSupportWindowWasDestroyed(functionCalls: MutableList<FunctionCall>) {
+        assertEquals(
+            "destroyWindow",
+            functionCalls.removeAt(0).name,
+            "net wm support window needs to be destroyed"
+        )
+    }
+
+    private fun checkThatTheDisplayWasClosed(functionCalls: MutableList<FunctionCall>) {
+        assertEquals(
+            "closeDisplay",
+            functionCalls.removeAt(0).name,
+            "the display needs to be closed when shutting down due to no default screen"
+        )
+    }
+
+    private fun checkThatThereIsNoUnexpectedInteraction(functionCalls: MutableList<FunctionCall>) {
+        assertTrue(
+            functionCalls.isEmpty(),
+            "There should be no more calls to the system, when we can't get a display"
+        )
     }
 }
