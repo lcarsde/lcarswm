@@ -94,11 +94,21 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         eventLoop(system, logger, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, graphicsContexts)
 
-        cleanupColorMap(system, colorMap)
-
-        system.selectInput(rootWindow, NoEventMask)
-        cleanup(logger, system, ewmhSupportWindowHandler)
+        shutdown(system, colorMap, rootWindow, logger, ewmhSupportWindowHandler)
     }
+}
+
+private fun shutdown(
+    system: SystemApi,
+    colorMap: Pair<Colormap, List<ULong>>,
+    rootWindow: Window,
+    logger: Logger,
+    ewmhSupportWindowHandler: EwmhSupportWindowHandler
+) {
+    cleanupColorMap(system, colorMap)
+
+    system.selectInput(rootWindow, NoEventMask)
+    cleanup(logger, system, ewmhSupportWindowHandler)
 }
 
 fun cleanup(logger: Logger, windowUtils: WindowUtilApi, ewmhSupportWindowHandler: EwmhSupportWindowHandler) {
