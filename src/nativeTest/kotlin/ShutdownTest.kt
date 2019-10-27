@@ -232,7 +232,7 @@ class ShutdownTest {
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
         checkSelectInputSetting(functionCalls, NoEventMask)
-        checkWindowPropertyRemoval(functionCalls, testFacade.atomMap)
+        checkWindowPropertyRemoval(functionCalls, testFacade.atomMap, "_NET_SUPPORTED")
         checkThatSupportWindowWasDestroyed(functionCalls)
         checkThatTheDisplayWasClosed(functionCalls)
 
@@ -294,7 +294,8 @@ class ShutdownTest {
 
     private fun checkWindowPropertyRemoval(
         functionCalls: MutableList<FunctionCall>,
-        atomMap: Map<String, Atom>
+        atomMap: Map<String, Atom>,
+        propertyName: String
     ) {
         val deletePropertyCall = functionCalls.removeAt(0)
         assertEquals(
