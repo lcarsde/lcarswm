@@ -13,7 +13,7 @@ class ShutdownTest {
         val logger = LoggerMock()
         val testFacade = object : SystemFacadeMock() {
             override fun openDisplay(): Boolean {
-                super.functionCalls.add(FunctionCall("openDisplay"))
+                super.openDisplay()
                 return false
             }
         }
@@ -29,7 +29,7 @@ class ShutdownTest {
         val logger = LoggerMock()
         val testFacade = object : SystemFacadeMock() {
             override fun defaultScreenOfDisplay(): CPointer<Screen>? {
-                super.functionCalls.add(FunctionCall("defaultScreenOfDisplay"))
+                super.defaultScreenOfDisplay()
                 return null
             }
         }
@@ -54,18 +54,9 @@ class ShutdownTest {
                 return 23
             }
 
-            override fun internAtom(name: String, onlyIfExists: Boolean): Atom {
-                val defaultResponse = super.internAtom(name, onlyIfExists)
-                return if (name == "WM_S${defaultScreenNumber()}") {
-                    42.convert()
-                } else {
-                    defaultResponse
-                }
-            }
-
             override fun getSelectionOwner(atom: Atom): Window {
                 val defaultResponse = super.getSelectionOwner(atom)
-                return if (atom.convert<Int>() == 42) {
+                return if (atom == atomMap["WM_S${defaultScreenNumber()}"]) {
                     21.convert() // this screen is taken
                 } else {
                     defaultResponse
@@ -109,21 +100,10 @@ class ShutdownTest {
                 return window++
             }
 
-            override fun defaultScreenNumber(): Int {
-                return 23
-            }
-
-            override fun internAtom(name: String, onlyIfExists: Boolean): Atom {
-                val defaultResponse = super.internAtom(name, onlyIfExists)
-                return if (name == "WM_S${defaultScreenNumber()}") {
-                    42.convert()
-                } else {
-                    defaultResponse
-                }
-            }
+            override fun defaultScreenNumber(): Int = 23
 
             override fun getSelectionOwner(atom: Atom): Window {
-                return if (atom.convert<Int>() == 42) {
+                return if (atom == atomMap["WM_S${defaultScreenNumber()}"]) {
                     super.functionCalls.add(FunctionCall("getSelectionOwner", atom, selectionOwnerCounter++))
                     None.convert()
                 } else {
