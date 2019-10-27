@@ -108,6 +108,8 @@ private fun shutdown(
     cleanupColorMap(system, colorMap)
 
     system.selectInput(rootWindow, NoEventMask)
+    ewmhSupportWindowHandler.unsetWindowProperties()
+
     cleanup(logger, system, ewmhSupportWindowHandler)
 }
 

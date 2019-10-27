@@ -224,6 +224,9 @@ class ShutdownTest {
         val selectInputCall = functionCalls.removeAt(0)
         assertEquals("selectInput", selectInputCall.name, "selectInput needs to be called on shutdown, to unselect the input")
         assertEquals(NoEventMask, selectInputCall.parameters[1], "selectInput must not select any input to unselect everything")
+        val deletePropertyCall = functionCalls.removeAt(0)
+        assertEquals("deleteProperty", deletePropertyCall.name, "We need to call deleteProperty to unset _NET_SUPPORTED")
+        assertEquals(testFacade.atomMap["_NET_SUPPORTED"], deletePropertyCall.parameters[1], "The property to delete during shutdown is _NET_SUPPORTED")
         assertEquals("destroyWindow", functionCalls.removeAt(0).name, "net wm support window needs to be destroyed")
         assertEquals("closeDisplay", functionCalls.removeAt(0).name, "the display needs to be closed when shutting down due to another active WM")
 

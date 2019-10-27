@@ -51,4 +51,8 @@ class EwmhSupportWindowHandler(
     fun destroySupportWindow() {
         system.destroyWindow(ewmhSupportWindow)
     }
+
+    fun unsetWindowProperties() {
+        system.deleteProperty(rootWindow, netSupportedAtom)
+    }
 }

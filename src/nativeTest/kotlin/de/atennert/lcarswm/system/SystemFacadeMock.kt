@@ -314,9 +314,13 @@ open class SystemFacadeMock : SystemApi {
         return handler
     }
 
+    val atomMap = mutableMapOf<String, Atom>()
+    private var atomCounter: Atom = 1.convert()
     override fun internAtom(name: String, onlyIfExists: Boolean): Atom {
         functionCalls.add(FunctionCall("internAtom", name, onlyIfExists))
-        return 0.convert()
+        val nextAtom = atomMap[name] ?: atomCounter++
+        atomMap[name] = nextAtom
+        return nextAtom
     }
 
     override fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int): Int {
