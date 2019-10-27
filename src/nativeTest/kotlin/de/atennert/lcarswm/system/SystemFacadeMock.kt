@@ -46,6 +46,8 @@ open class SystemFacadeMock : SystemApi {
 
     override fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int): Int = 0
 
+    override fun deleteProperty(window: Window, propertyAtom: Atom): Int = 0
+
     override fun killClient(window: Window): Int = 0
 
     override fun createWindow(

@@ -324,6 +324,11 @@ open class LoggingSystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun deleteProperty(window: Window, propertyAtom: Atom): Int {
+        functionCalls.add(FunctionCall("deleteProperty", window, propertyAtom))
+        return 0
+    }
+
     override fun killClient(window: Window): Int {
         functionCalls.add(FunctionCall("killClient", window))
         return 0

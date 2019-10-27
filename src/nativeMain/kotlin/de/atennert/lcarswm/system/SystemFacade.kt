@@ -91,6 +91,10 @@ class SystemFacade : SystemApi {
         return XChangeProperty(display, window, propertyAtom, typeAtom, format, PropModeReplace, data?.toCValues(), data?.size ?: 0)
     }
 
+    override fun deleteProperty(window: Window, propertyAtom: Atom): Int {
+        return XDeleteProperty(display, window, propertyAtom)
+    }
+
     override fun killClient(window: Window): Int {
         return XKillClient(display, window)
     }
