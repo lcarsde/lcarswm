@@ -44,7 +44,17 @@ class EwmhSupportWindowHandler(
 
         system.changeProperty(ewmhSupportWindow, netWmName, utf8Atom, "LCARSWM".toUByteArray(), 8)
 
-        system.changeProperty(rootWindow, netSupportedAtom, atomAtom, ubyteArrayOf(), 32)
+        system.changeProperty(rootWindow, netSupportedAtom, atomAtom, getSupportedProperties(), 32)
+    }
+
+    private fun getSupportedProperties(): UByteArray {
+        val supportedProperties = ulongArrayOf(netSupportWmCheckAtom,
+            netWmName)
+
+        val propertyCount = supportedProperties.size
+        val propertyBytes = supportedProperties.map { it.toUByteArray() }
+
+        return UByteArray(propertyCount * 4) {propertyBytes[it.div(4)][it.rem(4)]}
     }
 
     fun unsetWindowProperties() {
