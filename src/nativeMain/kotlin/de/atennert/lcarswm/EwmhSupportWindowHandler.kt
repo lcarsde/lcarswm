@@ -12,6 +12,8 @@ class EwmhSupportWindowHandler(
 ) {
     val ewmhSupportWindow: Window
 
+    private val longSizeInBytes = 4
+
     private val windowAtom = system.internAtom("WINDOW", false)
     private val atomAtom = system.internAtom("ATOM", false)
     private val utf8Atom = system.internAtom("UTF8_STRING", false)
@@ -54,7 +56,7 @@ class EwmhSupportWindowHandler(
         val propertyCount = supportedProperties.size
         val propertyBytes = supportedProperties.map { it.toUByteArray() }
 
-        return UByteArray(propertyCount * 4) {propertyBytes[it.div(4)][it.rem(4)]}
+        return UByteArray(propertyCount * longSizeInBytes) {propertyBytes[it.div(longSizeInBytes)][it.rem(longSizeInBytes)]}
     }
 
     fun unsetWindowProperties() {
