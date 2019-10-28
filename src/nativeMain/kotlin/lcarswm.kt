@@ -75,7 +75,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         val colorMap = allocateColorMap(system, screen.root_visual!!, rootWindow)
         val graphicsContexts = getGraphicContexts(system, rootWindow, colorMap.second)
 
-        val windowManagerConfig = WindowManagerState(system::internAtom)
+        val windowManagerConfig = WindowManagerState { system.internAtom(it) }
 
         setupLcarsWindow(system, screen, windowManagerConfig)
         windowManagerConfig.setActiveWindowListener { activeWindow ->
