@@ -53,10 +53,10 @@ class EwmhSupportWindowHandler(
         val supportedProperties = ulongArrayOf(netSupportWmCheckAtom,
             netWmName)
 
-        val propertyCount = supportedProperties.size
+        val byteCount = supportedProperties.size * longSizeInBytes
         val propertyBytes = supportedProperties.map { it.toUByteArray() }
 
-        return UByteArray(propertyCount * longSizeInBytes) {propertyBytes[it.div(longSizeInBytes)][it.rem(longSizeInBytes)]}
+        return UByteArray(byteCount) {propertyBytes[it.div(longSizeInBytes)][it.rem(longSizeInBytes)]}
     }
 
     fun unsetWindowProperties() {
