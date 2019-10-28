@@ -45,7 +45,7 @@ Fullscreen mode
 * header files and libraries for XLib, randr and xpm. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
 
 ## Known issues
-* Video players crash displaylink driver when using lcarswm
+* Video players crash displaylink driver when using lcarswm - if you know or guess something that could help, then write me ... seriously, I'm out of ideas on this one :-(
 * Softmaker office leaves shadow windows when closing
 * The frame window is drawing over the background and not scaling with popups
 
