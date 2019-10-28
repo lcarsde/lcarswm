@@ -88,7 +88,9 @@ class SystemFacade : SystemApi {
         data: UByteArray?,
         format: Int
     ): Int {
-        return XChangeProperty(display, window, propertyAtom, typeAtom, format, PropModeReplace, data?.toCValues(), data?.size ?: 0)
+        val bytesPerData = format.div(8)
+        val dataCount = data?.size?.div(bytesPerData) ?: 0
+        return XChangeProperty(display, window, propertyAtom, typeAtom, format, PropModeReplace, data?.toCValues(), dataCount)
     }
 
     override fun deleteProperty(window: Window, propertyAtom: Atom): Int {
