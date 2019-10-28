@@ -10,7 +10,7 @@ class RootWindowPropertyHandler(
     private val rootWindow: Window,
     rootVisual: CPointer<Visual>?
 ) {
-    val ewmhSupportWindow: Window
+    private val ewmhSupportWindow: Window
 
     private val longSizeInBytes = 4
 
@@ -40,7 +40,7 @@ class RootWindowPropertyHandler(
 
     fun becomeScreenOwner(): Boolean {
         val wmSnName = "WM_S${system.defaultScreenNumber()}"
-        val wmSn = system.internAtom(wmSnName, false)
+        val wmSn = system.internAtom(wmSnName)
 
         if (system.getSelectionOwner(wmSn) != None.convert<Window>()) {
             return false
