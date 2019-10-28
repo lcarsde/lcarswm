@@ -14,12 +14,12 @@ class EwmhSupportWindowHandler(
 
     private val longSizeInBytes = 4
 
-    private val windowAtom = system.internAtom("WINDOW", false)
-    private val atomAtom = system.internAtom("ATOM", false)
-    private val utf8Atom = system.internAtom("UTF8_STRING", false)
-    private val netWmName = system.internAtom("_NET_WM_NAME", false)
-    private val netSupportedAtom = system.internAtom("_NET_SUPPORTED", false)
-    private val netSupportWmCheckAtom = system.internAtom("_NET_SUPPORTING_WM_CHECK", false)
+    private val windowAtom = system.internAtom("WINDOW")
+    private val atomAtom = system.internAtom("ATOM")
+    private val utf8Atom = system.internAtom("UTF8_STRING")
+    private val netWmName = system.internAtom("_NET_WM_NAME")
+    private val netSupportedAtom = system.internAtom("_NET_SUPPORTED")
+    private val netSupportWmCheckAtom = system.internAtom("_NET_SUPPORTING_WM_CHECK")
 
     init {
         val windowAttributes = nativeHeap.alloc<XSetWindowAttributes>()
