@@ -32,7 +32,7 @@ interface WindowUtilApi {
 
     fun setErrorHandler(handler: XErrorHandler): XErrorHandler?
 
-    fun internAtom(name: String, onlyIfExists: Boolean): Atom
+    fun internAtom(name: String, onlyIfExists: Boolean = false): Atom
 
     fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int): Int
 
