@@ -44,11 +44,11 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         }
         val rootWindow = screen.root
 
-        val ewmhSupportWindowHandler = EwmhSupportWindowHandler(system, rootWindow, screen.root_visual)
+        val rootWindowPropertyHandler = RootWindowPropertyHandler(system, rootWindow, screen.root_visual)
 
-        if (!becomeScreenOwner(system, ewmhSupportWindowHandler)) {
+        if (!rootWindowPropertyHandler.becomeScreenOwner()) {
             logger.logError("::runWindowManager::Detected another active window manager")
-            cleanup(logger, system, ewmhSupportWindowHandler)
+            cleanup(logger, system, rootWindowPropertyHandler)
             return
         }
 
@@ -59,11 +59,11 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         if (wmDetected) {
             logger.logError("::runWindowManager::Detected another active window manager")
-            cleanup(logger, system, ewmhSupportWindowHandler)
+            cleanup(logger, system, rootWindowPropertyHandler)
             return
         }
 
-        ewmhSupportWindowHandler.setSupportWindowProperties()
+        rootWindowPropertyHandler.setSupportWindowProperties()
 
         setDisplayEnvironment(system)
 
@@ -96,7 +96,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         eventLoop(system, logger, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, graphicsContexts)
 
-        shutdown(system, colorMap, rootWindow, logger, ewmhSupportWindowHandler)
+        shutdown(system, colorMap, rootWindow, logger, rootWindowPropertyHandler)
     }
 }
 
@@ -105,18 +105,18 @@ private fun shutdown(
     colorMap: Pair<Colormap, List<ULong>>,
     rootWindow: Window,
     logger: Logger,
-    ewmhSupportWindowHandler: EwmhSupportWindowHandler
+    rootWindowPropertyHandler: RootWindowPropertyHandler
 ) {
     cleanupColorMap(system, colorMap)
 
     system.selectInput(rootWindow, NoEventMask)
-    ewmhSupportWindowHandler.unsetWindowProperties()
+    rootWindowPropertyHandler.unsetWindowProperties()
 
-    cleanup(logger, system, ewmhSupportWindowHandler)
+    cleanup(logger, system, rootWindowPropertyHandler)
 }
 
-fun cleanup(logger: Logger, windowUtils: WindowUtilApi, ewmhSupportWindowHandler: EwmhSupportWindowHandler) {
-    ewmhSupportWindowHandler.destroySupportWindow()
+fun cleanup(logger: Logger, windowUtils: WindowUtilApi, rootWindowPropertyHandler: RootWindowPropertyHandler) {
+    rootWindowPropertyHandler.destroySupportWindow()
 
     windowUtils.closeDisplay()
 
@@ -128,23 +128,6 @@ fun cleanup(logger: Logger, windowUtils: WindowUtilApi, ewmhSupportWindowHandler
 fun setDisplayEnvironment(system: SystemApi) {
     val displayString = system.getDisplayString()
     system.setenv("DISPLAY", displayString)
-}
-
-fun becomeScreenOwner(system: SystemApi, ewmhSupportWindowHandler: EwmhSupportWindowHandler): Boolean {
-    val wmSnName = "WM_S${system.defaultScreenNumber()}"
-    val wmSn = system.internAtom(wmSnName, false)
-
-    if (system.getSelectionOwner(wmSn) != None.convert<Window>()) {
-        return false
-    }
-
-    system.setSelectionOwner(wmSn, ewmhSupportWindowHandler.ewmhSupportWindow, CurrentTime.convert())
-
-    if (system.getSelectionOwner(wmSn) != ewmhSupportWindowHandler.ewmhSupportWindow) {
-        return false
-    }
-
-    return true
 }
 
 fun setupScreen(system: SystemApi, logger: Logger, rootWindow: Window, windowManagerConfig: WindowManagerState) {

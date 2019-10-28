@@ -5,7 +5,7 @@ import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
 
-class EwmhSupportWindowHandler(
+class RootWindowPropertyHandler(
     private val system: SystemApi,
     private val rootWindow: Window,
     rootVisual: CPointer<Visual>?
@@ -36,6 +36,23 @@ class EwmhSupportWindowHandler(
 
         system.mapWindow(this.ewmhSupportWindow)
         system.lowerWindow(this.ewmhSupportWindow)
+    }
+
+    fun becomeScreenOwner(): Boolean {
+        val wmSnName = "WM_S${system.defaultScreenNumber()}"
+        val wmSn = system.internAtom(wmSnName, false)
+
+        if (system.getSelectionOwner(wmSn) != None.convert<Window>()) {
+            return false
+        }
+
+        system.setSelectionOwner(wmSn, ewmhSupportWindow, CurrentTime.convert())
+
+        if (system.getSelectionOwner(wmSn) != ewmhSupportWindow) {
+            return false
+        }
+
+        return true
     }
 
     fun setSupportWindowProperties() {
