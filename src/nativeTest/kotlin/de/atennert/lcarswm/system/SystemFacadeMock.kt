@@ -357,7 +357,7 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    var window: Window = 2.convert() // 1 is root window
+    var nextWindowId: Window = 2.convert() // 1 is root window
 
     override fun createWindow(
         parentWindow: Window,
@@ -367,21 +367,24 @@ open class SystemFacadeMock : SystemApi {
         attributes: CPointer<XSetWindowAttributes>
     ): Window {
         functionCalls.add(FunctionCall("createWindow", parentWindow, measurements, attributeMask, attributes))
-        return window++
+        return nextWindowId++
     }
 
     override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
         functionCalls.add(FunctionCall("createSimpleWindow", parentWindow, measurements))
-        return window++
+        return nextWindowId++
     }
+
+    var selectionOwner: Window = None.convert()
 
     override fun getSelectionOwner(atom: Atom): Window {
         functionCalls.add(FunctionCall("getSelectionOwner", atom))
-        return 0.convert()
+        return selectionOwner
     }
 
     override fun setSelectionOwner(atom: Atom, window: Window, time: Time): Int {
         functionCalls.add(FunctionCall("setSelectionOwner", atom, window, time))
+        selectionOwner = window
         return 0
     }
 
