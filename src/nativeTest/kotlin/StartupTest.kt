@@ -55,8 +55,6 @@ class StartupTest {
     }
 
     private class StartupFacadeMock : SystemFacadeMock() {
-        val displayString = "displayString"
-
         override fun nextEvent(event: CPointer<XEvent>): Int {
             // send closing key event to stop the window manager
             super.nextEvent(event)
@@ -64,10 +62,6 @@ class StartupTest {
             event.pointed.xkey.keycode = keySyms.getValue(XK_Q).convert()
             event.pointed.xkey.state = modifiers[winModifierPosition].convert()
             return 0
-        }
-
-        override fun getDisplayString(): String {
-            return this.displayString
         }
     }
 }

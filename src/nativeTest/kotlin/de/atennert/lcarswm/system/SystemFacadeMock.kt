@@ -388,9 +388,10 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    val displayString = "TheDisplay"
     override fun getDisplayString(): String {
         functionCalls.add(FunctionCall("getDisplayString"))
-        return "TheDisplay"
+        return displayString
     }
 
     override fun getenv(name: String): CPointer<ByteVar>? {
