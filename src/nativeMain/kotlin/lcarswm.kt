@@ -1,4 +1,5 @@
 import de.atennert.lcarswm.*
+import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.events.EVENT_HANDLERS
 import de.atennert.lcarswm.events.handleRandrEvent
 import de.atennert.lcarswm.log.FileLogger
@@ -44,7 +45,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         }
         val rootWindow = screen.root
 
-        val rootWindowPropertyHandler = RootWindowPropertyHandler(system, rootWindow, screen.root_visual)
+        val atomLibrary = AtomLibrary(system)
+
+        val rootWindowPropertyHandler = RootWindowPropertyHandler(system, rootWindow, atomLibrary, screen.root_visual)
 
         if (!rootWindowPropertyHandler.becomeScreenOwner()) {
             logger.logError("::runWindowManager::Detected another active window manager")
@@ -75,7 +78,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         val colorMap = allocateColorMap(system, screen.root_visual!!, rootWindow)
         val graphicsContexts = getGraphicContexts(system, rootWindow, colorMap.second)
 
-        val windowManagerConfig = WindowManagerState { system.internAtom(it) }
+        val windowManagerConfig = WindowManagerState(atomLibrary::get)
 
         setupLcarsWindow(system, screen, windowManagerConfig)
         windowManagerConfig.setActiveWindowListener { activeWindow ->

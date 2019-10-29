@@ -1,18 +1,20 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.atom.Atoms
+import xlib.Atom
 import xlib.Window
 
 /**
  * Container class for the state of the window manager.
  */
 class WindowManagerState(
-    atomProvider: Function1<String, ULong>
+    atomProvider: Function1<Atoms, Atom>
 ) : WindowManagerStateHandler {
-    val wmDeleteWindow = atomProvider("WM_DELETE_WINDOW")
+    val wmDeleteWindow = atomProvider(Atoms.WM_DELETE_WINDOW)
 
-    val wmProtocols = atomProvider("WM_PROTOCOLS")
+    val wmProtocols = atomProvider(Atoms.WM_PROTOCOLS)
 
-    override val wmState = atomProvider("WM_STATE")
+    override val wmState = atomProvider(Atoms.WM_STATE)
 
     var screenMode = ScreenMode.NORMAL
         private set

@@ -1,5 +1,7 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.atom.Atoms.*
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -8,18 +10,12 @@ import xlib.*
 class RootWindowPropertyHandler(
     private val system: SystemApi,
     private val rootWindow: Window,
+    private val atomLibrary: AtomLibrary,
     rootVisual: CPointer<Visual>?
 ) {
     private val ewmhSupportWindow: Window
 
     private val longSizeInBytes = 4
-
-    private val windowAtom = system.internAtom("WINDOW")
-    private val atomAtom = system.internAtom("ATOM")
-    private val utf8Atom = system.internAtom("UTF8_STRING")
-    private val netWmName = system.internAtom("_NET_WM_NAME")
-    private val netSupportedAtom = system.internAtom("_NET_SUPPORTED")
-    private val netSupportWmCheckAtom = system.internAtom("_NET_SUPPORTING_WM_CHECK")
 
     init {
         val windowAttributes = nativeHeap.alloc<XSetWindowAttributes>()
@@ -58,17 +54,17 @@ class RootWindowPropertyHandler(
     fun setSupportWindowProperties() {
         val ewmhWindowInBytes = ewmhSupportWindow.toUByteArray()
 
-        system.changeProperty(rootWindow, netSupportWmCheckAtom, windowAtom, ewmhWindowInBytes, 32)
-        system.changeProperty(ewmhSupportWindow, netSupportWmCheckAtom, windowAtom, ewmhWindowInBytes, 32)
+        system.changeProperty(rootWindow, atomLibrary[NET_SUPPORTING_WM_CHECK], atomLibrary[WINDOW], ewmhWindowInBytes, 32)
+        system.changeProperty(ewmhSupportWindow, atomLibrary[NET_SUPPORTING_WM_CHECK], atomLibrary[WINDOW], ewmhWindowInBytes, 32)
 
-        system.changeProperty(ewmhSupportWindow, netWmName, utf8Atom, "LCARSWM".toUByteArray(), 8)
+        system.changeProperty(ewmhSupportWindow, atomLibrary[NET_WM_NAME], atomLibrary[UTF_STRING], "LCARSWM".toUByteArray(), 8)
 
-        system.changeProperty(rootWindow, netSupportedAtom, atomAtom, getSupportedProperties(), 32)
+        system.changeProperty(rootWindow, atomLibrary[NET_SUPPORTED], atomLibrary[ATOM], getSupportedProperties(), 32)
     }
 
     private fun getSupportedProperties(): UByteArray {
-        val supportedProperties = ulongArrayOf(netSupportWmCheckAtom,
-            netWmName)
+        val supportedProperties = ulongArrayOf(atomLibrary[NET_SUPPORTING_WM_CHECK],
+            atomLibrary[NET_WM_NAME])
 
         val byteCount = supportedProperties.size * longSizeInBytes
         val propertyBytes = supportedProperties.map { it.toUByteArray() }
@@ -77,7 +73,7 @@ class RootWindowPropertyHandler(
     }
 
     fun unsetWindowProperties() {
-        system.deleteProperty(rootWindow, netSupportedAtom)
+        system.deleteProperty(rootWindow, atomLibrary[NET_SUPPORTED])
     }
 
     fun destroySupportWindow() {
