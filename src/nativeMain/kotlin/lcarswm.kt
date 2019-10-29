@@ -18,6 +18,9 @@ private var staticLogger: Logger? = null
 const val ROOT_WINDOW_MASK = SubstructureRedirectMask or SubstructureNotifyMask or PropertyChangeMask or
         EnterWindowMask or LeaveWindowMask or FocusChangeMask or ButtonPressMask or ButtonReleaseMask
 
+const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotifyMask or
+        RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
+
 // the main method apparently must not be inside of a package so it can be compiled with Kotlin/Native
 fun main() {
     val system = SystemFacade()
@@ -176,11 +179,7 @@ private fun setupRandr(
 
     handleRandrEvent(system, logger, windowManagerState, image, rootWindow, graphicsContexts)
 
-    system.rSelectInput(rootWindow,
-        (RRScreenChangeNotifyMask or
-                RROutputChangeNotifyMask or
-                RRCrtcChangeNotifyMask or
-                RROutputPropertyNotifyMask).convert() )
+    system.rSelectInput(rootWindow, XRANDR_MASK.convert() )
 
     logger.logDebug("::setupRandr::RANDR base: ${eventBase.get()[0]}, error base: ${errorBase.get()[0]}")
 
