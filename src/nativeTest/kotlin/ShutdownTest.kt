@@ -84,22 +84,6 @@ class ShutdownTest {
         val testFacade = object : SystemFacadeMock() {
             var selectionOwnerCounter = 0
 
-            var window: Window = 123.convert()
-
-            override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
-                return window++
-            }
-
-            override fun createWindow(
-                parentWindow: Window,
-                measurements: List<Int>,
-                visual: CPointer<Visual>?,
-                attributeMask: ULong,
-                attributes: CPointer<XSetWindowAttributes>
-            ): Window {
-                return window++
-            }
-
             override fun defaultScreenNumber(): Int = 23
 
             override fun getSelectionOwner(atom: Atom): Window {
