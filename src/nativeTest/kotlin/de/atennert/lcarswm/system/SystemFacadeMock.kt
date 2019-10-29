@@ -273,7 +273,7 @@ open class SystemFacadeMock : SystemApi {
     override fun defaultScreenOfDisplay(): CPointer<Screen>? {
         functionCalls.add(FunctionCall("defaultScreenOfDisplay"))
         val screen = nativeHeap.alloc<Screen>()
-        screen.root = 0.convert()
+        screen.root = 1.convert()
         screen.root_visual = nativeHeap.alloc<Visual>().ptr
         return screen.ptr
     }
@@ -357,6 +357,8 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    var window: Window = 2.convert() // 1 is root window
+
     override fun createWindow(
         parentWindow: Window,
         measurements: List<Int>,
@@ -365,12 +367,12 @@ open class SystemFacadeMock : SystemApi {
         attributes: CPointer<XSetWindowAttributes>
     ): Window {
         functionCalls.add(FunctionCall("createWindow", parentWindow, measurements, attributeMask, attributes))
-        return 0.convert()
+        return window++
     }
 
     override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
         functionCalls.add(FunctionCall("createSimpleWindow", parentWindow, measurements))
-        return 0.convert()
+        return window++
     }
 
     override fun getSelectionOwner(atom: Atom): Window {
