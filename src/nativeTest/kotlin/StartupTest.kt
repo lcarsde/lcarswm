@@ -5,6 +5,7 @@ import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class StartupTest {
     @Test
@@ -19,7 +20,38 @@ class StartupTest {
 
         assertNotNull(setenvCall, "setenv should be called to set the DISPLAY name")
 
-        assertEquals(systemFacade.displayString, setenvCall.parameters[1], "the DISPLAY environment variable should be set to the return value of getDisplayString")
+        assertEquals(
+            systemFacade.displayString,
+            setenvCall.parameters[1],
+            "the DISPLAY environment variable should be set to the return value of getDisplayString"
+        )
+    }
+
+    @Test
+    fun `set required properties`() {
+        val systemFacade = StartupFacadeMock()
+        val rootWindow: Window = 1.convert() // hard coded in SystemFacadeMock
+        val supportWindow: Window = systemFacade.nextWindowId // first created window starts at 2 in SystemFacadeMock
+
+        runWindowManager(systemFacade, LoggerMock())
+
+        val propertyCalls = systemFacade.functionCalls.filter { it.name == "changeProperty" }
+        val atoms = systemFacade.atomMap
+
+        val expectedProperties = listOf(
+            Pair(rootWindow, "_NET_SUPPORTING_WM_CHECK"),
+            Pair(rootWindow, "_NET_SUPPORTED"),
+            Pair(supportWindow, "_NET_SUPPORTING_WM_CHECK"),
+            Pair(supportWindow, "_NET_WM_NAME")
+        )
+
+        expectedProperties.forEach { (window, atomName) ->
+            assertNotNull(
+                propertyCalls.find { it.parameters[0] == window && it.parameters[1] == atoms[atomName] },
+                "The property $atomName should set/changed on window $window"
+            )
+        }
+
     }
 
     private class StartupFacadeMock : SystemFacadeMock() {
