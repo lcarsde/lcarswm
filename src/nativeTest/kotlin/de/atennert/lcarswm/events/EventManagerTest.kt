@@ -50,8 +50,9 @@ class EventManagerTest {
 
         var gotCalled = false
 
-        override fun handleEvent(event: XEvent) {
+        override fun handleEvent(event: XEvent): Boolean {
             this.gotCalled = true
+            return false
         }
     }
 }
