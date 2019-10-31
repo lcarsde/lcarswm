@@ -8,9 +8,15 @@ class EventManager private constructor(
     private val eventHandlers: Map<Int, XEventHandler>,
     private val logger: Logger
 ) {
-    fun handleEvent(event: XEvent) {
-        this.eventHandlers[event.type]?.handleEvent(event)
-            ?: logger.logWarning("EventManager::handleEvent::no handler registered for event of type ${event.type}")
+    fun handleEvent(event: XEvent): Boolean {
+        val eventHandler = this.eventHandlers[event.type]
+
+        if (eventHandler == null) {
+            logger.logWarning("EventManager::handleEvent::no handler registered for event of type ${event.type}")
+            return false
+        }
+
+        return eventHandler.handleEvent(event)
     }
 
     class Builder(private val logger: Logger) {
