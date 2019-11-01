@@ -1,7 +1,7 @@
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
-import de.atennert.lcarswm.events.EVENT_HANDLERS
-import de.atennert.lcarswm.events.handleRandrEvent
+import de.atennert.lcarswm.events.old.EVENT_HANDLERS
+import de.atennert.lcarswm.events.old.handleRandrEvent
 import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.SystemFacade
@@ -177,7 +177,14 @@ private fun setupRandr(
         return NO_RANDR_BASE
     }
 
-    handleRandrEvent(system, logger, windowManagerState, image, rootWindow, graphicsContexts)
+    handleRandrEvent(
+        system,
+        logger,
+        windowManagerState,
+        image,
+        rootWindow,
+        graphicsContexts
+    )
 
     system.rSelectInput(rootWindow, XRANDR_MASK.convert() )
 
@@ -204,7 +211,14 @@ private fun eventLoop(
 
         if (eventValue == randrEventValue) {
             logger.logDebug("::eventLoop::received randr event")
-            handleRandrEvent(system, logger, windowManagerState, image, rootWindow, graphicsContexts)
+            handleRandrEvent(
+                system,
+                logger,
+                windowManagerState,
+                image,
+                rootWindow,
+                graphicsContexts
+            )
             nativeHeap.free(xEvent)
             continue
         }

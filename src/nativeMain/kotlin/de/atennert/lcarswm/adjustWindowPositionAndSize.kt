@@ -1,6 +1,6 @@
 package de.atennert.lcarswm
 
-import de.atennert.lcarswm.events.sendConfigureNotify
+import de.atennert.lcarswm.events.old.sendConfigureNotify
 import de.atennert.lcarswm.system.api.EventApi
 import kotlinx.cinterop.convert
 

@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.events.old.sendConfigureNotify
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import xlib.ConfigureNotify

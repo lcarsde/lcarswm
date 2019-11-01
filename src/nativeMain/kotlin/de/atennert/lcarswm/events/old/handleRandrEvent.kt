@@ -1,4 +1,4 @@
-package de.atennert.lcarswm.events
+package de.atennert.lcarswm.events.old
 
 import de.atennert.lcarswm.Monitor
 import de.atennert.lcarswm.WindowManagerState
