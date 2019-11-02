@@ -7,7 +7,8 @@ import xlib.DestroyNotify
 import xlib.XEvent
 
 /**
- *
+ * The DestroyNotify event is triggered when a window was destroyed. If we (still) know the destroyed window, then we
+ * need to clean up after it here.
  */
 class DestroyNotifyHandler(
     private val system: SystemApi,
