@@ -9,6 +9,7 @@ import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
+import xlib.DestroyNotify
 import xlib.Window
 import xlib.XEvent
 import kotlin.test.Test
@@ -17,6 +18,16 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class HandleDestroyNotifyTest {
+    @Test
+    fun `return the event type DestroyNotify`() {
+        val windowId: Window = 1.convert()
+        val windowManagerState = WindowManagerStateTestImpl(windowId)
+
+        val destroyNotifyHandler = DestroyNotifyHandler(SystemFacadeMock(), LoggerMock(), windowManagerState)
+
+        assertEquals(DestroyNotify, destroyNotifyHandler.xEventType, "The event type for DestroyEventHandler needs to be DestroyNotify")
+    }
+
     @Test
     fun `remove window on destroy notify`() {
         val windowId: Window = 1.convert()
@@ -27,12 +38,8 @@ class HandleDestroyNotifyTest {
         val windowManagerState = WindowManagerStateTestImpl(windowId)
         val system = SystemFacadeMock()
 
-        val requestShutdown = handleDestroyNotify(
-            system,
-            LoggerMock(),
-            windowManagerState,
-            destroyNotifyEvent
-        )
+        val destroyNotifyHandler = DestroyNotifyHandler(system, LoggerMock(), windowManagerState)
+        val requestShutdown = destroyNotifyHandler.handleEvent(destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")
         assertEquals(1, windowManagerState.removedWindowIds.size, "There wasn't exactly one window removal")
@@ -53,12 +60,8 @@ class HandleDestroyNotifyTest {
         val windowManagerState = WindowManagerStateTestImpl(0.convert())
         val system = SystemFacadeMock()
 
-        val requestShutdown = handleDestroyNotify(
-            system,
-            LoggerMock(),
-            windowManagerState,
-            destroyNotifyEvent
-        )
+        val destroyNotifyHandler = DestroyNotifyHandler(system, LoggerMock(), windowManagerState)
+        val requestShutdown = destroyNotifyHandler.handleEvent(destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")
         assertTrue(windowManagerState.removedWindowIds.isEmpty(), "an unknown window shouldn't be removed")
