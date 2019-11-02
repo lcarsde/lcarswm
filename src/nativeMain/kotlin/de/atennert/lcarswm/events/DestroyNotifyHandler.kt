@@ -17,15 +17,15 @@ class DestroyNotifyHandler(
     override val xEventType = DestroyNotify
 
     override fun handleEvent(event: XEvent): Boolean {
-        val destroyEvent = event.xdestroywindow
-        logger.logDebug("DestroyNotifyHandler::handleEvent::destroy window: ${destroyEvent.window}")
-        if (windowManagerState.hasWindow(destroyEvent.window)) {
-            val window = windowManagerState.windows.map { it.first }.single { it.id == destroyEvent.window }
+        val destroyedWindow = event.xdestroywindow.window
+        logger.logDebug("DestroyNotifyHandler::handleEvent::clean up after destroyed window: $destroyedWindow")
+        if (windowManagerState.hasWindow(destroyedWindow)) {
+            val window = windowManagerState.windows.map { it.first }.single { it.id == destroyedWindow }
             system.unmapWindow(window.frame)
-            system.removeFromSaveSet(destroyEvent.window)
+            system.removeFromSaveSet(destroyedWindow)
             system.destroyWindow(window.frame)
 
-            windowManagerState.removeWindow(destroyEvent.window)
+            windowManagerState.removeWindow(destroyedWindow)
         }
         return false
     }

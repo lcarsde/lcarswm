@@ -17,7 +17,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class HandleDestroyNotifyTest {
+class DestroyNotifyHandlerTest {
     @Test
     fun `return the event type DestroyNotify`() {
         val windowId: Window = 1.convert()
