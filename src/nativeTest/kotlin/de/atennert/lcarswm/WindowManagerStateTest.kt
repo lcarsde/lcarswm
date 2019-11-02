@@ -316,4 +316,19 @@ class WindowManagerStateTest {
 
         assertEquals(activeWindow, window1, "No update for active window received")
     }
+
+    @Test
+    fun `get a known window`() {
+        val monitor = Monitor(1.convert(), "name", true)
+        val windowManagerState = WindowManagerState { 1.convert() }
+        val windowContainer = WindowContainer(1.convert())
+
+        windowManagerState.updateMonitors(listOf(monitor)) { _, _ -> }
+
+        windowManagerState.addWindow(windowContainer, monitor)
+
+        val returnedWindowContainer = windowManagerState.getWindowContainer(windowContainer.id)
+
+        assertEquals(windowContainer, returnedWindowContainer, "A known window should be returned")
+    }
 }

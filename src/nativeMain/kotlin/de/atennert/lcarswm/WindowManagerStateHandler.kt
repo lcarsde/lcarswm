@@ -15,5 +15,7 @@ interface WindowManagerStateHandler {
 
     fun hasWindow(windowId: Window): Boolean
 
+    fun getWindowContainer(windowId: Window): WindowContainer
+
     fun getScreenModeForMonitor(monitor: Monitor): ScreenMode
 }

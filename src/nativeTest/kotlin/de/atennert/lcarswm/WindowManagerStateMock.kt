@@ -1,10 +1,11 @@
 package de.atennert.lcarswm
 
 import kotlinx.cinterop.convert
+import xlib.Atom
 import xlib.Window
 
 open class WindowManagerStateMock: WindowManagerStateHandler {
-    override val wmState: ULong = 0.convert()
+    override val wmState: Atom = 0.convert()
 
     override val initialMonitor: Monitor = Monitor(0.convert(), "Monitor", true)
 
@@ -19,4 +20,6 @@ open class WindowManagerStateMock: WindowManagerStateHandler {
     override fun getScreenModeForMonitor(monitor: Monitor): ScreenMode {
         return ScreenMode.NORMAL
     }
+
+    override fun getWindowContainer(windowId: Window): WindowContainer = windows.map {it.first}.single {it.id == windowId}
 }

@@ -52,6 +52,8 @@ class WindowManagerState(
 
     override fun hasWindow(windowId: Window) = this.windows.find { (w, _) -> w.id == windowId } != null
 
+    override fun getWindowContainer(windowId: Window): WindowContainer = this.windows.map {it.first}.single { it.id == windowId }
+
     fun getWindowMonitor(windowId: Window): Monitor? {
         return this.windows
             .find { (window, _) -> window.id == windowId }
