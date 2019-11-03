@@ -81,6 +81,9 @@ Fullscreen mode
 TODO
 
 ### Other
+* Refactor event handling
+* Buffer events
+* Add time handling
 * Activate windows my clicking on them
 * Application selector
 * Content for the data bar (empty upper area in normal mode)
