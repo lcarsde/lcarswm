@@ -1,13 +1,10 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.WindowManagerStateMock
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
-import xlib.ConfigureRequest
-import xlib.Window
-import xlib.XEvent
-import xlib.XWindowChanges
+import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -25,7 +22,43 @@ class ConfigureRequestHandlerTest {
 
     @Test
     fun `handle known window`() {
+        val system = object : SystemFacadeMock() {
+            val display = nativeHeap.allocPointerTo<Display>().value
+            override fun getDisplay(): CPointer<Display>? = display
+        }
+        val knownWindow: Window = 1.convert()
+        val windowManagerState = WindowManagerStateTestImpl(knownWindow)
+        val windowMeasurements = windowManagerState.windows[0].second.getCurrentWindowMeasurements(ScreenMode.NORMAL)
 
+        val configureRequestHandler = ConfigureRequestHandler(system, LoggerMock(), windowManagerState)
+
+        val configureRequestEvent = createConfigureRequestEvent()
+        val shutdownValue = configureRequestHandler.handleEvent(configureRequestEvent)
+
+        val configureNotifyCall = system.functionCalls[0]
+        val configureWindow = configureNotifyCall.parameters[0]
+        val valueMask = configureNotifyCall.parameters[2]
+        @Suppress("UNCHECKED_CAST")
+        val sentEvent = (configureNotifyCall.parameters[3] as CPointer<XEvent>).pointed
+        val configureEvent = sentEvent.xconfigure
+
+        assertFalse(shutdownValue, "The ConfigureRequestHandler shouldn't trigger a shutdown")
+
+        assertEquals("sendEvent", configureNotifyCall.name, "The ConfigureRequestHandler should send a configure notify event for known windows")
+        assertEquals(knownWindow, configureWindow, "The receiver window should be the known window")
+        assertEquals(StructureNotifyMask, valueMask, "The value mask should be StructureNotify")
+
+        assertEquals(ConfigureNotify, sentEvent.type, "The event type needs to match ConfigureNotify")
+        assertEquals(system.display, configureEvent.display, "The display should match the facades display")
+        assertEquals(knownWindow, configureEvent.event, "The event should be the known window")
+        assertEquals(knownWindow, configureEvent.window, "The window should be the known window")
+        assertEquals(windowMeasurements[0], configureEvent.x, "The x value should match the corresponding window measurement")
+        assertEquals(windowMeasurements[1], configureEvent.y, "The y value should match the corresponding window measurement")
+        assertEquals(windowMeasurements[2], configureEvent.width, "The width should match the corresponding window measurement")
+        assertEquals(windowMeasurements[3], configureEvent.height, "The height should match the corresponding window measurement")
+        assertEquals(0, configureEvent.border_width, "The border width should be 0")
+        assertEquals(None.convert(), configureEvent.above, "The above value should be None") // TODO this shouldn't be None, we need to keep that with the window data
+        assertEquals(X_FALSE, configureEvent.override_redirect, "Override redirect should be false as we don't handle popups")
     }
 
     @Test
@@ -72,6 +105,13 @@ class ConfigureRequestHandlerTest {
     }
 
     private class WindowManagerStateTestImpl(private val knownWindow: Window? = null) : WindowManagerStateMock() {
+        override val windows = mutableListOf<Pair<WindowContainer, Monitor>>()
+
+        init {
+            if (knownWindow != null) {
+                windows.add(Pair(WindowContainer(knownWindow), Monitor(2.convert(), "", true)))
+            }
+        }
         override fun hasWindow(windowId: Window): Boolean = windowId == knownWindow
     }
 }
