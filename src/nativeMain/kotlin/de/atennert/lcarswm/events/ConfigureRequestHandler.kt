@@ -14,7 +14,8 @@ import xlib.XEvent
 import xlib.XWindowChanges
 
 /**
- *
+ * Depending on whether we know or don't know the window of the configure request event, we adjust the windows
+ * dimensions or simply forward the request.
  */
 class ConfigureRequestHandler(
     private val eventApi: EventApi,
