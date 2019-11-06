@@ -27,7 +27,7 @@ class ConfigureRequestHandler(
     override fun handleEvent(event: XEvent): Boolean {
         val configureEvent = event.xconfigurerequest
 
-        logger.logDebug("::handleConfigureRequest::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}")
+        logger.logDebug("ConfigureRequestHandler::handleEvent::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}")
 
         if (windowManagerState.hasWindow(configureEvent.window)) {
             val (windowContainer, monitor) = windowManagerState.windows.single {it.first.id == configureEvent.window}
