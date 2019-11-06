@@ -9,6 +9,7 @@ import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
 import xlib.ConfigureRequest
+import xlib.XConfigureRequestEvent
 import xlib.XEvent
 import xlib.XWindowChanges
 
@@ -32,9 +33,14 @@ class ConfigureRequestHandler(
             val measurements = monitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(monitor))
 
             sendConfigureNotify(eventApi, windowContainer.id, measurements)
-            return false
+        } else {
+            forwardConfigureRequest(configureEvent)
         }
 
+        return false
+    }
+
+    private fun forwardConfigureRequest(configureEvent: XConfigureRequestEvent) {
         val windowChanges = nativeHeap.alloc<XWindowChanges>()
         windowChanges.x = configureEvent.x
         windowChanges.y = configureEvent.y
@@ -44,6 +50,5 @@ class ConfigureRequestHandler(
         windowChanges.stack_mode = configureEvent.detail
         windowChanges.border_width = 0
         eventApi.configureWindow(configureEvent.window, configureEvent.value_mask.convert(), windowChanges.ptr)
-        return false
     }
 }
