@@ -27,9 +27,11 @@ class ConfigureRequestHandler(
     override fun handleEvent(event: XEvent): Boolean {
         val configureEvent = event.xconfigurerequest
 
-        logger.logDebug("ConfigureRequestHandler::handleEvent::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}")
+        val isWindowKnown = windowManagerState.hasWindow(configureEvent.window)
 
-        if (windowManagerState.hasWindow(configureEvent.window)) {
+        logger.logDebug("ConfigureRequestHandler::handleEvent::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}, is known: $isWindowKnown")
+
+        if (isWindowKnown) {
             val (windowContainer, monitor) = windowManagerState.windows.single {it.first.id == configureEvent.window}
             val measurements = monitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(monitor))
 
