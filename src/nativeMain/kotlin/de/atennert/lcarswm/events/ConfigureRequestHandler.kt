@@ -32,15 +32,19 @@ class ConfigureRequestHandler(
         logger.logDebug("ConfigureRequestHandler::handleEvent::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}, is known: $isWindowKnown")
 
         if (isWindowKnown) {
-            val (windowContainer, monitor) = windowManagerState.windows.single {it.first.id == configureEvent.window}
-            val measurements = monitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(monitor))
-
-            sendConfigureNotify(eventApi, windowContainer.id, measurements)
+            adjustWindowToScreen(configureEvent)
         } else {
             forwardConfigureRequest(configureEvent)
         }
 
         return false
+    }
+
+    private fun adjustWindowToScreen(configureEvent: XConfigureRequestEvent) {
+        val (windowContainer, monitor) = windowManagerState.windows.single { it.first.id == configureEvent.window }
+        val measurements = monitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(monitor))
+
+        sendConfigureNotify(eventApi, windowContainer.id, measurements)
     }
 
     private fun forwardConfigureRequest(configureEvent: XConfigureRequestEvent) {
