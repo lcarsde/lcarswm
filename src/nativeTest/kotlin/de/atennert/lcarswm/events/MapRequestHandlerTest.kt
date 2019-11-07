@@ -16,7 +16,7 @@ import kotlin.test.assertNull
 class MapRequestHandlerTest {
     @Test
     fun `has MapRequest type`() {
-        val mapRequestHandler = MapRequestHandler(SystemFacadeMock(), WindowManagerStateTestImpl())
+        val mapRequestHandler = MapRequestHandler(SystemFacadeMock(), WindowManagerStateMock())
 
         assertEquals(MapRequest, mapRequestHandler.xEventType, "The MapRequestHandler should have the type MapRequest")
     }
@@ -24,7 +24,7 @@ class MapRequestHandlerTest {
     @Test
     fun `don't handle known windows`() {
         val system = SystemFacadeMock()
-        val windowManagerState = WindowManagerStateTestImpl()
+        val windowManagerState = WindowManagerStateMock()
 
         val mapRequestHandler = MapRequestHandler(system, windowManagerState)
 
@@ -37,14 +37,6 @@ class MapRequestHandlerTest {
         assertEquals(false, shutdownValue, "The MapRequestHandler shouldn't trigger a shutdown")
 
         assertEquals(0, system.functionCalls.size, "There shouldn't be calls to the outside")
-        assertNull(windowManagerState.addedWindow, "There was no window added to the memory")
-    }
-
-    private class WindowManagerStateTestImpl : WindowManagerStateMock() {
-        var addedWindow: WindowContainer? = null
-
-        override fun addWindow(window: WindowContainer, monitor: Monitor) {
-            addedWindow = window
-        }
+        assertEquals(0, windowManagerState.functionCalls.size, "There shouldn't be actions on WindowManagerState")
     }
 }
