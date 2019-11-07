@@ -43,4 +43,26 @@ class MapRequestHandlerTest {
 
         assertTrue(windowRegistration.functionCalls.isEmpty(), "There shouldn't be actions on the window registration")
     }
+
+    @Test
+    fun `handle unknown windows`() {
+        val windowManagerState = WindowManagerStateMock()
+        val windowRegistration = WindowRegistrationMock()
+
+        val mapRequestHandler = MapRequestHandler(LoggerMock(), windowManagerState, windowRegistration)
+
+        val mapRequestEvent = nativeHeap.alloc<XEvent>()
+        mapRequestEvent.type = MapRequest
+        mapRequestEvent.xmaprequest.window = 1.convert()
+
+        val shutdownValue = mapRequestHandler.handleEvent(mapRequestEvent)
+
+        val registrationCalls = windowRegistration.functionCalls
+
+        assertEquals(false, shutdownValue, "The MapRequestHandler shouldn't trigger a shutdown")
+
+        val addWindowCall = registrationCalls.removeAt(0)
+        assertEquals("addWindow", addWindowCall.name, "An unknown window should be added")
+        assertEquals(mapRequestEvent.xmaprequest.window, addWindowCall.parameters[0], "The added window should be the one from the map event")
+    }
 }

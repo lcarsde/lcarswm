@@ -19,9 +19,14 @@ class MapRequestHandler(
     override fun handleEvent(event: XEvent): Boolean {
         val mapEvent = event.xmaprequest
 
-        val isKnown = windowManagerState.hasWindow(mapEvent.window)
+        val isWindowKnown = windowManagerState.hasWindow(mapEvent.window)
 
-        logger.logDebug("::handleMapRequest::map request for window ${mapEvent.window}, parent: ${mapEvent.parent}, is known: $isKnown")
+        logger.logDebug("::handleMapRequest::map request for window ${mapEvent.window}, parent: ${mapEvent.parent}, is known: $isWindowKnown")
+
+        if (!isWindowKnown) {
+            windowRegistration.addWindow(mapEvent.window, false)
+        }
+
         return false
     }
 }
