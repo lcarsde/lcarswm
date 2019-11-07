@@ -18,8 +18,9 @@ class WindowRegistration(
     private val windowManagerState: WindowManagerStateHandler,
     private val atomLibrary: AtomLibrary,
     private val rootWindow: Window
-) {
-    fun addWindow(windowId: Window, isSetup: Boolean) {
+) : WindowRegistrationApi {
+
+    override fun addWindow(windowId: Window, isSetup: Boolean) {
         val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
         system.getWindowAttributes(windowId, windowAttributes.ptr)
 

@@ -3,7 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.log.LoggerMock
-import de.atennert.lcarswm.system.SystemFacadeMock
+import de.atennert.lcarswm.windowactions.WindowRegistrationMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
@@ -13,24 +13,25 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+
 class MapRequestHandlerTest {
     @Test
     fun `has MapRequest type`() {
-        val mapRequestHandler = MapRequestHandler(LoggerMock(), WindowManagerStateMock())
+        val mapRequestHandler = MapRequestHandler(LoggerMock(), WindowManagerStateMock(), WindowRegistrationMock())
 
         assertEquals(MapRequest, mapRequestHandler.xEventType, "The MapRequestHandler should have the type MapRequest")
     }
 
     @Test
     fun `don't handle known windows`() {
-        val system = SystemFacadeMock()
         val windowManagerState = object : WindowManagerStateMock() {
             init {
                 windows.add(Pair(WindowContainer(1.convert()), initialMonitor))
             }
         }
+        val windowRegistration = WindowRegistrationMock()
 
-        val mapRequestHandler = MapRequestHandler(LoggerMock(), windowManagerState)
+        val mapRequestHandler = MapRequestHandler(LoggerMock(), windowManagerState, windowRegistration)
 
         val mapRequestEvent = nativeHeap.alloc<XEvent>()
         mapRequestEvent.type = MapRequest
@@ -40,7 +41,6 @@ class MapRequestHandlerTest {
 
         assertEquals(false, shutdownValue, "The MapRequestHandler shouldn't trigger a shutdown")
 
-        assertTrue(system.functionCalls.isEmpty(), "There shouldn't be calls to the outside")
-        assertTrue(windowManagerState.functionCalls.isEmpty(), "There shouldn't be actions on WindowManagerState")
+        assertTrue(windowRegistration.functionCalls.isEmpty(), "There shouldn't be actions on the window registration")
     }
 }
