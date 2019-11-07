@@ -1,6 +1,8 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
+import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
@@ -14,7 +16,7 @@ import kotlin.test.assertTrue
 class MapRequestHandlerTest {
     @Test
     fun `has MapRequest type`() {
-        val mapRequestHandler = MapRequestHandler(SystemFacadeMock(), WindowManagerStateMock())
+        val mapRequestHandler = MapRequestHandler(LoggerMock(), WindowManagerStateMock())
 
         assertEquals(MapRequest, mapRequestHandler.xEventType, "The MapRequestHandler should have the type MapRequest")
     }
@@ -22,9 +24,13 @@ class MapRequestHandlerTest {
     @Test
     fun `don't handle known windows`() {
         val system = SystemFacadeMock()
-        val windowManagerState = WindowManagerStateMock()
+        val windowManagerState = object : WindowManagerStateMock() {
+            init {
+                windows.add(Pair(WindowContainer(1.convert()), initialMonitor))
+            }
+        }
 
-        val mapRequestHandler = MapRequestHandler(system, windowManagerState)
+        val mapRequestHandler = MapRequestHandler(LoggerMock(), windowManagerState)
 
         val mapRequestEvent = nativeHeap.alloc<XEvent>()
         mapRequestEvent.type = MapRequest
