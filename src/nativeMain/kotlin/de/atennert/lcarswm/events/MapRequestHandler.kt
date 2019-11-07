@@ -1,6 +1,5 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.WindowManagerStateHandler
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.windowactions.WindowRegistrationApi
 import xlib.MapRequest
