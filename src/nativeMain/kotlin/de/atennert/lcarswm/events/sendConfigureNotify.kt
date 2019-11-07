@@ -1,4 +1,4 @@
-package de.atennert.lcarswm.events.old
+package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.system.api.EventApi

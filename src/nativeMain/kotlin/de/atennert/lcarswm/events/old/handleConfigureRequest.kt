@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events.old
 
 import de.atennert.lcarswm.WindowManagerState
+import de.atennert.lcarswm.events.sendConfigureNotify
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.EventApi
 import kotlinx.cinterop.alloc
