@@ -1,13 +1,12 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.WindowContainer
-import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.windowactions.WindowRegistrationMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
 import xlib.MapRequest
+import xlib.Window
 import xlib.XEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,21 +16,18 @@ import kotlin.test.assertTrue
 class MapRequestHandlerTest {
     @Test
     fun `has MapRequest type`() {
-        val mapRequestHandler = MapRequestHandler(LoggerMock(), WindowManagerStateMock(), WindowRegistrationMock())
+        val mapRequestHandler = MapRequestHandler(LoggerMock(), WindowRegistrationMock())
 
         assertEquals(MapRequest, mapRequestHandler.xEventType, "The MapRequestHandler should have the type MapRequest")
     }
 
     @Test
     fun `don't handle known windows`() {
-        val windowManagerState = object : WindowManagerStateMock() {
-            init {
-                windows.add(Pair(WindowContainer(1.convert()), initialMonitor))
-            }
+        val windowRegistration = object : WindowRegistrationMock() {
+            override fun isWindowManaged(windowId: Window): Boolean = true
         }
-        val windowRegistration = WindowRegistrationMock()
 
-        val mapRequestHandler = MapRequestHandler(LoggerMock(), windowManagerState, windowRegistration)
+        val mapRequestHandler = MapRequestHandler(LoggerMock(), windowRegistration)
 
         val mapRequestEvent = nativeHeap.alloc<XEvent>()
         mapRequestEvent.type = MapRequest
@@ -46,10 +42,9 @@ class MapRequestHandlerTest {
 
     @Test
     fun `handle unknown windows`() {
-        val windowManagerState = WindowManagerStateMock()
         val windowRegistration = WindowRegistrationMock()
 
-        val mapRequestHandler = MapRequestHandler(LoggerMock(), windowManagerState, windowRegistration)
+        val mapRequestHandler = MapRequestHandler(LoggerMock(), windowRegistration)
 
         val mapRequestEvent = nativeHeap.alloc<XEvent>()
         mapRequestEvent.type = MapRequest

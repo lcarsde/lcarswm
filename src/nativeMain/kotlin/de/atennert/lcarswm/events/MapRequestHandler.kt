@@ -11,7 +11,6 @@ import xlib.XEvent
  */
 class MapRequestHandler(
     private val logger: Logger,
-    private val windowManagerState: WindowManagerStateHandler,
     private val windowRegistration: WindowRegistrationApi
 ) : XEventHandler{
     override val xEventType = MapRequest
@@ -19,7 +18,7 @@ class MapRequestHandler(
     override fun handleEvent(event: XEvent): Boolean {
         val mapEvent = event.xmaprequest
 
-        val isWindowKnown = windowManagerState.hasWindow(mapEvent.window)
+        val isWindowKnown = windowRegistration.isWindowManaged(mapEvent.window)
 
         logger.logDebug("::handleMapRequest::map request for window ${mapEvent.window}, parent: ${mapEvent.parent}, is known: $isWindowKnown")
 

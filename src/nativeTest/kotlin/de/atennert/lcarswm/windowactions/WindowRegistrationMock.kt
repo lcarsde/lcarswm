@@ -6,7 +6,7 @@ import xlib.Window
 /**
  *
  */
-class WindowRegistrationMock : WindowRegistrationApi {
+open class WindowRegistrationMock : WindowRegistrationApi {
     val functionCalls = mutableListOf<FunctionCall>()
 
     override fun addWindow(windowId: Window, isSetup: Boolean) {
