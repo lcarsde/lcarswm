@@ -1,7 +1,5 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.Monitor
-import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
@@ -11,7 +9,7 @@ import xlib.MapRequest
 import xlib.XEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class MapRequestHandlerTest {
     @Test
@@ -36,7 +34,7 @@ class MapRequestHandlerTest {
 
         assertEquals(false, shutdownValue, "The MapRequestHandler shouldn't trigger a shutdown")
 
-        assertEquals(0, system.functionCalls.size, "There shouldn't be calls to the outside")
-        assertEquals(0, windowManagerState.functionCalls.size, "There shouldn't be actions on WindowManagerState")
+        assertTrue(system.functionCalls.isEmpty(), "There shouldn't be calls to the outside")
+        assertTrue(windowManagerState.functionCalls.isEmpty(), "There shouldn't be actions on WindowManagerState")
     }
 }
