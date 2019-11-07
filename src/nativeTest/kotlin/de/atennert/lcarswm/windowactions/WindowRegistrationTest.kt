@@ -3,6 +3,8 @@ package de.atennert.lcarswm.windowactions
 import de.atennert.lcarswm.Monitor
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
+import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.atom.Atoms.WM_STATE
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
@@ -16,7 +18,7 @@ import kotlin.test.assertTrue
 /**
  *
  */
-class AddWindowTest {
+class WindowRegistrationTest {
     @Test
     fun `check window initialization`() {
         val rootWindowId: Window = 2.convert()
@@ -26,21 +28,25 @@ class AddWindowTest {
 
         val systemApi = SystemApiHelper(frameId, commandList)
         val windowManagerState = WindowManagerStateHelper(commandList)
+        val atomLibrary = AtomLibrary(systemApi)
 
-        addWindow(
+        systemApi.functionCalls.clear() // remove AtomLibrary setup
+
+        val windowRegistration = WindowRegistration(
             systemApi,
             LoggerMock(),
             windowManagerState,
-            rootWindowId,
-            windowId,
-            false
+            atomLibrary,
+            rootWindowId
         )
+
+        windowRegistration.addWindow(windowId, false)
 
         assertEquals("createSimpleWindow-$rootWindowId", commandList.removeAt(0), "frame window should be created firstly")
         assertEquals("reparentWindow-$windowId-$frameId", commandList.removeAt(0), "child window should be reparented to frame secondly")
         assertEquals("mapWindow-$frameId", commandList.removeAt(0), "frame window should be mapped thirdly")
         assertEquals("mapWindow-$windowId", commandList.removeAt(0), "child window should be mapped fourthly")
-        assertEquals("changeProperty - $windowId:${windowManagerState.wmState}:${windowManagerState.wmState}:$NormalState", commandList.removeAt(0), "normal state needs to be set in windows frame atom")
+        assertEquals("changeProperty - $windowId:${atomLibrary[WM_STATE]}:${atomLibrary[WM_STATE]}:$NormalState", commandList.removeAt(0), "normal state needs to be set in windows frame atom")
         assertEquals("addWindow-$windowId", commandList.removeAt(0), "finally, the child window should be added to the window list")
 
         assertTrue(commandList.isEmpty(), "There should be no unchecked commands")
@@ -78,8 +84,6 @@ class AddWindowTest {
     }
 
     class WindowManagerStateHelper(private val commandList: MutableList<String>) : WindowManagerStateMock() {
-        override val wmState: Atom = 42.convert()
-
         override fun addWindow(window: WindowContainer, monitor: Monitor) {
             commandList.add("addWindow-${window.id}")
         }
