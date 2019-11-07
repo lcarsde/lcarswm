@@ -7,4 +7,6 @@ import xlib.Window
  */
 interface WindowRegistrationApi {
     fun addWindow(windowId: Window, isSetup: Boolean)
+
+    fun isWindowManaged(windowId: Window): Boolean
 }

@@ -65,4 +65,6 @@ class WindowRegistration(
 
         nativeHeap.free(windowAttributes)
     }
+
+    override fun isWindowManaged(windowId: Window): Boolean = windowManagerState.hasWindow(windowId)
 }

@@ -13,4 +13,5 @@ class WindowRegistrationMock : WindowRegistrationApi {
         functionCalls.add(FunctionCall("addWindow", windowId, isSetup))
     }
 
+    override fun isWindowManaged(windowId: Window): Boolean = false
 }

@@ -13,6 +13,7 @@ import xlib.NormalState
 import xlib.Window
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -50,6 +51,30 @@ class WindowRegistrationTest {
         assertEquals("addWindow-$windowId", commandList.removeAt(0), "finally, the child window should be added to the window list")
 
         assertTrue(commandList.isEmpty(), "There should be no unchecked commands")
+    }
+
+    @Test
+    fun `provide info about whether we know a certain window`() {
+        val rootWindowId: Window = 2.convert()
+        val windowId: Window = 5.convert()
+
+        val systemApi = SystemFacadeMock()
+        val windowManagerState = WindowManagerStateMock()
+        val atomLibrary = AtomLibrary(systemApi)
+
+        val windowRegistration = WindowRegistration(
+            SystemFacadeMock(),
+            LoggerMock(),
+            windowManagerState,
+            atomLibrary,
+            rootWindowId
+        )
+
+        assertFalse(windowRegistration.isWindowManaged(windowId), "An unknown window should not be reported managed")
+
+        windowRegistration.addWindow(windowId, false)
+
+        assertTrue(windowRegistration.isWindowManaged(windowId), "A known window should be reported managed")
     }
 
     class SystemApiHelper(
