@@ -1,5 +1,8 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.Monitor
+import de.atennert.lcarswm.WindowContainer
+import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
@@ -24,7 +27,14 @@ class AddWindowTest {
         val systemApi = SystemApiHelper(frameId, commandList)
         val windowManagerState = WindowManagerStateHelper(commandList)
 
-        addWindow(systemApi, LoggerMock(), windowManagerState, rootWindowId, windowId, false)
+        addWindow(
+            systemApi,
+            LoggerMock(),
+            windowManagerState,
+            rootWindowId,
+            windowId,
+            false
+        )
 
         assertEquals("createSimpleWindow-$rootWindowId", commandList.removeAt(0), "frame window should be created firstly")
         assertEquals("reparentWindow-$windowId-$frameId", commandList.removeAt(0), "child window should be reparented to frame secondly")

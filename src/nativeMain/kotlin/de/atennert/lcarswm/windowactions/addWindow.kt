@@ -1,5 +1,7 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.WindowContainer
+import de.atennert.lcarswm.WindowManagerStateHandler
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*

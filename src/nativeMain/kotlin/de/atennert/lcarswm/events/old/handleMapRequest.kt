@@ -1,7 +1,7 @@
 package de.atennert.lcarswm.events.old
 
 import de.atennert.lcarswm.WindowManagerState
-import de.atennert.lcarswm.addWindow
+import de.atennert.lcarswm.windowactions.addWindow
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import xlib.Window

@@ -7,6 +7,7 @@ import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.system.api.WindowUtilApi
+import de.atennert.lcarswm.windowactions.addWindow
 import kotlinx.cinterop.*
 import xlib.*
 
