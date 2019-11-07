@@ -3,7 +3,6 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.Monitor
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
-import de.atennert.lcarswm.events.old.handleDestroyNotify
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
@@ -64,19 +63,20 @@ class DestroyNotifyHandlerTest {
         val requestShutdown = destroyNotifyHandler.handleEvent(destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")
-        assertTrue(windowManagerState.removedWindowIds.isEmpty(), "an unknown window shouldn't be removed")
+        assertTrue(windowManagerState.functionCalls.isEmpty(), "an unknown window shouldn't be removed")
         assertTrue(system.functionCalls.isEmpty(), "There should be no calls to system, as nothing was to do")
     }
 
-    private class WindowManagerStateTestImpl(private val knownWindow: Window) : WindowManagerStateMock() {
+    private class WindowManagerStateTestImpl(knownWindow: Window) : WindowManagerStateMock() {
         val removedWindowIds = mutableListOf<Window>()
 
-        override val windows = listOf(Pair(WindowContainer(knownWindow), Monitor(0.convert(), "", true)))
-
-        override fun removeWindow(windowId: Window) {
-            this.removedWindowIds.add(windowId)
+        init {
+            windows.add(Pair(WindowContainer(knownWindow), Monitor(0.convert(), "", true)))
         }
 
-        override fun hasWindow(windowId: Window): Boolean = windowId == knownWindow
+        override fun removeWindow(windowId: Window) {
+            super.removeWindow(windowId)
+            this.removedWindowIds.add(windowId)
+        }
     }
 }
