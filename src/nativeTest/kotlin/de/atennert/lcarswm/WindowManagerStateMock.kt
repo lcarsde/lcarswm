@@ -1,19 +1,27 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.system.FunctionCall
 import kotlinx.cinterop.convert
 import xlib.Atom
+import xlib.FUNCPROTO
 import xlib.Window
 
-open class WindowManagerStateMock: WindowManagerStateHandler {
+open class WindowManagerStateMock : WindowManagerStateHandler {
+    val functionCalls = mutableListOf<FunctionCall>()
+
     override val wmState: Atom = 0.convert()
 
     override val initialMonitor: Monitor = Monitor(0.convert(), "Monitor", true)
 
     override val windows = emptyList<Pair<WindowContainer, Monitor>>()
 
-    override fun addWindow(window: WindowContainer, monitor: Monitor) {}
+    override fun addWindow(window: WindowContainer, monitor: Monitor) {
+        functionCalls.add(FunctionCall("addWindow", window, monitor))
+    }
 
-    override fun removeWindow(windowId: Window) {}
+    override fun removeWindow(windowId: Window) {
+        functionCalls.add(FunctionCall("removeWindow", windowId))
+    }
 
     override fun hasWindow(windowId: Window): Boolean = false
 
