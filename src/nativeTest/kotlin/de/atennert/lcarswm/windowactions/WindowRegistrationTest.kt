@@ -1,6 +1,5 @@
 package de.atennert.lcarswm.windowactions
 
-import de.atennert.lcarswm.Monitor
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.atom.AtomLibrary
@@ -28,7 +27,7 @@ class WindowRegistrationTest {
         val commandList = mutableListOf<String>()
 
         val systemApi = SystemApiHelper(frameId, commandList)
-        val windowManagerState = WindowManagerStateHelper(commandList)
+        val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
@@ -48,10 +47,21 @@ class WindowRegistrationTest {
         assertEquals("mapWindow-$frameId", commandList.removeAt(0), "frame window should be mapped thirdly")
         assertEquals("mapWindow-$windowId", commandList.removeAt(0), "child window should be mapped fourthly")
         assertEquals("changeProperty - $windowId:${atomLibrary[WM_STATE]}:${atomLibrary[WM_STATE]}:$NormalState", commandList.removeAt(0), "normal state needs to be set in windows frame atom")
-        assertEquals("addWindow-$windowId", commandList.removeAt(0), "finally, the child window should be added to the window list")
+
+        val addWindowCall = windowManagerState.functionCalls.removeAt(0)
+        assertEquals("addWindow", addWindowCall.name, "the child window should be _added to the window list_")
+        assertEquals(windowId, (addWindowCall.parameters[0] as WindowContainer).id, "the _child window_ should be added to the window list")
 
         assertTrue(commandList.isEmpty(), "There should be no unchecked commands")
     }
+
+    // TODO override-redirect window (negative)
+
+    // TODO setup && !viewable (negative)
+
+    // TODO setup && viewable (positive)
+
+    // TODO get rid of SystemApiHelper
 
     @Test
     fun `provide info about whether we know a certain window`() {
@@ -105,12 +115,6 @@ class WindowRegistrationTest {
         ): Int {
             commandList.add("changeProperty - $window:$propertyAtom:$typeAtom:${data?.get(0)}")
             return 0
-        }
-    }
-
-    class WindowManagerStateHelper(private val commandList: MutableList<String>) : WindowManagerStateMock() {
-        override fun addWindow(window: WindowContainer, monitor: Monitor) {
-            commandList.add("addWindow-${window.id}")
         }
     }
 }
