@@ -26,7 +26,7 @@ class WindowRegistration(
 
         if (windowAttributes.override_redirect != 0 || (isSetup &&
                     windowAttributes.map_state != IsViewable)) {
-            logger.logInfo("::addWindow::skipping window $windowId")
+            logger.logInfo("WindowRegistration::addWindow::skipping window $windowId")
 
             if (!isSetup) {
                 system.mapWindow(windowId)
