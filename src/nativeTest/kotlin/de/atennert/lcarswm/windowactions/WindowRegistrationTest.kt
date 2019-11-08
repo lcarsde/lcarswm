@@ -73,7 +73,7 @@ class WindowRegistrationTest {
         val atomLibrary = AtomLibrary(systemApi)
 
         val windowRegistration = WindowRegistration(
-            SystemFacadeMock(),
+            systemApi,
             LoggerMock(),
             windowManagerState,
             atomLibrary,
