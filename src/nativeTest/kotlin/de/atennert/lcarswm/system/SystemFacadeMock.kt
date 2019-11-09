@@ -374,7 +374,7 @@ open class SystemFacadeMock : SystemApi {
         return nextWindowId++
     }
 
-    var selectionOwner: Window = None.convert()
+    private var selectionOwner: Window = None.convert()
 
     override fun getSelectionOwner(atom: Atom): Window {
         functionCalls.add(FunctionCall("getSelectionOwner", atom))
