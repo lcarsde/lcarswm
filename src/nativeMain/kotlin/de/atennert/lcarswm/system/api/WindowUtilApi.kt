@@ -26,7 +26,7 @@ interface WindowUtilApi {
 
     fun queryTree(window: Window, rootReturn: CValuesRef<WindowVar>, parentReturn: CValuesRef<WindowVar>, childrenReturn: CValuesRef<CPointerVar<WindowVar>>, childrenReturnCounts: CValuesRef<UIntVar>): Int
 
-    fun getWindowAttributes(window: Window, attributes: CValuesRef<XWindowAttributes>): Int
+    fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int
 
     fun getWMProtocols(window: Window, protocolsReturn: CValuesRef<CPointerVar<AtomVar>>, protocolCountReturn: CValuesRef<IntVar>): Int
 

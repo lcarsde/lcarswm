@@ -314,7 +314,7 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    override fun getWindowAttributes(window: Window, attributes: CValuesRef<XWindowAttributes>): Int {
+    override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
         functionCalls.add(FunctionCall("getWindowAttributes", window, attributes))
         return 0
     }

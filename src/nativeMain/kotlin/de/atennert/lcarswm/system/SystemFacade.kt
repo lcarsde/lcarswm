@@ -60,7 +60,7 @@ class SystemFacade : SystemApi {
 
     override fun getWindowAttributes(
         window: Window,
-        attributes: CValuesRef<XWindowAttributes>
+        attributes: CPointer<XWindowAttributes>
     ): Int {
         return XGetWindowAttributes(display, window, attributes)
     }
