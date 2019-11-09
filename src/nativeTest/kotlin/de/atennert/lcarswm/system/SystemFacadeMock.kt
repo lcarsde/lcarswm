@@ -358,6 +358,12 @@ open class SystemFacadeMock : SystemApi {
 
     var nextWindowId: Window = 2.convert() // 1 is root window
 
+    /**
+     * Utility method to get a window ID for testing.
+     * This will increment the window ID counter.
+     */
+    fun getNewWindowId(): Window = nextWindowId++
+
     override fun createWindow(
         parentWindow: Window,
         measurements: List<Int>,
