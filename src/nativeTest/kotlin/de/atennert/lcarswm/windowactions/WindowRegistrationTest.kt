@@ -6,10 +6,10 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms.WM_STATE
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
-import xlib.Atom
-import xlib.NormalState
-import xlib.Window
+import kotlinx.cinterop.pointed
+import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -59,7 +59,51 @@ class WindowRegistrationTest {
 
     // TODO setup && !viewable (negative)
 
-    // TODO setup && viewable (positive)
+    @Test
+    fun `check window initialization for setup`() {
+        val rootWindowId: Window = 2.convert()
+        val windowId: Window = 5.convert()
+
+        val systemApi = object : SystemFacadeMock() {
+            override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
+                attributes.pointed.map_state = IsViewable
+                return 0
+            }
+        }
+        val windowManagerState = WindowManagerStateMock()
+        val atomLibrary = AtomLibrary(systemApi)
+
+        systemApi.functionCalls.clear() // remove AtomLibrary setup
+
+        val windowRegistration = WindowRegistration(
+            systemApi,
+            LoggerMock(),
+            windowManagerState,
+            atomLibrary,
+            rootWindowId
+        )
+
+        windowRegistration.addWindow(windowId, true)
+
+        val setupCalls = systemApi.functionCalls
+
+        assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "frame window should be created")
+        assertEquals("selectInput", setupCalls.removeAt(0).name, "select the input on the window frame")
+        assertEquals("addToSaveSet", setupCalls.removeAt(0).name, "add the windows frame to the save set")
+        assertEquals("reparentWindow", setupCalls.removeAt(0).name, "child window should be reparented to frame")
+        assertEquals("resizeWindow", setupCalls.removeAt(0).name,"resize window to monitor required dimensions")
+        assertEquals("mapWindow", setupCalls.removeAt(0).name, "frame window should be mapped")
+        assertEquals("mapWindow", setupCalls.removeAt(0).name, "child window should be mapped")
+
+        val changePropertyCall = setupCalls.removeAt(0)
+        assertEquals("changeProperty", changePropertyCall.name, "normal state needs to be _set_ in windows state atom")
+        assertEquals(windowId, changePropertyCall.parameters[0], "normal state needs to be set in _windows_ state atom")
+        assertEquals(NormalState, (changePropertyCall.parameters[3] as UByteArray)[0].convert(), "_normal state_ needs to be set in windows state atom")
+
+        val addWindowCall = windowManagerState.functionCalls.removeAt(0)
+        assertEquals("addWindow", addWindowCall.name, "the child window should be _added to the window list_")
+        assertEquals(windowId, (addWindowCall.parameters[0] as WindowContainer).id, "the _child window_ should be added to the window list")
+    }
 
     // TODO get rid of SystemApiHelper
 
