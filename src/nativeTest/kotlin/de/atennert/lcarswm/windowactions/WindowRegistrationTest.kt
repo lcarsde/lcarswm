@@ -21,12 +21,10 @@ import kotlin.test.assertTrue
 class WindowRegistrationTest {
     @Test
     fun `check window initialization`() {
+        val systemApi = SystemFacadeMock()
         val rootWindowId: Window = 2.convert()
         val windowId: Window = 5.convert()
-        val frameId: Window = 12.convert()
-        val commandList = mutableListOf<String>()
 
-        val systemApi = SystemApiHelper(frameId, commandList)
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
@@ -42,17 +40,7 @@ class WindowRegistrationTest {
 
         windowRegistration.addWindow(windowId, false)
 
-        assertEquals("createSimpleWindow-$rootWindowId", commandList.removeAt(0), "frame window should be created firstly")
-        assertEquals("reparentWindow-$windowId-$frameId", commandList.removeAt(0), "child window should be reparented to frame secondly")
-        assertEquals("mapWindow-$frameId", commandList.removeAt(0), "frame window should be mapped thirdly")
-        assertEquals("mapWindow-$windowId", commandList.removeAt(0), "child window should be mapped fourthly")
-        assertEquals("changeProperty - $windowId:${atomLibrary[WM_STATE]}:${atomLibrary[WM_STATE]}:$NormalState", commandList.removeAt(0), "normal state needs to be set in windows frame atom")
-
-        val addWindowCall = windowManagerState.functionCalls.removeAt(0)
-        assertEquals("addWindow", addWindowCall.name, "the child window should be _added to the window list_")
-        assertEquals(windowId, (addWindowCall.parameters[0] as WindowContainer).id, "the _child window_ should be added to the window list")
-
-        assertTrue(commandList.isEmpty(), "There should be no unchecked commands")
+        checkWindowAddProcedure(systemApi, windowId, windowManagerState)
     }
 
     // TODO override-redirect window (negative)
@@ -85,24 +73,40 @@ class WindowRegistrationTest {
 
         windowRegistration.addWindow(windowId, true)
 
+        checkWindowAddProcedure(systemApi, windowId, windowManagerState)
+    }
+
+    private fun checkWindowAddProcedure(
+        systemApi: SystemFacadeMock,
+        windowId: Window,
+        windowManagerState: WindowManagerStateMock
+    ) {
         val setupCalls = systemApi.functionCalls
 
         assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "frame window should be created")
         assertEquals("selectInput", setupCalls.removeAt(0).name, "select the input on the window frame")
         assertEquals("addToSaveSet", setupCalls.removeAt(0).name, "add the windows frame to the save set")
         assertEquals("reparentWindow", setupCalls.removeAt(0).name, "child window should be reparented to frame")
-        assertEquals("resizeWindow", setupCalls.removeAt(0).name,"resize window to monitor required dimensions")
+        assertEquals("resizeWindow", setupCalls.removeAt(0).name, "resize window to monitor required dimensions")
         assertEquals("mapWindow", setupCalls.removeAt(0).name, "frame window should be mapped")
         assertEquals("mapWindow", setupCalls.removeAt(0).name, "child window should be mapped")
 
         val changePropertyCall = setupCalls.removeAt(0)
         assertEquals("changeProperty", changePropertyCall.name, "normal state needs to be _set_ in windows state atom")
         assertEquals(windowId, changePropertyCall.parameters[0], "normal state needs to be set in _windows_ state atom")
-        assertEquals(NormalState, (changePropertyCall.parameters[3] as UByteArray)[0].convert(), "_normal state_ needs to be set in windows state atom")
+        assertEquals(
+            NormalState,
+            (changePropertyCall.parameters[3] as UByteArray)[0].convert(),
+            "_normal state_ needs to be set in windows state atom"
+        )
 
         val addWindowCall = windowManagerState.functionCalls.removeAt(0)
         assertEquals("addWindow", addWindowCall.name, "the child window should be _added to the window list_")
-        assertEquals(windowId, (addWindowCall.parameters[0] as WindowContainer).id, "the _child window_ should be added to the window list")
+        assertEquals(
+            windowId,
+            (addWindowCall.parameters[0] as WindowContainer).id,
+            "the _child window_ should be added to the window list"
+        )
     }
 
     // TODO get rid of SystemApiHelper
