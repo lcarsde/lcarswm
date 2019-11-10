@@ -273,7 +273,7 @@ open class SystemFacadeMock : SystemApi {
     override fun defaultScreenOfDisplay(): CPointer<Screen>? {
         functionCalls.add(FunctionCall("defaultScreenOfDisplay"))
         val screen = nativeHeap.alloc<Screen>()
-        screen.root = 1.convert()
+        screen.root = rootWindowId
         screen.root_visual = nativeHeap.alloc<Visual>().ptr
         return screen.ptr
     }
@@ -356,6 +356,7 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    val rootWindowId: Window = 1.convert()
     var nextWindowId: Window = 2.convert() // 1 is root window
 
     /**
