@@ -61,15 +61,15 @@ class WindowRegistrationTest {
 
     @Test
     fun `check window initialization for setup`() {
-        val rootWindowId: Window = 2.convert()
-        val windowId: Window = 5.convert()
-
         val systemApi = object : SystemFacadeMock() {
             override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
                 attributes.pointed.map_state = IsViewable
                 return 0
             }
         }
+        val rootWindowId: Window = systemApi.rootWindowId
+        val windowId: Window = systemApi.getNewWindowId()
+
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
