@@ -3,13 +3,15 @@ package de.atennert.lcarswm.windowactions
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.atom.AtomLibrary
-import de.atennert.lcarswm.atom.Atoms.WM_STATE
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
-import xlib.*
+import xlib.IsViewable
+import xlib.NormalState
+import xlib.Window
+import xlib.XWindowAttributes
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -109,8 +111,6 @@ class WindowRegistrationTest {
         )
     }
 
-    // TODO get rid of SystemApiHelper
-
     @Test
     fun `provide info about whether we know a certain window`() {
         val rootWindowId: Window = 2.convert()
@@ -133,36 +133,5 @@ class WindowRegistrationTest {
         windowRegistration.addWindow(windowId, false)
 
         assertTrue(windowRegistration.isWindowManaged(windowId), "A known window should be reported managed")
-    }
-
-    class SystemApiHelper(
-        private val frameId: Window,
-        private val commandList: MutableList<String>
-    ) : SystemFacadeMock() {
-        override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
-            commandList.add("createSimpleWindow-$parentWindow")
-            return frameId
-        }
-
-        override fun reparentWindow(window: Window, parent: Window, x: Int, y: Int): Int {
-            commandList.add("reparentWindow-$window-$parent")
-            return 0
-        }
-
-        override fun mapWindow(window: Window): Int {
-            commandList.add("mapWindow-$window")
-            return 0
-        }
-
-        override fun changeProperty(
-            window: Window,
-            propertyAtom: Atom,
-            typeAtom: Atom,
-            data: UByteArray?,
-            format: Int
-        ): Int {
-            commandList.add("changeProperty - $window:$propertyAtom:$typeAtom:${data?.get(0)}")
-            return 0
-        }
     }
 }
