@@ -2,6 +2,7 @@ package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateHandler
+import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms.WM_STATE
 import de.atennert.lcarswm.log.Logger
@@ -24,7 +25,7 @@ class WindowRegistration(
         val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
         system.getWindowAttributes(windowId, windowAttributes.ptr)
 
-        if (windowAttributes.override_redirect != 0 || (isSetup &&
+        if (windowAttributes.override_redirect != X_FALSE || (isSetup &&
                     windowAttributes.map_state != IsViewable)) {
             logger.logInfo("WindowRegistration::addWindow::skipping window $windowId")
 
