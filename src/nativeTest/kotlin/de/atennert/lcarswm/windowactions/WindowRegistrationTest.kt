@@ -2,6 +2,7 @@ package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateMock
+import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
@@ -44,10 +45,6 @@ class WindowRegistrationTest {
 
         checkWindowAddProcedure(systemApi, windowId, windowManagerState)
     }
-
-    // TODO override-redirect window (negative)
-
-    // TODO setup && !viewable (negative)
 
     @Test
     fun `check window initialization for setup`() {
@@ -109,6 +106,42 @@ class WindowRegistrationTest {
             (addWindowCall.parameters[0] as WindowContainer).id,
             "the _child window_ should be added to the window list"
         )
+    }
+
+    // TODO setup && !viewable (negative)
+    @Test
+    fun `don't add override-redirect windows`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
+                attributes.pointed.override_redirect = X_TRUE
+                return 0
+            }
+        }
+        val rootWindowId: Window = systemApi.rootWindowId
+        val windowId: Window = systemApi.getNewWindowId()
+
+        val windowManagerState = WindowManagerStateMock()
+        val atomLibrary = AtomLibrary(systemApi)
+
+        systemApi.functionCalls.clear() // remove AtomLibrary setup
+
+        val windowRegistration = WindowRegistration(
+            systemApi,
+            LoggerMock(),
+            windowManagerState,
+            atomLibrary,
+            rootWindowId
+        )
+
+        windowRegistration.addWindow(windowId, false)
+
+        val setupCalls = systemApi.functionCalls
+
+        assertEquals(1, setupCalls.size, "There should only be one call to map the popup")
+
+        val mapCall = setupCalls.removeAt(0)
+        assertEquals("mapWindow", mapCall.name, "We need to map the popup")
+        assertEquals(windowId, mapCall.parameters[0], "The popup needs to be mapped")
     }
 
     @Test
