@@ -145,6 +145,35 @@ class WindowRegistrationTest {
     }
 
     @Test
+    fun `don't map override-redirect windows during WM setup`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
+                attributes.pointed.override_redirect = X_TRUE
+                return 0
+            }
+        }
+        val rootWindowId: Window = systemApi.rootWindowId
+        val windowId: Window = systemApi.getNewWindowId()
+
+        val windowManagerState = WindowManagerStateMock()
+        val atomLibrary = AtomLibrary(systemApi)
+
+        systemApi.functionCalls.clear() // remove AtomLibrary setup
+
+        val windowRegistration = WindowRegistration(
+            systemApi,
+            LoggerMock(),
+            windowManagerState,
+            atomLibrary,
+            rootWindowId
+        )
+
+        windowRegistration.addWindow(windowId, true)
+
+        assertEquals(0, systemApi.functionCalls.size, "There should no system call")
+    }
+
+    @Test
     fun `provide info about whether we know a certain window`() {
         val rootWindowId: Window = 2.convert()
         val windowId: Window = 5.convert()
