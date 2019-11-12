@@ -21,6 +21,9 @@ class WindowRegistration(
     private val rootWindow: Window
 ) : WindowRegistrationApi {
 
+    private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or EnterWindowMask or
+            LeaveWindowMask or ButtonPressMask or ButtonReleaseMask
+
     override fun addWindow(windowId: Window, isSetup: Boolean) {
         val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
         system.getWindowAttributes(windowId, windowAttributes.ptr)
@@ -44,9 +47,7 @@ class WindowRegistration(
 
         window.frame = system.createSimpleWindow(rootWindow, measurements)
 
-        system.selectInput(window.frame, SubstructureRedirectMask or FocusChangeMask or EnterWindowMask or
-                LeaveWindowMask or ButtonPressMask or ButtonReleaseMask
-        )
+        system.selectInput(window.frame, frameEventMask)
 
         system.addToSaveSet(windowId)
 
