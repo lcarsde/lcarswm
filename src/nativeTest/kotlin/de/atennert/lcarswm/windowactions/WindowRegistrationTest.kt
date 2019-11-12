@@ -113,6 +113,21 @@ class WindowRegistrationTest {
                 return 0
             }
         }
+        testForNoActionDuringSetup(systemApi)
+    }
+
+    @Test
+    fun `don't map override-redirect windows during WM setup`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
+                attributes.pointed.override_redirect = X_TRUE
+                return 0
+            }
+        }
+        testForNoActionDuringSetup(systemApi)
+    }
+
+    private fun testForNoActionDuringSetup(systemApi: SystemFacadeMock) {
         val rootWindowId: Window = systemApi.rootWindowId
         val windowId: Window = systemApi.getNewWindowId()
 
@@ -131,7 +146,7 @@ class WindowRegistrationTest {
 
         windowRegistration.addWindow(windowId, true)
 
-        assertTrue(systemApi.functionCalls.isEmpty(), "There should no calls for non-viewable windows during setup")
+        assertEquals(0, systemApi.functionCalls.size, "There should no system call")
     }
 
     @Test
@@ -167,35 +182,6 @@ class WindowRegistrationTest {
         val mapCall = setupCalls.removeAt(0)
         assertEquals("mapWindow", mapCall.name, "We need to map the popup")
         assertEquals(windowId, mapCall.parameters[0], "The popup needs to be mapped")
-    }
-
-    @Test
-    fun `don't map override-redirect windows during WM setup`() {
-        val systemApi = object : SystemFacadeMock() {
-            override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
-                attributes.pointed.override_redirect = X_TRUE
-                return 0
-            }
-        }
-        val rootWindowId: Window = systemApi.rootWindowId
-        val windowId: Window = systemApi.getNewWindowId()
-
-        val windowManagerState = WindowManagerStateMock()
-        val atomLibrary = AtomLibrary(systemApi)
-
-        systemApi.functionCalls.clear() // remove AtomLibrary setup
-
-        val windowRegistration = WindowRegistration(
-            systemApi,
-            LoggerMock(),
-            windowManagerState,
-            atomLibrary,
-            rootWindowId
-        )
-
-        windowRegistration.addWindow(windowId, true)
-
-        assertEquals(0, systemApi.functionCalls.size, "There should no system call")
     }
 
     @Test
