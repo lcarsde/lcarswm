@@ -9,10 +9,7 @@ import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
-import xlib.IsViewable
-import xlib.NormalState
-import xlib.Window
-import xlib.XWindowAttributes
+import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -108,7 +105,35 @@ class WindowRegistrationTest {
         )
     }
 
-    // TODO setup && !viewable (negative)
+    @Test
+    fun `don't add non-viewable windows during setup`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
+                attributes.pointed.map_state = IsUnmapped
+                return 0
+            }
+        }
+        val rootWindowId: Window = systemApi.rootWindowId
+        val windowId: Window = systemApi.getNewWindowId()
+
+        val windowManagerState = WindowManagerStateMock()
+        val atomLibrary = AtomLibrary(systemApi)
+
+        systemApi.functionCalls.clear() // remove AtomLibrary setup
+
+        val windowRegistration = WindowRegistration(
+            systemApi,
+            LoggerMock(),
+            windowManagerState,
+            atomLibrary,
+            rootWindowId
+        )
+
+        windowRegistration.addWindow(windowId, true)
+
+        assertTrue(systemApi.functionCalls.isEmpty(), "There should no calls for non-viewable windows during setup")
+    }
+
     @Test
     fun `don't add override-redirect windows`() {
         val systemApi = object : SystemFacadeMock() {
