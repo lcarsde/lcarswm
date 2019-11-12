@@ -22,8 +22,8 @@ class WindowRegistrationTest {
     @Test
     fun `check window initialization`() {
         val systemApi = SystemFacadeMock()
-        val rootWindowId: Window = 2.convert()
-        val windowId: Window = 5.convert()
+        val rootWindowId: Window = systemApi.rootWindowId
+        val windowId: Window = systemApi.getNewWindowId()
 
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
