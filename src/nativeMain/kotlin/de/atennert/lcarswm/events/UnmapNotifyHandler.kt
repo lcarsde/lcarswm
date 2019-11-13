@@ -1,15 +1,27 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.system.api.SystemApi
+import de.atennert.lcarswm.windowactions.WindowRegistrationApi
 import xlib.UnmapNotify
+import xlib.Window
 import xlib.XEvent
 
 /**
  *
  */
-class UnmapNotifyHandler : XEventHandler {
+class UnmapNotifyHandler(
+    private val system: SystemApi,
+    private val windowRegistration: WindowRegistrationApi,
+    private val rootWindowId: Window
+) : XEventHandler {
     override val xEventType = UnmapNotify
 
     override fun handleEvent(event: XEvent): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val unmapEvent = event.xunmap
+
+        system.reparentWindow(unmapEvent.window, rootWindowId, 0, 0)
+        system.removeFromSaveSet(unmapEvent.window)
+
+        return false
     }
 }
