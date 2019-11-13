@@ -8,10 +8,12 @@ import xlib.Window
  */
 open class WindowRegistrationMock : WindowRegistrationApi {
     val functionCalls = mutableListOf<FunctionCall>()
+    private val managedWindowIds = mutableListOf<Window>()
 
     override fun addWindow(windowId: Window, isSetup: Boolean) {
         functionCalls.add(FunctionCall("addWindow", windowId, isSetup))
+        managedWindowIds.add(windowId)
     }
 
-    override fun isWindowManaged(windowId: Window): Boolean = false
+    override fun isWindowManaged(windowId: Window): Boolean = managedWindowIds.contains(windowId)
 }
