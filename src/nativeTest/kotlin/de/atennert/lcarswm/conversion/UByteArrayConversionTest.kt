@@ -31,4 +31,25 @@ class UByteArrayConversionTest {
         uByteArray.zip(stringAsAscii)
             .forEach { (expected, actual) -> assertEquals(expected, actual, "The values should be the same") }
     }
+
+    @Test
+    fun `combine UByteArray list to UByteArray`() {
+        val uByteArrayList = listOf(
+            ubyteArrayOf(0.convert(), 1.convert()),
+            ubyteArrayOf(2.convert(), 3.convert(), 4.convert()))
+
+        val combinedByteArray = uByteArrayList.combine()
+
+        ubyteArrayOf(0.convert(), 1.convert(), 2.convert(), 3.convert(), 4.convert())
+            .zip(combinedByteArray)
+            .forEach { (expected, actual) -> assertEquals(expected, actual, "The values should be the same") }
+    }
+
+    @Test
+    fun `combine empty UByteArray list to UByteArray`() {
+        val uByteArrayList = listOf<UByteArray>()
+        val combinedByteArray = uByteArrayList.combine()
+
+        assertEquals(0, combinedByteArray.size, "The byte array should be empty")
+    }
 }
