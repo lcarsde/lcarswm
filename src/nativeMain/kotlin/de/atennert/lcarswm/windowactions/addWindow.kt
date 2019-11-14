@@ -2,6 +2,8 @@ package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.WindowContainer
 import de.atennert.lcarswm.WindowManagerStateHandler
+import de.atennert.lcarswm.conversion.combine
+import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -46,8 +48,9 @@ fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManag
 
     system.mapWindow(window.id)
 
-    val wmStateDataList = listOf(NormalState, None.convert())
-    val wmStateData = UByteArray(2) { wmStateDataList[it].convert()}
+    val wmStateData = listOf<ULong>(NormalState.convert(), None.convert())
+        .map { it.toUByteArray() }
+        .combine()
     system.changeProperty(window.id, windowManagerState.wmState, windowManagerState.wmState, wmStateData, 32)
 
     windowManagerState.addWindow(window, windowMonitor)
