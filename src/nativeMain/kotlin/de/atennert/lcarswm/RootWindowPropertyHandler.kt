@@ -2,6 +2,7 @@ package de.atennert.lcarswm
 
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms.*
+import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -84,12 +85,12 @@ class RootWindowPropertyHandler(
         val supportedProperties = arrayOf(
             NET_SUPPORTING_WM_CHECK,
             NET_WM_NAME
-        ).map { atomLibrary[it] }
+        )
 
-        val byteCount = supportedProperties.size * longSizeInBytes
-        val propertyBytes = supportedProperties.map { it.toUByteArray() }
-
-        return UByteArray(byteCount) { propertyBytes[it.div(longSizeInBytes)][it.rem(longSizeInBytes)] }
+        return supportedProperties
+            .map { atomLibrary[it] }
+            .map { it.toUByteArray() }
+            .combine()
     }
 
     fun unsetWindowProperties() {
