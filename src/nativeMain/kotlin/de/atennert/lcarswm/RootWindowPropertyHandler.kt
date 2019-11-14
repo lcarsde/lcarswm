@@ -16,8 +16,6 @@ class RootWindowPropertyHandler(
 ) {
     private val ewmhSupportWindow: Window
 
-    private val longSizeInBytes = 4
-
     init {
         val windowAttributes = nativeHeap.alloc<XSetWindowAttributes>()
         windowAttributes.override_redirect = X_TRUE
