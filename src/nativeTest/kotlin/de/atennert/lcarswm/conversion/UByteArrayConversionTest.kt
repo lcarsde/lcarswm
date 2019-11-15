@@ -13,10 +13,10 @@ class UByteArrayConversionTest {
 
         assertEquals(4, uByteArray.size, "A ULong should turn into a UByteArray of size 4")
 
-        assertEquals(0x12.toUByte(), uByteArray[0], "The first byte should be 0x12")
-        assertEquals(0x34.toUByte(), uByteArray[1], "The second byte should be 0x34")
-        assertEquals(0x56.toUByte(), uByteArray[2], "The third byte should be 0x56")
-        assertEquals(0x78.toUByte(), uByteArray[3], "The fourth byte should be 0x78")
+        assertEquals(0x78.toUByte(), uByteArray[0], "The first byte should be 0x12")
+        assertEquals(0x56.toUByte(), uByteArray[1], "The second byte should be 0x34")
+        assertEquals(0x34.toUByte(), uByteArray[2], "The third byte should be 0x56")
+        assertEquals(0x12.toUByte(), uByteArray[3], "The fourth byte should be 0x78")
     }
 
     @Test
