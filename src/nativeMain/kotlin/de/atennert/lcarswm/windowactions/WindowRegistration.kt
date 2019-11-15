@@ -5,6 +5,8 @@ import de.atennert.lcarswm.WindowManagerStateHandler
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms.WM_STATE
+import de.atennert.lcarswm.conversion.combine
+import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -23,6 +25,10 @@ class WindowRegistration(
 
     private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or EnterWindowMask or
             LeaveWindowMask or ButtonPressMask or ButtonReleaseMask
+
+    private val wmStateData = listOf<ULong>(NormalState.convert(), None.convert())
+        .map { it.toUByteArray() }
+        .combine()
 
     override fun addWindow(windowId: Window, isSetup: Boolean) {
         val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
@@ -59,8 +65,6 @@ class WindowRegistration(
 
         system.mapWindow(window.id)
 
-        val wmStateDataList = listOf(NormalState, None.convert())
-        val wmStateData = UByteArray(2) { wmStateDataList[it].convert()}
         system.changeProperty(window.id, atomLibrary[WM_STATE], atomLibrary[WM_STATE], wmStateData, 32)
 
         windowManagerState.addWindow(window, windowMonitor)
