@@ -81,6 +81,7 @@ Fullscreen mode
 TODO
 
 ### Other
+* Cleanup graphics contexts
 * Refactor event handling
 * Buffer events
 * Add time handling
