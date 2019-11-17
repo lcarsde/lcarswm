@@ -75,6 +75,9 @@ class WindowRegistration(
     override fun isWindowManaged(windowId: Window): Boolean = windowManagerState.hasWindow(windowId)
 
     override fun removeWindow(windowId: Window) {
+        system.reparentWindow(windowId, rootWindow, 0, 0)
+        system.removeFromSaveSet(windowId)
+
         windowManagerState.removeWindow(windowId)
     }
 }

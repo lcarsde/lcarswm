@@ -11,18 +11,13 @@ import xlib.XEvent
  *
  */
 class UnmapNotifyHandler(
-    private val system: SystemApi,
     private val windowRegistration: WindowRegistrationApi,
-    private val rootWindowDrawer: UIDrawing,
-    private val rootWindowId: Window
+    private val rootWindowDrawer: UIDrawing
 ) : XEventHandler {
     override val xEventType = UnmapNotify
 
     override fun handleEvent(event: XEvent): Boolean {
         val unmapEvent = event.xunmap
-
-        system.reparentWindow(unmapEvent.window, rootWindowId, 0, 0)
-        system.removeFromSaveSet(unmapEvent.window)
 
         windowRegistration.removeWindow(unmapEvent.window)
 
