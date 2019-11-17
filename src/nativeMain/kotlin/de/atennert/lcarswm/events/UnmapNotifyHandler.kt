@@ -7,7 +7,7 @@ import xlib.UnmapNotify
 import xlib.XEvent
 
 /**
- *
+ * Unregister known windows and redraw the root window on unmap notify.
  */
 class UnmapNotifyHandler(
     private val logger: Logger,
