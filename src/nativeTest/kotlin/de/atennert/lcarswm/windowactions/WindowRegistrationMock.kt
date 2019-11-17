@@ -16,4 +16,9 @@ open class WindowRegistrationMock : WindowRegistrationApi {
     }
 
     override fun isWindowManaged(windowId: Window): Boolean = managedWindowIds.contains(windowId)
+
+    override fun removeWindow(windowId: Window) {
+        functionCalls.add(FunctionCall("removeWindow", windowId))
+        managedWindowIds.remove(windowId)
+    }
 }

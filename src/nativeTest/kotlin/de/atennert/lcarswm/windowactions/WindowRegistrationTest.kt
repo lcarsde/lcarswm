@@ -207,4 +207,28 @@ class WindowRegistrationTest {
 
         assertTrue(windowRegistration.isWindowManaged(windowId), "A known window should be reported managed")
     }
+
+    fun `check window removal`() {
+        val systemApi = SystemFacadeMock()
+
+        val rootWindowId = systemApi.rootWindowId
+        val windowId = systemApi.getNewWindowId()
+
+        val windowManagerState = WindowManagerStateMock()
+        val atomLibrary = AtomLibrary(systemApi)
+
+        val windowRegistration = WindowRegistration(
+            systemApi,
+            LoggerMock(),
+            windowManagerState,
+            atomLibrary,
+            rootWindowId
+        )
+
+        val windowManagerStateCalls = windowManagerState.functionCalls
+
+        val removeWindowCall = windowManagerStateCalls.removeAt(0)
+        assertEquals("removeWindow", removeWindowCall.name, "The window needs to be _removed_")
+        assertEquals(windowId, removeWindowCall.parameters[0], "The _window_ needs to be removed")
+    }
 }

@@ -1,9 +1,9 @@
 package de.atennert.lcarswm
 
 class UIDrawingMock : UIDrawing {
-    var drawWindowManagerFrameCalls = 0
+    var drawWindowManagerFrameCallCount = 0
 
     override fun drawWindowManagerFrame() {
-        drawWindowManagerFrameCalls++
+        drawWindowManagerFrameCallCount++
     }
 }
