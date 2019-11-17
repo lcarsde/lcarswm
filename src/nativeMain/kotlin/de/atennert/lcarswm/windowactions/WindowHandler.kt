@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
-import de.atennert.lcarswm.WindowContainer
+import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.WindowManagerStateHandler
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.atom.AtomLibrary
@@ -46,7 +46,7 @@ class WindowHandler(
             return
         }
 
-        val window = WindowContainer(windowId)
+        val window = FramedWindow(windowId)
         val windowMonitor = windowManagerState.initialMonitor
 
         val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))

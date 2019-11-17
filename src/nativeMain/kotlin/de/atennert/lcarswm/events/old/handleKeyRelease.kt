@@ -34,7 +34,7 @@ fun handleKeyRelease(
         XF86XK_AudioLowerVolume -> loadAppFromKeyBinding(system, logger, "XF86AudioLowerVolume")
         XF86XK_AudioRaiseVolume -> loadAppFromKeyBinding(system, logger, "XF86AudioRaiseVolume")
         XK_F4 -> {
-            val window = windowManagerState.activeWindow
+            val window = windowManagerState.activeFramedWindow
             if (window != null) {
                 logger.logDebug("::handleKeyRelease::closing window ${window.id}")
                 closeWindow(window.id, system, windowManagerState)

@@ -1,7 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.Monitor
-import de.atennert.lcarswm.WindowContainer
+import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
@@ -71,7 +71,7 @@ class DestroyNotifyHandlerTest {
         val removedWindowIds = mutableListOf<Window>()
 
         init {
-            windows.add(Pair(WindowContainer(knownWindow), Monitor(0.convert(), "", true)))
+            windows.add(Pair(FramedWindow(knownWindow), Monitor(0.convert(), "", true)))
         }
 
         override fun removeWindow(windowId: Window) {

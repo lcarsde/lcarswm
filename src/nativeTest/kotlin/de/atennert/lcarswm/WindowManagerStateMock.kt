@@ -12,11 +12,11 @@ open class WindowManagerStateMock : WindowManagerStateHandler {
 
     override val initialMonitor: Monitor = Monitor(0.convert(), "Monitor", true)
 
-    override val windows = mutableListOf<Pair<WindowContainer, Monitor>>()
+    override val windows = mutableListOf<Pair<FramedWindow, Monitor>>()
 
-    override fun addWindow(window: WindowContainer, monitor: Monitor) {
-        functionCalls.add(FunctionCall("addWindow", window, monitor))
-        windows.add(Pair(window, monitor))
+    override fun addWindow(framedWindow: FramedWindow, monitor: Monitor) {
+        functionCalls.add(FunctionCall("addWindow", framedWindow, monitor))
+        windows.add(Pair(framedWindow, monitor))
     }
 
     override fun removeWindow(windowId: Window) {
@@ -30,5 +30,5 @@ open class WindowManagerStateMock : WindowManagerStateHandler {
 
     override fun getScreenModeForMonitor(monitor: Monitor): ScreenMode = ScreenMode.NORMAL
 
-    override fun getWindowContainer(windowId: Window): WindowContainer = windows.map {it.first}.single {it.id == windowId}
+    override fun getWindowContainer(windowId: Window): FramedWindow = windows.map {it.first}.single {it.id == windowId}
 }

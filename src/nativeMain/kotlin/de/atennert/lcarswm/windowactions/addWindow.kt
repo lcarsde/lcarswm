@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
-import de.atennert.lcarswm.WindowContainer
+import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.WindowManagerStateHandler
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
@@ -28,7 +28,7 @@ fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManag
         return
     }
 
-    val window = WindowContainer(windowId)
+    val window = FramedWindow(windowId)
     val windowMonitor = windowManagerState.initialMonitor
 
     val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))

@@ -7,15 +7,15 @@ interface WindowManagerStateHandler {
 
     val initialMonitor: Monitor
 
-    val windows: List<Pair<WindowContainer, Monitor>>
+    val windows: List<Pair<FramedWindow, Monitor>>
 
-    fun addWindow(window: WindowContainer, monitor: Monitor)
+    fun addWindow(framedWindow: FramedWindow, monitor: Monitor)
 
     fun removeWindow(windowId: Window)
 
     fun hasWindow(windowId: Window): Boolean
 
-    fun getWindowContainer(windowId: Window): WindowContainer
+    fun getWindowContainer(windowId: Window): FramedWindow
 
     fun getScreenModeForMonitor(monitor: Monitor): ScreenMode
 }

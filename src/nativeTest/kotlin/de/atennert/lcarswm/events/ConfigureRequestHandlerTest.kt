@@ -105,11 +105,11 @@ class ConfigureRequestHandlerTest {
     }
 
     private class WindowManagerStateTestImpl(private val knownWindow: Window? = null) : WindowManagerStateMock() {
-        override val windows = mutableListOf<Pair<WindowContainer, Monitor>>()
+        override val windows = mutableListOf<Pair<FramedWindow, Monitor>>()
 
         init {
             if (knownWindow != null) {
-                windows.add(Pair(WindowContainer(knownWindow), Monitor(2.convert(), "", true)))
+                windows.add(Pair(FramedWindow(knownWindow), Monitor(2.convert(), "", true)))
             }
         }
         override fun hasWindow(windowId: Window): Boolean = windowId == knownWindow

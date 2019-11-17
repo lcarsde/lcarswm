@@ -6,6 +6,6 @@ import xlib.Window
 /**
  * POJO for registered windows.
  */
-data class WindowContainer(val id: Window) {
+data class FramedWindow(val id: Window) {
     var frame: Window = 0.convert()
 }

@@ -10,10 +10,10 @@ import kotlinx.cinterop.convert
 fun adjustWindowPositionAndSize(
     eventApi: EventApi,
     windowMeasurements: List<Int>,
-    window: WindowContainer
+    framedWindow: FramedWindow
 ) {
     eventApi.moveResizeWindow(
-        window.frame,
+        framedWindow.frame,
         windowMeasurements[0],
         windowMeasurements[1],
         windowMeasurements[2].convert(),
@@ -21,10 +21,10 @@ fun adjustWindowPositionAndSize(
     )
 
     eventApi.resizeWindow(
-        window.id,
+        framedWindow.id,
         windowMeasurements[2].convert(),
         windowMeasurements[3].convert()
     )
 
-    sendConfigureNotify(eventApi, window.id, windowMeasurements)
+    sendConfigureNotify(eventApi, framedWindow.id, windowMeasurements)
 }

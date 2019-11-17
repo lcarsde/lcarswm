@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
-import de.atennert.lcarswm.WindowContainer
+import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
@@ -100,7 +100,7 @@ class WindowHandlerTest {
         assertEquals("addWindow", addWindowCall.name, "the child window should be _added to the window list_")
         assertEquals(
             windowId,
-            (addWindowCall.parameters[0] as WindowContainer).id,
+            (addWindowCall.parameters[0] as FramedWindow).id,
             "the _child window_ should be added to the window list"
         )
     }
