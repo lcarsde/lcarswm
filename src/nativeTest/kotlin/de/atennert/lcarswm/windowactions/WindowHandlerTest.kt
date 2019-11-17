@@ -18,7 +18,7 @@ import kotlin.test.assertTrue
 /**
  *
  */
-class WindowRegistrationTest {
+class WindowHandlerTest {
     @Test
     fun `check window initialization`() {
         val systemApi = SystemFacadeMock()
@@ -30,7 +30,7 @@ class WindowRegistrationTest {
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
-        val windowRegistration = WindowRegistration(
+        val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowManagerState,
@@ -59,7 +59,7 @@ class WindowRegistrationTest {
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
-        val windowRegistration = WindowRegistration(
+        val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowManagerState,
@@ -136,7 +136,7 @@ class WindowRegistrationTest {
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
-        val windowRegistration = WindowRegistration(
+        val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowManagerState,
@@ -165,7 +165,7 @@ class WindowRegistrationTest {
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
-        val windowRegistration = WindowRegistration(
+        val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowManagerState,
@@ -193,7 +193,7 @@ class WindowRegistrationTest {
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
-        val windowRegistration = WindowRegistration(
+        val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowManagerState,
@@ -220,7 +220,7 @@ class WindowRegistrationTest {
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
-        val windowRegistration = WindowRegistration(
+        val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowManagerState,

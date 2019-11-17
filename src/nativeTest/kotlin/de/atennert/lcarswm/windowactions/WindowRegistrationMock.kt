@@ -6,7 +6,7 @@ import xlib.Window
 /**
  * Mock for testing use of the window registration.
  */
-open class WindowRegistrationMock : WindowRegistrationApi {
+open class WindowRegistrationMock : WindowRegistration {
     val functionCalls = mutableListOf<FunctionCall>()
     private val managedWindowIds = mutableListOf<Window>()
 
