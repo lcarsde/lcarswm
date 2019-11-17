@@ -1,10 +1,8 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.UIDrawing
-import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.WindowRegistrationApi
 import xlib.UnmapNotify
-import xlib.Window
 import xlib.XEvent
 
 /**
@@ -17,9 +15,12 @@ class UnmapNotifyHandler(
     override val xEventType = UnmapNotify
 
     override fun handleEvent(event: XEvent): Boolean {
-        val unmapEvent = event.xunmap
+        val window = event.xunmap.window
+        val isWindowKnown = windowRegistration.isWindowManaged(window)
 
-        windowRegistration.removeWindow(unmapEvent.window)
+        if (isWindowKnown) {
+            windowRegistration.removeWindow(window)
+        }
 
         rootWindowDrawer.drawWindowManagerFrame()
 
