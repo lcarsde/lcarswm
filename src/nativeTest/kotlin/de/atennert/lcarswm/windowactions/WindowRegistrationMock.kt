@@ -4,7 +4,7 @@ import de.atennert.lcarswm.system.FunctionCall
 import xlib.Window
 
 /**
- *
+ * Mock for testing use of the window registration.
  */
 open class WindowRegistrationMock : WindowRegistrationApi {
     val functionCalls = mutableListOf<FunctionCall>()
