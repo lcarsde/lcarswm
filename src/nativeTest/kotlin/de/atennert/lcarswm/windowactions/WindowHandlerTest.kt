@@ -246,5 +246,7 @@ class WindowHandlerTest {
         val removeWindowCall = windowManagerStateCalls.removeAt(0)
         assertEquals("removeWindow", removeWindowCall.name, "The window needs to be _removed_")
         assertEquals(windowId, removeWindowCall.parameters[0], "The _window_ needs to be removed")
+
+        assertFalse(windowRegistration.isWindowManaged(windowId), "The window should not be managed anymore")
     }
 }
