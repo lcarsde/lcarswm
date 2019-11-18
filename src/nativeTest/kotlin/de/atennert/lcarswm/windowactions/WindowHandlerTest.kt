@@ -222,7 +222,7 @@ class WindowHandlerTest {
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
-        winddowManagerState.windows.add(Pair(framedWindow, Monitor(1.convert(), "", true)))
+        windowManagerState.windows.add(Pair(framedWindow, Monitor(1.convert(), "", true)))
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
         val windowRegistration = WindowHandler(
