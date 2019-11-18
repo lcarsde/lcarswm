@@ -80,6 +80,7 @@ class WindowHandler(
         system.unmapWindow(framedWindow.frame)
         system.reparentWindow(windowId, rootWindow, 0, 0)
         system.removeFromSaveSet(windowId)
+        system.destroyWindow(framedWindow.frame)
 
         windowManagerState.removeWindow(windowId)
     }
