@@ -215,10 +215,13 @@ class WindowHandlerTest {
 
         val rootWindowId = systemApi.rootWindowId
         val windowId = systemApi.getNewWindowId()
+        val framedWindow = FramedWindow(windowId)
+        framedWindow.frame = systemApi.getNewWindowId()
 
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
+        winddowManagerState.windows.add(Pair(framedWindow, Monitor(1.convert(), "", true)))
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
         val windowRegistration = WindowHandler(
@@ -233,6 +236,10 @@ class WindowHandlerTest {
 
         val unregisterSystemCalls = systemApi.functionCalls
         val windowManagerStateCalls = windowManagerState.functionCalls
+        
+        val unmapFrameCall = unregisterSystemCalls.removeAt(0)
+        assertEquals("unmapWindow", unmapFrameCall.name, "The frame of the unmapped window needs to be _unmapped_")
+        assertEquals(framedWindow.frame, unmapFrameCall.parameters[0], "The _frame_ of the unmapped window needs to be unmapped")
 
         val reparentCall = unregisterSystemCalls.removeAt(0)
         assertEquals("reparentWindow", reparentCall.name, "We need to _reparent_ the window back to root")
