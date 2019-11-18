@@ -249,6 +249,10 @@ class WindowHandlerTest {
         val removeFromSaveSetCall = unregisterSystemCalls.removeAt(0)
         assertEquals("removeFromSaveSet", removeFromSaveSetCall.name, "We need to _remove_ the window from the save set")
         assertEquals(windowId, removeFromSaveSetCall.parameters[0], "We need to remove the _window_ from the save set")
+        
+        val destroyFrameCall = unregisterSystemCalls.removeAt(0)
+        assertEquals("destroyWindow", destroyFrameCall.name, "The frame of the unmapped window needs to be _destroyed_")
+        assertEquals(framedWindow.frame, destroyFrameCall.parameters[0], "The _frame_ of the unmapped window needs to be destroyed")
 
         val removeWindowCall = windowManagerStateCalls.removeAt(0)
         assertEquals("removeWindow", removeWindowCall.name, "The window needs to be _removed_")
