@@ -9,9 +9,11 @@ import xlib.*
 open class SystemFacadeMock : SystemApi {
     val functionCalls = mutableListOf<FunctionCall>()
 
+    val randrEventBase = 80
+    val randrErrorBase = 160
     override fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int {
-        eventBase[0] = 80
-        errorBase[0] = 160
+        eventBase[0] = randrEventBase
+        errorBase[0] = randrErrorBase
         functionCalls.add(FunctionCall("rQueryExtension", eventBase, errorBase))
         return 0
     }
