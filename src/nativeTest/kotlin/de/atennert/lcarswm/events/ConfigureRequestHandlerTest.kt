@@ -2,6 +2,7 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.log.LoggerMock
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import xlib.*

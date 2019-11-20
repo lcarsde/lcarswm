@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.*
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.CPointer
 import xlib.GC

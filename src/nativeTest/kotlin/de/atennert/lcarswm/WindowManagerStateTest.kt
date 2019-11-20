@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.monitor.Monitor
 import kotlinx.cinterop.convert
 import xlib.Window
 import kotlin.test.Test

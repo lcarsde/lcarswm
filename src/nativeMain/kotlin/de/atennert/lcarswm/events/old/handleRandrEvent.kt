@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.events.old
 
-import de.atennert.lcarswm.Monitor
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.adjustWindowPositionAndSize
 import de.atennert.lcarswm.log.Logger
@@ -90,10 +90,10 @@ private fun getOutputName(outputObject: CPointer<XRROutputInfo>): String {
 }
 
 private fun addMeasurementToMonitor(
-    system: SystemApi,
-    monitor: Monitor,
-    crtcReference: RRCrtc,
-    resources: CPointer<XRRScreenResources>
+        system: SystemApi,
+        monitor: Monitor,
+        crtcReference: RRCrtc,
+        resources: CPointer<XRRScreenResources>
 ): Monitor {
     val crtcInfo = system.rGetCrtcInfo(resources, crtcReference)!!.pointed
 

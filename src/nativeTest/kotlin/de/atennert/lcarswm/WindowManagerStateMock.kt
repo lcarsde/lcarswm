@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.FunctionCall
 import kotlinx.cinterop.convert
 import xlib.Atom

@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -70,11 +71,11 @@ fun cleanupColorMap(
 }
 
 private fun drawMaximizedFrame(
-    graphicsContexts: List<GC>,
-    rootWindow: Window,
-    drawApi: DrawApi,
-    monitor: Monitor,
-    image: CPointer<XImage>
+        graphicsContexts: List<GC>,
+        rootWindow: Window,
+        drawApi: DrawApi,
+        monitor: Monitor,
+        image: CPointer<XImage>
 ) {
     clearScreen(graphicsContexts, rootWindow, drawApi, monitor)
 
@@ -151,11 +152,11 @@ private fun drawMaximizedFrame(
 }
 
 private fun drawNormalFrame(
-    graphicsContexts: List<GC>,
-    rootWindow: Window,
-    drawApi: DrawApi,
-    monitor: Monitor,
-    image: CPointer<XImage>
+        graphicsContexts: List<GC>,
+        rootWindow: Window,
+        drawApi: DrawApi,
+        monitor: Monitor,
+        image: CPointer<XImage>
 ) {
     clearScreen(graphicsContexts, rootWindow, drawApi, monitor)
 

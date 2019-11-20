@@ -1,5 +1,6 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.monitor
 
+import de.atennert.lcarswm.ScreenMode
 import xlib.RROutput
 
 /**
@@ -86,16 +87,16 @@ data class Monitor(val id: RROutput, val name: String, val isPrimary: Boolean) {
      */
     fun getCurrentWindowMeasurements(screenMode: ScreenMode): List<Int> = when (screenMode) {
             ScreenMode.NORMAL -> windowMeasurementsToList(
-                this.defaultWindowPosition,
-                this.defaultWindowSize
+                    this.defaultWindowPosition,
+                    this.defaultWindowSize
             )
             ScreenMode.MAXIMIZED -> windowMeasurementsToList(
-                this.maximizedWindowPosition,
-                this.maximizedWindowSize
+                    this.maximizedWindowPosition,
+                    this.maximizedWindowSize
             )
             ScreenMode.FULLSCREEN -> windowMeasurementsToList(
-                this.fullscreenWindowPosition,
-                this.fullscreenWindowSize
+                    this.fullscreenWindowPosition,
+                    this.fullscreenWindowSize
             )
         }
 
