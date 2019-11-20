@@ -9,7 +9,7 @@ import kotlinx.cinterop.pin
 import xlib.RRScreenChangeNotify
 import xlib.XEvent
 
-class RandrHandlerFactory(randrApi: RandrApi, logger: Logger, private val monitorManager: MonitorManager, private val uiDrawer: UIDrawing) {
+class RandrHandlerFactory(randrApi: RandrApi, private val logger: Logger, private val monitorManager: MonitorManager, private val uiDrawer: UIDrawing) {
     private val randrEventBase: Int
     private val randrErrorBase: Int
 
@@ -29,6 +29,8 @@ class RandrHandlerFactory(randrApi: RandrApi, logger: Logger, private val monito
         override val xEventType = randrEventBase + RRScreenChangeNotify
 
         override fun handleEvent(event: XEvent): Boolean {
+            logger.logDebug("ScreenChangeHandler::handleEvent::screen changed")
+
             monitorManager.updateMonitorList()
 
             // TODO rearrange windows if necessary
