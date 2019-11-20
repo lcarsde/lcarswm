@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.UIDrawingMock
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
@@ -16,7 +17,8 @@ class RandrScreenChangeHandlerTest {
     fun `check correct type of RandrScreenChangeHandler`() {
         val systemApi = SystemFacadeMock()
         val monitorManager = MonitorManagerMock()
-        val randrHandlerFactory = RandrHandlerFactory(systemApi, monitorManager, LoggerMock())
+        val uiDrawer = UIDrawingMock()
+        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock(), monitorManager, uiDrawer)
 
         val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler()
 
@@ -29,8 +31,9 @@ class RandrScreenChangeHandlerTest {
     fun `handle screen change`() {
         val systemApi = SystemFacadeMock()
         val monitorManager = MonitorManagerMock()
+        val uiDrawer = UIDrawingMock()
 
-        val randrHandlerFactory = RandrHandlerFactory(systemApi, monitorManager, LoggerMock())
+        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock(), monitorManager, uiDrawer)
 
         val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler()
 
@@ -40,10 +43,14 @@ class RandrScreenChangeHandlerTest {
         val shutdownValue = screenChangeHandler.handleEvent(screenChangeEvent)
 
         val monitorManagerCalls = monitorManager.functionCalls
+        val drawingCalls = uiDrawer.functionCalls
 
         assertFalse(shutdownValue, "Handling a screen change should close the window manager")
 
         val updateMonitorListCall = monitorManagerCalls.removeAt(0)
         assertEquals("updateMonitorList", updateMonitorListCall.name, "The monitor list needs to be updated")
+
+        val redrawUiCall = drawingCalls.removeAt(0)
+        assertEquals("drawWindowManagerFrame", redrawUiCall.name, "The window manager UI needs to be redrawn on the updated monitors")
     }
 }

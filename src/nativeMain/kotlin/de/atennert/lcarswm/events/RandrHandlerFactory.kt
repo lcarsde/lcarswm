@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.UIDrawing
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.RandrApi
@@ -8,7 +9,7 @@ import kotlinx.cinterop.pin
 import xlib.RRScreenChangeNotify
 import xlib.XEvent
 
-class RandrHandlerFactory(randrApi: RandrApi, private val monitorManager: MonitorManager, logger: Logger) {
+class RandrHandlerFactory(randrApi: RandrApi, logger: Logger, private val monitorManager: MonitorManager, private val uiDrawer: UIDrawing) {
     private val randrEventBase: Int
     private val randrErrorBase: Int
 
@@ -29,6 +30,11 @@ class RandrHandlerFactory(randrApi: RandrApi, private val monitorManager: Monito
 
         override fun handleEvent(event: XEvent): Boolean {
             monitorManager.updateMonitorList()
+
+            // TODO rearrange windows if necessary
+
+            uiDrawer.drawWindowManagerFrame()
+
             return false
         }
     }

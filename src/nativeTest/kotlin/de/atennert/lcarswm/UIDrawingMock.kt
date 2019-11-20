@@ -1,9 +1,11 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.system.FunctionCall
+
 class UIDrawingMock : UIDrawing {
-    var drawWindowManagerFrameCallCount = 0
+    val functionCalls = mutableListOf<FunctionCall>()
 
     override fun drawWindowManagerFrame() {
-        drawWindowManagerFrameCallCount++
+        functionCalls.add(FunctionCall("drawWindowManagerFrame"))
     }
 }
