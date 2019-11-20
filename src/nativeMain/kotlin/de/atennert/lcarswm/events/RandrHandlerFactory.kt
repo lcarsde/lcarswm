@@ -1,13 +1,14 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.RandrApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.pin
 import xlib.RRScreenChangeNotify
 import xlib.XEvent
 
-class RandrHandlerFactory(randrApi: RandrApi, logger: Logger) {
+class RandrHandlerFactory(randrApi: RandrApi, monitorManager: MonitorManager, logger: Logger) {
     private val randrEventBase: Int
     private val randrErrorBase: Int
 
@@ -27,7 +28,7 @@ class RandrHandlerFactory(randrApi: RandrApi, logger: Logger) {
         override val xEventType = randrEventBase + RRScreenChangeNotify
 
         override fun handleEvent(event: XEvent): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            return false
         }
     }
 }
