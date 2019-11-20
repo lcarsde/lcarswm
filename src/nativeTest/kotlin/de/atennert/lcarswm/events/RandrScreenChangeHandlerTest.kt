@@ -5,9 +5,9 @@ import xlib.RRScreenChangeNotify
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class RandrHandlerFactoryTest {
+class RandrScreenChangeHandlerTest {
     @Test
-    fun `create RandrScreenChangeHandler`() {
+    fun `check correct type of RandrScreenChangeHandler`() {
         val systemApi = SystemFacadeMock()
         val randrHandlerFactory = RandrHandlerFactory(systemApi)
 
