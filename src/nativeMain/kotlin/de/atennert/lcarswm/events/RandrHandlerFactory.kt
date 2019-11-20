@@ -8,7 +8,7 @@ import kotlinx.cinterop.pin
 import xlib.RRScreenChangeNotify
 import xlib.XEvent
 
-class RandrHandlerFactory(randrApi: RandrApi, monitorManager: MonitorManager, logger: Logger) {
+class RandrHandlerFactory(randrApi: RandrApi, private val monitorManager: MonitorManager, logger: Logger) {
     private val randrEventBase: Int
     private val randrErrorBase: Int
 
@@ -28,6 +28,7 @@ class RandrHandlerFactory(randrApi: RandrApi, monitorManager: MonitorManager, lo
         override val xEventType = randrEventBase + RRScreenChangeNotify
 
         override fun handleEvent(event: XEvent): Boolean {
+            monitorManager.updateMonitorList()
             return false
         }
     }

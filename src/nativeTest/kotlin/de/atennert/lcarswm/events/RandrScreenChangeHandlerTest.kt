@@ -39,6 +39,11 @@ class RandrScreenChangeHandlerTest {
 
         val shutdownValue = screenChangeHandler.handleEvent(screenChangeEvent)
 
+        val monitorManagerCalls = monitorManager.functionCalls
+
         assertFalse(shutdownValue, "Handling a screen change should close the window manager")
+
+        val updateMonitorListCall = monitorManagerCalls.removeAt(0)
+        assertEquals("updateMonitorList", updateMonitorListCall.name, "The monitor list needs to be updated")
     }
 }
