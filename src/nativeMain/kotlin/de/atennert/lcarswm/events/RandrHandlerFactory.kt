@@ -1,12 +1,13 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.RandrApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.pin
 import xlib.RRScreenChangeNotify
 import xlib.XEvent
 
-class RandrHandlerFactory(randrApi: RandrApi) {
+class RandrHandlerFactory(randrApi: RandrApi, logger: Logger) {
     private val randrEventBase: Int
     private val randrErrorBase: Int
 
@@ -18,6 +19,8 @@ class RandrHandlerFactory(randrApi: RandrApi) {
 
         randrEventBase = eventBase.get()[0]
         randrErrorBase = errorBase.get()[0]
+
+        logger.logDebug("RandrHandlerFactory::init::event base: $randrEventBase, error base: $randrErrorBase")
     }
 
     fun createScreenChangeHandler(): XEventHandler = object : XEventHandler {
