@@ -22,24 +22,20 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun rGetScreenResources(window: Window): CPointer<XRRScreenResources>? {
-        functionCalls.add(FunctionCall("rGetScreenResources", window))
         val screenResources = nativeHeap.alloc<XRRScreenResources>()
         return screenResources.ptr
     }
 
     override fun rGetOutputPrimary(window: Window): RROutput {
-        functionCalls.add(FunctionCall("rGetOutputPrimary", window))
         return 0.convert()
     }
 
     override fun rGetOutputInfo(resources: CPointer<XRRScreenResources>, output: RROutput): CPointer<XRROutputInfo>? {
-        functionCalls.add(FunctionCall("rGetOutputInfo", resources, output))
         val outputInfo = nativeHeap.alloc<XRROutputInfo>()
         return outputInfo.ptr
     }
 
     override fun rGetCrtcInfo(resources: CPointer<XRRScreenResources>, crtc: RRCrtc): CPointer<XRRCrtcInfo>? {
-        functionCalls.add(FunctionCall("rGetCrtcInfo", resources, crtc))
         val crtcInfo = nativeHeap.alloc<XRRCrtcInfo>()
         return crtcInfo.ptr
     }
