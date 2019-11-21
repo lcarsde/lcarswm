@@ -33,6 +33,8 @@ class RandrHandlerFactory(randrApi: RandrApi, private val logger: Logger, privat
 
             monitorManager.updateMonitorList()
 
+            // TODO adjust root window size
+
             // TODO rearrange windows if necessary
 
             uiDrawer.drawWindowManagerFrame()
