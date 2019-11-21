@@ -5,6 +5,7 @@ import kotlinx.cinterop.*
 import platform.posix.FILE
 import platform.posix.__pid_t
 import xlib.*
+import kotlin.test.assertEquals
 
 open class SystemFacadeMock : SystemApi {
     val functionCalls = mutableListOf<FunctionCall>()
@@ -22,6 +23,7 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun rGetScreenResources(window: Window): CPointer<XRRScreenResources>? {
+        assertEquals(rootWindowId, window, "The window manager should only request screen resources for the root window")
         val outputs = ulongArrayOf(1.convert(), 2.convert()).pin()
         val screenResources = nativeHeap.alloc<XRRScreenResources>()
         screenResources.noutput = 2
@@ -30,6 +32,7 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun rGetOutputPrimary(window: Window): RROutput {
+        assertEquals(rootWindowId, window, "The window manager should only request the primary output for the root window")
         return 0.convert()
     }
 
