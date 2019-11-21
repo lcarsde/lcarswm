@@ -24,10 +24,10 @@ open class SystemFacadeMock : SystemApi {
 
     override fun rGetScreenResources(window: Window): CPointer<XRRScreenResources>? {
         assertEquals(rootWindowId, window, "The window manager should only request screen resources for the root window")
-        val outputs = ulongArrayOf(1.convert(), 2.convert()).pin()
+        val outputs = ulongArrayOf(1.convert(), 2.convert())
         val screenResources = nativeHeap.alloc<XRRScreenResources>()
-        screenResources.noutput = 2
-        screenResources.outputs = outputs.addressOf(0)
+        screenResources.noutput = outputs.size
+        screenResources.outputs = outputs.pin().addressOf(0)
         return screenResources.ptr
     }
 
