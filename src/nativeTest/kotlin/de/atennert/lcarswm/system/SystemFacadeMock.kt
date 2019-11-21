@@ -22,9 +22,9 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("rSelectInput", window, mask))
     }
 
+    private val outputs = ulongArrayOf(1.convert(), 2.convert())
     override fun rGetScreenResources(window: Window): CPointer<XRRScreenResources>? {
         assertEquals(rootWindowId, window, "The window manager should only request screen resources for the root window")
-        val outputs = ulongArrayOf(1.convert(), 2.convert())
         val screenResources = nativeHeap.alloc<XRRScreenResources>()
         screenResources.noutput = outputs.size
         screenResources.outputs = outputs.pin().addressOf(0)
@@ -33,7 +33,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun rGetOutputPrimary(window: Window): RROutput {
         assertEquals(rootWindowId, window, "The window manager should only request the primary output for the root window")
-        return 0.convert()
+        return outputs[0]
     }
 
     override fun rGetOutputInfo(resources: CPointer<XRRScreenResources>, output: RROutput): CPointer<XRROutputInfo>? {
