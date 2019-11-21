@@ -22,7 +22,10 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun rGetScreenResources(window: Window): CPointer<XRRScreenResources>? {
+        val outputs = ulongArrayOf(1.convert(), 2.convert()).pin()
         val screenResources = nativeHeap.alloc<XRRScreenResources>()
+        screenResources.noutput = 2
+        screenResources.outputs = outputs.addressOf(0)
         return screenResources.ptr
     }
 
