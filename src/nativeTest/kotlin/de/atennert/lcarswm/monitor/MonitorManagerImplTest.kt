@@ -1,6 +1,9 @@
 package de.atennert.lcarswm.monitor
 
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.convert
+import xlib.RROutput
+import xlib.Window
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -23,4 +26,15 @@ class MonitorManagerImplTest {
     }
 
     // TODO check monitor update for no provided primary
+    fun `check the first monitor becomes primary, if there's no primary`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun rGetOutputPrimary(window: Window): RROutput = 0.convert()
+        }
+        val monitorManager: MonitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+
+        val monitorList = monitorManager.getMonitors()
+        val primaryMonitor = monitorManager.getPrimaryMonitor()
+
+        assertEquals(monitorList[0], primaryMonitor, "The first monitor shall become the primary, if there's no primary")
+    }
 }
