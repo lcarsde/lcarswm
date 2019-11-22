@@ -10,22 +10,25 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
     private var monitors: List<Monitor> = emptyList()
 
     override fun updateMonitorList() {
-        val screenResources = randrApi.rGetScreenResources(rootWindowId)!!.pointed
+        val monitorIds = getMonitorIds()
+        val primary = getPrimary(monitorIds)
 
-        val outputs = Array(screenResources.noutput) {screenResources.outputs!![it]}
-        val primary = getPrimary(outputs)
-
-        monitors = outputs
+        monitors = monitorIds
                 .map { Monitor(it, "", it == primary) }
     }
 
-    private fun getPrimary(outputs: Array<RROutput>): RROutput {
-        val primaryScreen = randrApi.rGetOutputPrimary(rootWindowId)
+    private fun getMonitorIds(): Array<RROutput> {
+        val screenResources = randrApi.rGetScreenResources(rootWindowId)!!.pointed
+        return Array(screenResources.noutput) { screenResources.outputs!![it] }
+    }
 
-        return if (outputs.contains(primaryScreen)) {
-            primaryScreen
+    private fun getPrimary(monitorIds: Array<RROutput>): RROutput {
+        val primaryMonitorId = randrApi.rGetOutputPrimary(rootWindowId)
+
+        return if (monitorIds.contains(primaryMonitorId)) {
+            primaryMonitorId
         } else {
-            outputs[0]
+            monitorIds[0]
         }
     }
 
