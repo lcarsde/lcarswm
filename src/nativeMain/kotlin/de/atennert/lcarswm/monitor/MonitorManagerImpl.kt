@@ -6,7 +6,7 @@ import kotlinx.cinterop.pointed
 import xlib.Window
 
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager {
-    private var monitors: List<Monitor> = listOf();
+    private var monitors: List<Monitor> = emptyList()
 
     override fun updateMonitorList() {
         val screenResources = randrApi.rGetScreenResources(rootWindowId)!!.pointed
