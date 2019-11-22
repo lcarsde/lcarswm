@@ -25,7 +25,7 @@ class MonitorManagerImplTest {
         assertEquals(systemApi.primaryOutput, primaryMonitor.id, "The ID of the primary monitor should match")
     }
 
-    // TODO check monitor update for no provided primary
+    @Test
     fun `check the first monitor becomes primary, if there's no primary`() {
         val systemApi = object : SystemFacadeMock() {
             override fun rGetOutputPrimary(window: Window): RROutput = 0.convert()
