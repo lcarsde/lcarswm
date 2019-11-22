@@ -3,6 +3,7 @@ package de.atennert.lcarswm.monitor
 import de.atennert.lcarswm.system.api.RandrApi
 import kotlinx.cinterop.get
 import kotlinx.cinterop.pointed
+import xlib.RROutput
 import xlib.Window
 
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager {
@@ -10,18 +11,22 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
 
     override fun updateMonitorList() {
         val screenResources = randrApi.rGetScreenResources(rootWindowId)!!.pointed
-        val primaryScreen = randrApi.rGetOutputPrimary(rootWindowId)
 
         val outputs = Array(screenResources.noutput) {screenResources.outputs!![it]}
+        val primary = getPrimary(outputs)
 
-        val checkedPrimary = if (outputs.contains(primaryScreen)) {
+        monitors = outputs
+                .map { Monitor(it, "", it == primary) }
+    }
+
+    private fun getPrimary(outputs: Array<RROutput>): RROutput {
+        val primaryScreen = randrApi.rGetOutputPrimary(rootWindowId)
+
+        return if (outputs.contains(primaryScreen)) {
             primaryScreen
         } else {
             outputs[0]
         }
-
-        monitors = Array(screenResources.noutput) {screenResources.outputs!![it]}
-                .map { Monitor(it, "", it == checkedPrimary) }
     }
 
     override fun getMonitors(): List<Monitor> = monitors.toList()
