@@ -32,6 +32,8 @@ class MonitorManagerImplTest {
         }
         val monitorManager: MonitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
+        monitorManager.updateMonitorList()
+
         val monitorList = monitorManager.getMonitors()
         val primaryMonitor = monitorManager.getPrimaryMonitor()
 
