@@ -39,4 +39,19 @@ class MonitorManagerImplTest {
 
         assertEquals(monitorList[0], primaryMonitor, "The first monitor shall become the primary, if there's no primary")
     }
+
+    @Test
+    fun `check that monitors have their names`() {
+        val systemApi = SystemFacadeMock()
+
+        val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+
+        monitorManager.updateMonitorList()
+
+        val monitorList = monitorManager.getMonitors()
+
+        monitorList.forEachIndexed { index, monitor ->
+            assertEquals(systemApi.outputNames[index], monitor.name, "The monitor names should be correct")
+        }
+    }
 }

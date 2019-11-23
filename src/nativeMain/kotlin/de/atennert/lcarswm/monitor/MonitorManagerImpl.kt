@@ -1,24 +1,36 @@
 package de.atennert.lcarswm.monitor
 
 import de.atennert.lcarswm.system.api.RandrApi
+import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.get
 import kotlinx.cinterop.pointed
 import xlib.RROutput
 import xlib.Window
+import xlib.XRROutputInfo
+import xlib.XRRScreenResources
 
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager {
     private var monitors: List<Monitor> = emptyList()
 
     override fun updateMonitorList() {
-        val monitorIds = getMonitorIds()
+        val monitorData = getMonitorData()
+        val monitorIds = getMonitorIds(monitorData)
         val primary = getPrimary(monitorIds)
 
-        monitors = monitorIds
-                .map { Monitor(it, "", it == primary) }
+        val monitorNames = monitorIds
+                .mapNotNull { randrApi.rGetOutputInfo(monitorData, it) }
+                .map(this::getOutputName)
+
+        monitors = monitorIds.zip(monitorNames)
+                .map { (id, name) -> Monitor(id, name, id == primary) }
     }
 
-    private fun getMonitorIds(): Array<RROutput> {
-        val screenResources = randrApi.rGetScreenResources(rootWindowId)!!.pointed
+    private fun getMonitorData(): CPointer<XRRScreenResources> {
+        return randrApi.rGetScreenResources(rootWindowId)!!
+    }
+
+    private fun getMonitorIds(monitorData: CPointer<XRRScreenResources>): Array<RROutput> {
+        val screenResources = monitorData.pointed
         return Array(screenResources.noutput) { screenResources.outputs!![it] }
     }
 
@@ -30,6 +42,16 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         } else {
             monitorIds[0]
         }
+    }
+
+    /**
+     * Get the name of the given output.
+     */
+    private fun getOutputName(outputObject: CPointer<XRROutputInfo>): String {
+        val name = outputObject.pointed.name
+        val nameArray = ByteArray(outputObject.pointed.nameLen) { name!![it] }
+
+        return nameArray.decodeToString()
     }
 
     override fun getMonitors(): List<Monitor> = monitors.toList()
