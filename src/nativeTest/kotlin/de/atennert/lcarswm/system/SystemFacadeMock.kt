@@ -40,13 +40,9 @@ open class SystemFacadeMock : SystemApi {
     val outputNames = arrayOf("output1", "output2")
     override fun rGetOutputInfo(resources: CPointer<XRRScreenResources>, output: RROutput): CPointer<XRROutputInfo>? {
         val outputInfo = nativeHeap.alloc<XRROutputInfo>()
-        if (output == outputs[0]) {
-            outputInfo.name = outputNames[0].encodeToByteArray().pin().addressOf(0)
-            outputInfo.nameLen = 7
-        } else if (output == outputs[1]) {
-            outputInfo.name = outputNames[1].encodeToByteArray().pin().addressOf(0)
-            outputInfo.nameLen = 7
-        }
+        val outputName = outputNames[outputs.indexOf(output)]
+        outputInfo.name = outputName.encodeToByteArray().pin().addressOf(0)
+        outputInfo.nameLen = outputName.length
         return outputInfo.ptr
     }
 
