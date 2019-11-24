@@ -43,11 +43,18 @@ open class SystemFacadeMock : SystemApi {
         val outputName = outputNames[outputs.indexOf(output)]
         outputInfo.name = outputName.encodeToByteArray().pin().addressOf(0)
         outputInfo.nameLen = outputName.length
+        outputInfo.crtc = output
         return outputInfo.ptr
     }
 
+    val crtcInfos = arrayOf(arrayOf(0, 0, 1000, 500), arrayOf(1000, 0, 1000, 500))
     override fun rGetCrtcInfo(resources: CPointer<XRRScreenResources>, crtc: RRCrtc): CPointer<XRRCrtcInfo>? {
+        val usedCrtcInfos = crtcInfos[crtc.convert<Int>() - 1];
         val crtcInfo = nativeHeap.alloc<XRRCrtcInfo>()
+        crtcInfo.x = usedCrtcInfos[0]
+        crtcInfo.y = usedCrtcInfos[1]
+        crtcInfo.width = usedCrtcInfos[2].convert()
+        crtcInfo.height = usedCrtcInfos[3].convert()
         return crtcInfo.ptr
     }
 
