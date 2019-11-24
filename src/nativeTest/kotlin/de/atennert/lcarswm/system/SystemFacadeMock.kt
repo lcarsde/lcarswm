@@ -5,14 +5,16 @@ import kotlinx.cinterop.*
 import platform.posix.FILE
 import platform.posix.__pid_t
 import xlib.*
+import kotlin.test.assertEquals
 
 open class SystemFacadeMock : SystemApi {
     val functionCalls = mutableListOf<FunctionCall>()
 
+    val randrEventBase = 80
+    val randrErrorBase = 160
     override fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int {
-        eventBase[0] = 80
-        errorBase[0] = 160
-        functionCalls.add(FunctionCall("rQueryExtension", eventBase, errorBase))
+        eventBase[0] = randrEventBase
+        errorBase[0] = randrErrorBase
         return 0
     }
 
@@ -20,25 +22,31 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("rSelectInput", window, mask))
     }
 
+    val outputs = ulongArrayOf(1.convert(), 2.convert())
     override fun rGetScreenResources(window: Window): CPointer<XRRScreenResources>? {
-        functionCalls.add(FunctionCall("rGetScreenResources", window))
+        assertEquals(rootWindowId, window, "The window manager should only request screen resources for the root window")
         val screenResources = nativeHeap.alloc<XRRScreenResources>()
+        screenResources.noutput = outputs.size
+        screenResources.outputs = outputs.pin().addressOf(0)
         return screenResources.ptr
     }
 
+    val primaryOutput = outputs[0]
     override fun rGetOutputPrimary(window: Window): RROutput {
-        functionCalls.add(FunctionCall("rGetOutputPrimary", window))
-        return 0.convert()
+        assertEquals(rootWindowId, window, "The window manager should only request the primary output for the root window")
+        return primaryOutput
     }
 
+    val outputNames = arrayOf("output1", "output2")
     override fun rGetOutputInfo(resources: CPointer<XRRScreenResources>, output: RROutput): CPointer<XRROutputInfo>? {
-        functionCalls.add(FunctionCall("rGetOutputInfo", resources, output))
         val outputInfo = nativeHeap.alloc<XRROutputInfo>()
+        val outputName = outputNames[outputs.indexOf(output)]
+        outputInfo.name = outputName.encodeToByteArray().pin().addressOf(0)
+        outputInfo.nameLen = outputName.length
         return outputInfo.ptr
     }
 
     override fun rGetCrtcInfo(resources: CPointer<XRRScreenResources>, crtc: RRCrtc): CPointer<XRRCrtcInfo>? {
-        functionCalls.add(FunctionCall("rGetCrtcInfo", resources, crtc))
         val crtcInfo = nativeHeap.alloc<XRRCrtcInfo>()
         return crtcInfo.ptr
     }

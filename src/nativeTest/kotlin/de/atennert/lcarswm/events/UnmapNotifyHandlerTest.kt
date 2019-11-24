@@ -51,7 +51,8 @@ class UnmapNotifyHandlerTest {
         assertEquals("removeWindow", removeFromRegistryCall.name, "The window needs to be _removed_ from the registry")
         assertEquals(unmapWindowId, removeFromRegistryCall.parameters[0], "The _window_ needs to be removed from the registry")
 
-        assertEquals(1, uiDrawingMock.drawWindowManagerFrameCallCount, "We need to redraw the root window UI on unmapping")
+        val redrawUiCall = uiDrawingMock.functionCalls.removeAt(0)
+        assertEquals("drawWindowManagerFrame", redrawUiCall.name, "We need to redraw the root window UI on unmapping")
     }
 
     @Test
@@ -76,6 +77,7 @@ class UnmapNotifyHandlerTest {
 
         assertTrue(unregisterWindowCalls.isEmpty(), "There should be calls to the window registration for an unknown window")
 
-        assertEquals(1, uiDrawingMock.drawWindowManagerFrameCallCount, "We need to redraw the root window UI on unmapping")
+        val redrawUiCall = uiDrawingMock.functionCalls.removeAt(0)
+        assertEquals("drawWindowManagerFrame", redrawUiCall.name, "We need to redraw the root window UI removing an unknown window")
     }
 }

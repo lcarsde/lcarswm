@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.monitor.Monitor
 import xlib.Window
 
 interface WindowManagerStateHandler {

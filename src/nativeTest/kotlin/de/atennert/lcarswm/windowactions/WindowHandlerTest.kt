@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.FramedWindow
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
@@ -215,10 +216,13 @@ class WindowHandlerTest {
 
         val rootWindowId = systemApi.rootWindowId
         val windowId = systemApi.getNewWindowId()
+        val framedWindow = FramedWindow(windowId)
+        framedWindow.frame = systemApi.getNewWindowId()
 
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
+        windowManagerState.windows.add(Pair(framedWindow, Monitor(1.convert(), "", true)))
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
         val windowRegistration = WindowHandler(
@@ -233,6 +237,10 @@ class WindowHandlerTest {
 
         val unregisterSystemCalls = systemApi.functionCalls
         val windowManagerStateCalls = windowManagerState.functionCalls
+        
+        val unmapFrameCall = unregisterSystemCalls.removeAt(0)
+        assertEquals("unmapWindow", unmapFrameCall.name, "The frame of the removed window needs to be _unmapped_")
+        assertEquals(framedWindow.frame, unmapFrameCall.parameters[0], "The _frame_ of the removed window needs to be unmapped")
 
         val reparentCall = unregisterSystemCalls.removeAt(0)
         assertEquals("reparentWindow", reparentCall.name, "We need to _reparent_ the window back to root")
@@ -242,6 +250,10 @@ class WindowHandlerTest {
         val removeFromSaveSetCall = unregisterSystemCalls.removeAt(0)
         assertEquals("removeFromSaveSet", removeFromSaveSetCall.name, "We need to _remove_ the window from the save set")
         assertEquals(windowId, removeFromSaveSetCall.parameters[0], "We need to remove the _window_ from the save set")
+        
+        val destroyFrameCall = unregisterSystemCalls.removeAt(0)
+        assertEquals("destroyWindow", destroyFrameCall.name, "The frame of the removed window needs to be _destroyed_")
+        assertEquals(framedWindow.frame, destroyFrameCall.parameters[0], "The _frame_ of the removed window needs to be destroyed")
 
         val removeWindowCall = windowManagerStateCalls.removeAt(0)
         assertEquals("removeWindow", removeWindowCall.name, "The window needs to be _removed_")

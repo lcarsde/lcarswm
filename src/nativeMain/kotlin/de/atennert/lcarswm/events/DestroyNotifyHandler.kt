@@ -13,7 +13,7 @@ import xlib.XEvent
 class DestroyNotifyHandler(
     private val system: SystemApi,
     private val logger: Logger,
-    private val windowManagerState: WindowManagerStateHandler
+    private val windowManagerState: WindowManagerStateHandler // TODO use WindowRegistration
 ) : XEventHandler {
     override val xEventType = DestroyNotify
 

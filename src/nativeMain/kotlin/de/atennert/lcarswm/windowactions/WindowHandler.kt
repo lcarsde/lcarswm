@@ -75,8 +75,12 @@ class WindowHandler(
     override fun isWindowManaged(windowId: Window): Boolean = windowManagerState.hasWindow(windowId)
 
     override fun removeWindow(windowId: Window) {
+        val framedWindow = windowManagerState.getWindowContainer(windowId)
+        
+        system.unmapWindow(framedWindow.frame)
         system.reparentWindow(windowId, rootWindow, 0, 0)
         system.removeFromSaveSet(windowId)
+        system.destroyWindow(framedWindow.frame)
 
         windowManagerState.removeWindow(windowId)
     }

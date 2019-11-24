@@ -1,6 +1,7 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.atom.Atoms
+import de.atennert.lcarswm.monitor.Monitor
 import xlib.Atom
 import xlib.Window
 

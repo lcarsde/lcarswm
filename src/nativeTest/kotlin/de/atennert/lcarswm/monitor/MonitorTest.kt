@@ -1,5 +1,6 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.monitor
 
+import de.atennert.lcarswm.ScreenMode
 import kotlin.test.*
 
 /**
