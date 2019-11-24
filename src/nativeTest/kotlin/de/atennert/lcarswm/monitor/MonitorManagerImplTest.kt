@@ -1,9 +1,13 @@
 package de.atennert.lcarswm.monitor
 
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
+import kotlinx.cinterop.pointed
 import xlib.RROutput
 import xlib.Window
+import xlib.XRROutputInfo
+import xlib.XRRScreenResources
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -53,5 +57,33 @@ class MonitorManagerImplTest {
         monitorList.forEachIndexed { index, monitor ->
             assertEquals(systemApi.outputNames[index], monitor.name, "The monitor names should be correct")
         }
+    }
+
+    // TODO positive crtc test
+
+    @Test
+    fun `don't add monitors without crtc`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun rGetOutputInfo(
+                resources: CPointer<XRRScreenResources>,
+                output: RROutput
+            ): CPointer<XRROutputInfo>? {
+                val result = super.rGetOutputInfo(resources, output)
+                if (output == outputs[1]) {
+                    result!!.pointed.crtc = 0.convert()
+                }
+                return result
+            }
+        }
+
+        val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+
+        monitorManager.updateMonitorList()
+
+        val monitorList = monitorManager.getMonitors()
+
+        assertEquals(1, monitorList.size, "There should only be one monitor as the other doesn't have a crtc")
+
+        assertEquals(systemApi.outputs[0], monitorList[0].id, "The monitor with crtc should be in the monitor list")
     }
 }

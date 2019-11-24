@@ -2,6 +2,7 @@ package de.atennert.lcarswm.monitor
 
 import de.atennert.lcarswm.system.api.RandrApi
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.convert
 import kotlinx.cinterop.get
 import kotlinx.cinterop.pointed
 import xlib.RROutput
@@ -17,12 +18,17 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         val monitorIds = getMonitorIds(monitorData)
         val primary = getPrimary(monitorIds)
 
-        val monitorNames = monitorIds
-                .mapNotNull { randrApi.rGetOutputInfo(monitorData, it) }
-                .map(this::getOutputName)
+        val activeMonitorInfos = monitorIds
+            .map { monitorId -> Pair(monitorId, randrApi.rGetOutputInfo(monitorData, monitorId)) }
+            .filter { (_, outputInfo) -> outputInfo != null && outputInfo.pointed.crtc.convert<Int>() != 0 }
 
-        monitors = monitorIds.zip(monitorNames)
-                .map { (id, name) -> Monitor(id, name, id == primary) }
+        val monitorNames = activeMonitorInfos
+            .map { (_, outputInfo) -> getOutputName(outputInfo!!) }
+
+        monitors = activeMonitorInfos
+            .map { (monitorId, _) -> monitorId }
+            .zip(monitorNames)
+            .map { (id, name) -> Monitor(id, name, id == primary) }
     }
 
     private fun getMonitorData(): CPointer<XRRScreenResources> {
