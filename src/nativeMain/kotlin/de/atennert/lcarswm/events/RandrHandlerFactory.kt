@@ -9,7 +9,12 @@ import kotlinx.cinterop.pin
 import xlib.RRScreenChangeNotify
 import xlib.XEvent
 
-class RandrHandlerFactory(randrApi: RandrApi, private val logger: Logger, private val monitorManager: MonitorManager, private val uiDrawer: UIDrawing) {
+class RandrHandlerFactory(
+    randrApi: RandrApi,
+    private val logger: Logger,
+    private val monitorManager: MonitorManager,
+    private val uiDrawer: UIDrawing
+) {
     private val randrEventBase: Int
     private val randrErrorBase: Int
 
