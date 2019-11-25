@@ -71,10 +71,10 @@ class MonitorManagerImplTest {
 
         monitorList.forEachIndexed { index, monitor ->
             val totalMeasurements = systemApi.crtcInfos[index]
-            assertEquals(totalMeasurements[0], monitor.x, "")
-            assertEquals(totalMeasurements[1], monitor.y, "")
-            assertEquals(totalMeasurements[2], monitor.width, "")
-            assertEquals(totalMeasurements[3], monitor.height, "")
+            assertEquals(totalMeasurements[0], monitor.x, "The expected x value needs to match the monitors x value")
+            assertEquals(totalMeasurements[1], monitor.y, "The expected y value needs to match the monitors y value")
+            assertEquals(totalMeasurements[2], monitor.width, "The expected width needs to match the monitors width")
+            assertEquals(totalMeasurements[3], monitor.height, "The expected height needs to match the monitors height")
         }
     }
 
@@ -103,4 +103,6 @@ class MonitorManagerImplTest {
 
         assertEquals(systemApi.outputs[0], monitorList[0].id, "The monitor with crtc should be in the monitor list")
     }
+
+    // TODO calculate combined screen size
 }
