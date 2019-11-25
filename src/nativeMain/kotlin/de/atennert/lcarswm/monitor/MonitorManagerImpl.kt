@@ -5,10 +5,7 @@ import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.get
 import kotlinx.cinterop.pointed
-import xlib.RROutput
-import xlib.Window
-import xlib.XRROutputInfo
-import xlib.XRRScreenResources
+import xlib.*
 
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager {
     private var monitors: List<Monitor> = emptyList()
@@ -29,6 +26,11 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
             .map { (monitorId, _) -> monitorId }
             .zip(monitorNames)
             .map { (id, name) -> Monitor(id, name, id == primary) }
+
+        monitors.zip(activeMonitorInfos.map {it.second})
+            .forEach { (monitor, outputInfo) ->
+                addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData)
+            }
     }
 
     private fun getMonitorData(): CPointer<XRRScreenResources> {
@@ -58,6 +60,16 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         val nameArray = ByteArray(outputObject.pointed.nameLen) { name!![it] }
 
         return nameArray.decodeToString()
+    }
+
+    private fun addMeasurementToMonitor(
+        monitor: Monitor,
+        crtcReference: RRCrtc,
+        monitorData: CPointer<XRRScreenResources>
+    ) {
+        val crtcInfo = randrApi.rGetCrtcInfo(monitorData, crtcReference)!!.pointed
+
+        monitor.setMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
     }
 
     override fun getMonitors(): List<Monitor> = monitors.toList()
