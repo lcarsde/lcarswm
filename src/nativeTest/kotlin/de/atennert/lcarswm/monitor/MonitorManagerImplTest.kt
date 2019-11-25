@@ -59,7 +59,24 @@ class MonitorManagerImplTest {
         }
     }
 
-    // TODO positive crtc test
+    @Test
+    fun `add monitor measurements`() {
+        val systemApi = SystemFacadeMock()
+
+        val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+
+        monitorManager.updateMonitorList()
+
+        val monitorList = monitorManager.getMonitors()
+
+        monitorList.forEachIndexed { index, monitor ->
+            val totalMeasurements = systemApi.crtcInfos[index]
+            assertEquals(totalMeasurements[0], monitor.x, "")
+            assertEquals(totalMeasurements[1], monitor.y, "")
+            assertEquals(totalMeasurements[2], monitor.width, "")
+            assertEquals(totalMeasurements[3], monitor.height, "")
+        }
+    }
 
     @Test
     fun `don't add monitors without crtc`() {
