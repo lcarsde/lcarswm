@@ -6,6 +6,7 @@ import kotlinx.cinterop.convert
 import kotlinx.cinterop.get
 import kotlinx.cinterop.pointed
 import xlib.*
+import kotlin.math.max
 
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager {
     private var monitors: List<Monitor> = emptyList()
@@ -76,15 +77,10 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
     override fun getPrimaryMonitor(): Monitor = monitors.single { it.isPrimary }
 
     override fun getCombinedScreenSize(): Pair<Int, Int> = monitors
-        .fold(Pair(0, 0)) { (width, height), monitor ->
-            var newWidth = width
-            var newHeight = height
-            if (monitor.x + monitor.width > width) {
-                newWidth = monitor.x + monitor.width
-            }
-            if (monitor.y + monitor.height > height) {
-                newHeight = monitor.y + monitor.height
-            }
-            Pair(newWidth, newHeight)
+        .fold(Pair(0, 0)) { (oldWidth, oldHeight), monitor ->
+            Pair(
+                max(monitor.x + monitor.width, oldWidth),
+                max(monitor.y + monitor.height, oldHeight)
+            )
         }
 }
