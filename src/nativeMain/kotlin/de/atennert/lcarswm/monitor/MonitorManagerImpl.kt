@@ -75,4 +75,8 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
     override fun getMonitors(): List<Monitor> = monitors.toList()
 
     override fun getPrimaryMonitor(): Monitor = monitors.single { it.isPrimary }
+
+    override fun getCombinedScreenSize(): Pair<Int, Int> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

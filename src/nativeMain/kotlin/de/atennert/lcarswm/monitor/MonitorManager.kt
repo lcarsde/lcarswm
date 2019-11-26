@@ -6,4 +6,6 @@ interface MonitorManager {
     fun getMonitors(): List<Monitor>
 
     fun getPrimaryMonitor(): Monitor
+
+    fun getCombinedScreenSize(): Pair<Int, Int>
 }

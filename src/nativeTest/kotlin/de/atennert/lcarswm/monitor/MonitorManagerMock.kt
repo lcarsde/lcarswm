@@ -13,4 +13,6 @@ class MonitorManagerMock : MonitorManager {
     override fun getMonitors(): List<Monitor> = listOf()
 
     override fun getPrimaryMonitor(): Monitor = Monitor(1.convert(), "", true)
+
+    override fun getCombinedScreenSize(): Pair<Int, Int> = Pair(1920, 1080)
 }
