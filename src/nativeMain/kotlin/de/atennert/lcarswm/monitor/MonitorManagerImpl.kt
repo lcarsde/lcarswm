@@ -26,11 +26,8 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
             .map { (monitorId, _) -> monitorId }
             .zip(monitorNames)
             .map { (id, name) -> Monitor(id, name, id == primary) }
-
-        monitors.zip(activeMonitorInfos.map { it.second })
-            .forEach { (monitor, outputInfo) ->
-                addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData)
-            }
+            .zip(activeMonitorInfos.map { it.second })
+            .map { (monitor, outputInfo) -> addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData) }
     }
 
     private fun getMonitorData(): CPointer<XRRScreenResources> {
@@ -66,10 +63,12 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         monitor: Monitor,
         crtcReference: RRCrtc,
         monitorData: CPointer<XRRScreenResources>
-    ) {
+    ): Monitor {
         val crtcInfo = randrApi.rGetCrtcInfo(monitorData, crtcReference)!!.pointed
 
         monitor.setMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
+
+        return monitor
     }
 
     override fun getMonitors(): List<Monitor> = monitors.toList()
