@@ -27,7 +27,7 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
             .zip(monitorNames)
             .map { (id, name) -> Monitor(id, name, id == primary) }
 
-        monitors.zip(activeMonitorInfos.map {it.second})
+        monitors.zip(activeMonitorInfos.map { it.second })
             .forEach { (monitor, outputInfo) ->
                 addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData)
             }
@@ -76,7 +76,16 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
 
     override fun getPrimaryMonitor(): Monitor = monitors.single { it.isPrimary }
 
-    override fun getCombinedScreenSize(): Pair<Int, Int> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getCombinedScreenSize(): Pair<Int, Int> = monitors
+        .fold(Pair(0, 0)) { (width, height), monitor ->
+            var newWidth = width
+            var newHeight = height
+            if (monitor.x + monitor.width > width) {
+                newWidth = monitor.x + monitor.width
+            }
+            if (monitor.y + monitor.height > height) {
+                newHeight = monitor.y + monitor.height
+            }
+            Pair(newWidth, newHeight)
+        }
 }
