@@ -104,5 +104,18 @@ class MonitorManagerImplTest {
         assertEquals(systemApi.outputs[0], monitorList[0].id, "The monitor with crtc should be in the monitor list")
     }
 
-    // TODO calculate combined screen size
+    @Test
+    fun `get the combined monitor screen size`() {
+        val systemApi = SystemFacadeMock()
+
+        val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+
+        monitorManager.updateMonitorList()
+
+        val (width, height) = monitorManager.getCombinedScreenSize()
+
+        assertEquals(2000, width, "The width should match the combined screen width")
+
+        assertEquals(500, height, "The height should match the combined screen height")
+    }
 }
