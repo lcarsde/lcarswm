@@ -19,7 +19,7 @@ class RandrScreenChangeHandlerTest {
         val systemApi = SystemFacadeMock()
         val monitorManager = MonitorManagerMock()
         val uiDrawer = UIDrawingMock()
-        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock(), monitorManager, uiDrawer)
+        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock(), monitorManager, uiDrawer, systemApi.rootWindowId)
 
         val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler()
 
@@ -34,7 +34,7 @@ class RandrScreenChangeHandlerTest {
         val monitorManager = MonitorManagerMock()
         val uiDrawer = UIDrawingMock()
 
-        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock(), monitorManager, uiDrawer)
+        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock(), monitorManager, uiDrawer, systemApi.rootWindowId)
 
         val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler()
 
