@@ -5,7 +5,6 @@ import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
-import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
 import xlib.RRScreenChangeNotify
 import xlib.XEvent
