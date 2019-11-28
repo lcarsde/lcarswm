@@ -4,6 +4,7 @@ import de.atennert.lcarswm.UIDrawing
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.SystemApi
+import de.atennert.lcarswm.windowactions.WindowCoordinator
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pin
@@ -15,6 +16,7 @@ class RandrHandlerFactory(
     private val systemApi: SystemApi,
     private val logger: Logger,
     private val monitorManager: MonitorManager,
+    private val windowCoordinator: WindowCoordinator,
     private val uiDrawer: UIDrawing,
     private val rootWindowId: Window
 ) {
