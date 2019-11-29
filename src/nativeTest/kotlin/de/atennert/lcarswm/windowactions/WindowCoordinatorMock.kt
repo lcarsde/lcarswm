@@ -1,6 +1,8 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.FunctionCall
+import kotlinx.cinterop.convert
 import xlib.Window
 
 class WindowCoordinatorMock : WindowCoordinator {
@@ -10,7 +12,9 @@ class WindowCoordinatorMock : WindowCoordinator {
         functionCalls.add(FunctionCall("rearrangeActiveWindows"))
     }
 
-    override fun addWindowToMonitor(windowId: Window) {
+    val primaryMonitor = Monitor(1.convert(), "", true)
+    override fun addWindowToMonitor(windowId: Window): Monitor {
         functionCalls.add(FunctionCall("addWindowToMonitor", windowId))
+        return primaryMonitor
     }
 }
