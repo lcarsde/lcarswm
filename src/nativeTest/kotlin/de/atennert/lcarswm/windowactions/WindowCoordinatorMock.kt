@@ -12,7 +12,7 @@ class WindowCoordinatorMock : WindowCoordinator {
         functionCalls.add(FunctionCall("rearrangeActiveWindows"))
     }
 
-    val primaryMonitor = Monitor(1.convert(), "", true)
+    val primaryMonitor = Monitor(21.convert(), "", true)
     override fun addWindowToMonitor(windowId: Window): Monitor {
         functionCalls.add(FunctionCall("addWindowToMonitor", windowId))
         return primaryMonitor
