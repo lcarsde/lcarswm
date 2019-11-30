@@ -26,6 +26,7 @@ class WindowHandlerTest {
         val rootWindowId: Window = systemApi.rootWindowId
         val windowId: Window = systemApi.getNewWindowId()
 
+        val windowCoordinator = WindowCoordinatorMock()
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
@@ -35,13 +36,14 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowManagerState,
+            windowCoordinator,
             atomLibrary,
             rootWindowId
         )
 
         windowRegistration.addWindow(windowId, false)
 
-        checkWindowAddProcedure(systemApi, windowId, windowManagerState)
+        checkWindowAddProcedure(systemApi, windowId, windowManagerState, windowCoordinator)
     }
 
     @Test
@@ -55,6 +57,7 @@ class WindowHandlerTest {
         val rootWindowId: Window = systemApi.rootWindowId
         val windowId: Window = systemApi.getNewWindowId()
 
+        val windowCoordinator = WindowCoordinatorMock()
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
@@ -64,20 +67,26 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowManagerState,
+            windowCoordinator,
             atomLibrary,
             rootWindowId
         )
 
         windowRegistration.addWindow(windowId, true)
 
-        checkWindowAddProcedure(systemApi, windowId, windowManagerState)
+        checkWindowAddProcedure(systemApi, windowId, windowManagerState, windowCoordinator)
     }
 
     private fun checkWindowAddProcedure(
         systemApi: SystemFacadeMock,
         windowId: Window,
-        windowManagerState: WindowManagerStateMock
+        windowManagerState: WindowManagerStateMock,
+        windowCoordinator: WindowCoordinatorMock
     ) {
+        val addWindowToMonitorCall = windowCoordinator.functionCalls.removeAt(0)
+        assertEquals("addWindowToMonitor", addWindowToMonitorCall.name, "Add window to a monitor")
+        assertEquals(windowId, addWindowToMonitorCall.parameters[0], "Add _window_ to monitor")
+
         val setupCalls = systemApi.functionCalls
 
         assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "frame window should be created")
@@ -103,6 +112,11 @@ class WindowHandlerTest {
             windowId,
             (addWindowCall.parameters[0] as FramedWindow).id,
             "the _child window_ should be added to the window list"
+        )
+        assertEquals(
+            windowCoordinator.primaryMonitor,
+            addWindowCall.parameters[1] as Monitor,
+            "The window needs to be added to the primary monitor"
         )
     }
 
@@ -132,6 +146,7 @@ class WindowHandlerTest {
         val rootWindowId: Window = systemApi.rootWindowId
         val windowId: Window = systemApi.getNewWindowId()
 
+        val windowCoordinator = WindowCoordinatorMock()
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
@@ -141,6 +156,7 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowManagerState,
+            windowCoordinator,
             atomLibrary,
             rootWindowId
         )
@@ -161,6 +177,7 @@ class WindowHandlerTest {
         val rootWindowId: Window = systemApi.rootWindowId
         val windowId: Window = systemApi.getNewWindowId()
 
+        val windowCoordinator = WindowCoordinatorMock()
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
@@ -170,6 +187,7 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowManagerState,
+            windowCoordinator,
             atomLibrary,
             rootWindowId
         )
@@ -192,6 +210,7 @@ class WindowHandlerTest {
         val rootWindowId = systemApi.rootWindowId
         val windowId = systemApi.getNewWindowId()
 
+        val windowCoordinator = WindowCoordinatorMock()
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
@@ -199,6 +218,7 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowManagerState,
+            windowCoordinator,
             atomLibrary,
             rootWindowId
         )
@@ -219,6 +239,7 @@ class WindowHandlerTest {
         val framedWindow = FramedWindow(windowId)
         framedWindow.frame = systemApi.getNewWindowId()
 
+        val windowCoordinator = WindowCoordinatorMock()
         val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
@@ -229,6 +250,7 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowManagerState,
+            windowCoordinator,
             atomLibrary,
             rootWindowId
         )
