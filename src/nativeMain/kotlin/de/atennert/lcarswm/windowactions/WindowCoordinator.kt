@@ -7,4 +7,6 @@ interface WindowCoordinator {
     fun rearrangeActiveWindows()
 
     fun addWindowToMonitor(windowId: Window): Monitor
+
+    fun removeWindow(windowId: Window)
 }

@@ -17,4 +17,8 @@ class WindowCoordinatorMock : WindowCoordinator {
         functionCalls.add(FunctionCall("addWindowToMonitor", windowId))
         return primaryMonitor
     }
+
+    override fun removeWindow(windowId: Window) {
+        functionCalls.add(FunctionCall("removeWindow", windowId))
+    }
 }
