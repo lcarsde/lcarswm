@@ -259,7 +259,7 @@ class WindowHandlerTest {
 
         val unregisterSystemCalls = systemApi.functionCalls
         val windowManagerStateCalls = windowManagerState.functionCalls
-        
+
         val unmapFrameCall = unregisterSystemCalls.removeAt(0)
         assertEquals("unmapWindow", unmapFrameCall.name, "The frame of the removed window needs to be _unmapped_")
         assertEquals(framedWindow.frame, unmapFrameCall.parameters[0], "The _frame_ of the removed window needs to be unmapped")
@@ -280,6 +280,10 @@ class WindowHandlerTest {
         val removeWindowCall = windowManagerStateCalls.removeAt(0)
         assertEquals("removeWindow", removeWindowCall.name, "The window needs to be _removed_")
         assertEquals(windowId, removeWindowCall.parameters[0], "The _window_ needs to be removed")
+
+        val removeFromCoordinatorCall = windowCoordinator.functionCalls.removeAt(0)
+        assertEquals("removeWindow", removeFromCoordinatorCall.name, "Remove the window from the window coordinator")
+        assertEquals(windowId, removeFromCoordinatorCall.parameters[0], "Remove the _window_ from the window coordinator")
 
         assertFalse(windowRegistration.isWindowManaged(windowId), "The window should not be managed anymore")
     }
