@@ -19,6 +19,7 @@ class WindowHandler(
     private val system: SystemApi,
     private val logger: Logger,
     private val windowManagerState: WindowManagerStateHandler,
+    private val windowCoordinator: WindowCoordinator,
     private val atomLibrary: AtomLibrary,
     private val rootWindow: Window
 ) : WindowRegistration {
@@ -34,8 +35,8 @@ class WindowHandler(
         val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
         system.getWindowAttributes(windowId, windowAttributes.ptr)
 
-        if (windowAttributes.override_redirect != X_FALSE || (isSetup &&
-                    windowAttributes.map_state != IsViewable)) {
+        if (windowAttributes.override_redirect != X_FALSE ||
+            (isSetup && windowAttributes.map_state != IsViewable)) {
             logger.logInfo("WindowRegistration::addWindow::skipping window $windowId")
 
             if (!isSetup) {
@@ -47,7 +48,7 @@ class WindowHandler(
         }
 
         val window = FramedWindow(windowId)
-        val windowMonitor = windowManagerState.initialMonitor
+        val windowMonitor = windowCoordinator.addWindowToMonitor(windowId)
 
         val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))
 
