@@ -84,5 +84,6 @@ class WindowHandler(
         system.destroyWindow(framedWindow.frame)
 
         windowManagerState.removeWindow(windowId)
+        windowCoordinator.removeWindow(windowId)
     }
 }
