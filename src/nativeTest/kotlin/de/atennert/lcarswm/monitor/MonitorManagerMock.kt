@@ -12,7 +12,7 @@ class MonitorManagerMock : MonitorManager {
 
     override fun getMonitors(): List<Monitor> = listOf()
 
-    val primaryMonitor = Monitor(1.convert(), "", true)
+    val primaryMonitor = Monitor(42.convert(), "", true)
     override fun getPrimaryMonitor(): Monitor = primaryMonitor
 
     override fun getCombinedScreenSize(): Pair<Int, Int> = Pair(1920, 1080)
