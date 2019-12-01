@@ -20,4 +20,7 @@ class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : Wind
 
     override fun moveWindowToNextMonitor(windowId: Window) {
     }
+
+    override fun moveWindowToPreviousMonitor(windowId: Window) {
+    }
 }

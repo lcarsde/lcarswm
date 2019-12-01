@@ -11,4 +11,6 @@ interface WindowCoordinator {
     fun removeWindow(windowId: Window)
 
     fun moveWindowToNextMonitor(windowId: Window)
+
+    fun moveWindowToPreviousMonitor(windowId: Window)
 }
