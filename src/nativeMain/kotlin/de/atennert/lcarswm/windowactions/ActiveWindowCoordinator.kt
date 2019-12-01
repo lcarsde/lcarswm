@@ -23,4 +23,8 @@ class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : Wind
 
     override fun moveWindowToPreviousMonitor(windowId: Window) {
     }
+
+    override fun getMonitorForWindow(windowId: Window): Monitor {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

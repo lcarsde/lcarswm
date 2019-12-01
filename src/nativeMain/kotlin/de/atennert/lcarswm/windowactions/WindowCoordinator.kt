@@ -13,4 +13,6 @@ interface WindowCoordinator {
     fun moveWindowToNextMonitor(windowId: Window)
 
     fun moveWindowToPreviousMonitor(windowId: Window)
+
+    fun getMonitorForWindow(windowId: Window): Monitor
 }
