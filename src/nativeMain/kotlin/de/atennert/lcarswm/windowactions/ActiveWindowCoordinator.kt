@@ -17,4 +17,7 @@ class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : Wind
 
     override fun removeWindow(windowId: Window) {
     }
+
+    override fun moveWindowToNextMonitor(windowId: Window) {
+    }
 }

@@ -21,4 +21,8 @@ class WindowCoordinatorMock : WindowCoordinator {
     override fun removeWindow(windowId: Window) {
         functionCalls.add(FunctionCall("removeWindow", windowId))
     }
+
+    override fun moveWindowToNextMonitor(windowId: Window) {
+        functionCalls.add(FunctionCall("moveWindowToNextMonitor", windowId))
+    }
 }
