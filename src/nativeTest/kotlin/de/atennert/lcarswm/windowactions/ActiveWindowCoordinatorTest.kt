@@ -9,13 +9,21 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `add windows to a monitor`() {
         val systemApi = SystemFacadeMock()
-        val testWindowId = systemApi.getNewWindowId()
+        val windowId = systemApi.getNewWindowId()
         val monitorManager = MonitorManagerMock()
 
         val activeWindowCoordinator = ActiveWindowCoordinator(monitorManager)
 
-        val initialMonitor = activeWindowCoordinator.addWindowToMonitor(testWindowId)
+        val initialMonitor = activeWindowCoordinator.addWindowToMonitor(windowId)
 
-        assertEquals(monitorManager.primaryMonitor, initialMonitor, "New windows should initially be added to the primary monitor")
+        assertEquals(
+            monitorManager.primaryMonitor, initialMonitor,
+            "New windows should initially be added to the primary monitor"
+        )
+
+        assertEquals(
+            monitorManager.primaryMonitor, activeWindowCoordinator.getMonitorForWindow(windowId),
+            "The monitor manager should have stored the window-monitor-relation"
+        )
     }
 }
