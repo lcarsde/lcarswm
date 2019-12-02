@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.monitor
 
+import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
@@ -117,5 +118,14 @@ class MonitorManagerImplTest {
         assertEquals(2000, width, "The width should match the combined screen width")
 
         assertEquals(500, height, "The height should match the combined screen height")
+    }
+
+    @Test
+    fun `check that default screen mode is normal`() {
+        val systemApi = SystemFacadeMock()
+
+        val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+
+        assertEquals(ScreenMode.NORMAL, monitorManager.getScreenMode(), "The default screen mode should be normal")
     }
 }
