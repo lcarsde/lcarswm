@@ -8,11 +8,14 @@ import xlib.Window
  *
  */
 class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : WindowCoordinator {
+    private val windowsOnMonitors = mutableMapOf<Window, Monitor>()
+
     override fun rearrangeActiveWindows() {
     }
 
     override fun addWindowToMonitor(windowId: Window): Monitor {
-        return monitorManager.getPrimaryMonitor()
+        windowsOnMonitors[windowId] = monitorManager.getPrimaryMonitor()
+        return getMonitorForWindow(windowId)
     }
 
     override fun removeWindow(windowId: Window) {
@@ -25,6 +28,6 @@ class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : Wind
     }
 
     override fun getMonitorForWindow(windowId: Window): Monitor {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return windowsOnMonitors.getValue(windowId)
     }
 }
