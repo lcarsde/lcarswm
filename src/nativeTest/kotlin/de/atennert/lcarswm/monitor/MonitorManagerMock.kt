@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.monitor
 
+import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.system.FunctionCall
 import kotlinx.cinterop.convert
 
@@ -16,4 +17,6 @@ class MonitorManagerMock : MonitorManager {
     override fun getPrimaryMonitor(): Monitor = primaryMonitor
 
     override fun getCombinedScreenSize(): Pair<Int, Int> = Pair(1920, 1080)
+
+    override fun getScreenMode(): ScreenMode = ScreenMode.NORMAL
 }

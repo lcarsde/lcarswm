@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.monitor
 
+import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.system.api.RandrApi
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
@@ -83,4 +84,8 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
                 max(monitor.y + monitor.height, oldHeight)
             )
         }
+
+    override fun getScreenMode(): ScreenMode {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
