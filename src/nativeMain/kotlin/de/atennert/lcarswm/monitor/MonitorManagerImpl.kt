@@ -86,6 +86,6 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         }
 
     override fun getScreenMode(): ScreenMode {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return ScreenMode.NORMAL
     }
 }
