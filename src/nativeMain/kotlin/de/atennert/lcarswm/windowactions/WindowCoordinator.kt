@@ -6,7 +6,10 @@ import xlib.Window
 interface WindowCoordinator {
     fun rearrangeActiveWindows()
 
-    fun addWindowToMonitor(windowId: Window): Monitor
+    /**
+     * @return measurements
+     */
+    fun addWindowToMonitor(windowId: Window): List<Int>
 
     fun removeWindow(windowId: Window)
 

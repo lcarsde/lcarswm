@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.FunctionCall
 import kotlinx.cinterop.convert
@@ -13,9 +14,9 @@ class WindowCoordinatorMock : WindowCoordinator {
     }
 
     val primaryMonitor = Monitor(21.convert(), "", true)
-    override fun addWindowToMonitor(windowId: Window): Monitor {
+    override fun addWindowToMonitor(windowId: Window): List<Int> {
         functionCalls.add(FunctionCall("addWindowToMonitor", windowId))
-        return primaryMonitor
+        return primaryMonitor.getCurrentWindowMeasurements(ScreenMode.NORMAL)
     }
 
     override fun removeWindow(windowId: Window) {

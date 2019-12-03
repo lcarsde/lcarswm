@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlin.test.Test
@@ -15,10 +16,10 @@ class ActiveWindowCoordinatorTest {
 
         val activeWindowCoordinator = ActiveWindowCoordinator(monitorManager)
 
-        val initialMonitor = activeWindowCoordinator.addWindowToMonitor(windowId)
+        val measurements = activeWindowCoordinator.addWindowToMonitor(windowId)
 
         assertEquals(
-            monitorManager.primaryMonitor, initialMonitor,
+            monitorManager.primaryMonitor.getCurrentWindowMeasurements(ScreenMode.NORMAL), measurements,
             "New windows should initially be added to the primary monitor"
         )
 

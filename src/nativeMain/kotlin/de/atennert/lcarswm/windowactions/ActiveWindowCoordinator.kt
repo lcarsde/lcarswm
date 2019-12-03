@@ -13,9 +13,9 @@ class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : Wind
     override fun rearrangeActiveWindows() {
     }
 
-    override fun addWindowToMonitor(windowId: Window): Monitor {
+    override fun addWindowToMonitor(windowId: Window): List<Int> {
         windowsOnMonitors[windowId] = monitorManager.getPrimaryMonitor()
-        return getMonitorForWindow(windowId)
+        return getMonitorForWindow(windowId).getCurrentWindowMeasurements(monitorManager.getScreenMode())
     }
 
     override fun removeWindow(windowId: Window) {
