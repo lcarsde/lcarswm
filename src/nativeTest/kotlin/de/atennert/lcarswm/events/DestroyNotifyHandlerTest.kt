@@ -1,10 +1,7 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.monitor.Monitor
-import de.atennert.lcarswm.FramedWindow
-import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.log.LoggerMock
-import de.atennert.lcarswm.system.SystemFacadeMock
+import de.atennert.lcarswm.windowactions.WindowRegistrationMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
@@ -19,10 +16,7 @@ import kotlin.test.assertTrue
 class DestroyNotifyHandlerTest {
     @Test
     fun `return the event type DestroyNotify`() {
-        val windowId: Window = 1.convert()
-        val windowManagerState = WindowManagerStateTestImpl(windowId)
-
-        val destroyNotifyHandler = DestroyNotifyHandler(SystemFacadeMock(), LoggerMock(), windowManagerState)
+        val destroyNotifyHandler = DestroyNotifyHandler(LoggerMock(), WindowRegistrationMock())
 
         assertEquals(DestroyNotify, destroyNotifyHandler.xEventType, "The event type for DestroyEventHandler needs to be DestroyNotify")
     }
@@ -34,19 +28,18 @@ class DestroyNotifyHandlerTest {
         val destroyNotifyEvent = nativeHeap.alloc<XEvent>()
         destroyNotifyEvent.xdestroywindow.window = windowId
 
-        val windowManagerState = WindowManagerStateTestImpl(windowId)
-        val system = SystemFacadeMock()
+        val windowRegistration = WindowRegistrationMock()
+        windowRegistration.addWindow(windowId, false)
+        windowRegistration.functionCalls.clear()
 
-        val destroyNotifyHandler = DestroyNotifyHandler(system, LoggerMock(), windowManagerState)
+        val destroyNotifyHandler = DestroyNotifyHandler(LoggerMock(), windowRegistration)
         val requestShutdown = destroyNotifyHandler.handleEvent(destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")
-        assertEquals(1, windowManagerState.removedWindowIds.size, "There wasn't exactly one window removal")
-        assertEquals(windowId, windowManagerState.removedWindowIds[0], "Window was not removed from state management")
 
-        assertEquals("unmapWindow", system.functionCalls.removeAt(0).name, "The frame needs to be unmapped")
-        assertEquals("removeFromSaveSet", system.functionCalls.removeAt(0).name, "the window needs to be removed from the save set")
-        assertEquals("destroyWindow", system.functionCalls.removeAt(0).name, "The frame needs to be destroyed")
+        val removeWindowCall = windowRegistration.functionCalls.removeAt(0)
+        assertEquals("removeWindow", removeWindowCall.name, "Remove needs to be called on the window registration")
+        assertEquals(windowId, removeWindowCall.parameters[0], "The window needs to be removed from the registration")
     }
 
     @Test
@@ -56,27 +49,13 @@ class DestroyNotifyHandlerTest {
         val destroyNotifyEvent = nativeHeap.alloc<XEvent>()
         destroyNotifyEvent.xdestroywindow.window = windowId
 
-        val windowManagerState = WindowManagerStateTestImpl(0.convert())
-        val system = SystemFacadeMock()
+        val windowRegistration = WindowRegistrationMock()
 
-        val destroyNotifyHandler = DestroyNotifyHandler(system, LoggerMock(), windowManagerState)
+        val destroyNotifyHandler = DestroyNotifyHandler(LoggerMock(), windowRegistration)
         val requestShutdown = destroyNotifyHandler.handleEvent(destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")
-        assertTrue(windowManagerState.functionCalls.isEmpty(), "an unknown window shouldn't be removed")
-        assertTrue(system.functionCalls.isEmpty(), "There should be no calls to system, as nothing was to do")
-    }
 
-    private class WindowManagerStateTestImpl(knownWindow: Window) : WindowManagerStateMock() {
-        val removedWindowIds = mutableListOf<Window>()
-
-        init {
-            windows.add(Pair(FramedWindow(knownWindow), Monitor(0.convert(), "", true)))
-        }
-
-        override fun removeWindow(windowId: Window) {
-            super.removeWindow(windowId)
-            this.removedWindowIds.add(windowId)
-        }
+        assertTrue(windowRegistration.functionCalls.isEmpty(), "an unknown window shouldn't be removed")
     }
 }

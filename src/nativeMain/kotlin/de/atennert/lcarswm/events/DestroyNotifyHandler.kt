@@ -1,8 +1,7 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.WindowManagerStateHandler
 import de.atennert.lcarswm.log.Logger
-import de.atennert.lcarswm.system.api.SystemApi
+import de.atennert.lcarswm.windowactions.WindowRegistration
 import xlib.DestroyNotify
 import xlib.XEvent
 
@@ -11,9 +10,8 @@ import xlib.XEvent
  * need to clean up after it here.
  */
 class DestroyNotifyHandler(
-    private val system: SystemApi,
     private val logger: Logger,
-    private val windowManagerState: WindowManagerStateHandler // TODO use WindowRegistration
+    private val windowRegistration: WindowRegistration
 ) : XEventHandler {
     override val xEventType = DestroyNotify
 
@@ -21,13 +19,8 @@ class DestroyNotifyHandler(
         val destroyedWindow = event.xdestroywindow.window
         logger.logDebug("DestroyNotifyHandler::handleEvent::clean up after destroyed window: $destroyedWindow")
         
-        if (windowManagerState.hasWindow(destroyedWindow)) {
-            val windowContainer = windowManagerState.getWindowContainer(destroyedWindow)
-            system.unmapWindow(windowContainer.frame)
-            system.removeFromSaveSet(destroyedWindow)
-            system.destroyWindow(windowContainer.frame)
-
-            windowManagerState.removeWindow(destroyedWindow)
+        if (windowRegistration.isWindowManaged(destroyedWindow)) {
+            windowRegistration.removeWindow(destroyedWindow)
         }
         return false
     }
