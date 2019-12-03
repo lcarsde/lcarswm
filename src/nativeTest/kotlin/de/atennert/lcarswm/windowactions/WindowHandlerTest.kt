@@ -1,8 +1,5 @@
 package de.atennert.lcarswm.windowactions
 
-import de.atennert.lcarswm.FramedWindow
-import de.atennert.lcarswm.monitor.Monitor
-import de.atennert.lcarswm.WindowManagerStateMock
 import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.log.LoggerMock
@@ -27,7 +24,6 @@ class WindowHandlerTest {
         val windowId: Window = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
-        val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
@@ -35,7 +31,6 @@ class WindowHandlerTest {
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
-            windowManagerState,
             windowCoordinator,
             atomLibrary,
             rootWindowId
@@ -43,7 +38,7 @@ class WindowHandlerTest {
 
         windowRegistration.addWindow(windowId, false)
 
-        checkWindowAddProcedure(systemApi, windowId, windowManagerState, windowCoordinator)
+        checkWindowAddProcedure(systemApi, windowId, windowCoordinator)
     }
 
     @Test
@@ -58,7 +53,6 @@ class WindowHandlerTest {
         val windowId: Window = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
-        val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
@@ -66,7 +60,6 @@ class WindowHandlerTest {
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
-            windowManagerState,
             windowCoordinator,
             atomLibrary,
             rootWindowId
@@ -74,13 +67,12 @@ class WindowHandlerTest {
 
         windowRegistration.addWindow(windowId, true)
 
-        checkWindowAddProcedure(systemApi, windowId, windowManagerState, windowCoordinator)
+        checkWindowAddProcedure(systemApi, windowId, windowCoordinator)
     }
 
     private fun checkWindowAddProcedure(
         systemApi: SystemFacadeMock,
         windowId: Window,
-        windowManagerState: WindowManagerStateMock,
         windowCoordinator: WindowCoordinatorMock
     ) {
         val addWindowToMonitorCall = windowCoordinator.functionCalls.removeAt(0)
@@ -104,19 +96,6 @@ class WindowHandlerTest {
             NormalState,
             (changePropertyCall.parameters[3] as UByteArray)[0].convert(),
             "_normal state_ needs to be set in windows state atom"
-        )
-
-        val addWindowCall = windowManagerState.functionCalls.removeAt(0)
-        assertEquals("addWindow", addWindowCall.name, "the child window should be _added to the window list_")
-        assertEquals(
-            windowId,
-            (addWindowCall.parameters[0] as FramedWindow).id,
-            "the _child window_ should be added to the window list"
-        )
-        assertEquals(
-            windowCoordinator.primaryMonitor,
-            addWindowCall.parameters[1] as Monitor,
-            "The window needs to be added to the primary monitor"
         )
     }
 
@@ -147,7 +126,6 @@ class WindowHandlerTest {
         val windowId: Window = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
-        val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
@@ -155,7 +133,6 @@ class WindowHandlerTest {
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
-            windowManagerState,
             windowCoordinator,
             atomLibrary,
             rootWindowId
@@ -178,7 +155,6 @@ class WindowHandlerTest {
         val windowId: Window = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
-        val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
@@ -186,7 +162,6 @@ class WindowHandlerTest {
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
-            windowManagerState,
             windowCoordinator,
             atomLibrary,
             rootWindowId
@@ -211,13 +186,11 @@ class WindowHandlerTest {
         val windowId = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
-        val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
 
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
-            windowManagerState,
             windowCoordinator,
             atomLibrary,
             rootWindowId
@@ -236,33 +209,28 @@ class WindowHandlerTest {
 
         val rootWindowId = systemApi.rootWindowId
         val windowId = systemApi.getNewWindowId()
-        val framedWindow = FramedWindow(windowId)
-        framedWindow.frame = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
-        val windowManagerState = WindowManagerStateMock()
         val atomLibrary = AtomLibrary(systemApi)
-
-        windowManagerState.windows.add(Pair(framedWindow, Monitor(1.convert(), "", true)))
-        systemApi.functionCalls.clear() // remove AtomLibrary setup
 
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
-            windowManagerState,
             windowCoordinator,
             atomLibrary,
             rootWindowId
         )
+        windowRegistration.addWindow(windowId, false)
+
+        systemApi.functionCalls.clear() // remove AtomLibrary setup and window adding
+        windowCoordinator.functionCalls.clear()
 
         windowRegistration.removeWindow(windowId)
 
         val unregisterSystemCalls = systemApi.functionCalls
-        val windowManagerStateCalls = windowManagerState.functionCalls
 
         val unmapFrameCall = unregisterSystemCalls.removeAt(0)
         assertEquals("unmapWindow", unmapFrameCall.name, "The frame of the removed window needs to be _unmapped_")
-        assertEquals(framedWindow.frame, unmapFrameCall.parameters[0], "The _frame_ of the removed window needs to be unmapped")
 
         val reparentCall = unregisterSystemCalls.removeAt(0)
         assertEquals("reparentWindow", reparentCall.name, "We need to _reparent_ the window back to root")
@@ -275,11 +243,6 @@ class WindowHandlerTest {
         
         val destroyFrameCall = unregisterSystemCalls.removeAt(0)
         assertEquals("destroyWindow", destroyFrameCall.name, "The frame of the removed window needs to be _destroyed_")
-        assertEquals(framedWindow.frame, destroyFrameCall.parameters[0], "The _frame_ of the removed window needs to be destroyed")
-
-        val removeWindowCall = windowManagerStateCalls.removeAt(0)
-        assertEquals("removeWindow", removeWindowCall.name, "The window needs to be _removed_")
-        assertEquals(windowId, removeWindowCall.parameters[0], "The _window_ needs to be removed")
 
         val removeFromCoordinatorCall = windowCoordinator.functionCalls.removeAt(0)
         assertEquals("removeWindow", removeFromCoordinatorCall.name, "Remove the window from the window coordinator")

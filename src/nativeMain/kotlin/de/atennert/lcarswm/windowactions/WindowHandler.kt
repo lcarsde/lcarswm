@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.FramedWindow
-import de.atennert.lcarswm.WindowManagerStateHandler
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms.WM_STATE
@@ -18,7 +17,6 @@ import xlib.*
 class WindowHandler(
     private val system: SystemApi,
     private val logger: Logger,
-    private val windowManagerState: WindowManagerStateHandler,
     private val windowCoordinator: WindowCoordinator,
     private val atomLibrary: AtomLibrary,
     private val rootWindow: Window
@@ -30,6 +28,8 @@ class WindowHandler(
     private val wmStateData = listOf<ULong>(NormalState.convert(), None.convert())
         .map { it.toUByteArray() }
         .combine()
+
+    private val registeredWindows = mutableMapOf<Window, FramedWindow>()
 
     override fun addWindow(windowId: Window, isSetup: Boolean) {
         val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
@@ -48,9 +48,8 @@ class WindowHandler(
         }
 
         val window = FramedWindow(windowId)
-        val windowMonitor = windowCoordinator.addWindowToMonitor(windowId)
 
-        val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))
+        val measurements = windowCoordinator.addWindowToMonitor(windowId)
 
         window.frame = system.createSimpleWindow(rootWindow, measurements)
 
@@ -68,22 +67,21 @@ class WindowHandler(
 
         system.changeProperty(window.id, atomLibrary[WM_STATE], atomLibrary[WM_STATE], wmStateData, 32)
 
-        windowManagerState.addWindow(window, windowMonitor)
+        registeredWindows[windowId] = window
 
         nativeHeap.free(windowAttributes)
     }
 
-    override fun isWindowManaged(windowId: Window): Boolean = windowManagerState.hasWindow(windowId)
+    override fun isWindowManaged(windowId: Window): Boolean = registeredWindows.containsKey(windowId)
 
     override fun removeWindow(windowId: Window) {
-        val framedWindow = windowManagerState.getWindowContainer(windowId)
+        val framedWindow = registeredWindows.remove(windowId)!!
         
         system.unmapWindow(framedWindow.frame)
         system.reparentWindow(windowId, rootWindow, 0, 0)
         system.removeFromSaveSet(windowId)
         system.destroyWindow(framedWindow.frame)
 
-        windowManagerState.removeWindow(windowId)
         windowCoordinator.removeWindow(windowId)
     }
 }
