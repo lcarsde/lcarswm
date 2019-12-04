@@ -18,4 +18,6 @@ interface WindowCoordinator {
     fun moveWindowToPreviousMonitor(windowId: Window)
 
     fun getMonitorForWindow(windowId: Window): Monitor
+
+    fun getWindowMeasurements(windowId: Window): List<Int>
 }

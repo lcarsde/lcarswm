@@ -31,4 +31,8 @@ class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : Wind
     override fun getMonitorForWindow(windowId: Window): Monitor {
         return windowsOnMonitors.getValue(windowId)
     }
+
+    override fun getWindowMeasurements(windowId: Window): List<Int> {
+        return emptyList() // TODO
+    }
 }

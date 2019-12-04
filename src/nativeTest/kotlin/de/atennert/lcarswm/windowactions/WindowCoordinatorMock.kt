@@ -34,4 +34,8 @@ class WindowCoordinatorMock : WindowCoordinator {
     override fun getMonitorForWindow(windowId: Window): Monitor {
         return Monitor(1.convert(), "some monitor", false)
     }
+
+    override fun getWindowMeasurements(windowId: Window): List<Int> {
+        return primaryMonitor.getCurrentWindowMeasurements(ScreenMode.NORMAL)
+    }
 }
