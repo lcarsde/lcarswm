@@ -1,8 +1,9 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.WindowManagerStateHandler
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.EventApi
+import de.atennert.lcarswm.windowactions.WindowCoordinator
+import de.atennert.lcarswm.windowactions.WindowRegistration
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
@@ -19,14 +20,15 @@ import xlib.XWindowChanges
 class ConfigureRequestHandler(
     private val eventApi: EventApi,
     private val logger: Logger,
-    private val windowManagerState: WindowManagerStateHandler // TODO replace with WindowRegistration
+    private val windowRegistration: WindowRegistration,
+    private val windowCoordinator: WindowCoordinator
 ) : XEventHandler {
     override val xEventType = ConfigureRequest
 
     override fun handleEvent(event: XEvent): Boolean {
         val configureEvent = event.xconfigurerequest
 
-        val isWindowKnown = windowManagerState.hasWindow(configureEvent.window)
+        val isWindowKnown = windowRegistration.isWindowManaged(configureEvent.window)
 
         logger.logDebug("ConfigureRequestHandler::handleEvent::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}, is known: $isWindowKnown")
 
@@ -40,8 +42,7 @@ class ConfigureRequestHandler(
     }
 
     private fun adjustWindowToScreen(configureEvent: XConfigureRequestEvent) {
-        val (_, monitor) = windowManagerState.windows.single { it.first.id == configureEvent.window }
-        val measurements = monitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(monitor))
+        val measurements = windowCoordinator.getWindowMeasurements(configureEvent.window)
 
         sendConfigureNotify(eventApi, configureEvent.window, measurements)
     }

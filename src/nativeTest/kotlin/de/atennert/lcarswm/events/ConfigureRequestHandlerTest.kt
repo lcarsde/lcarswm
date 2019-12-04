@@ -1,9 +1,10 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.*
+import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.log.LoggerMock
-import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.SystemFacadeMock
+import de.atennert.lcarswm.windowactions.WindowCoordinatorMock
+import de.atennert.lcarswm.windowactions.WindowRegistrationMock
 import kotlinx.cinterop.*
 import xlib.*
 import kotlin.test.Test
@@ -16,7 +17,7 @@ import kotlin.test.assertFalse
 class ConfigureRequestHandlerTest {
     @Test
     fun `has ConfigureRequest type`() {
-        val configureRequestHandler = ConfigureRequestHandler(SystemFacadeMock(), LoggerMock(), WindowManagerStateMock())
+        val configureRequestHandler = ConfigureRequestHandler(SystemFacadeMock(), LoggerMock(), WindowRegistrationMock(), WindowCoordinatorMock())
 
         assertEquals(ConfigureRequest, configureRequestHandler.xEventType, "The ConfigureRequestHandler should have the ConfigureRequest type")
     }
@@ -27,13 +28,16 @@ class ConfigureRequestHandlerTest {
             val display = nativeHeap.allocPointerTo<Display>().value
             override fun getDisplay(): CPointer<Display>? = display
         }
-        val knownWindow: Window = 1.convert()
-        val windowManagerState = WindowManagerStateTestImpl(knownWindow)
-        val windowMeasurements = windowManagerState.windows[0].second.getCurrentWindowMeasurements(ScreenMode.NORMAL)
+        val knownWindow = system.getNewWindowId()
+        val windowRegistration = object : WindowRegistrationMock() {
+            override fun isWindowManaged(windowId: Window): Boolean = windowId == knownWindow
+        }
+        val monitorCoordinator = WindowCoordinatorMock()
+        val windowMeasurements = monitorCoordinator.getWindowMeasurements(knownWindow)
 
-        val configureRequestHandler = ConfigureRequestHandler(system, LoggerMock(), windowManagerState)
+        val configureRequestHandler = ConfigureRequestHandler(system, LoggerMock(), windowRegistration, monitorCoordinator)
 
-        val configureRequestEvent = createConfigureRequestEvent()
+        val configureRequestEvent = createConfigureRequestEvent(knownWindow)
         val shutdownValue = configureRequestHandler.handleEvent(configureRequestEvent)
 
         val configureNotifyCall = system.functionCalls[0]
@@ -65,11 +69,12 @@ class ConfigureRequestHandlerTest {
     @Test
     fun `handle unknown window`() {
         val system = SystemFacadeMock()
-        val windowManagerState = WindowManagerStateTestImpl()
+        val windowRegistration = WindowRegistrationMock()
+        val monitorCoordinator = WindowCoordinatorMock()
 
-        val configureRequestHandler = ConfigureRequestHandler(system, LoggerMock(), windowManagerState)
+        val configureRequestHandler = ConfigureRequestHandler(system, LoggerMock(), windowRegistration, monitorCoordinator)
 
-        val configureRequestEvent = createConfigureRequestEvent()
+        val configureRequestEvent = createConfigureRequestEvent(system.getNewWindowId())
         val shutdownValue = configureRequestHandler.handleEvent(configureRequestEvent)
 
         val configureWindowCall = system.functionCalls[0] // there should be only one call for unknown windows
@@ -92,9 +97,9 @@ class ConfigureRequestHandlerTest {
         assertEquals(0, windowChanges.border_width, "The windows border width should be 0")
     }
 
-    private fun createConfigureRequestEvent(): XEvent {
+    private fun createConfigureRequestEvent(windowId: Window): XEvent {
         val configureRequestEvent = nativeHeap.alloc<XEvent>()
-        configureRequestEvent.xconfigurerequest.window = 1.convert()
+        configureRequestEvent.xconfigurerequest.window = windowId
         configureRequestEvent.xconfigurerequest.value_mask = 123.convert()
         configureRequestEvent.xconfigurerequest.x = 2
         configureRequestEvent.xconfigurerequest.y = 3
@@ -103,16 +108,5 @@ class ConfigureRequestHandlerTest {
         configureRequestEvent.xconfigurerequest.above = 6.convert()
         configureRequestEvent.xconfigurerequest.detail = 7
         return configureRequestEvent
-    }
-
-    private class WindowManagerStateTestImpl(private val knownWindow: Window? = null) : WindowManagerStateMock() {
-        override val windows = mutableListOf<Pair<FramedWindow, Monitor>>()
-
-        init {
-            if (knownWindow != null) {
-                windows.add(Pair(FramedWindow(knownWindow), Monitor(2.convert(), "", true)))
-            }
-        }
-        override fun hasWindow(windowId: Window): Boolean = windowId == knownWindow
     }
 }
