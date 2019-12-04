@@ -19,7 +19,7 @@ import xlib.XWindowChanges
 class ConfigureRequestHandler(
     private val eventApi: EventApi,
     private val logger: Logger,
-    private val windowManagerState: WindowManagerStateHandler
+    private val windowManagerState: WindowManagerStateHandler // TODO replace with WindowRegistration
 ) : XEventHandler {
     override val xEventType = ConfigureRequest
 
@@ -40,10 +40,10 @@ class ConfigureRequestHandler(
     }
 
     private fun adjustWindowToScreen(configureEvent: XConfigureRequestEvent) {
-        val (windowContainer, monitor) = windowManagerState.windows.single { it.first.id == configureEvent.window }
+        val (_, monitor) = windowManagerState.windows.single { it.first.id == configureEvent.window }
         val measurements = monitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(monitor))
 
-        sendConfigureNotify(eventApi, windowContainer.id, measurements)
+        sendConfigureNotify(eventApi, configureEvent.window, measurements)
     }
 
     private fun forwardConfigureRequest(configureEvent: XConfigureRequestEvent) {
