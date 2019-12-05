@@ -43,4 +43,19 @@ class ActiveWindowCoordinatorTest {
 
         assertFails("The window should be removed") { activeWindowCoordinator.getMonitorForWindow(windowId) }
     }
+
+    @Test
+    fun `get measurements for window`() {
+        val systemApi = SystemFacadeMock()
+        val windowId = systemApi.getNewWindowId()
+        val monitorManager = MonitorManagerMock()
+
+        val activeWindowCoordinator = ActiveWindowCoordinator(monitorManager)
+        activeWindowCoordinator.addWindowToMonitor(windowId)
+
+        val measurements = activeWindowCoordinator.getWindowMeasurements(windowId)
+
+        assertEquals(monitorManager.primaryMonitor.getCurrentWindowMeasurements(ScreenMode.NORMAL), measurements,
+            "The window coordinator should return the correct window measurements")
+    }
 }
