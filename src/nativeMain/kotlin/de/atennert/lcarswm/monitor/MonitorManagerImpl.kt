@@ -27,7 +27,7 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         monitors = activeMonitorInfos
             .map { (monitorId, _) -> monitorId }
             .zip(monitorNames)
-            .map { (id, name) -> Monitor(id, name, id == primary) }
+            .map { (id, name) -> Monitor(this, id, name, id == primary) }
             .zip(activeMonitorInfos.map { it.second })
             .map { (monitor, outputInfo) -> addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData) }
     }
@@ -68,7 +68,7 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
     ): Monitor {
         val crtcInfo = randrApi.rGetCrtcInfo(monitorData, crtcReference)!!.pointed
 
-        monitor.setMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
+        monitor.setMonitorMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
 
         return monitor
     }

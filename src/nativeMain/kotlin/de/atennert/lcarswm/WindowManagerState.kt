@@ -70,7 +70,7 @@ class WindowManagerState(
             .forEach { (i, windowEntry) -> this.windows[i] = Pair(windowEntry.first, monitors[0]) }
 
         monitors.forEach { monitor ->
-            val windowMeasurements = monitor.getCurrentWindowMeasurements(getScreenModeForMonitor(monitor))
+            val windowMeasurements = monitor.getWindowMeasurements()
             this.windows
                 .filter { (_, windowMonitor) -> monitor == windowMonitor }
                 .forEach { (window, _) -> updateWindowFcn(windowMeasurements, window) }
@@ -81,7 +81,7 @@ class WindowManagerState(
         this.screenMode = screenMode
 
         this.monitors.forEach { monitor ->
-            val measurements = monitor.getCurrentWindowMeasurements(getScreenModeForMonitor(monitor))
+            val measurements = monitor.getWindowMeasurements()
             this.windows
                 .filter { (_, windowMonitor) -> windowMonitor == monitor }
                 .forEach { (window, _) ->

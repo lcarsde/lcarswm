@@ -4,7 +4,7 @@ import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.system.FunctionCall
 import kotlinx.cinterop.convert
 
-class MonitorManagerMock : MonitorManager {
+open class MonitorManagerMock : MonitorManager {
     val functionCalls = mutableListOf<FunctionCall>()
 
     override fun updateMonitorList() {
@@ -13,7 +13,7 @@ class MonitorManagerMock : MonitorManager {
 
     override fun getMonitors(): List<Monitor> = listOf()
 
-    val primaryMonitor = Monitor(42.convert(), "", true)
+    val primaryMonitor = Monitor(this, 42.convert(), "", true)
     override fun getPrimaryMonitor(): Monitor = primaryMonitor
 
     override fun getCombinedScreenSize(): Pair<Int, Int> = Pair(1920, 1080)

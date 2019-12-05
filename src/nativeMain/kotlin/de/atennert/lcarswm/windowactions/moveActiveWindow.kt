@@ -18,7 +18,7 @@ fun moveActiveWindow(
 ) {
     val activeWindow = windowManagerState.activeFramedWindow ?: return
     val newMonitor = windowMoveFunction(activeWindow)
-    val measurements = newMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(newMonitor))
+    val measurements = newMonitor.getWindowMeasurements()
 
     adjustWindowPositionAndSize(
         system,

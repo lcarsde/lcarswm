@@ -15,7 +15,7 @@ class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : Wind
 
     override fun addWindowToMonitor(windowId: Window): List<Int> {
         windowsOnMonitors[windowId] = monitorManager.getPrimaryMonitor()
-        return getMonitorForWindow(windowId).getCurrentWindowMeasurements(monitorManager.getScreenMode())
+        return getMonitorForWindow(windowId).getWindowMeasurements()
     }
 
     override fun removeWindow(windowId: Window) {
@@ -33,6 +33,6 @@ class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : Wind
     }
 
     override fun getWindowMeasurements(windowId: Window): List<Int> {
-        return getMonitorForWindow(windowId).getCurrentWindowMeasurements(monitorManager.getScreenMode())
+        return getMonitorForWindow(windowId).getWindowMeasurements()
     }
 }

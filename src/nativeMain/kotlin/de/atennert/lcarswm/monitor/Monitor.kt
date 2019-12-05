@@ -6,7 +6,7 @@ import xlib.RROutput
 /**
  * Resource representing a physical monitor and its settings.
  */
-data class Monitor(val id: RROutput, val name: String, val isPrimary: Boolean) {
+data class Monitor(private val monitorManager: MonitorManager, val id: RROutput, val name: String, val isPrimary: Boolean) {
 
     var x = 0
         private set
@@ -54,7 +54,7 @@ data class Monitor(val id: RROutput, val name: String, val isPrimary: Boolean) {
      * Update the monitor measurement settings.
      * @return true if any setting changed, false otherwise
      */
-    fun setMeasurements(x: Int, y: Int, width: UInt, height: UInt) {
+    fun setMonitorMeasurements(x: Int, y: Int, width: UInt, height: UInt) {
         if (this.isFullyInitialized) {
             throw IllegalStateException("Tried to set values on monitor ${this.id}:$this.name but values are already set!")
         }
@@ -85,7 +85,7 @@ data class Monitor(val id: RROutput, val name: String, val isPrimary: Boolean) {
     /**
      * @return the current window measurements in the form [x, y, width, height], depending on the current screenMode
      */
-    fun getCurrentWindowMeasurements(screenMode: ScreenMode): List<Int> = when (screenMode) {
+    fun getWindowMeasurements(): List<Int> = when (monitorManager.getScreenMode()) {
             ScreenMode.NORMAL -> windowMeasurementsToList(
                     this.defaultWindowPosition,
                     this.defaultWindowSize

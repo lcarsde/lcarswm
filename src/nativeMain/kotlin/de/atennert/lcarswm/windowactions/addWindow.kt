@@ -31,7 +31,7 @@ fun addWindow(system: SystemApi, logger: Logger, windowManagerState: WindowManag
     val window = FramedWindow(windowId)
     val windowMonitor = windowManagerState.initialMonitor
 
-    val measurements = windowMonitor.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowMonitor))
+    val measurements = windowMonitor.getWindowMeasurements()
 
     window.frame = system.createSimpleWindow(rootWindow, measurements)
 

@@ -26,7 +26,7 @@ fun handleConfigureRequest(
 
     if (windowManagerState.hasWindow(configureEvent.window)) {
         val windowPair = windowManagerState.windows.single {it.first.id == configureEvent.window}
-        val measurements = windowPair.second.getCurrentWindowMeasurements(windowManagerState.getScreenModeForMonitor(windowPair.second))
+        val measurements = windowPair.second.getWindowMeasurements()
 
         val window = windowPair.first
         sendConfigureNotify(eventApi, window.id, measurements)

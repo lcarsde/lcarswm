@@ -4,6 +4,7 @@ import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.WindowManagerState
 import de.atennert.lcarswm.adjustWindowPositionAndSize
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.monitor.MonitorManagerImpl
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.redrawRootWindow
 import kotlinx.cinterop.*
@@ -27,6 +28,8 @@ fun handleRandrEvent(
 
     val outputs = resources.pointed.outputs
 
+    val monitorManager = MonitorManagerImpl(system, rootWindow)
+
     val sortedMonitors = Array(resources.pointed.noutput)
     { i -> Pair(outputs!![i], system.rGetOutputInfo(resources, outputs[i])) }
         .asSequence()
@@ -37,7 +40,7 @@ fun handleRandrEvent(
             Triple(outputId, outputObject!!, getOutputName(outputObject))
         }
         .map { (outputId, outputObject, outputName) ->
-            Triple(Monitor(outputId, outputName, outputId == primary), outputObject.pointed.crtc, outputObject)
+            Triple(Monitor(monitorManager, outputId, outputName, outputId == primary), outputObject.pointed.crtc, outputObject)
         }
         .onEach { (monitor, c, _) ->
             logger.logInfo("::printOutput::name: ${monitor.name}, id: ${monitor.id} crtc: $c")
@@ -97,7 +100,7 @@ private fun addMeasurementToMonitor(
 ): Monitor {
     val crtcInfo = system.rGetCrtcInfo(resources, crtcReference)!!.pointed
 
-    monitor.setMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
+    monitor.setMonitorMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
 
     return monitor
 }

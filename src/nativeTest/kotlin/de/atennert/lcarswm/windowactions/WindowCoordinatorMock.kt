@@ -1,7 +1,7 @@
 package de.atennert.lcarswm.windowactions
 
-import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.monitor.Monitor
+import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.FunctionCall
 import kotlinx.cinterop.convert
 import xlib.Window
@@ -13,10 +13,10 @@ class WindowCoordinatorMock : WindowCoordinator {
         functionCalls.add(FunctionCall("rearrangeActiveWindows"))
     }
 
-    val primaryMonitor = Monitor(21.convert(), "", true)
+    val primaryMonitor = Monitor(MonitorManagerMock(), 21.convert(), "", true)
     override fun addWindowToMonitor(windowId: Window): List<Int> {
         functionCalls.add(FunctionCall("addWindowToMonitor", windowId))
-        return primaryMonitor.getCurrentWindowMeasurements(ScreenMode.NORMAL)
+        return primaryMonitor.getWindowMeasurements()
     }
 
     override fun removeWindow(windowId: Window) {
@@ -32,10 +32,10 @@ class WindowCoordinatorMock : WindowCoordinator {
     }
 
     override fun getMonitorForWindow(windowId: Window): Monitor {
-        return Monitor(1.convert(), "some monitor", false)
+        return Monitor(MonitorManagerMock(), 1.convert(), "some monitor", false)
     }
 
     override fun getWindowMeasurements(windowId: Window): List<Int> {
-        return primaryMonitor.getCurrentWindowMeasurements(ScreenMode.NORMAL)
+        return primaryMonitor.getWindowMeasurements()
     }
 }
