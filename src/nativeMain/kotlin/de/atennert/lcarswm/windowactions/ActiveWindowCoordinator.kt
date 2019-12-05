@@ -33,6 +33,6 @@ class ActiveWindowCoordinator(private val monitorManager: MonitorManager) : Wind
     }
 
     override fun getWindowMeasurements(windowId: Window): List<Int> {
-        return emptyList() // TODO
+        return getMonitorForWindow(windowId).getCurrentWindowMeasurements(monitorManager.getScreenMode())
     }
 }
