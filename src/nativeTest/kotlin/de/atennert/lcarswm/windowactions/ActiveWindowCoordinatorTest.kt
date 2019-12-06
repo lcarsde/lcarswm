@@ -3,6 +3,8 @@ package de.atennert.lcarswm.windowactions
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
+import xlib.ConfigureNotify
+import xlib.StructureNotifyMask
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
@@ -14,7 +16,7 @@ class ActiveWindowCoordinatorTest {
         val window = FramedWindow(systemApi.getNewWindowId())
         val monitorManager = MonitorManagerMock()
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
 
         val measurements = activeWindowCoordinator.addWindowToMonitor(window)
 
@@ -35,7 +37,7 @@ class ActiveWindowCoordinatorTest {
         val window = FramedWindow(systemApi.getNewWindowId())
         val monitorManager = MonitorManagerMock()
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
 
         activeWindowCoordinator.addWindowToMonitor(window)
 
@@ -50,12 +52,40 @@ class ActiveWindowCoordinatorTest {
         val window = FramedWindow(systemApi.getNewWindowId())
         val monitorManager = MonitorManagerMock()
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
         activeWindowCoordinator.addWindowToMonitor(window)
 
         val measurements = activeWindowCoordinator.getWindowMeasurements(window.id)
 
         assertEquals(monitorManager.primaryMonitor.getWindowMeasurements(), measurements,
             "The window coordinator should return the correct window measurements")
+    }
+
+    @Test
+    fun `rearrange registered window`() {
+        val systemApi = SystemFacadeMock()
+        val window = FramedWindow(systemApi.getNewWindowId())
+        window.frame = systemApi.getNewWindowId()
+        val monitorManager = MonitorManagerMock()
+
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        activeWindowCoordinator.addWindowToMonitor(window)
+
+        activeWindowCoordinator.rearrangeActiveWindows()
+
+        val systemCalls = systemApi.functionCalls
+
+        val moveResizeWindowCall = systemCalls.removeAt(0)
+        assertEquals("moveResizeWindow", moveResizeWindowCall.name, "The frame needs to be moved/resized")
+        assertEquals(window.frame, moveResizeWindowCall.parameters[0], "The _frame_ needs to be moved/resized")
+
+        val resizeWindowCall = systemCalls.removeAt(0)
+        assertEquals("resizeWindow", resizeWindowCall.name, "The window needs to be resized")
+        assertEquals(window.id, resizeWindowCall.parameters[0], "The _window_ needs to be resized")
+
+        val sendEventCall = systemCalls.removeAt(0)
+        assertEquals("sendEvent", sendEventCall.name, "The window needs to get a structure notify event")
+        assertEquals(window.id, sendEventCall.parameters[0], "The _window_ needs to get a structure notify event")
+        assertEquals(StructureNotifyMask, sendEventCall.parameters[2], "The window needs to get a _structure notify_ event")
     }
 }
