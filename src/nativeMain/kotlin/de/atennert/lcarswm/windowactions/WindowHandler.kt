@@ -49,7 +49,7 @@ class WindowHandler(
 
         val window = FramedWindow(windowId)
 
-        val measurements = windowCoordinator.addWindowToMonitor(windowId)
+        val measurements = windowCoordinator.addWindowToMonitor(window)
 
         window.frame = system.createSimpleWindow(rootWindow, measurements)
 
@@ -82,6 +82,6 @@ class WindowHandler(
         system.removeFromSaveSet(windowId)
         system.destroyWindow(framedWindow.frame)
 
-        windowCoordinator.removeWindow(windowId)
+        windowCoordinator.removeWindow(framedWindow)
     }
 }

@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.FunctionCall
@@ -14,13 +15,13 @@ class WindowCoordinatorMock : WindowCoordinator {
     }
 
     val primaryMonitor = Monitor(MonitorManagerMock(), 21.convert(), "", true)
-    override fun addWindowToMonitor(windowId: Window): List<Int> {
-        functionCalls.add(FunctionCall("addWindowToMonitor", windowId))
+    override fun addWindowToMonitor(window: FramedWindow): List<Int> {
+        functionCalls.add(FunctionCall("addWindowToMonitor", window))
         return primaryMonitor.getWindowMeasurements()
     }
 
-    override fun removeWindow(windowId: Window) {
-        functionCalls.add(FunctionCall("removeWindow", windowId))
+    override fun removeWindow(window: FramedWindow) {
+        functionCalls.add(FunctionCall("removeWindow", window))
     }
 
     override fun moveWindowToNextMonitor(windowId: Window) {

@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlin.test.Test
@@ -10,12 +11,12 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `add windows to a monitor`() {
         val systemApi = SystemFacadeMock()
-        val windowId = systemApi.getNewWindowId()
+        val window = FramedWindow(systemApi.getNewWindowId())
         val monitorManager = MonitorManagerMock()
 
         val activeWindowCoordinator = ActiveWindowCoordinator(monitorManager)
 
-        val measurements = activeWindowCoordinator.addWindowToMonitor(windowId)
+        val measurements = activeWindowCoordinator.addWindowToMonitor(window)
 
         assertEquals(
             monitorManager.primaryMonitor.getWindowMeasurements(), measurements,
@@ -23,7 +24,7 @@ class ActiveWindowCoordinatorTest {
         )
 
         assertEquals(
-            monitorManager.primaryMonitor, activeWindowCoordinator.getMonitorForWindow(windowId),
+            monitorManager.primaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id),
             "The monitor manager should have stored the window-monitor-relation"
         )
     }
@@ -31,28 +32,28 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `remove window from coordinator`() {
         val systemApi = SystemFacadeMock()
-        val windowId = systemApi.getNewWindowId()
+        val window = FramedWindow(systemApi.getNewWindowId())
         val monitorManager = MonitorManagerMock()
 
         val activeWindowCoordinator = ActiveWindowCoordinator(monitorManager)
 
-        activeWindowCoordinator.addWindowToMonitor(windowId)
+        activeWindowCoordinator.addWindowToMonitor(window)
 
-        activeWindowCoordinator.removeWindow(windowId)
+        activeWindowCoordinator.removeWindow(window)
 
-        assertFails("The window should be removed") { activeWindowCoordinator.getMonitorForWindow(windowId) }
+        assertFails("The window should be removed") { activeWindowCoordinator.getMonitorForWindow(window.id) }
     }
 
     @Test
     fun `get measurements for window`() {
         val systemApi = SystemFacadeMock()
-        val windowId = systemApi.getNewWindowId()
+        val window = FramedWindow(systemApi.getNewWindowId())
         val monitorManager = MonitorManagerMock()
 
         val activeWindowCoordinator = ActiveWindowCoordinator(monitorManager)
-        activeWindowCoordinator.addWindowToMonitor(windowId)
+        activeWindowCoordinator.addWindowToMonitor(window)
 
-        val measurements = activeWindowCoordinator.getWindowMeasurements(windowId)
+        val measurements = activeWindowCoordinator.getWindowMeasurements(window.id)
 
         assertEquals(monitorManager.primaryMonitor.getWindowMeasurements(), measurements,
             "The window coordinator should return the correct window measurements")

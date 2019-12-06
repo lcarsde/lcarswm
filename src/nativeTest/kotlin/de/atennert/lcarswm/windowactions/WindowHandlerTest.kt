@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.log.LoggerMock
@@ -77,7 +78,7 @@ class WindowHandlerTest {
     ) {
         val addWindowToMonitorCall = windowCoordinator.functionCalls.removeAt(0)
         assertEquals("addWindowToMonitor", addWindowToMonitorCall.name, "Add window to a monitor")
-        assertEquals(windowId, addWindowToMonitorCall.parameters[0], "Add _window_ to monitor")
+        assertEquals(windowId, (addWindowToMonitorCall.parameters[0] as FramedWindow).id, "Add _window_ to monitor")
 
         val setupCalls = systemApi.functionCalls
 
@@ -246,7 +247,7 @@ class WindowHandlerTest {
 
         val removeFromCoordinatorCall = windowCoordinator.functionCalls.removeAt(0)
         assertEquals("removeWindow", removeFromCoordinatorCall.name, "Remove the window from the window coordinator")
-        assertEquals(windowId, removeFromCoordinatorCall.parameters[0], "Remove the _window_ from the window coordinator")
+        assertEquals(windowId, (removeFromCoordinatorCall.parameters[0] as FramedWindow).id, "Remove the _window_ from the window coordinator")
 
         assertFalse(windowRegistration.isWindowManaged(windowId), "The window should not be managed anymore")
     }

@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.monitor.Monitor
 import xlib.Window
 
@@ -9,9 +10,9 @@ interface WindowCoordinator {
     /**
      * @return measurements
      */
-    fun addWindowToMonitor(windowId: Window): List<Int>
+    fun addWindowToMonitor(window: FramedWindow): List<Int>
 
-    fun removeWindow(windowId: Window)
+    fun removeWindow(window: FramedWindow)
 
     fun moveWindowToNextMonitor(windowId: Window)
 
