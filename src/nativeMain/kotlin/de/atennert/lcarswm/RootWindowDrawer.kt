@@ -8,8 +8,16 @@ import xlib.*
 /**
  *
  */
-class RootWindowDrawer(private val drawApi: DrawApi, private val rootWindow: Window) : UIDrawing {
-//    val wmLogo: CPointer<XImage>
+class RootWindowDrawer(private val drawApi: DrawApi, private val screen: Screen) : UIDrawing {
+    private val rootWindow = screen.root
+    private val colorMap = allocateColorMap(drawApi, screen.root_visual!!, rootWindow)
+    private val graphicsContexts = loadGraphicContexts(drawApi, rootWindow, colorMap.second)
+
+    private val logoImage = nativeHeap.allocArrayOfPointersTo(nativeHeap.alloc<XImage>())
+
+    init {
+        drawApi.readXpmFileToImage("/usr/share/pixmaps/lcarswm.xpm", logoImage)
+    }
 
     private val colors = listOf(
         Triple(0, 0, 0),
@@ -37,7 +45,7 @@ class RootWindowDrawer(private val drawApi: DrawApi, private val rootWindow: Win
 //        }
     }
 
-    fun allocateColorMap(
+    private fun allocateColorMap(
         drawApi: DrawApi,
         visual: CPointer<Visual>,
         windowId: Window
@@ -60,7 +68,7 @@ class RootWindowDrawer(private val drawApi: DrawApi, private val rootWindow: Win
         return Pair(colorMapId, colorReplies)
     }
 
-    fun loadGraphicContexts(
+    private fun loadGraphicContexts(
         drawApi: DrawApi,
         window: Window,
         colors: List<ULong>
