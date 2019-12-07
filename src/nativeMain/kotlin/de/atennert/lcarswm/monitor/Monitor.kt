@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.monitor
 
 import de.atennert.lcarswm.ScreenMode
+import kotlinx.cinterop.convert
 import xlib.RROutput
 
 /**
@@ -41,7 +42,7 @@ data class Monitor(
         private set
 
     override fun hashCode(): Int {
-        return id.toInt()
+        return id.convert()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -66,8 +67,8 @@ data class Monitor(
 
         this.x = x
         this.y = y
-        this.width = width.toInt()
-        this.height = height.toInt()
+        this.width = width.convert()
+        this.height = height.convert()
 
         this.isFullyInitialized = true
     }
