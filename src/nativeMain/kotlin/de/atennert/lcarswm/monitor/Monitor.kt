@@ -91,7 +91,7 @@ data class Monitor(
     /**
      * @return the current window measurements in the form [x, y, width, height], depending on the current screenMode
      */
-    fun getWindowMeasurements(): List<Int> = when (monitorManager.getScreenMode()) {
+    fun getWindowMeasurements(): List<Int> = when (getScreenMode()) {
         ScreenMode.NORMAL -> windowMeasurementsToList(
             this.defaultWindowPosition,
             this.defaultWindowSize
