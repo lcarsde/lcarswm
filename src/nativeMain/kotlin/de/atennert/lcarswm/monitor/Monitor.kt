@@ -107,6 +107,7 @@ data class Monitor(
     }
 
     fun getScreenMode(): ScreenMode = when {
+        !isPrimary && monitorManager.getScreenMode() == ScreenMode.NORMAL -> ScreenMode.MAXIMIZED
         else -> monitorManager.getScreenMode()
     }
 

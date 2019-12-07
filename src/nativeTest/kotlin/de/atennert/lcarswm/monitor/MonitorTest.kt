@@ -92,6 +92,14 @@ class MonitorTest {
     }
 
     @Test
+    fun `verify that non-primary monitors return the maximized on normal screen mode`() {
+        val monitorManager = MonitorManagerMock()
+        val monitor = Monitor(monitorManager, 1.toULong(), "name", false)
+
+        assertEquals(ScreenMode.MAXIMIZED, monitor.getScreenMode(), "A non-primary monitor should return the maximized mode when the monitor manager defines normal mode")
+    }
+
+    @Test
     fun `verify calculation of default window measurements`() {
         val monitorManager = MonitorManagerMock()
         val monitor = Monitor(monitorManager, 1.toULong(), "name", true)
