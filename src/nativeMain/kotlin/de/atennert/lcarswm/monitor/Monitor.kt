@@ -6,7 +6,12 @@ import xlib.RROutput
 /**
  * Resource representing a physical monitor and its settings.
  */
-data class Monitor(private val monitorManager: MonitorManager, val id: RROutput, val name: String, val isPrimary: Boolean) {
+data class Monitor(
+    private val monitorManager: MonitorManager,
+    val id: RROutput,
+    val name: String,
+    val isPrimary: Boolean
+) {
 
     var x = 0
         private set
@@ -86,19 +91,23 @@ data class Monitor(private val monitorManager: MonitorManager, val id: RROutput,
      * @return the current window measurements in the form [x, y, width, height], depending on the current screenMode
      */
     fun getWindowMeasurements(): List<Int> = when (monitorManager.getScreenMode()) {
-            ScreenMode.NORMAL -> windowMeasurementsToList(
-                    this.defaultWindowPosition,
-                    this.defaultWindowSize
-            )
-            ScreenMode.MAXIMIZED -> windowMeasurementsToList(
-                    this.maximizedWindowPosition,
-                    this.maximizedWindowSize
-            )
-            ScreenMode.FULLSCREEN -> windowMeasurementsToList(
-                    this.fullscreenWindowPosition,
-                    this.fullscreenWindowSize
-            )
-        }
+        ScreenMode.NORMAL -> windowMeasurementsToList(
+            this.defaultWindowPosition,
+            this.defaultWindowSize
+        )
+        ScreenMode.MAXIMIZED -> windowMeasurementsToList(
+            this.maximizedWindowPosition,
+            this.maximizedWindowSize
+        )
+        ScreenMode.FULLSCREEN -> windowMeasurementsToList(
+            this.fullscreenWindowPosition,
+            this.fullscreenWindowSize
+        )
+    }
+
+    fun getScreenMode(): ScreenMode = when {
+        else -> monitorManager.getScreenMode()
+    }
 
     companion object {
         private fun windowMeasurementsToList(position: Pair<Int, Int>, size: Pair<Int, Int>): List<Int> {

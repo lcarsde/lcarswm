@@ -84,9 +84,17 @@ class MonitorTest {
     }
 
     @Test
+    fun `verify that primary monitors return the correct normal screen mode`() {
+        val monitorManager = MonitorManagerMock()
+        val monitor = Monitor(monitorManager, 1.toULong(), "name", true)
+
+        assertEquals(ScreenMode.NORMAL, monitor.getScreenMode(), "The primary monitor should return the normal mode when the monitor manager defines normal mode")
+    }
+
+    @Test
     fun `verify calculation of default window measurements`() {
         val monitorManager = MonitorManagerMock()
-        val monitor = Monitor(monitorManager, 1.toULong(), "name", false)
+        val monitor = Monitor(monitorManager, 1.toULong(), "name", true)
         monitor.setMonitorMeasurements(0, 0, 800.toUInt(), 600.toUInt())
 
         val defaultMeasurements = monitor.getWindowMeasurements()
