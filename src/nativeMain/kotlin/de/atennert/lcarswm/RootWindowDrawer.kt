@@ -1,6 +1,7 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.monitor.Monitor
+import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -8,7 +9,11 @@ import xlib.*
 /**
  *
  */
-class RootWindowDrawer(private val drawApi: DrawApi, private val screen: Screen) : UIDrawing {
+class RootWindowDrawer(
+    private val drawApi: DrawApi,
+    private val monitorManager: MonitorManager,
+    private val screen: Screen
+) : UIDrawing {
     private val rootWindow = screen.root
     private val colorMap = allocateColorMap(drawApi, screen.root_visual!!, rootWindow)
     private val graphicsContexts = loadGraphicContexts(drawApi, rootWindow, colorMap.second)
@@ -32,17 +37,13 @@ class RootWindowDrawer(private val drawApi: DrawApi, private val screen: Screen)
     )
 
     override fun drawWindowManagerFrame() {
-//        windowManagerState.monitors.forEach { monitor ->
-//            val monitorScreenMode = windowManagerState.getScreenModeForMonitor(monitor)
-//            val drawFunction = DRAW_FUNCTIONS[monitorScreenMode]!!
-//            drawFunction(
-//                graphicsContexts,
-//                rootWindow,
-//                drawApi,
-//                monitor,
-//                image
-//            )
-//        }
+        monitorManager.getMonitors().forEach {
+            when (it.getScreenMode()) {
+                ScreenMode.NORMAL -> drawNormalFrame(it)
+                ScreenMode.MAXIMIZED -> drawMaximizedFrame(it)
+                ScreenMode.FULLSCREEN -> clearScreen(it)
+            }
+        }
     }
 
     private fun allocateColorMap(
@@ -91,7 +92,7 @@ class RootWindowDrawer(private val drawApi: DrawApi, private val screen: Screen)
         drawApi: DrawApi,
         colorMap: Pair<Colormap, List<ULong>>
     ) {
-        val colorPixels = ULongArray(colorMap.second.size) {colorMap.second[it]}
+        val colorPixels = ULongArray(colorMap.second.size) { colorMap.second[it] }
         drawApi.freeColors(colorMap.first, colorPixels.toCValues(), colorPixels.size)
         drawApi.freeColormap(colorMap.first)
     }
