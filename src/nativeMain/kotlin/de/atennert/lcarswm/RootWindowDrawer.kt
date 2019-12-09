@@ -12,7 +12,7 @@ import xlib.*
 class RootWindowDrawer(
     private val drawApi: DrawApi,
     private val monitorManager: MonitorManager,
-    private val screen: Screen
+    screen: Screen
 ) : UIDrawing {
     private val rootWindow = screen.root
     private val colorMap = allocateColorMap(drawApi, screen.root_visual!!, rootWindow)
