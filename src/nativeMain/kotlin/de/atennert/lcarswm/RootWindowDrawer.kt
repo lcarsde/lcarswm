@@ -85,7 +85,7 @@ class RootWindowDrawer(
         }
 
     fun cleanupGraphicsContexts() {
-
+        graphicsContexts.forEach { drawApi.freeGC(it) }
     }
 
     fun cleanupColorMap(
