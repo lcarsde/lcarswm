@@ -35,6 +35,10 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
     }
 
     fun grabInputControls() {
+        grabModifierKeys()
+    }
+
+    private fun grabModifierKeys() {
         modifiers.forEach { keyCode ->
             inputApi.grabKey(
                 keyCode.convert(),
