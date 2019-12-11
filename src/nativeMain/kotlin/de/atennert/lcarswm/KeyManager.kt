@@ -20,6 +20,8 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
 
     val modifiers: List<UByte> = getModifierKeys(WM_MODIFIER_KEY)
 
+    private val grabbedKeys = mutableMapOf<KeyCode, KeySym>()
+
     private fun getModifierKeys(modifierKey: Int): List<UByte> {
         val modifierKeymap = inputApi.getModifierMapping()?.pointed ?: return emptyList()
 
@@ -37,6 +39,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
     fun grabInputControls() {
         grabModifierKeys()
         grabModifiedKeys()
+        grabUnmodifiedKeys()
     }
 
     private fun grabModifierKeys() {
@@ -56,10 +59,25 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
         LCARS_WM_KEY_SYMS
             .map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
             .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
+            .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
             .forEach { (_, keyCode) ->
                 inputApi.grabKey(
                     keyCode.convert(), WM_MODIFIER_KEY.convert(), rootWindowId, false, GrabModeAsync, GrabModeAsync
                 )
             }
+    }
+
+    private fun grabUnmodifiedKeys() {
+        LCARS_NO_MASK_KEY_SYMS
+            .map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
+            .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
+            .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
+            .forEach { (_, keyCode) ->
+                inputApi.grabKey(keyCode.convert(), AnyModifier.convert(), rootWindowId, false, GrabModeAsync, GrabModeAsync)
+            }
+    }
+
+    fun getKeySym(keyCode: KeyCode): KeySym {
+        return grabbedKeys.getValue(keyCode)
     }
 }
