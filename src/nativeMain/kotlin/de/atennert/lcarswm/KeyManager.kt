@@ -36,6 +36,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
 
     fun grabInputControls() {
         grabModifierKeys()
+        grabModifiedKeys()
     }
 
     private fun grabModifierKeys() {
@@ -49,5 +50,16 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
                 GrabModeAsync
             )
         }
+    }
+
+    private fun grabModifiedKeys() {
+        LCARS_WM_KEY_SYMS
+            .map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
+            .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
+            .forEach { (_, keyCode) ->
+                inputApi.grabKey(
+                    keyCode.convert(), WM_MODIFIER_KEY.convert(), rootWindowId, false, GrabModeAsync, GrabModeAsync
+                )
+            }
     }
 }
