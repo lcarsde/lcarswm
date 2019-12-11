@@ -1,11 +1,12 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.api.InputApi
+import kotlinx.cinterop.convert
 import kotlinx.cinterop.get
 import kotlinx.cinterop.pointed
 import xlib.*
 
-class KeyManager(private val inputApi: InputApi, rootWindowId: Window) {
+class KeyManager(private val inputApi: InputApi, private val rootWindowId: Window) {
     private val modifierIndexes = arrayOf(
         ShiftMask,
         LockMask,
@@ -31,5 +32,18 @@ class KeyManager(private val inputApi: InputApi, rootWindowId: Window) {
         }
 
         return modKeys
+    }
+
+    fun grabInputControls() {
+        modifiers.forEach { keyCode ->
+            inputApi.grabKey(
+                keyCode.convert(),
+                AnyModifier.convert(),
+                rootWindowId,
+                false,
+                GrabModeAsync,
+                GrabModeAsync
+            )
+        }
     }
 }
