@@ -56,24 +56,19 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
     }
 
     private fun grabModifiedKeys() {
-        LCARS_WM_KEY_SYMS
-            .map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
-            .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
-            .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
-            .forEach { (_, keyCode) ->
-                inputApi.grabKey(
-                    keyCode.convert(), WM_MODIFIER_KEY.convert(), rootWindowId, false, GrabModeAsync, GrabModeAsync
-                )
-            }
+        grabKeysForKeySyms(LCARS_WM_KEY_SYMS, WM_MODIFIER_KEY)
     }
 
     private fun grabUnmodifiedKeys() {
-        LCARS_NO_MASK_KEY_SYMS
-            .map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
+        grabKeysForKeySyms(LCARS_NO_MASK_KEY_SYMS, AnyModifier)
+    }
+
+    private fun grabKeysForKeySyms(keySyms: List<Int>, modifierKey: Int) {
+        keySyms.map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
             .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
             .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
             .forEach { (_, keyCode) ->
-                inputApi.grabKey(keyCode.convert(), AnyModifier.convert(), rootWindowId, false, GrabModeAsync, GrabModeAsync)
+                inputApi.grabKey(keyCode.convert(), modifierKey.convert(), rootWindowId, false, GrabModeAsync, GrabModeAsync)
             }
     }
 
