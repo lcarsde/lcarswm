@@ -3,6 +3,7 @@ package de.atennert.lcarswm.windowactions
 import kotlinx.cinterop.convert
 import xlib.Window
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class WindowFocusHandlerTest {
@@ -15,5 +16,20 @@ class WindowFocusHandlerTest {
         var activeWindow: Window? = 42.convert()
         windowFocusHandler.registerObserver {activeWindow = it}
         assertNull(activeWindow, "The observer should get null window")
+    }
+
+    @Test
+    fun `update focused window`() {
+        val windowFocusHandler = WindowFocusHandler()
+        val testWindow = 21.convert<Window>()
+        var activeWindow: Window? = 42.convert()
+
+        windowFocusHandler.registerObserver {activeWindow = it}
+
+        windowFocusHandler.setFocusedWindow(testWindow)
+
+        assertEquals(testWindow, windowFocusHandler.getFocusedWindow(), "The focused window should be updated")
+
+        assertEquals(testWindow, activeWindow, "The observer should get the updated window")
     }
 }
