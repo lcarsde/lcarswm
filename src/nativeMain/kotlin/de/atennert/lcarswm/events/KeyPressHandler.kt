@@ -5,10 +5,7 @@ import de.atennert.lcarswm.UIDrawing
 import de.atennert.lcarswm.windowactions.WindowCoordinator
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
 import kotlinx.cinterop.convert
-import xlib.KeyPress
-import xlib.XEvent
-import xlib.XK_Down
-import xlib.XK_Up
+import xlib.*
 
 class KeyPressHandler(
     private val keyManager: KeyManager,
@@ -20,17 +17,27 @@ class KeyPressHandler(
 
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
+        val focusedWindow = windowFocusHandler.getFocusedWindow()!!
+
         when (keyManager.getKeySym(keyCode.convert()).convert<Int>()) {
             XK_Up -> {
-                windowCoordinator.moveWindowToNextMonitor(windowFocusHandler.getFocusedWindow()!!)
-                uiDrawer.drawWindowManagerFrame()
+                moveWindowToNextMonitor(focusedWindow)
             }
             XK_Down -> {
-                windowCoordinator.moveWindowToPreviousMonitor(windowFocusHandler.getFocusedWindow()!!)
-                uiDrawer.drawWindowManagerFrame()
+                moveWindowToPreviousMonitor(focusedWindow)
             }
         }
 
         return false
+    }
+
+    private fun moveWindowToPreviousMonitor(focusedWindow: Window) {
+        windowCoordinator.moveWindowToPreviousMonitor(focusedWindow)
+        uiDrawer.drawWindowManagerFrame()
+    }
+
+    private fun moveWindowToNextMonitor(focusedWindow: Window) {
+        windowCoordinator.moveWindowToNextMonitor(focusedWindow)
+        uiDrawer.drawWindowManagerFrame()
     }
 }
