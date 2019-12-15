@@ -9,10 +9,7 @@ import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import xlib.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  *
@@ -265,5 +262,7 @@ class WindowHandlerTest {
         assertEquals(windowId, (removeFromCoordinatorCall.parameters[0] as FramedWindow).id, "Remove the _window_ from the window coordinator")
 
         assertFalse(windowRegistration.isWindowManaged(windowId), "The window should not be managed anymore")
+
+        assertNull(focusHandler.getFocusedWindow(), "The focused window needs to be unset")
     }
 }
