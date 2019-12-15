@@ -26,6 +26,7 @@ class WindowHandlerTest {
 
         val windowCoordinator = WindowCoordinatorMock()
         val atomLibrary = AtomLibrary(systemApi)
+        val focusHandler = WindowFocusHandler()
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -33,13 +34,14 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowCoordinator,
+            focusHandler,
             atomLibrary,
             rootWindowId
         )
 
         windowRegistration.addWindow(windowId, false)
 
-        checkWindowAddProcedure(systemApi, windowId, windowCoordinator)
+        checkWindowAddProcedure(systemApi, windowId, windowCoordinator, focusHandler)
     }
 
     @Test
@@ -55,6 +57,7 @@ class WindowHandlerTest {
 
         val windowCoordinator = WindowCoordinatorMock()
         val atomLibrary = AtomLibrary(systemApi)
+        val focusHandler = WindowFocusHandler()
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -62,19 +65,21 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowCoordinator,
+            focusHandler,
             atomLibrary,
             rootWindowId
         )
 
         windowRegistration.addWindow(windowId, true)
 
-        checkWindowAddProcedure(systemApi, windowId, windowCoordinator)
+        checkWindowAddProcedure(systemApi, windowId, windowCoordinator, focusHandler)
     }
 
     private fun checkWindowAddProcedure(
         systemApi: SystemFacadeMock,
         windowId: Window,
-        windowCoordinator: WindowCoordinatorMock
+        windowCoordinator: WindowCoordinatorMock,
+        focusHandler: WindowFocusHandler
     ) {
         val addWindowToMonitorCall = windowCoordinator.functionCalls.removeAt(0)
         assertEquals("addWindowToMonitor", addWindowToMonitorCall.name, "Add window to a monitor")
@@ -98,6 +103,8 @@ class WindowHandlerTest {
             (changePropertyCall.parameters[3] as UByteArray)[0].convert(),
             "_normal state_ needs to be set in windows state atom"
         )
+
+        assertEquals(windowId, focusHandler.getFocusedWindow(), "The new window needs to be focused")
     }
 
     @Test
@@ -128,6 +135,7 @@ class WindowHandlerTest {
 
         val windowCoordinator = WindowCoordinatorMock()
         val atomLibrary = AtomLibrary(systemApi)
+        val focusHandler = WindowFocusHandler()
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -135,6 +143,7 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowCoordinator,
+            focusHandler,
             atomLibrary,
             rootWindowId
         )
@@ -157,6 +166,7 @@ class WindowHandlerTest {
 
         val windowCoordinator = WindowCoordinatorMock()
         val atomLibrary = AtomLibrary(systemApi)
+        val focusHandler = WindowFocusHandler()
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -164,6 +174,7 @@ class WindowHandlerTest {
             systemApi,
             LoggerMock(),
             windowCoordinator,
+            focusHandler,
             atomLibrary,
             rootWindowId
         )
@@ -188,11 +199,13 @@ class WindowHandlerTest {
 
         val windowCoordinator = WindowCoordinatorMock()
         val atomLibrary = AtomLibrary(systemApi)
+        val focusHandler = WindowFocusHandler()
 
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowCoordinator,
+            focusHandler,
             atomLibrary,
             rootWindowId
         )
@@ -213,11 +226,13 @@ class WindowHandlerTest {
 
         val windowCoordinator = WindowCoordinatorMock()
         val atomLibrary = AtomLibrary(systemApi)
+        val focusHandler = WindowFocusHandler()
 
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowCoordinator,
+            focusHandler,
             atomLibrary,
             rootWindowId
         )

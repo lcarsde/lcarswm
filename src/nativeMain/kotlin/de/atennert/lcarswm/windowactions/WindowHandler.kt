@@ -18,6 +18,7 @@ class WindowHandler(
     private val system: SystemApi,
     private val logger: Logger,
     private val windowCoordinator: WindowCoordinator,
+    private val focusHandler: WindowFocusHandler,
     private val atomLibrary: AtomLibrary,
     private val rootWindow: Window
 ) : WindowRegistration {
