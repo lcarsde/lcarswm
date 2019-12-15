@@ -18,6 +18,13 @@ class WindowFocusHandler {
 
     fun setFocusedWindow(activeWindow: Window) {
         this.activeWindow = activeWindow
-        observers.forEach { it(activeWindow) }
+        this.observers.forEach { it(activeWindow) }
+    }
+
+    fun removeWindow(window: Window) {
+        if (this.activeWindow == window) {
+            this.activeWindow = null
+            this.observers.forEach { it(null) }
+        }
     }
 }

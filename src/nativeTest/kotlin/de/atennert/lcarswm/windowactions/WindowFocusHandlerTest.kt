@@ -32,4 +32,16 @@ class WindowFocusHandlerTest {
 
         assertEquals(testWindow, activeWindow, "The observer should get the updated window")
     }
+
+    @Test
+    fun `remove last focused window`() {
+        val focusHandler = WindowFocusHandler()
+        val window1: Window = 1.convert()
+
+        focusHandler.setFocusedWindow(window1)
+
+        focusHandler.removeWindow(window1)
+
+        assertNull(focusHandler.getFocusedWindow(), "The focused window should be removed")
+    }
 }
