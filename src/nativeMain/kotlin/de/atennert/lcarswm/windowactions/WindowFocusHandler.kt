@@ -5,6 +5,8 @@ import xlib.Window
 class WindowFocusHandler {
     private var activeWindow: Window? = null
 
+    private val windowIdList = mutableSetOf<Window>()
+
     private val observers = mutableListOf<(Window?) -> Unit>()
 
     fun getFocusedWindow(): Window? {
@@ -19,12 +21,18 @@ class WindowFocusHandler {
     fun setFocusedWindow(activeWindow: Window) {
         this.activeWindow = activeWindow
         this.observers.forEach { it(activeWindow) }
+        if (!windowIdList.contains(activeWindow)) {
+            windowIdList.add(activeWindow)
+        }
     }
 
     fun removeWindow(window: Window) {
-        if (this.activeWindow == window) {
-            this.activeWindow = null
-            this.observers.forEach { it(null) }
+        windowIdList.remove(window)
+        this.activeWindow = if (windowIdList.isEmpty()) {
+            null
+        } else {
+            windowIdList.first()
         }
+        this.observers.forEach { it(this.activeWindow) }
     }
 }

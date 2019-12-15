@@ -44,4 +44,18 @@ class WindowFocusHandlerTest {
 
         assertNull(focusHandler.getFocusedWindow(), "The focused window should be removed")
     }
+
+    @Test
+    fun `remove second focused window`() {
+        val focusHandler = WindowFocusHandler()
+        val window1: Window = 1.convert()
+        val window2: Window = 2.convert()
+
+        focusHandler.setFocusedWindow(window1)
+        focusHandler.setFocusedWindow(window2)
+
+        focusHandler.removeWindow(window2)
+
+        assertEquals(window1, focusHandler.getFocusedWindow(), "The fallback should be another focusable window")
+    }
 }
