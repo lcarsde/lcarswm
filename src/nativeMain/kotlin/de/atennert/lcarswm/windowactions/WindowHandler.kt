@@ -70,6 +70,8 @@ class WindowHandler(
 
         registeredWindows[windowId] = window
 
+        focusHandler.setFocusedWindow(windowId)
+
         nativeHeap.free(windowAttributes)
     }
 
