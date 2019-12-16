@@ -58,4 +58,25 @@ class WindowFocusHandlerTest {
 
         assertEquals(window1, focusHandler.getFocusedWindow(), "The fallback should be another focusable window")
     }
+
+    @Test
+    fun `toggle through windows`() {
+        val focusHandler = WindowFocusHandler()
+        val window1: Window = 1.convert()
+        val window2: Window = 2.convert()
+        val window3: Window = 3.convert()
+
+        focusHandler.setFocusedWindow(window1)
+        focusHandler.setFocusedWindow(window2)
+        focusHandler.setFocusedWindow(window3)
+
+        focusHandler.toggleWindowFocus()
+        assertEquals(window1, focusHandler.getFocusedWindow(), "The focus should toggle to window 1")
+
+        focusHandler.toggleWindowFocus()
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
+
+        focusHandler.toggleWindowFocus()
+        assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
+    }
 }
