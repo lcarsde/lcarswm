@@ -35,4 +35,19 @@ class WindowFocusHandler {
         }
         this.observers.forEach { it(this.activeWindow) }
     }
+
+    fun toggleWindowFocus() {
+        val focusIndex = getIndexOfFocusedWindow()
+        val nextWindow = getNextWindowToFocus(focusIndex)
+        setFocusedWindow(nextWindow)
+    }
+
+    private fun getIndexOfFocusedWindow(): Int {
+        return windowIdList.indexOf(activeWindow)
+    }
+
+    private fun getNextWindowToFocus(currentFocusIndex: Int): Window {
+        val nextIndex = (currentFocusIndex + 1).rem(windowIdList.size)
+        return windowIdList.elementAt(nextIndex)
+    }
 }
