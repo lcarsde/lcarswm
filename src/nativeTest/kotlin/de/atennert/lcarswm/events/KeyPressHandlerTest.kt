@@ -134,4 +134,34 @@ class KeyPressHandlerTest {
         assertEquals("stackWindowToTheTop", restackCall.name, "The window $window needs to be stacked to the top")
         assertEquals(window, restackCall.parameters[0], "The _window ${window}_ needs to be stacked to the top")
     }
+
+    // TODO toggle without window
+    @Test
+    fun `don't toggle without focusable windows`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun keysymToKeycode(keySym: KeySym): KeyCode {
+                if (keySym.convert<Int>() == XK_Tab) {
+                    return 42.convert()
+                }
+                return super.keysymToKeycode(keySym)
+            }
+        }
+        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val windowCoordinator = WindowCoordinatorMock()
+        val windowFocusHandler = WindowFocusHandler()
+        val uiDrawer = UIDrawingMock()
+        keyManager.grabInputControls()
+
+        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+
+        val keyPressEvent = nativeHeap.alloc<XEvent>()
+        keyPressEvent.type = KeyPress
+        keyPressEvent.xkey.keycode = 42.convert()
+
+        val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
+
+        assertFalse(shutdownValue, "Handling the up-key shouldn't trigger a shutdown")
+
+        assertEquals(0, windowCoordinator.functionCalls.size, "There is no window to restack")
+    }
 }

@@ -17,11 +17,11 @@ class KeyPressHandler(
 
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
-        val focusedWindow = windowFocusHandler.getFocusedWindow()!!
+        val focusedWindow = windowFocusHandler.getFocusedWindow()
 
         when (keyManager.getKeySym(keyCode.convert()).convert<Int>()) {
-            XK_Up -> moveWindowToNextMonitor(focusedWindow)
-            XK_Down -> moveWindowToPreviousMonitor(focusedWindow)
+            XK_Up -> moveWindowToNextMonitor(focusedWindow!!)
+            XK_Down -> moveWindowToPreviousMonitor(focusedWindow!!)
             XK_Tab -> toggleFocusedWindow()
         }
 
@@ -40,6 +40,7 @@ class KeyPressHandler(
 
     private fun toggleFocusedWindow() {
         windowFocusHandler.toggleWindowFocus()
-        windowCoordinator.stackWindowToTheTop(windowFocusHandler.getFocusedWindow()!!)
+        val newFocusedWindow = windowFocusHandler.getFocusedWindow() ?: return
+        windowCoordinator.stackWindowToTheTop(newFocusedWindow)
     }
 }
