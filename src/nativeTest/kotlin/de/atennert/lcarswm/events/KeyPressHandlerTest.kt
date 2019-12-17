@@ -2,16 +2,14 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.KeyManager
 import de.atennert.lcarswm.UIDrawingMock
+import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import de.atennert.lcarswm.windowactions.WindowCoordinatorMock
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
-import xlib.KeyPress
-import xlib.XEvent
-import xlib.XK_Down
-import xlib.XK_Up
+import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -83,5 +81,60 @@ class KeyPressHandlerTest {
 
         val uiRedrawCall = uiDrawer.functionCalls.removeAt(0)
         assertEquals("drawWindowManagerFrame", uiRedrawCall.name, "The WM UI needs to be redrawn")
+    }
+
+    @Test
+    fun `toggle focused Window`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun keysymToKeycode(keySym: KeySym): KeyCode {
+                if (keySym.convert<Int>() == XK_Tab) {
+                    return 42.convert()
+                }
+                return super.keysymToKeycode(keySym)
+            }
+        }
+        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val windowCoordinator = WindowCoordinatorMock()
+        val windowFocusHandler = WindowFocusHandler()
+        val uiDrawer = UIDrawingMock()
+        val window1 = systemApi.getNewWindowId()
+        val window2 = systemApi.getNewWindowId()
+        val window3 = systemApi.getNewWindowId()
+        keyManager.grabInputControls()
+        windowFocusHandler.setFocusedWindow(window1)
+        windowFocusHandler.setFocusedWindow(window2)
+        windowFocusHandler.setFocusedWindow(window3)
+        windowFocusHandler.setFocusedWindow(window1)
+
+        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+
+        val keyPressEvent = nativeHeap.alloc<XEvent>()
+        keyPressEvent.type = KeyPress
+        keyPressEvent.xkey.keycode = 42.convert()
+
+        val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
+
+        assertFalse(shutdownValue, "Handling the up-key shouldn't trigger a shutdown")
+        val coordinatorCalls = windowCoordinator.functionCalls
+
+        assertEquals(window2, windowFocusHandler.getFocusedWindow(), "The focused window needs to be updated")
+        checkRestacking(coordinatorCalls.removeAt(0), window2)
+
+        keyPressHandler.handleEvent(keyPressEvent)
+        assertEquals(window3, windowFocusHandler.getFocusedWindow(), "The focused window needs to be updated")
+        checkRestacking(coordinatorCalls.removeAt(0), window3)
+
+
+        keyPressHandler.handleEvent(keyPressEvent)
+        assertEquals(window1, windowFocusHandler.getFocusedWindow(), "The focused window needs to be updated")
+        checkRestacking(coordinatorCalls.removeAt(0), window1)
+    }
+
+    private fun checkRestacking(restackCall: FunctionCall, window: Window) {
+        assertEquals("stackWindowToTheTop", restackCall.name, "The window $window needs to be stacked to the top")
+        assertEquals(window, restackCall.parameters[0], "The _window ${window}_ needs to be stacked to the top")
+//        assertEquals("configureWindow", configureCall.name, "The window $window needs to be configured")
+//        assertEquals(window, configureCall.parameters[0], "The _window ${window}_ needs to be configured")
+//        assertEquals(CWStackMode.convert<UInt>(), configureCall.parameters[1], "The $window window needs to be restacked")
     }
 }
