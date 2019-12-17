@@ -79,4 +79,6 @@ class WindowFocusHandlerTest {
         focusHandler.toggleWindowFocus()
         assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
     }
+
+    // TODO toggle through no windows
 }
