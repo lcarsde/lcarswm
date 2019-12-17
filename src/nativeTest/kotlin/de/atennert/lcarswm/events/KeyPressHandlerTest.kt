@@ -133,8 +133,5 @@ class KeyPressHandlerTest {
     private fun checkRestacking(restackCall: FunctionCall, window: Window) {
         assertEquals("stackWindowToTheTop", restackCall.name, "The window $window needs to be stacked to the top")
         assertEquals(window, restackCall.parameters[0], "The _window ${window}_ needs to be stacked to the top")
-//        assertEquals("configureWindow", configureCall.name, "The window $window needs to be configured")
-//        assertEquals(window, configureCall.parameters[0], "The _window ${window}_ needs to be configured")
-//        assertEquals(CWStackMode.convert<UInt>(), configureCall.parameters[1], "The $window window needs to be restacked")
     }
 }
