@@ -39,4 +39,8 @@ class WindowCoordinatorMock : WindowCoordinator {
     override fun getWindowMeasurements(windowId: Window): List<Int> {
         return primaryMonitor.getWindowMeasurements()
     }
+
+    override fun stackWindowToTheTop(windowId: Window) {
+        functionCalls.add(FunctionCall("stackWindowToTheTop", windowId))
+    }
 }

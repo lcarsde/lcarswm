@@ -21,4 +21,6 @@ interface WindowCoordinator {
     fun getMonitorForWindow(windowId: Window): Monitor
 
     fun getWindowMeasurements(windowId: Window): List<Int>
+
+    fun stackWindowToTheTop(windowId: Window)
 }

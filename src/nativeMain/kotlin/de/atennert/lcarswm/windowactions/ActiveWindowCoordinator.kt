@@ -42,4 +42,7 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
     override fun getWindowMeasurements(windowId: Window): List<Int> {
         return getMonitorForWindow(windowId).getWindowMeasurements()
     }
+
+    override fun stackWindowToTheTop(windowId: Window) {
+    }
 }
