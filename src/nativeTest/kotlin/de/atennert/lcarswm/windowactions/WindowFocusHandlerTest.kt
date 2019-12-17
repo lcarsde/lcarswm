@@ -80,5 +80,14 @@ class WindowFocusHandlerTest {
         assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
     }
 
+    @Test
+    fun `don'r react on toggle without windows`() {
+        val focusHandler = WindowFocusHandler()
+
+        focusHandler.toggleWindowFocus()
+
+        assertNull(focusHandler.getFocusedWindow(), "There is no focusable window")
+    }
+
     // TODO toggle through no windows
 }

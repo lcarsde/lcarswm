@@ -37,6 +37,9 @@ class WindowFocusHandler {
     }
 
     fun toggleWindowFocus() {
+        if (activeWindow == null) {
+            return
+        }
         val focusIndex = getIndexOfFocusedWindow()
         val nextWindow = getNextWindowToFocus(focusIndex)
         setFocusedWindow(nextWindow)
