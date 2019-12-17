@@ -65,7 +65,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
 
     private fun grabKeysForKeySyms(keySyms: List<Int>, modifierKey: Int) {
         keySyms.map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
-            .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
+            .filterNot { (_, keyCode) -> keyCode.convert<Int>() == 0 }
             .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
             .forEach { (_, keyCode) ->
                 inputApi.grabKey(keyCode.convert(), modifierKey.convert(), rootWindowId, false, GrabModeAsync, GrabModeAsync)
