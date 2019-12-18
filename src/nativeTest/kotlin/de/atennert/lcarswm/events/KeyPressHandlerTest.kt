@@ -13,6 +13,7 @@ import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class KeyPressHandlerTest {
     @Test
@@ -84,6 +85,54 @@ class KeyPressHandlerTest {
     }
 
     @Test
+    fun `don't react on move to next monitor without a focusable window`() {
+        val systemApi = SystemFacadeMock()
+        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val windowCoordinator = WindowCoordinatorMock()
+        val windowFocusHandler = WindowFocusHandler()
+        val uiDrawer = UIDrawingMock()
+        keyManager.grabInputControls()
+
+        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+
+        val keyPressEvent = nativeHeap.alloc<XEvent>()
+        keyPressEvent.type = KeyPress
+        keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Up).convert()
+
+        val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
+
+        assertFalse(shutdownValue, "Handling the up-key shouldn't trigger a shutdown")
+
+        assertTrue(windowCoordinator.functionCalls.isEmpty(), "There should be no call to the window coordinator without focused window")
+
+        assertTrue(uiDrawer.functionCalls.isEmpty(), "There should be no call to the UI drawer without focused window")
+    }
+
+    @Test
+    fun `don't react on move to previous monitor without a focusable window`() {
+        val systemApi = SystemFacadeMock()
+        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val windowCoordinator = WindowCoordinatorMock()
+        val windowFocusHandler = WindowFocusHandler()
+        val uiDrawer = UIDrawingMock()
+        keyManager.grabInputControls()
+
+        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+
+        val keyPressEvent = nativeHeap.alloc<XEvent>()
+        keyPressEvent.type = KeyPress
+        keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Down).convert()
+
+        val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
+
+        assertFalse(shutdownValue, "Handling the up-key shouldn't trigger a shutdown")
+
+        assertTrue(windowCoordinator.functionCalls.isEmpty(), "There should be no call to the window coordinator without focused window")
+
+        assertTrue(uiDrawer.functionCalls.isEmpty(), "There should be no call to the UI drawer without focused window")
+    }
+
+    @Test
     fun `toggle focused Window`() {
         val systemApi = object : SystemFacadeMock() {
             override fun keysymToKeycode(keySym: KeySym): KeyCode {
@@ -135,7 +184,6 @@ class KeyPressHandlerTest {
         assertEquals(window, restackCall.parameters[0], "The _window ${window}_ needs to be stacked to the top")
     }
 
-    // TODO toggle without window
     @Test
     fun `don't toggle without focusable windows`() {
         val systemApi = object : SystemFacadeMock() {
