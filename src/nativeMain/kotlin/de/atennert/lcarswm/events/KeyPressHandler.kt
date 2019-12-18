@@ -17,23 +17,24 @@ class KeyPressHandler(
 
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
-        val focusedWindow = windowFocusHandler.getFocusedWindow()
 
         when (keyManager.getKeySym(keyCode.convert()).convert<Int>()) {
-            XK_Up -> moveWindowToNextMonitor(focusedWindow!!)
-            XK_Down -> moveWindowToPreviousMonitor(focusedWindow!!)
+            XK_Up -> moveWindowToNextMonitor()
+            XK_Down -> moveWindowToPreviousMonitor()
             XK_Tab -> toggleFocusedWindow()
         }
 
         return false
     }
 
-    private fun moveWindowToPreviousMonitor(focusedWindow: Window) {
+    private fun moveWindowToPreviousMonitor() {
+        val focusedWindow = windowFocusHandler.getFocusedWindow() ?: return
         windowCoordinator.moveWindowToPreviousMonitor(focusedWindow)
         uiDrawer.drawWindowManagerFrame()
     }
 
-    private fun moveWindowToNextMonitor(focusedWindow: Window) {
+    private fun moveWindowToNextMonitor() {
+        val focusedWindow = windowFocusHandler.getFocusedWindow() ?: return
         windowCoordinator.moveWindowToNextMonitor(focusedWindow)
         uiDrawer.drawWindowManagerFrame()
     }
