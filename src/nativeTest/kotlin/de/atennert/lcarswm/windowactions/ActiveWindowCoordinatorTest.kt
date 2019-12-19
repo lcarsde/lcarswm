@@ -3,8 +3,13 @@ package de.atennert.lcarswm.windowactions
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
-import xlib.ConfigureNotify
+import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.pointed
+import xlib.Above
+import xlib.CWStackMode
 import xlib.StructureNotifyMask
+import xlib.XWindowChanges
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
@@ -87,5 +92,24 @@ class ActiveWindowCoordinatorTest {
         assertEquals("sendEvent", sendEventCall.name, "The window needs to get a structure notify event")
         assertEquals(window.id, sendEventCall.parameters[0], "The _window_ needs to get a structure notify event")
         assertEquals(StructureNotifyMask, sendEventCall.parameters[2], "The window needs to get a _structure notify_ event")
+    }
+
+    @Test
+    private fun `restack a window to the top`() {
+        val systemApi = SystemFacadeMock()
+        val window = FramedWindow(systemApi.getNewWindowId())
+        window.frame = systemApi.getNewWindowId()
+        val monitorManager = MonitorManagerMock()
+
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        activeWindowCoordinator.addWindowToMonitor(window)
+
+        activeWindowCoordinator.stackWindowToTheTop(window.id)
+
+        val configureCall = systemApi.functionCalls.removeAt(0)
+        assertEquals("configureWindow", configureCall.name, "The window $window needs to be configured")
+        assertEquals(window.frame, configureCall.parameters[0], "The _window ${window}_ needs to be configured")
+        assertEquals(CWStackMode.convert<UInt>(), configureCall.parameters[1], "The $window window needs to be restacked")
+        assertEquals(Above, (configureCall.parameters[2] as CPointer<XWindowChanges>).pointed.stack_mode, "The stack mode should be 'above'")
     }
 }
