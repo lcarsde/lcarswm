@@ -5,7 +5,14 @@ import de.atennert.lcarswm.adjustWindowPositionAndSize
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.EventApi
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.nativeHeap
+import kotlinx.cinterop.ptr
+import xlib.Above
+import xlib.CWStackMode
 import xlib.Window
+import xlib.XWindowChanges
 
 /**
  *
@@ -44,5 +51,11 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
     }
 
     override fun stackWindowToTheTop(windowId: Window) {
+        val window = windowsOnMonitors.keys.single { it.id == windowId }
+
+        val windowChanges = nativeHeap.alloc<XWindowChanges>()
+        windowChanges.stack_mode = Above
+
+        eventApi.configureWindow(window.frame, CWStackMode.convert(), windowChanges.ptr)
     }
 }
