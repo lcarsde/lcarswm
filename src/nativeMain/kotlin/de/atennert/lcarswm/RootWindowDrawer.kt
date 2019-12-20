@@ -7,7 +7,7 @@ import kotlinx.cinterop.*
 import xlib.*
 
 /**
- *
+ * Class for drawing the root window decorations.
  */
 class RootWindowDrawer(
     private val drawApi: DrawApi,
