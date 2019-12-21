@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.FramedWindow
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
@@ -71,11 +72,16 @@ class ActiveWindowCoordinatorTest {
         val systemApi = SystemFacadeMock()
         val window = FramedWindow(systemApi.getNewWindowId())
         window.frame = systemApi.getNewWindowId()
-        val monitorManager = MonitorManagerMock()
+        lateinit var monitor: Monitor
+        val monitorManager = object : MonitorManagerMock() {
+            override fun getPrimaryMonitor(): Monitor = monitor
+        }
+        monitor = Monitor(monitorManager, 21.convert(), "", true)
 
         val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
         activeWindowCoordinator.addWindowToMonitor(window)
 
+        monitor = Monitor(monitorManager, 42.convert(), "", true)
         activeWindowCoordinator.rearrangeActiveWindows()
 
         val systemCalls = systemApi.functionCalls
@@ -92,6 +98,8 @@ class ActiveWindowCoordinatorTest {
         assertEquals("sendEvent", sendEventCall.name, "The window needs to get a structure notify event")
         assertEquals(window.id, sendEventCall.parameters[0], "The _window_ needs to get a structure notify event")
         assertEquals(StructureNotifyMask, sendEventCall.parameters[2], "The window needs to get a _structure notify_ event")
+
+        assertEquals(monitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the new monitor")
     }
 
     @Test
