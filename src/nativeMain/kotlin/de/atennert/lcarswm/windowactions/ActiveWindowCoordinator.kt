@@ -22,9 +22,15 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
     private val windowsOnMonitors = mutableMapOf<FramedWindow, Monitor>()
 
     override fun rearrangeActiveWindows() {
-        windowsOnMonitors.forEach { (window, monitor) ->
-            adjustWindowPositionAndSize(eventApi, monitor.getWindowMeasurements(), window)
-        }
+        val monitors = monitorManager.getMonitors()
+        val primaryMonitor = monitorManager.getPrimaryMonitor()
+        val updatedWindows = windowsOnMonitors
+            .filterNot { (_, monitor) -> monitors.contains(monitor) }
+            .map { (window, _) -> Pair(window, primaryMonitor) }
+            .onEach { (window, monitor) ->
+                adjustWindowPositionAndSize(eventApi, monitor.getWindowMeasurements(), window)
+            }
+        windowsOnMonitors.putAll(updatedWindows)
     }
 
     override fun addWindowToMonitor(window: FramedWindow): List<Int> {
