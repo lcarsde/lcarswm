@@ -11,7 +11,7 @@ open class MonitorManagerMock : MonitorManager {
         functionCalls.add(FunctionCall("updateMonitorList"))
     }
 
-    override fun getMonitors(): List<Monitor> = listOf()
+    override fun getMonitors(): List<Monitor> = listOf(getPrimaryMonitor())
 
     val primaryMonitor = Monitor(this, 42.convert(), "", true)
     override fun getPrimaryMonitor(): Monitor = primaryMonitor
