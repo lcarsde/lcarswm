@@ -54,6 +54,14 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
     }
 
     override fun moveWindowToPreviousMonitor(windowId: Window) {
+        val window = windowsOnMonitors.keys.single { it.id == windowId }
+        val currentMonitor = windowsOnMonitors[window]
+        val monitors = monitorManager.getMonitors()
+        val currentMonitorIndex = monitors.indexOf(currentMonitor)
+        val nextMonitorIndex = if (currentMonitorIndex == 0) monitors.size - 1 else currentMonitorIndex - 1
+        val nextMonitor = monitors[nextMonitorIndex]
+        windowsOnMonitors[window] = nextMonitor
+        adjustWindowPositionAndSize(eventApi, nextMonitor.getWindowMeasurements(), window)
     }
 
     override fun getMonitorForWindow(windowId: Window): Monitor {
