@@ -3,6 +3,7 @@ package de.atennert.lcarswm.windowactions
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
+import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
@@ -86,18 +87,7 @@ class ActiveWindowCoordinatorTest {
 
         val systemCalls = systemApi.functionCalls
 
-        val moveResizeWindowCall = systemCalls.removeAt(0)
-        assertEquals("moveResizeWindow", moveResizeWindowCall.name, "The frame needs to be moved/resized")
-        assertEquals(window.frame, moveResizeWindowCall.parameters[0], "The _frame_ needs to be moved/resized")
-
-        val resizeWindowCall = systemCalls.removeAt(0)
-        assertEquals("resizeWindow", resizeWindowCall.name, "The window needs to be resized")
-        assertEquals(window.id, resizeWindowCall.parameters[0], "The _window_ needs to be resized")
-
-        val sendEventCall = systemCalls.removeAt(0)
-        assertEquals("sendEvent", sendEventCall.name, "The window needs to get a structure notify event")
-        assertEquals(window.id, sendEventCall.parameters[0], "The _window_ needs to get a structure notify event")
-        assertEquals(StructureNotifyMask, sendEventCall.parameters[2], "The window needs to get a _structure notify_ event")
+        checkMoveWindowCalls(systemCalls, window)
 
         assertEquals(monitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the new monitor")
     }
@@ -119,5 +109,60 @@ class ActiveWindowCoordinatorTest {
         assertEquals(window.frame, configureCall.parameters[0], "The _window ${window}_ needs to be configured")
         assertEquals(CWStackMode.convert<UInt>(), configureCall.parameters[1], "The $window window needs to be restacked")
         assertEquals(Above, (configureCall.parameters[2] as CPointer<XWindowChanges>).pointed.stack_mode, "The stack mode should be 'above'")
+    }
+
+    @Test
+    fun `move window to next monitor`() {
+        val systemApi = SystemFacadeMock()
+        val window = FramedWindow(systemApi.getNewWindowId())
+        window.frame = systemApi.getNewWindowId()
+        lateinit var secondaryMonitor: Monitor
+        lateinit var tertiaryMonitor: Monitor
+        val monitorManager = object : MonitorManagerMock() {
+            override fun getMonitors(): List<Monitor> {
+                return listOf(primaryMonitor, secondaryMonitor, tertiaryMonitor)
+            }
+        }
+        secondaryMonitor = Monitor(monitorManager, 3.convert(), "", false)
+        tertiaryMonitor = Monitor(monitorManager, 4.convert(), "", false)
+
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        activeWindowCoordinator.addWindowToMonitor(window)
+
+        val systemCalls = systemApi.functionCalls
+
+        activeWindowCoordinator.moveWindowToNextMonitor(window.id)
+        assertEquals(secondaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the first next monitor")
+        checkMoveWindowCalls(systemCalls, window)
+
+        activeWindowCoordinator.moveWindowToNextMonitor(window.id)
+        assertEquals(tertiaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the second next monitor")
+        checkMoveWindowCalls(systemCalls, window)
+
+        activeWindowCoordinator.moveWindowToNextMonitor(window.id)
+        assertEquals(monitorManager.primaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the primary monitor")
+        checkMoveWindowCalls(systemCalls, window)
+    }
+
+    private fun checkMoveWindowCalls(
+        systemCalls: MutableList<FunctionCall>,
+        window: FramedWindow
+    ) {
+        val moveResizeWindowCall = systemCalls.removeAt(0)
+        assertEquals("moveResizeWindow", moveResizeWindowCall.name, "The frame needs to be moved/resized")
+        assertEquals(window.frame, moveResizeWindowCall.parameters[0], "The _frame_ needs to be moved/resized")
+
+        val resizeWindowCall = systemCalls.removeAt(0)
+        assertEquals("resizeWindow", resizeWindowCall.name, "The window needs to be resized")
+        assertEquals(window.id, resizeWindowCall.parameters[0], "The _window_ needs to be resized")
+
+        val sendEventCall = systemCalls.removeAt(0)
+        assertEquals("sendEvent", sendEventCall.name, "The window needs to get a structure notify event")
+        assertEquals(window.id, sendEventCall.parameters[0], "The _window_ needs to get a structure notify event")
+        assertEquals(
+            StructureNotifyMask,
+            sendEventCall.parameters[2],
+            "The window needs to get a _structure notify_ event"
+        )
     }
 }
