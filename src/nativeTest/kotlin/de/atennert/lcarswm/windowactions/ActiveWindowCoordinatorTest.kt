@@ -144,6 +144,39 @@ class ActiveWindowCoordinatorTest {
         checkMoveWindowCalls(systemCalls, window)
     }
 
+    @Test
+    fun `move window to previous monitor`() {
+        val systemApi = SystemFacadeMock()
+        val window = FramedWindow(systemApi.getNewWindowId())
+        window.frame = systemApi.getNewWindowId()
+        lateinit var secondaryMonitor: Monitor
+        lateinit var tertiaryMonitor: Monitor
+        val monitorManager = object : MonitorManagerMock() {
+            override fun getMonitors(): List<Monitor> {
+                return listOf(primaryMonitor, secondaryMonitor, tertiaryMonitor)
+            }
+        }
+        secondaryMonitor = Monitor(monitorManager, 3.convert(), "", false)
+        tertiaryMonitor = Monitor(monitorManager, 4.convert(), "", false)
+
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        activeWindowCoordinator.addWindowToMonitor(window)
+
+        val systemCalls = systemApi.functionCalls
+
+        activeWindowCoordinator.moveWindowToPreviousMonitor(window.id)
+        assertEquals(tertiaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the first previous monitor")
+        checkMoveWindowCalls(systemCalls, window)
+
+        activeWindowCoordinator.moveWindowToPreviousMonitor(window.id)
+        assertEquals(secondaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the second previous monitor")
+        checkMoveWindowCalls(systemCalls, window)
+
+        activeWindowCoordinator.moveWindowToPreviousMonitor(window.id)
+        assertEquals(monitorManager.primaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the primary monitor")
+        checkMoveWindowCalls(systemCalls, window)
+    }
+
     private fun checkMoveWindowCalls(
         systemCalls: MutableList<FunctionCall>,
         window: FramedWindow
