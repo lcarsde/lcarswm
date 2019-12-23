@@ -100,6 +100,9 @@ TODO
 * GTK-Theme (if I can't find one)
 * WM switching (WM_S*)
 * Configuration for the colors
+* Monitors
+  * Merge overlaying screens of same size
+  * If screens have different sizes, the higher one draws
 
 ## Some definitions
 * Height of top and bottom bar: 40px
