@@ -43,6 +43,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Up).convert()
+        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -71,6 +72,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Down).convert()
+        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -98,6 +100,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Up).convert()
+        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -122,6 +125,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Down).convert()
+        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -160,6 +164,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = 42.convert()
+        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -205,6 +210,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = 42.convert()
+        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
