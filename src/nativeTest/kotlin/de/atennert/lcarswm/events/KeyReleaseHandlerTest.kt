@@ -4,7 +4,6 @@ import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
-import kotlinx.cinterop.pointed
 import xlib.KeyRelease
 import xlib.XEvent
 import xlib.XK_Q
@@ -27,14 +26,14 @@ class KeyReleaseHandlerTest {
     fun `shutdown on Q`() {
         val systemApi = SystemFacadeMock()
 
-        val event = nativeHeap.alloc<XEvent>()
-        event.type = KeyRelease
-        event.xkey.keycode = systemApi.keySyms.getValue(XK_Q).convert()
-        event.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        val keyReleaseEvent = nativeHeap.alloc<XEvent>()
+        keyReleaseEvent.type = KeyRelease
+        keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Q).convert()
+        keyReleaseEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
         val keyReleaseHandler = KeyReleaseHandler()
 
-        val shutdownValue = keyReleaseHandler.handleEvent(event)
+        val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
         assertTrue(shutdownValue, "The window manager should shut down on Q")
     }
