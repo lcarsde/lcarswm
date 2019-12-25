@@ -23,14 +23,16 @@ class KeyReleaseHandler(
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
         when (keyManager.getKeySym(keyCode.convert()).convert<Int>()) {
-            XK_F4 -> {
-                val focusedWindow = focusHandler.getFocusedWindow()
-                if (focusedWindow != null) {
-                    systemApi.killClient(focusedWindow)
-                }
-            }
+            XK_F4 -> closeActiveWindow()
             XK_Q -> return true
         }
         return false
+    }
+
+    private fun closeActiveWindow() {
+        val focusedWindow = focusHandler.getFocusedWindow()
+        if (focusedWindow != null) {
+            systemApi.killClient(focusedWindow)
+        }
     }
 }
