@@ -338,7 +338,6 @@ open class SystemFacadeMock : SystemApi {
         protocolsReturn: CValuesRef<CPointerVar<AtomVar>>,
         protocolCountReturn: CValuesRef<IntVar>
     ): Int {
-        functionCalls.add(FunctionCall("getWMProtocols", protocolsReturn, protocolCountReturn))
         return 0
     }
 
