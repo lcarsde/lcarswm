@@ -6,6 +6,9 @@ import kotlinx.cinterop.get
 import kotlinx.cinterop.pointed
 import xlib.*
 
+/**
+ * This class handles the registration of keys for keyboard commands.
+ */
 class KeyManager(private val inputApi: InputApi, private val rootWindowId: Window) {
     private val modifierIndexes = arrayOf(
         ShiftMask,
