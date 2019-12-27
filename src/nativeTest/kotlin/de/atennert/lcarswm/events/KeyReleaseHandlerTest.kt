@@ -55,9 +55,45 @@ class KeyReleaseHandlerTest {
         val systemApi = object : SystemFacadeMock() {
             override fun getWMProtocols(
                 window: Window,
-                protocolsReturn: CValuesRef<CPointerVar<AtomVar>>,
-                protocolCountReturn: CValuesRef<IntVar>
+                protocolsReturn: CPointer<CPointerVar<AtomVar>>,
+                protocolCountReturn: CPointer<IntVar>
             ): Int = -1
+        }
+        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val focusHandler = WindowFocusHandler()
+        val windowId = systemApi.getNewWindowId()
+        focusHandler.setFocusedWindow(windowId)
+        keyManager.grabInputControls()
+
+        systemApi.functionCalls.clear()
+
+        val keyReleaseEvent = nativeHeap.alloc<XEvent>()
+        keyReleaseEvent.type = KeyRelease
+        keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
+        keyReleaseEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager)
+
+        val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
+
+        assertFalse(shutdownValue, "The window manager should not shut down on F4")
+
+        val killClientCall = systemApi.functionCalls.removeAt(0)
+        assertEquals("killClient", killClientCall.name, "The window should be killed if we can't get its protocols")
+        assertEquals(windowId, killClientCall.parameters[0], "The active window needs to be killed")
+    }
+
+    @Test
+    fun `kill active window if the WM protocols don't contain WM_DELETE_WINDOW`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun getWMProtocols(
+                window: Window,
+                protocolsReturn: CPointer<CPointerVar<AtomVar>>,
+                protocolCountReturn: CPointer<IntVar>
+            ): Int {
+                protocolCountReturn.pointed.value = 0
+                return 0
+            }
         }
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
         val focusHandler = WindowFocusHandler()
