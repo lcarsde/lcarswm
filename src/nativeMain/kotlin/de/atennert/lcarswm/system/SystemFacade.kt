@@ -67,8 +67,8 @@ class SystemFacade : SystemApi {
 
     override fun getWMProtocols(
         window: Window,
-        protocolsReturn: CValuesRef<CPointerVar<AtomVar>>,
-        protocolCountReturn: CValuesRef<IntVar>
+        protocolsReturn: CPointer<CPointerVar<AtomVar>>,
+        protocolCountReturn: CPointer<IntVar>
     ): Int {
         return XGetWMProtocols(display, window, protocolsReturn, protocolCountReturn)
     }

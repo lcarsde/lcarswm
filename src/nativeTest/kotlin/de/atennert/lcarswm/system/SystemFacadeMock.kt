@@ -335,8 +335,8 @@ open class SystemFacadeMock : SystemApi {
 
     override fun getWMProtocols(
         window: Window,
-        protocolsReturn: CValuesRef<CPointerVar<AtomVar>>,
-        protocolCountReturn: CValuesRef<IntVar>
+        protocolsReturn: CPointer<CPointerVar<AtomVar>>,
+        protocolCountReturn: CPointer<IntVar>
     ): Int {
         return 0
     }
