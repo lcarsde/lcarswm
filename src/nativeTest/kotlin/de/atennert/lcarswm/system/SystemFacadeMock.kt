@@ -338,6 +338,14 @@ open class SystemFacadeMock : SystemApi {
         protocolsReturn: CPointer<CPointerVar<AtomVar>>,
         protocolCountReturn: CPointer<IntVar>
     ): Int {
+        val protocols = arrayOf("WM_DELETE_WINDOW")
+        val atomArray = nativeHeap.allocArray<AtomVar>(protocols.size)
+        protocols.forEachIndexed { index, atomName ->
+            atomArray[index] = atomMap.getOrPut(atomName) { atomCounter++ }
+        }
+
+        protocolCountReturn.pointed.value = protocols.size
+        protocolsReturn.pointed.value = atomArray
         return 0
     }
 
