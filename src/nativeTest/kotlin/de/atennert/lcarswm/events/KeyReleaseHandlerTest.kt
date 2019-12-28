@@ -3,7 +3,6 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.KeyManager
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
-import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.system.SystemFacadeMock
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
 import kotlinx.cinterop.*
