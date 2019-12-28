@@ -47,6 +47,14 @@ class KeyReleaseHandler(
 
         if (!protocols.contains(atomLibrary[Atoms.WM_DELETE_WINDOW])) {
             systemApi.killClient(focusedWindow)
+        } else {
+            val msg = nativeHeap.alloc<XEvent>()
+            msg.xclient.type = ClientMessage
+            msg.xclient.message_type = atomLibrary[Atoms.WM_PROTOCOLS]
+            msg.xclient.window = focusedWindow
+            msg.xclient.format = 32
+            msg.xclient.data.l[0] = atomLibrary[Atoms.WM_DELETE_WINDOW].convert()
+            systemApi.sendEvent(focusedWindow, false, 0, msg.ptr)
         }
     }
 }
