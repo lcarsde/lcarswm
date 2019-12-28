@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.KeyManager
+import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.system.SystemFacadeMock
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
 import kotlinx.cinterop.*
@@ -19,8 +20,9 @@ class KeyReleaseHandlerTest {
         val systemApi = SystemFacadeMock()
         val focusHandler = WindowFocusHandler()
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val atomLibrary = AtomLibrary(systemApi)
 
-        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager)
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary)
 
         assertEquals(
             KeyRelease,
@@ -34,6 +36,7 @@ class KeyReleaseHandlerTest {
         val systemApi = SystemFacadeMock()
         val focusHandler = WindowFocusHandler()
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val atomLibrary = AtomLibrary(systemApi)
         keyManager.grabInputControls()
 
         systemApi.functionCalls.clear()
@@ -43,7 +46,7 @@ class KeyReleaseHandlerTest {
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Q).convert()
         keyReleaseEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
-        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager)
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary)
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
@@ -62,6 +65,7 @@ class KeyReleaseHandlerTest {
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
         val focusHandler = WindowFocusHandler()
         val windowId = systemApi.getNewWindowId()
+        val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
         keyManager.grabInputControls()
 
@@ -72,7 +76,7 @@ class KeyReleaseHandlerTest {
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
         keyReleaseEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
-        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager)
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary)
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
@@ -98,6 +102,7 @@ class KeyReleaseHandlerTest {
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
         val focusHandler = WindowFocusHandler()
         val windowId = systemApi.getNewWindowId()
+        val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
         keyManager.grabInputControls()
 
@@ -108,7 +113,7 @@ class KeyReleaseHandlerTest {
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
         keyReleaseEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
 
-        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager)
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary)
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
