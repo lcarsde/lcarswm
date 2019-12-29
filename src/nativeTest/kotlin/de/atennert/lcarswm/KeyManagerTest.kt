@@ -5,6 +5,7 @@ import kotlinx.cinterop.convert
 import xlib.AnyModifier
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class KeyManagerTest {
     @Test
@@ -71,7 +72,7 @@ class KeyManagerTest {
             .forEach { keySym ->
                 assertEquals(
                     keySym,
-                    keyManager.getKeySym(systemApi.keySyms.getValue(keySym).convert()).convert()
+                    keyManager.getKeySym(systemApi.keySyms.getValue(keySym).convert())!!.convert()
                 )
             }
 
@@ -99,8 +100,17 @@ class KeyManagerTest {
             .forEach { keySym ->
                 assertEquals(
                     keySym,
-                    keyManager.getKeySym(systemApi.keySyms.getValue(keySym).convert()).convert()
+                    keyManager.getKeySym(systemApi.keySyms.getValue(keySym).convert())!!.convert()
                 )
             }
+    }
+
+    @Test
+    fun `return null on unknown key`() {
+        val systemApi = SystemFacadeMock()
+
+        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+
+        assertNull(keyManager.getKeySym((-1).convert()), "The key manager should return null for unknown key codes")
     }
 }
