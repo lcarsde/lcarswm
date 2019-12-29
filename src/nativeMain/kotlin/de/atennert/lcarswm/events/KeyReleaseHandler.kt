@@ -22,7 +22,7 @@ class KeyReleaseHandler(
 
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
-        when (keyManager.getKeySym(keyCode.convert()).convert<Int>()) {
+        when (keyManager.getKeySym(keyCode.convert())?.convert<Int>()) {
             XK_F4 -> closeActiveWindow()
             XK_Q -> return true
         }

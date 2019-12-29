@@ -18,7 +18,7 @@ class KeyPressHandler(
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
 
-        when (keyManager.getKeySym(keyCode.convert()).convert<Int>()) {
+        when (keyManager.getKeySym(keyCode.convert())?.convert<Int>()) {
             XK_Up -> moveWindowToNextMonitor()
             XK_Down -> moveWindowToPreviousMonitor()
             XK_Tab -> toggleFocusedWindow()
