@@ -75,7 +75,5 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
             }
     }
 
-    fun getKeySym(keyCode: KeyCode): KeySym {
-        return grabbedKeys.getValue(keyCode)
-    }
+    fun getKeySym(keyCode: KeyCode): KeySym? = grabbedKeys[keyCode]
 }
