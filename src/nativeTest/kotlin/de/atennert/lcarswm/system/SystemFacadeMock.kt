@@ -428,10 +428,16 @@ open class SystemFacadeMock : SystemApi {
         return envValue.pin().addressOf(0)
     }
 
+    val fileMap = mutableMapOf<CPointer<FILE>, MutableList<String>>()
+
     override fun fopen(fileName: String, modes: String): CPointer<FILE>? {
         functionCalls.add(FunctionCall("fopen", fileName, modes))
-        return nativeHeap.allocPointerTo<FILE>().value
+        val newFilePointer = nativeHeap.allocPointerTo<FILE>().value!!
+        fileMap[newFilePointer] = getLines(fileName).toMutableList()
+        return newFilePointer
     }
+
+    fun getLines(fileName: String): List<String> = emptyList()
 
     override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
         return null
@@ -444,6 +450,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun fclose(file: CPointer<FILE>): Int {
         functionCalls.add(FunctionCall("fclose", file))
+        fileMap.remove(file)
         return 0
     }
 
