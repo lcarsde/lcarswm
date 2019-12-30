@@ -434,7 +434,6 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
-        functionCalls.add(FunctionCall("fgets", buffer, bufferSize, file))
         return null
     }
 
