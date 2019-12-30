@@ -439,7 +439,7 @@ open class SystemFacadeMock : SystemApi {
 
     fun getLines(fileName: String): List<String> = emptyList()
 
-    override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
+    override fun fgets(buffer: CPointer<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
         return null
     }
 
@@ -477,7 +477,7 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("exit", status))
     }
 
-    override fun execvp(fileName: String, args: CValuesRef<CPointerVar<ByteVar>>): Int {
+    override fun execvp(fileName: String, args: CPointer<CPointerVar<ByteVar>>): Int {
         functionCalls.add(FunctionCall("execvp", fileName, args))
         return 0
     }

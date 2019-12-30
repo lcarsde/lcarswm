@@ -197,7 +197,7 @@ class SystemFacade : SystemApi {
         return platform.posix.fopen(fileName, modes)
     }
 
-    override fun fgets(buffer: CValuesRef<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
+    override fun fgets(buffer: CPointer<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
         return platform.posix.fgets(buffer, bufferSize, file)
     }
 
@@ -229,7 +229,7 @@ class SystemFacade : SystemApi {
         platform.posix.exit(status)
     }
 
-    override fun execvp(fileName: String, args: CValuesRef<CPointerVar<ByteVar>>): Int {
+    override fun execvp(fileName: String, args: CPointer<CPointerVar<ByteVar>>): Int {
         return platform.posix.execvp(fileName, args)
     }
 
