@@ -1,9 +1,7 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.api.PosixApi
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.pin
-import kotlinx.cinterop.toCValues
+import kotlinx.cinterop.*
 
 /**
  * Run a given program.
@@ -19,9 +17,10 @@ fun runProgram(posixApi: PosixApi, programPath: String, args: List<String>): Boo
             }
 
             programPath.encodeToByteArray().pin()
-            val argv = args.map { it.encodeToByteArray().pin().addressOf(0) }
+            val byteArgs = args.map { it.encodeToByteArray().pin().addressOf(0).pointed }
+            val argv = nativeHeap.allocArrayOfPointersTo(byteArgs)
 
-            if (posixApi.execvp(programPath, argv.toCValues()) == -1) {
+            if (posixApi.execvp(programPath, argv) == -1) {
                 posixApi.perror("execvp failed")
                 posixApi.exit(1)
             }
