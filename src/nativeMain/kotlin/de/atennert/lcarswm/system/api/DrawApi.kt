@@ -7,7 +7,7 @@ import kotlinx.cinterop.ULongVar
 import xlib.*
 
 /**
- *
+ * API interface for X drawing functions
  */
 interface DrawApi {
     fun fillArcs(drawable: Drawable, graphicsContext: GC, arcs: CValuesRef<XArc>, arcCount: Int): Int
