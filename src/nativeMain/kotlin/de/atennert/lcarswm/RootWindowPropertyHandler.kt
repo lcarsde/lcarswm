@@ -8,6 +8,9 @@ import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
 
+/**
+ * Class for handling property (atom) related actions.
+ */
 class RootWindowPropertyHandler(
     private val system: SystemApi,
     private val rootWindow: Window,
