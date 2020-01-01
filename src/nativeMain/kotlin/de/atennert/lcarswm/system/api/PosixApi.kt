@@ -6,6 +6,9 @@ import kotlinx.cinterop.CPointerVar
 import platform.posix.FILE
 import platform.posix.__pid_t
 
+/**
+ * Interface for accessing POSIX functions
+ */
 interface PosixApi {
     fun getenv(name: String): CPointer<ByteVar>?
 
