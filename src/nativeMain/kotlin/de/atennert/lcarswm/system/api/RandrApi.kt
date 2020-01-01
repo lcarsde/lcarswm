@@ -5,7 +5,7 @@ import kotlinx.cinterop.IntVar
 import xlib.*
 
 /**
- *
+ * Interface for accessing X RANDR functions
  */
 interface RandrApi {
     fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int
