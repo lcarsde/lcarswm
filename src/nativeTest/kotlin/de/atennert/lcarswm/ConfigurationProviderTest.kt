@@ -40,7 +40,8 @@ class ConfigurationProviderTest {
         val systemApi = object : SystemFacadeMock() {
             override fun getLines(fileName: String): List<String> {
                 return if (fileName == "my-config.properties") {
-                    listOf("property1=looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue1\n")
+                    listOf("property1=looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue1\n",
+                        "property2=looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue2")
                 } else {
                     emptyList()
                 }
@@ -50,5 +51,7 @@ class ConfigurationProviderTest {
         val configurationProvider = ConfigurationProvider(systemApi, "my-config.properties")
 
         assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue1", configurationProvider["property1"], "The configuration provider should read loooooong entries with end of line")
+
+        assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue2", configurationProvider["property2"], "The configuration provider should read loooooong entries with end of file")
     }
 }
