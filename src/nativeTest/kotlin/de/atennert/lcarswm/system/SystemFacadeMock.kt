@@ -6,6 +6,7 @@ import platform.posix.FILE
 import platform.posix.__pid_t
 import xlib.*
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 open class SystemFacadeMock : SystemApi {
     val functionCalls = mutableListOf<FunctionCall>()
@@ -428,19 +429,31 @@ open class SystemFacadeMock : SystemApi {
         return envValue.pin().addressOf(0)
     }
 
-    val fileMap = mutableMapOf<CPointer<FILE>, MutableList<String>>()
+    private val fileMap = mutableMapOf<CPointer<FILE>, MutableList<String>>()
 
     override fun fopen(fileName: String, modes: String): CPointer<FILE>? {
         functionCalls.add(FunctionCall("fopen", fileName, modes))
-        val newFilePointer = nativeHeap.allocPointerTo<FILE>().value!!
-        fileMap[newFilePointer] = getLines(fileName).toMutableList()
-        return newFilePointer
+        val newFilePointer = nativeHeap.alloc<FILE>()
+        fileMap[newFilePointer.ptr] = getLines(fileName).toMutableList()
+        return newFilePointer.ptr
     }
 
-    fun getLines(fileName: String): List<String> = emptyList()
+    open fun getLines(fileName: String): List<String> = emptyList()
 
     override fun fgets(buffer: CPointer<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
-        return null
+        val lines = fileMap[file]?: return null
+        if (lines.isEmpty()) {
+            return null
+        }
+
+        val nextLine = lines.removeAt(0)
+
+        nextLine.encodeToByteArray()
+            .forEachIndexed { index, value -> buffer[index] = value }
+
+        buffer[nextLine.length] = 0
+
+        return buffer
     }
 
     override fun fputs(s: String, file: CPointer<FILE>): Int {
@@ -450,7 +463,9 @@ open class SystemFacadeMock : SystemApi {
 
     override fun fclose(file: CPointer<FILE>): Int {
         functionCalls.add(FunctionCall("fclose", file))
+        assertTrue(fileMap.contains(file))
         fileMap.remove(file)
+        nativeHeap.free(file)
         return 0
     }
 
