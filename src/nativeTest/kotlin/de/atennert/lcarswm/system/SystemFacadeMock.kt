@@ -447,11 +447,16 @@ open class SystemFacadeMock : SystemApi {
         }
 
         val nextLine = lines.removeAt(0)
+        val maxUsableCharacters = bufferSize - 1
+        if (nextLine.length > maxUsableCharacters) {
+            lines.add(0, nextLine.drop(maxUsableCharacters))
+        }
 
-        nextLine.encodeToByteArray()
+        val providedCharacters = nextLine.take(maxUsableCharacters)
+        providedCharacters.encodeToByteArray()
             .forEachIndexed { index, value -> buffer[index] = value }
 
-        buffer[nextLine.length] = 0
+        buffer[providedCharacters.length] = 0
 
         return buffer
     }
