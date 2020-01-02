@@ -34,4 +34,21 @@ class ConfigurationProviderTest {
 
         assertNull(configurationProvider["propertyNone"], "The configuration provider should return null on unknown properties")
     }
+
+    @Test
+    fun `read loooong entries`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun getLines(fileName: String): List<String> {
+                return if (fileName == "my-config.properties") {
+                    listOf("property1=looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue1\n")
+                } else {
+                    emptyList()
+                }
+            }
+        }
+
+        val configurationProvider = ConfigurationProvider(systemApi, "my-config.properties")
+
+        assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue1", configurationProvider["property1"], "The configuration provider should read loooooong entries with end of line")
+    }
 }
