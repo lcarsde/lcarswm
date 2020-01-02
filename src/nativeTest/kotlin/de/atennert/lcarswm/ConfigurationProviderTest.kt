@@ -1,9 +1,14 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.ByteVar
+import kotlinx.cinterop.CPointer
+import platform.posix.FILE
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ConfigurationProviderTest {
     @Test
@@ -53,5 +58,21 @@ class ConfigurationProviderTest {
         assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue1", configurationProvider["property1"], "The configuration provider should read loooooong entries with end of line")
 
         assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue2", configurationProvider["property2"], "The configuration provider should read loooooong entries with end of file")
+    }
+
+    @Test
+    fun `handle not existing files`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun fopen(fileName: String, modes: String): CPointer<FILE>? = null
+
+            override fun fgets(buffer: CPointer<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
+                functionCalls.add(FunctionCall("fgets"))
+                return null
+            }
+        }
+
+        ConfigurationProvider(systemApi, "my-config.properties")
+
+        assertTrue(systemApi.functionCalls.isEmpty(), "There should be no further calls to the system API")
     }
 }
