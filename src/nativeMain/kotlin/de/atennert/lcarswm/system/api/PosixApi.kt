@@ -20,6 +20,8 @@ interface PosixApi {
 
     fun fclose(file: CPointer<FILE>): Int
 
+    fun feof(file: CPointer<FILE>): Int
+
     fun fork(): __pid_t
 
     fun setsid(): __pid_t

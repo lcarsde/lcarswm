@@ -209,6 +209,10 @@ class SystemFacade : SystemApi {
         return platform.posix.fclose(file)
     }
 
+    override fun feof(file: CPointer<FILE>): Int {
+        return platform.posix.feof(file)
+    }
+
     override fun fork(): __pid_t {
         return platform.posix.fork()
     }

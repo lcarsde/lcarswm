@@ -474,6 +474,8 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun feof(file: CPointer<FILE>): Int = 0
+
     override fun fork(): __pid_t {
         functionCalls.add(FunctionCall("fork"))
         return 0
