@@ -17,16 +17,22 @@ class ConfigurationProvider(posixApi: PosixApi, configurationFilePath: String) {
             emptyMap()
         } else {
             val entryMap = mutableMapOf<String, String>()
+            var bufferString = ""
 
             ByteArray(readBufferSize).usePinned { entry ->
                 while (posixApi.fgets(entry.addressOf(0), readBufferSize, filePointer) != null) {
-                    val entryPair = entry.get()
+                    bufferString += entry.get()
                         .takeWhile { it > 0 }
                         .fold("") {acc, b -> acc + b.toChar()}
-                        .trim()
-                        .split('=')
 
-                    entryMap[entryPair[0]] = entryPair[1]
+                    if (bufferString.endsWith('\n')) {
+                        val entryPair = bufferString.trim()
+                            .split('=')
+
+                        entryMap[entryPair[0]] = entryPair[1]
+
+                        bufferString = ""
+                    }
                 }
             }
 
