@@ -452,11 +452,9 @@ open class SystemFacadeMock : SystemApi {
             lines.add(0, nextLine.drop(maxUsableCharacters))
         }
 
-        val providedCharacters = nextLine.take(maxUsableCharacters)
+        val providedCharacters = nextLine.take(maxUsableCharacters) + "\u0000"
         providedCharacters.encodeToByteArray()
             .forEachIndexed { index, value -> buffer[index] = value }
-
-        buffer[providedCharacters.length] = 0
 
         return buffer
     }
@@ -474,7 +472,9 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    override fun feof(file: CPointer<FILE>): Int = 0
+    override fun feof(file: CPointer<FILE>): Int {
+        return if (fileMap.contains(file) && fileMap[file]!!.isEmpty()) 1 else 0
+    }
 
     override fun fork(): __pid_t {
         functionCalls.add(FunctionCall("fork"))
