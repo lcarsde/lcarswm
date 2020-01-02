@@ -25,7 +25,7 @@ class ConfigurationProvider(posixApi: PosixApi, configurationFilePath: String) {
                         .takeWhile { it > 0 }
                         .fold("") {acc, b -> acc + b.toChar()}
 
-                    if (bufferString.endsWith('\n')) {
+                    if (bufferString.endsWith('\n') || posixApi.feof(filePointer) != 0) {
                         val entryPair = bufferString.trim()
                             .split('=')
 
