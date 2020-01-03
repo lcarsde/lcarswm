@@ -4,7 +4,7 @@ import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 
-class ConfigurationProvider(posixApi: PosixApi, configurationFilePath: String) {
+class ConfigurationProvider(posixApi: PosixApi, configurationFilePath: String) : Properties {
 
     private val readBufferSize = 60
 
@@ -41,5 +41,5 @@ class ConfigurationProvider(posixApi: PosixApi, configurationFilePath: String) {
         }
     }
 
-    operator fun get(propertyKey: String): String? = properties[propertyKey]
+    override operator fun get(propertyKey: String): String? = properties[propertyKey]
 }
