@@ -75,4 +75,17 @@ class ConfigurationProviderTest {
 
         assertTrue(systemApi.functionCalls.isEmpty(), "There should be no further calls to the system API")
     }
+
+    @Test
+    fun `get property names`() {
+        val systemApi = object : SystemFacadeMock() {
+            override fun getLines(fileName: String): List<String> {
+                return listOf("property1=longValue1\n", "property2=value2\n")
+            }
+        }
+
+        val configurationProvider = ConfigurationProvider(systemApi, "my-config.properties")
+
+        assertEquals(listOf("property1", "property2"), configurationProvider.getProperyNames(), "The provider should return the names of the available properties")
+    }
 }
