@@ -86,6 +86,6 @@ class ConfigurationProviderTest {
 
         val configurationProvider = ConfigurationProvider(systemApi, "my-config.properties")
 
-        assertEquals(listOf("property1", "property2"), configurationProvider.getProperyNames(), "The provider should return the names of the available properties")
+        assertEquals(setOf("property1", "property2"), configurationProvider.getProperyNames(), "The provider should return the names of the available properties")
     }
 }
