@@ -178,20 +178,28 @@ open class SystemFacadeMock : SystemApi {
 
     val winModifierPosition = 6
 
-    val keySyms = mapOf(
-        Pair(XK_Tab, 0),
-        Pair(XK_Up, 1),
-        Pair(XK_Down, 2),
-        Pair(XK_M, 3),
-        Pair(XK_Q, 4),
-        Pair(XK_F4, 5),
-        Pair(XK_T, 6),
-        Pair(XK_B, 7),
-        Pair(XK_I, 8),
-        Pair(XF86XK_AudioMute, 9),
-        Pair(XF86XK_AudioLowerVolume, 10),
-        Pair(XF86XK_AudioRaiseVolume, 11)
+    private var startKeyCode = 0
+
+    private val keyStrings = mapOf(
+        Pair("Tab", XK_Tab),
+        Pair("A", XK_A),
+        Pair("B", XK_B),
+        Pair("C", XK_C),
+        Pair("I", XK_I),
+        Pair("M", XK_M),
+        Pair("Q", XK_Q),
+        Pair("T", XK_T),
+        Pair("X", XK_X),
+        Pair("F4", XK_F4),
+        Pair("Up", XK_Up),
+        Pair("Down", XK_Down),
+        Pair("space", XK_space),
+        Pair("XF86AudioMute", XF86XK_AudioMute),
+        Pair("XF86AudioRaiseVolume", XF86XK_AudioRaiseVolume),
+        Pair("XF86AudioLowerVolume", XF86XK_AudioLowerVolume)
     )
+
+    val keySyms = keyStrings.values.associateWith { startKeyCode++ }
 
     override fun getModifierMapping(): CPointer<XModifierKeymap>? {
         val keymap = nativeHeap.alloc<XModifierKeymap>()
@@ -205,7 +213,7 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun stringToKeysym(s: String): KeySym {
-        return 0.convert()
+        return keyStrings.getValue(s).convert()
     }
 
     override fun sync(discardQueuedEvents: Boolean): Int {
