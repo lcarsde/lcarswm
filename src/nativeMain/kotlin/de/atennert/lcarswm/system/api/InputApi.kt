@@ -20,4 +20,6 @@ interface InputApi {
     fun getModifierMapping(): CPointer<XModifierKeymap>?
 
     fun keysymToKeycode(keySym: KeySym): KeyCode
+
+    fun stringToKeysym(s: String): KeySym
 }

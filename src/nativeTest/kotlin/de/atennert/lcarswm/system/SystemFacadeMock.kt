@@ -204,6 +204,10 @@ open class SystemFacadeMock : SystemApi {
         return keySyms[keySym.convert()]?.convert() ?: error("keySym not found")
     }
 
+    override fun stringToKeysym(s: String): KeySym {
+        return 0.convert()
+    }
+
     override fun sync(discardQueuedEvents: Boolean): Int {
         functionCalls.add(FunctionCall("sync", discardQueuedEvents))
         return 0

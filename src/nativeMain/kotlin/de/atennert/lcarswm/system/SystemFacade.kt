@@ -286,6 +286,10 @@ class SystemFacade : SystemApi {
         return XKeysymToKeycode(display, keySym)
     }
 
+    override fun stringToKeysym(s: String): KeySym {
+        return XStringToKeysym(s)
+    }
+
     override fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int {
         return XRRQueryExtension(display, eventBase, errorBase)
     }
