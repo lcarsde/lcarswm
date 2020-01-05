@@ -206,6 +206,18 @@ open class SystemFacadeMock : SystemApi {
         return keymap.ptr
     }
 
+    override fun getDisplayKeyCodeMinMaxCounts(): Pair<Int, Int> {
+        return Pair(8, 255)
+    }
+
+    override fun getKeyboardMapping(
+        firstKeyCode: KeyCode,
+        keyCodeCount: Int,
+        keySymsPerKeyCode: CPointer<IntVar>
+    ): CPointer<KeySymVar>? {
+        return nativeHeap.alloc<KeySymVar>().ptr
+    }
+
     override fun keysymToKeycode(keySym: KeySym): KeyCode {
         return keySyms[keySym.convert()]?.convert() ?: error("keySym not found")
     }

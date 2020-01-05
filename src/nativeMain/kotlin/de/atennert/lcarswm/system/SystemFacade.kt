@@ -280,6 +280,22 @@ class SystemFacade : SystemApi {
         return XGetModifierMapping(display)
     }
 
+    override fun getDisplayKeyCodeMinMaxCounts(): Pair<Int, Int> {
+        val keyCodes = IntArray(2)
+        keyCodes.usePinned {
+            XDisplayKeycodes(display, it.addressOf(0), it.addressOf(1))
+        }
+        return Pair(keyCodes[0], keyCodes[1])
+    }
+
+    override fun getKeyboardMapping(
+        firstKeyCode: KeyCode,
+        keyCodeCount: Int,
+        keySymsPerKeyCode: CPointer<IntVar>
+    ): CPointer<KeySymVar>? {
+        return XGetKeyboardMapping(display, firstKeyCode, keyCodeCount, keySymsPerKeyCode)
+    }
+
     override fun keysymToKeycode(keySym: KeySym): KeyCode {
         return XKeysymToKeycode(display, keySym)
     }

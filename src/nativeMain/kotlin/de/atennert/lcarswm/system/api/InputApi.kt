@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.system.api
 
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.IntVar
 import xlib.*
 
 /**
@@ -17,6 +18,10 @@ interface InputApi {
                    mask: UInt, pointerMode: Int, keyboardMode: Int, windowToConfineTo: Window, cursor: Cursor): Int
 
     fun getModifierMapping(): CPointer<XModifierKeymap>?
+
+    fun getDisplayKeyCodeMinMaxCounts(): Pair<Int, Int>
+
+    fun getKeyboardMapping(firstKeyCode: KeyCode, keyCodeCount: Int, keySymsPerKeyCode: CPointer<IntVar>): CPointer<KeySymVar>?
 
     fun keysymToKeycode(keySym: KeySym): KeyCode
 
