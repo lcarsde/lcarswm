@@ -172,7 +172,7 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    val modifiers = UByteArray(8) { 1.shl(it).convert() }
+    val modifiers = UByteArray(16) { (it+1).convert() }
 
     val winModifierPosition = 6
 
@@ -201,7 +201,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun getModifierMapping(): CPointer<XModifierKeymap>? {
         val keymap = nativeHeap.alloc<XModifierKeymap>()
-        keymap.max_keypermod = 1
+        keymap.max_keypermod = 2
         keymap.modifiermap = modifiers.pin().addressOf(0)
         return keymap.ptr
     }

@@ -15,7 +15,7 @@ class KeyManagerTest {
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
 
         assertEquals(
-            listOf(systemApi.modifiers[6]), keyManager.modifiers,
+            listOf(systemApi.modifiers[12], systemApi.modifiers[13]), keyManager.modifiers,
             "The KeyManager should get the required modifier keys"
         )
     }
@@ -29,24 +29,6 @@ class KeyManagerTest {
         keyManager.grabInputControls()
 
         val inputCalls = systemApi.functionCalls
-
-        val grabModifierKeyCall = inputCalls.removeAt(0)
-        assertEquals("grabKey", grabModifierKeyCall.name, "The modifier key needs to be grabbed")
-        assertEquals(
-            systemApi.modifiers[6].toInt(),
-            grabModifierKeyCall.parameters[0],
-            "The modifier key needs to be grabbed"
-        )
-        assertEquals(
-            AnyModifier.toUInt(),
-            grabModifierKeyCall.parameters[1],
-            "The modifier modifier key needs to be any"
-        )
-        assertEquals(
-            systemApi.rootWindowId,
-            grabModifierKeyCall.parameters[2],
-            "The modifier key needs to be grabbed for the root window"
-        )
 
         LCARS_WM_KEY_SYMS
             .filterNot { systemApi.keySyms[it] == 0 } // 0s are not available
