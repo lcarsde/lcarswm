@@ -257,11 +257,9 @@ class SystemFacade : SystemApi {
         keyCode: Int,
         modifiers: UInt,
         window: Window,
-        ownerEvents: Boolean,
-        pointerMode: Int,
         keyboardMode: Int
     ): Int {
-        return XGrabKey(display, keyCode, modifiers, window, convertToXBoolean(ownerEvents), pointerMode, keyboardMode)
+        return XGrabKey(display, keyCode, modifiers, window, X_FALSE, GrabModeAsync, keyboardMode)
     }
 
     override fun grabButton(

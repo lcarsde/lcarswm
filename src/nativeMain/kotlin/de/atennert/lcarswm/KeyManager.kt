@@ -47,14 +47,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
 
     private fun grabModifierKeys() {
         modifiers.forEach { keyCode ->
-            inputApi.grabKey(
-                keyCode.convert(),
-                AnyModifier.convert(),
-                rootWindowId,
-                false,
-                GrabModeAsync,
-                GrabModeAsync
-            )
+            inputApi.grabKey(keyCode.convert(), AnyModifier.convert(), rootWindowId, GrabModeAsync)
         }
     }
 
@@ -71,7 +64,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
             .filterNot { (_, keyCode) -> keyCode.convert<Int>() == 0 }
             .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
             .forEach { (_, keyCode) ->
-                inputApi.grabKey(keyCode.convert(), modifierKey.convert(), rootWindowId, false, GrabModeAsync, GrabModeAsync)
+                inputApi.grabKey(keyCode.convert(), modifierKey.convert(), rootWindowId, GrabModeAsync)
             }
     }
 

@@ -31,9 +31,7 @@ fun setupLcarsWindow(
 private fun grabKeys(inputApi: InputApi, window: Window, windowManagerState: WindowManagerState) {
     windowManagerState.modifierKeys
         .onEach { keyCode ->
-            inputApi.grabKey(
-                keyCode.convert(), AnyModifier.convert(), window, false, GrabModeAsync, GrabModeAsync
-            )
+            inputApi.grabKey(keyCode.convert(), AnyModifier.convert(), window, GrabModeAsync)
         }
 
 
@@ -43,9 +41,7 @@ private fun grabKeys(inputApi: InputApi, window: Window, windowManagerState: Win
         .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
         .onEach { (keySym, keyCode) -> windowManagerState.keyboardKeys[keyCode.toUInt()] = keySym }
         .forEach { (_, keyCode) ->
-            inputApi.grabKey(
-                keyCode.convert(), WM_MODIFIER_KEY.convert(), window, false, GrabModeAsync, GrabModeAsync
-            )
+            inputApi.grabKey(keyCode.convert(), WM_MODIFIER_KEY.convert(), window, GrabModeAsync)
         }
 
     LCARS_NO_MASK_KEY_SYMS
@@ -53,7 +49,7 @@ private fun grabKeys(inputApi: InputApi, window: Window, windowManagerState: Win
         .filterNot { (_, keyCode) -> keyCode.toInt() == 0 }
         .onEach { (keySym, keyCode) -> windowManagerState.keyboardKeys[keyCode.toUInt()] = keySym }
         .forEach { (_, keyCode) ->
-            inputApi.grabKey(keyCode.convert(), AnyModifier.convert(), window, false, GrabModeAsync, GrabModeAsync)
+            inputApi.grabKey(keyCode.convert(), AnyModifier.convert(), window, GrabModeAsync)
         }
 }
 

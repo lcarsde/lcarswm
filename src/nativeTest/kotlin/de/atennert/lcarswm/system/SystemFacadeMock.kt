@@ -151,11 +151,9 @@ open class SystemFacadeMock : SystemApi {
         keyCode: Int,
         modifiers: UInt,
         window: Window,
-        ownerEvents: Boolean,
-        pointerMode: Int,
         keyboardMode: Int
     ): Int {
-        functionCalls.add(FunctionCall("grabKey", keyCode, modifiers, window, ownerEvents, pointerMode, keyboardMode))
+        functionCalls.add(FunctionCall("grabKey", keyCode, modifiers, window, keyboardMode))
         return 0
     }
 
