@@ -172,7 +172,7 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    val modifiers = UByteArray(16) { (it+1).convert() }
+    val modifiers = UByteArray(16) { (it+8).convert() }
 
     val winModifierPosition = 6
 
@@ -215,7 +215,26 @@ open class SystemFacadeMock : SystemApi {
         keyCodeCount: Int,
         keySymsPerKeyCode: CPointer<IntVar>
     ): CPointer<KeySymVar>? {
-        return nativeHeap.alloc<KeySymVar>().ptr
+        keySymsPerKeyCode[0] = 1
+        val keyMapping = ulongArrayOf(
+            XK_Shift_R.convert(),
+            XK_Shift_L.convert(),
+            XK_Caps_Lock.convert(),
+            NoSymbol.convert(),
+            XK_Control_L.convert(),
+            XK_Control_R.convert(),
+            XK_Alt_L.convert(),
+            XK_Alt_R.convert(),
+            XK_Hyper_L.convert(),
+            XK_Hyper_R.convert(),
+            XK_Meta_L.convert(),
+            XK_Meta_R.convert(),
+            XK_Num_Lock.convert(),
+            NoSymbol.convert(),
+            XK_Scroll_Lock.convert(),
+            NoSymbol.convert()
+        )
+        return keyMapping.pin().addressOf(0)
     }
 
     override fun keysymToKeycode(keySym: KeySym): KeyCode {
