@@ -19,20 +19,12 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
         Mod5Mask
     )
 
-    val modMasks = mutableMapOf(
-        Pair(Modifiers.CAPS_LOCK, LockMask),
-        Pair(Modifiers.SHIFT, ShiftMask),
-        Pair(Modifiers.CONTROL, ControlMask)
-    )
+    val modMasks = getAllModifierKeys()
 
     private val grabbedKeys = mutableMapOf<KeyCode, KeySym>()
 
-    init {
-        getAllModifierKeys()
-    }
-
-    private fun getAllModifierKeys() {
-        val modifierKeymap = inputApi.getModifierMapping()?.pointed ?: return
+    private fun getAllModifierKeys(): Map<Modifiers, Int> {
+        val modifierKeymap = inputApi.getModifierMapping()?.pointed ?: return emptyMap()
         val (minKeyCodes, maxKeyCodes) = inputApi.getDisplayKeyCodeMinMaxCounts()
 
         val keySymsPerKeyCode = IntArray(1)
@@ -46,6 +38,12 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
         var altLUsed = false
         var metaLUsed = false
 
+        val modifierMasks = mutableMapOf(
+            Pair(Modifiers.CAPS_LOCK, LockMask),
+            Pair(Modifiers.SHIFT, ShiftMask),
+            Pair(Modifiers.CONTROL, ControlMask)
+        )
+
         for (i in 0 until modifierIndexes.size) {
             val mask = 1.shl(i)
             for (j in 0 until modifierKeymap.max_keypermod) {
@@ -55,49 +53,49 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
                         val keySym = keymap[(keyCode - minKeyCodes) * keySymsPerKeyCode[0] + k]
                         if (keySym.convert<Long>() != NoSymbol) {
                             when (keySym.convert<Int>()) {
-                                XK_Num_Lock ->
-                                    modMasks[Modifiers.NUM_LOCK] = modMasks.getOrElse(Modifiers.NUM_LOCK, {0}).or(mask)
-                                XK_Scroll_Lock ->
-                                    modMasks[Modifiers.SCROLL_LOCK] = modMasks.getOrElse(Modifiers.SCROLL_LOCK, {0}).or(mask)
+                                XK_Num_Lock -> modifierMasks[Modifiers.NUM_LOCK] =
+                                    modifierMasks.getOrElse(Modifiers.NUM_LOCK, {0}).or(mask)
+                                XK_Scroll_Lock -> modifierMasks[Modifiers.SCROLL_LOCK] =
+                                    modifierMasks.getOrElse(Modifiers.SCROLL_LOCK, {0}).or(mask)
 
-                                XK_Super_L -> modMasks[Modifiers.SUPER] = if (superLUsed) {
-                                    modMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
+                                XK_Super_L -> modifierMasks[Modifiers.SUPER] = if (superLUsed) {
+                                    modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
                                 } else {
                                     superLUsed = true
                                     mask // overwrite any super-r stuff
                                 }
                                 XK_Super_R -> if (!superLUsed) {
-                                    modMasks[Modifiers.SUPER] = modMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
+                                    modifierMasks[Modifiers.SUPER] = modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
                                 }
 
-                                XK_Hyper_L -> modMasks[Modifiers.HYPER] = if (hyperLUsed) {
-                                    modMasks.getOrElse(Modifiers.HYPER, {0}).or(mask)
+                                XK_Hyper_L -> modifierMasks[Modifiers.HYPER] = if (hyperLUsed) {
+                                    modifierMasks.getOrElse(Modifiers.HYPER, {0}).or(mask)
                                 } else {
                                     hyperLUsed = true
                                     mask // overwrite any hyper-r stuff
                                 }
                                 XK_Hyper_R -> if (!hyperLUsed) {
-                                    modMasks[Modifiers.HYPER] = modMasks.getOrElse(Modifiers.HYPER, {0}).or(mask)
+                                    modifierMasks[Modifiers.HYPER] = modifierMasks.getOrElse(Modifiers.HYPER, {0}).or(mask)
                                 }
 
-                                XK_Alt_L -> modMasks[Modifiers.ALT] = if (altLUsed) {
-                                    modMasks.getOrElse(Modifiers.ALT, {0}).or(mask)
+                                XK_Alt_L -> modifierMasks[Modifiers.ALT] = if (altLUsed) {
+                                    modifierMasks.getOrElse(Modifiers.ALT, {0}).or(mask)
                                 } else {
                                     altLUsed = true
                                     mask // overwrite any alt-r stuff
                                 }
                                 XK_Alt_R -> if (!altLUsed) {
-                                    modMasks[Modifiers.ALT] = modMasks.getOrElse(Modifiers.ALT, {0}).or(mask)
+                                    modifierMasks[Modifiers.ALT] = modifierMasks.getOrElse(Modifiers.ALT, {0}).or(mask)
                                 }
 
-                                XK_Meta_L -> modMasks[Modifiers.META] = if (metaLUsed) {
-                                    modMasks.getOrElse(Modifiers.META, {0}).or(mask)
+                                XK_Meta_L -> modifierMasks[Modifiers.META] = if (metaLUsed) {
+                                    modifierMasks.getOrElse(Modifiers.META, {0}).or(mask)
                                 } else {
                                     metaLUsed = true
                                     mask // overwrite any meta-r stuff
                                 }
                                 XK_Meta_R -> if (!metaLUsed) {
-                                    modMasks[Modifiers.META] = modMasks.getOrElse(Modifiers.META, {0}).or(mask)
+                                    modifierMasks[Modifiers.META] = modifierMasks.getOrElse(Modifiers.META, {0}).or(mask)
                                 }
                             }
                         }
@@ -105,6 +103,8 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
                 }
             }
         }
+
+        return modifierMasks
     }
 
     fun grabInputControls() {
