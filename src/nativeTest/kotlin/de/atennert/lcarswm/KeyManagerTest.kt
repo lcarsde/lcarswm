@@ -3,21 +3,32 @@ package de.atennert.lcarswm
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
 import xlib.AnyModifier
+import xlib.ControlMask
+import xlib.LockMask
+import xlib.ShiftMask
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class KeyManagerTest {
     @Test
-    fun `register modifier keys`() {
+    fun `load modifier keys`() {
         val systemApi = SystemFacadeMock()
 
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
 
-        assertEquals(
-            listOf(systemApi.modifiers[12], systemApi.modifiers[13]), keyManager.modifiers,
-            "The KeyManager should get the required modifier keys"
+        val expectedModifiers = mutableMapOf(
+            Pair(Modifiers.CAPS_LOCK, LockMask),
+            Pair(Modifiers.SHIFT, ShiftMask),
+            Pair(Modifiers.CONTROL, ControlMask),
+            Pair(Modifiers.ALT, 0x8),
+            Pair(Modifiers.HYPER, 0x10),
+            Pair(Modifiers.META, 0x20),
+            Pair(Modifiers.NUM_LOCK, 0x40),
+            Pair(Modifiers.SCROLL_LOCK, 0x80)
         )
+
+        assertEquals(expectedModifiers, keyManager.modMasks, "The KeyManager should get the required modifier keys")
     }
 
     @Test
