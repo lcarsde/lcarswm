@@ -38,13 +38,11 @@ class KeyConfiguration(
     }
 
     private fun getMask(modifierStrings: List<String>): Int {
-        return if (modifierStrings.isNotEmpty()) {
+        return modifierStrings.fold(0) { acc, modifierString ->
             val modifier = modKeyBindings.entries
-                .single { it.value.contains(modifierStrings.first()) }
+                .single { it.value.contains(modifierString) }
                 .key
-            keyManager.modMasks.getOrElse(modifier) { 0 }
-        } else {
-            0
+            acc or keyManager.modMasks.getValue(modifier)
         }
     }
 
