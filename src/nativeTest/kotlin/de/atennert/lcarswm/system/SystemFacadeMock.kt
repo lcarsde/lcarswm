@@ -183,6 +183,8 @@ open class SystemFacadeMock : SystemApi {
         Pair("A", XK_A),
         Pair("B", XK_B),
         Pair("C", XK_C),
+        Pair("D", XK_D),
+        Pair("E", XK_E),
         Pair("I", XK_I),
         Pair("M", XK_M),
         Pair("Q", XK_Q),
@@ -229,8 +231,8 @@ open class SystemFacadeMock : SystemApi {
             XK_Hyper_R.convert(),
             XK_Meta_L.convert(),
             XK_Meta_R.convert(),
-            XK_Num_Lock.convert(),
-            NoSymbol.convert(),
+            XK_Super_L.convert(),
+            XK_Super_R.convert(),
             XK_Scroll_Lock.convert(),
             NoSymbol.convert()
         )

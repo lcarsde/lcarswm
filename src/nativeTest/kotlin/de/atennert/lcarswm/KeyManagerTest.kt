@@ -24,7 +24,7 @@ class KeyManagerTest {
             Pair(Modifiers.ALT, 0x8),
             Pair(Modifiers.HYPER, 0x10),
             Pair(Modifiers.META, 0x20),
-            Pair(Modifiers.NUM_LOCK, 0x40),
+            Pair(Modifiers.SUPER, 0x40),
             Pair(Modifiers.SCROLL_LOCK, 0x80)
         )
 
