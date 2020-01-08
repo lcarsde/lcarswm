@@ -82,7 +82,10 @@ class KeyConfigurationTest {
         )
         assertEquals(
             "commandB",
-            keyConfiguration.getCommandForKey(XK_B.convert(), keyManager.modMasks.getValue(Modifiers.CONTROL).convert()),
+            keyConfiguration.getCommandForKey(
+                XK_B.convert(),
+                keyManager.modMasks.getValue(Modifiers.CONTROL).convert()
+            ),
             "The config should load the second key binding"
         )
         assertEquals(
@@ -92,7 +95,56 @@ class KeyConfigurationTest {
         )
     }
 
-    // TODO two modifier key config
+    @Test
+    fun `load key config with multiple modifiers`() {
+        val systemApi = SystemFacadeMock()
+        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
 
-    // TODO three modifier key config
+        val configurationProvider = object : Properties {
+            override fun get(propertyKey: String): String? {
+                return when (propertyKey) {
+                    "Ctrl+Alt+A" -> "commandA"
+                    "Win+Shift+Meta+B" -> "commandB"
+                    "Hyper+Super+X" -> "commandX"
+                    else -> error("unknown key configuration: $propertyKey")
+                }
+            }
+
+            override fun getProperyNames(): Set<String> {
+                return setOf("Ctrl+Alt+A", "Win+Shift+Meta+B", "Hyper+Super+X")
+            }
+        }
+        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager)
+
+        assertEquals(
+            "commandA",
+            keyConfiguration.getCommandForKey(XK_A.convert(),
+                getMask(keyManager,
+                listOf(Modifiers.CONTROL, Modifiers.ALT))
+            ),
+            "The config should load the first key binding"
+        )
+        assertEquals(
+            "commandB",
+            keyConfiguration.getCommandForKey(
+                XK_B.convert(),
+                getMask(keyManager, listOf(Modifiers.SUPER, Modifiers.SHIFT, Modifiers.META))
+            ),
+            "The config should load the second key binding"
+        )
+        assertEquals(
+            "commandX",
+            keyConfiguration.getCommandForKey(
+                XK_X.convert(),
+                getMask(keyManager, listOf(Modifiers.SUPER, Modifiers.HYPER))
+            ),
+            "The config should load the third key binding"
+        )
+    }
+
+    private fun getMask(keyManager: KeyManager, l: List<Modifiers>): UInt {
+        return l.fold(0) { acc, m ->
+            acc or keyManager.modMasks.getValue(m)
+        }.convert()
+    }
 }
