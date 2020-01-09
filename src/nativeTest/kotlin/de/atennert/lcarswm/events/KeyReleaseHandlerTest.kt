@@ -1,6 +1,8 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.KeyManager
+import de.atennert.lcarswm.Modifiers
+import de.atennert.lcarswm.Properties
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.system.SystemFacadeMock
@@ -16,6 +18,20 @@ import kotlin.test.assertTrue
  *
  */
 class KeyReleaseHandlerTest {
+
+    private val configurationProvider = object : Properties {
+        override fun get(propertyKey: String): String? {
+            return when (propertyKey) {
+                "Ctrl+F4" -> "command arg1 arg2"
+                else -> error("unknown key configuration: $propertyKey")
+            }
+        }
+
+        override fun getProperyNames(): Set<String> {
+            return setOf("Ctrl+F4")
+        }
+    }
+
     @Test
     fun `return the event type KeyReleaseHandler`() {
         val systemApi = SystemFacadeMock()
@@ -23,7 +39,7 @@ class KeyReleaseHandlerTest {
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
         val atomLibrary = AtomLibrary(systemApi)
 
-        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary)
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
 
         assertEquals(
             KeyRelease,
@@ -45,9 +61,9 @@ class KeyReleaseHandlerTest {
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Q).convert()
-        keyReleaseEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
 
-        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary)
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
@@ -75,9 +91,9 @@ class KeyReleaseHandlerTest {
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
-        keyReleaseEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
 
-        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary)
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
@@ -112,9 +128,9 @@ class KeyReleaseHandlerTest {
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
-        keyReleaseEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
 
-        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary)
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
@@ -140,9 +156,9 @@ class KeyReleaseHandlerTest {
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
-        keyReleaseEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
 
-        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary)
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
@@ -160,5 +176,51 @@ class KeyReleaseHandlerTest {
         assertEquals(atomLibrary[Atoms.WM_PROTOCOLS], eventData.xclient.message_type, "The message type should be WM_PROTOCOLS")
         assertEquals(32, eventData.xclient.format, "The message format should be 32 bit")
         assertEquals(atomLibrary[Atoms.WM_DELETE_WINDOW], eventData.xclient.data.l[0].convert(), "The delete WM window atom needs to match")
+    }
+
+    @Test
+    fun `execute configured command`() {
+        val systemApi = SystemFacadeMock()
+        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val focusHandler = WindowFocusHandler()
+        val windowId = systemApi.getNewWindowId()
+        val atomLibrary = AtomLibrary(systemApi)
+        focusHandler.setFocusedWindow(windowId)
+        keyManager.grabInputControls()
+
+        val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
+
+        systemApi.functionCalls.clear()
+
+        val keyReleaseEvent = nativeHeap.alloc<XEvent>()
+        keyReleaseEvent.type = KeyRelease
+        keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
+        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.CONTROL))
+
+        val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
+
+        assertFalse(shutdownValue, "The window manager should not shut down on Ctrl+F4")
+
+        val systemCalls = systemApi.functionCalls
+        val forkCall = systemCalls.removeAt(0)
+        assertEquals("fork", forkCall.name, "Fork needs to be called to create a process for the command")
+
+        val setsidCall = systemCalls.removeAt(0)
+        assertEquals("setsid", setsidCall.name, "Start a new session with setsid")
+
+        val execCall = systemCalls.removeAt(0)
+        assertEquals("execvp", execCall.name, "Call execvp to run the command")
+        assertEquals("command", execCall.parameters[0], "The filename needs to be the program name")
+        assertEquals(listOf("command", "arg1", "arg2"), execCall.parameters[1], "The command needs its arguments")
+
+        val exitCall = systemCalls.removeAt(0)
+        assertEquals("exit", exitCall.name, "Call exit to successfully finish the command execution")
+        assertEquals(0, exitCall.parameters[0], "Finish the execution with 0 (success)")
+    }
+
+    private fun getMask(keyManager: KeyManager, l: List<Modifiers>): UInt {
+        return l.fold(0) { acc, m ->
+            acc or keyManager.modMasks.getValue(m)
+        }.convert()
     }
 }
