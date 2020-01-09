@@ -233,8 +233,11 @@ class SystemFacade : SystemApi {
         platform.posix.exit(status)
     }
 
-    override fun execvp(fileName: String, args: CPointer<CPointerVar<ByteVar>>): Int {
-        return platform.posix.execvp(fileName, args)
+    override fun execvp(fileName: String, args: List<String>): Int {
+        val byteArgs = args.map { it.encodeToByteArray().pin().addressOf(0).pointed }
+        val convertedArgs = nativeHeap.allocArrayOfPointersTo(byteArgs)
+
+        return platform.posix.execvp(fileName, convertedArgs)
     }
 
     override fun gettimeofday(): Long {

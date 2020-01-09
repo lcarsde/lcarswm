@@ -32,7 +32,12 @@ interface PosixApi {
 
     fun exit(status: Int)
 
-    fun execvp(fileName: String, args: CPointer<CPointerVar<ByteVar>>): Int
+    /**
+     * Run a program
+     * @param fileName The programs executable file name
+     * @param args The program arguments (including the fileName)
+     */
+    fun execvp(fileName: String, args: List<String>): Int
 
     fun gettimeofday(): Long
 }

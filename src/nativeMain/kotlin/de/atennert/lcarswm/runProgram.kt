@@ -16,11 +16,7 @@ fun runProgram(posixApi: PosixApi, programPath: String, args: List<String>): Boo
                 posixApi.exit(1)
             }
 
-            programPath.encodeToByteArray().pin()
-            val byteArgs = args.map { it.encodeToByteArray().pin().addressOf(0).pointed }
-            val argv = nativeHeap.allocArrayOfPointersTo(byteArgs)
-
-            if (posixApi.execvp(programPath, argv) == -1) {
+            if (posixApi.execvp(programPath, args) == -1) {
                 posixApi.perror("execvp failed")
                 posixApi.exit(1)
             }

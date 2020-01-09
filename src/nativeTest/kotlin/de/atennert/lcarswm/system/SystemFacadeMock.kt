@@ -542,7 +542,7 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("exit", status))
     }
 
-    override fun execvp(fileName: String, args: CPointer<CPointerVar<ByteVar>>): Int {
+    override fun execvp(fileName: String, args: List<String>): Int {
         functionCalls.add(FunctionCall("execvp", fileName, args))
         return 0
     }
