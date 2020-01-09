@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.KeyManager
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.system.api.SystemApi
@@ -15,16 +15,29 @@ class KeyReleaseHandler(
     private val systemApi: SystemApi,
     private val focusHandler: WindowFocusHandler,
     private val keyManager: KeyManager,
-    private val atomLibrary: AtomLibrary
+    private val atomLibrary: AtomLibrary,
+    configurationProvider: Properties
 ) :
     XEventHandler {
     override val xEventType = KeyRelease
 
+    private val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager)
+
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
-        when (keyManager.getKeySym(keyCode.convert())?.convert<Int>()) {
-            XK_F4 -> closeActiveWindow()
-            XK_Q -> return true
+        val keyMask = event.xkey.state
+        val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
+        val winKeyMask = keyManager.modMasks.getValue(Modifiers.SUPER)
+
+        when (Pair(keySym.convert<Int>(), keyMask.convert<Int>())) {
+            Pair(XK_F4, winKeyMask) -> closeActiveWindow()
+            Pair(XK_Q, winKeyMask) -> return true
+            else -> {
+                keyConfiguration.getCommandForKey(keySym, keyMask)?.let { command ->
+                    val commandParts = command.split(' ')
+                    runProgram(systemApi, commandParts[0], commandParts)
+                }
+            }
         }
         return false
     }
