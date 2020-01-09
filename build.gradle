@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.multiplatform' version '1.3.50'
+    id 'org.jetbrains.kotlin.multiplatform' version '1.3.61'
 }
 
 group 'de.atennert'
@@ -16,6 +16,13 @@ kotlin {
         }
         binaries {
             executable()
+        }
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation kotlin('stdlib-common')
+            }
         }
     }
 }
