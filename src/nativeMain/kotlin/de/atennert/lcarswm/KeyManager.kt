@@ -44,7 +44,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
             Pair(Modifiers.CONTROL, ControlMask)
         )
 
-        for (i in 0 until modifierIndexes.size) {
+        for (i in modifierIndexes.indices) {
             val mask = 1.shl(i)
             for (j in 0 until modifierKeymap.max_keypermod) {
                 val keyCode = modifierKeymap.modifiermap!![i * modifierKeymap.max_keypermod + j].convert<Int>()
