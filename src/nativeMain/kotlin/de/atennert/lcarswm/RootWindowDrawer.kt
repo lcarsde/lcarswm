@@ -91,8 +91,7 @@ class RootWindowDrawer(
     }
 
     fun cleanupColorMap(
-        drawApi: DrawApi,
-        colorMap: Pair<Colormap, List<ULong>>
+        drawApi: DrawApi
     ) {
         val colorPixels = ULongArray(colorMap.second.size) { colorMap.second[it] }
         drawApi.freeColors(colorMap.first, colorPixels.toCValues(), colorPixels.size)
