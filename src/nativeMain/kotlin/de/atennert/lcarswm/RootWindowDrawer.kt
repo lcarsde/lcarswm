@@ -14,18 +14,6 @@ class RootWindowDrawer(
     private val monitorManager: MonitorManager,
     screen: Screen
 ) : UIDrawing {
-    private val rootWindow = screen.root
-    private val colorMap = allocateColorMap(drawApi, screen.root_visual!!, rootWindow)
-    private val graphicsContexts = loadGraphicContexts(drawApi, rootWindow, colorMap.second)
-
-    private val logoImage: CPointer<XImage>
-
-    init {
-        val imageArray = nativeHeap.allocArrayOfPointersTo(nativeHeap.alloc<XImage>())
-        drawApi.readXpmFileToImage("/usr/share/pixmaps/lcarswm.xpm", imageArray)
-        logoImage = imageArray[0]!!
-    }
-
     private val colors = listOf(
         Triple(0, 0, 0),
         Triple(0xFFFF, 0x9999, 0),
@@ -37,6 +25,18 @@ class RootWindowDrawer(
         Triple(0xFFFF, 0x9999, 0x6666),
         Triple(0xCCCC, 0x6666, 0x9999)
     )
+
+    private val rootWindow = screen.root
+    private val colorMap = allocateColorMap(drawApi, screen.root_visual!!, rootWindow)
+    private val graphicsContexts = loadGraphicContexts(drawApi, rootWindow, colorMap.second)
+
+    private val logoImage: CPointer<XImage>
+
+    init {
+        val imageArray = nativeHeap.allocArrayOfPointersTo(nativeHeap.alloc<XImage>())
+        drawApi.readXpmFileToImage("/usr/share/pixmaps/lcarswm.xpm", imageArray)
+        logoImage = imageArray[0]!!
+    }
 
     override fun drawWindowManagerFrame() {
         monitorManager.getMonitors().forEach {
