@@ -467,9 +467,10 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun getenv(name: String): CPointer<ByteVar>? {
-        functionCalls.add(FunctionCall("getenv", name))
-        val envValue = ByteArray(0)
-        return envValue.pin().addressOf(0)
+        return when(name) {
+            "XDG_CONFIG_HOME" -> "/home/me"
+            else -> error("getenv with unsimulated key: $name")
+        }.encodeToByteArray().pin().addressOf(0)
     }
 
     private val fileMap = mutableMapOf<CPointer<FILE>, MutableList<String>>()
