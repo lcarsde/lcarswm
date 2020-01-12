@@ -8,6 +8,10 @@ class EventManager private constructor(
     private val eventHandlers: Map<Int, XEventHandler>,
     private val logger: Logger
 ) {
+    /**
+     * Process a given event via one of the registered event handlers.
+     * @return true if the WM should shut down, false otherwise
+     */
     fun handleEvent(event: XEvent): Boolean {
         val eventHandler = this.eventHandlers[event.type]
 
