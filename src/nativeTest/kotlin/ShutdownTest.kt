@@ -165,6 +165,7 @@ class ShutdownTest {
         checkRequestOfNextEvent(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
+        checkFreeingOfGraphicsContexts(functionCalls)
         checkSelectInputSetting(functionCalls, NoEventMask)
         checkWindowPropertyRemoval(functionCalls, testFacade.atomMap, "_NET_SUPPORTED")
         checkThatSupportWindowWasDestroyed(functionCalls)
@@ -266,6 +267,16 @@ class ShutdownTest {
             functionCalls.removeAt(0).name,
             "the acquired color map needs to be freed on shutdown"
         )
+    }
+
+    private fun checkFreeingOfGraphicsContexts(functionCalls: MutableList<FunctionCall>) {
+        repeat(9) {
+            assertEquals(
+                "freeGC",
+                functionCalls.removeAt(0).name,
+                "the acquired graphics contexts needs to be freed on shutdown"
+            )
+        }
     }
 
     private fun checkThatSupportWindowWasDestroyed(functionCalls: MutableList<FunctionCall>) {
