@@ -1,13 +1,15 @@
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
-import de.atennert.lcarswm.events.old.EVENT_HANDLERS
-import de.atennert.lcarswm.events.old.handleRandrEvent
+import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.monitor.MonitorManager
+import de.atennert.lcarswm.monitor.MonitorManagerImpl
 import de.atennert.lcarswm.system.SystemFacade
+import de.atennert.lcarswm.system.api.EventApi
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.system.api.WindowUtilApi
-import de.atennert.lcarswm.windowactions.addWindow
+import de.atennert.lcarswm.windowactions.*
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -79,42 +81,65 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
-        val colorMap = allocateColorMap(system, screen.root_visual!!, rootWindow)
-        val graphicsContexts = getGraphicContexts(system, rootWindow, colorMap.second)
+        val monitorManager = MonitorManagerImpl(system, rootWindow)
 
-        val windowManagerConfig = WindowManagerState(atomLibrary::get)
+        val uiDrawer = RootWindowDrawer(system, monitorManager, screen)
 
-        setupLcarsWindow(system, screen, windowManagerConfig)
-        windowManagerConfig.setActiveWindowListener { activeWindow ->
+        val keyManager = KeyManager(system, rootWindow)
+        keyManager.grabInputControls()
+
+        val focusHandler = WindowFocusHandler()
+
+        focusHandler.registerObserver { activeWindow ->
             if (activeWindow != null) {
-                system.setInputFocus(activeWindow.id, RevertToParent, CurrentTime.convert())
+                system.setInputFocus(activeWindow, RevertToParent, CurrentTime.convert())
             } else {
                 system.setInputFocus(rootWindow, RevertToPointerRoot, CurrentTime.convert())
             }
         }
 
-        val logoImage = allocArrayOfPointersTo(alloc<XImage>())
+        val windowCoordinator = ActiveWindowCoordinator(system, monitorManager)
 
-        system.readXpmFileToImage("/usr/share/pixmaps/lcarswm.xpm", logoImage)
+        val screenChangeHandler = setupRandr(system, logger, monitorManager, windowCoordinator, uiDrawer, rootWindow)
 
-        val randrBase = setupRandr(system, logger, windowManagerConfig, logoImage[0]!!, rootWindow, graphicsContexts)
+        val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, rootWindow)
 
-        setupScreen(system, logger, rootWindow, windowManagerConfig)
+        setupScreen(system, rootWindow, windowRegistration)
 
-        eventLoop(system, logger, windowManagerConfig, randrBase, logoImage[0]!!, rootWindow, graphicsContexts)
+        val configPathBytes = system.getenv("XDG_CONFIG_HOME") ?: return
+        val configPath = configPathBytes.toKString()
+        val keyConfiguration = "$configPath/lcarswm/$KEY_CONFIG_FILE"
 
-        shutdown(system, colorMap, rootWindow, logger, rootWindowPropertyHandler)
+        val keyConfigurationProvider = ConfigurationProvider(system, keyConfiguration)
+
+        val eventManager = createEventManager(
+            system,
+            logger,
+            windowRegistration,
+            windowCoordinator,
+            focusHandler,
+            keyManager,
+            uiDrawer,
+            atomLibrary,
+            keyConfigurationProvider,
+            screenChangeHandler
+        )
+
+        eventLoop(system, eventManager)
+
+        shutdown(system, uiDrawer, rootWindow, logger, rootWindowPropertyHandler)
     }
 }
 
 private fun shutdown(
     system: SystemApi,
-    colorMap: Pair<Colormap, List<ULong>>,
+    rootWindowDrawer: RootWindowDrawer,
     rootWindow: Window,
     logger: Logger,
     rootWindowPropertyHandler: RootWindowPropertyHandler
 ) {
-    cleanupColorMap(system, colorMap)
+    rootWindowDrawer.cleanupColorMap(system)
+    rootWindowDrawer.cleanupGraphicsContexts()
 
     system.selectInput(rootWindow, NoEventMask)
     rootWindowPropertyHandler.unsetWindowProperties()
@@ -137,7 +162,10 @@ fun setDisplayEnvironment(system: SystemApi) {
     system.setenv("DISPLAY", displayString)
 }
 
-fun setupScreen(system: SystemApi, logger: Logger, rootWindow: Window, windowManagerConfig: WindowManagerState) {
+fun setupScreen(
+    system: SystemApi,
+    rootWindow: Window,
+    windowRegistration: WindowHandler) {
     system.grabServer()
 
     val returnedWindows = ULongArray(1)
@@ -145,14 +173,16 @@ fun setupScreen(system: SystemApi, logger: Logger, rootWindow: Window, windowMan
     val topLevelWindows = nativeHeap.allocPointerTo<ULongVarOf<Window>>()
     val topLevelWindowCount = UIntArray(1)
 
-    system.queryTree(rootWindow, returnedWindows.toCValues(), returnedParent.toCValues(),
+    system.queryTree(
+        rootWindow, returnedWindows.toCValues(), returnedParent.toCValues(),
         topLevelWindows.ptr,
-        topLevelWindowCount.toCValues())
+        topLevelWindowCount.toCValues()
+    )
 
-    ULongArray(topLevelWindowCount[0].toInt()) {topLevelWindows.value!![it]}
+    ULongArray(topLevelWindowCount[0].toInt()) { topLevelWindows.value!![it] }
         .filter { childId -> childId != rootWindow }
         .forEach { childId ->
-            addWindow(system, logger, windowManagerConfig, rootWindow, childId, true)
+            windowRegistration.addWindow(childId, true)
         }
 
     nativeHeap.free(topLevelWindows)
@@ -165,73 +195,58 @@ fun setupScreen(system: SystemApi, logger: Logger, rootWindow: Window, windowMan
 private fun setupRandr(
     system: SystemApi,
     logger: Logger,
-    windowManagerState: WindowManagerState,
-    image: CPointer<XImage>,
-    rootWindow: Window,
-    graphicsContexts: List<GC>
-): Int {
-    val eventBase = IntArray(1).pin()
-    val errorBase = IntArray(1).pin()
+    monitorManager: MonitorManager,
+    windowCoordinator: WindowCoordinator,
+    uiDrawer: UIDrawing,
+    rootWindowId: Window
+): XEventHandler {
+    val randrHandlerFactory =
+        RandrHandlerFactory(system, logger, monitorManager, windowCoordinator, uiDrawer, rootWindowId)
 
-    if (system.rQueryExtension(eventBase.addressOf(0), errorBase.addressOf(0)) == X_FALSE) {
-        logger.logWarning("::setupRandr::no RANDR extension")
-        return NO_RANDR_BASE
-    }
+    val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler()
+    val fakeEvent = nativeHeap.alloc<XEvent>()
+    screenChangeHandler.handleEvent(fakeEvent)
+    nativeHeap.free(fakeEvent)
 
-    handleRandrEvent(
-        system,
-        logger,
-        windowManagerState,
-        image,
-        rootWindow,
-        graphicsContexts
-    )
+    system.rSelectInput(rootWindowId, XRANDR_MASK.convert())
 
-    system.rSelectInput(rootWindow, XRANDR_MASK.convert() )
+    return screenChangeHandler
+}
 
-    logger.logDebug("::setupRandr::RANDR base: ${eventBase.get()[0]}, error base: ${errorBase.get()[0]}")
+private fun createEventManager(
+    system: SystemApi,
+    logger: Logger,
+    windowRegistration: WindowRegistration,
+    windowCoordinator: WindowCoordinator,
+    focusHandler: WindowFocusHandler,
+    keyManager: KeyManager,
+    uiDrawer: UIDrawing,
+    atomLibrary: AtomLibrary,
+    keyConfigurationProvider: ConfigurationProvider,
+    screenChangeHandler: XEventHandler
+): EventManager {
 
-    return eventBase.get()[0]
+    return EventManager.Builder(logger)
+        .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator))
+        .addEventHandler(DestroyNotifyHandler(logger, windowRegistration))
+        .addEventHandler(KeyPressHandler(keyManager, windowCoordinator, focusHandler, uiDrawer))
+        .addEventHandler(KeyReleaseHandler(system, focusHandler, keyManager, atomLibrary, keyConfigurationProvider))
+        .addEventHandler(MapRequestHandler(logger, windowRegistration))
+        .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
+        .addEventHandler(screenChangeHandler)
+        .build()
 }
 
 private fun eventLoop(
-    system: SystemApi,
-    logger: Logger,
-    windowManagerState: WindowManagerState,
-    randrBase: Int,
-    image: CPointer<XImage>,
-    rootWindow: Window,
-    graphicsContexts: List<GC>
+    eventApi: EventApi,
+    eventManager: EventManager
 ) {
-    val randrEventValue = randrBase + RRScreenChangeNotify
-
     while (true) {
         val xEvent = nativeHeap.alloc<XEvent>()
-        system.nextEvent(xEvent.ptr)
-        val eventValue = xEvent.type
+        eventApi.nextEvent(xEvent.ptr)
 
-        if (eventValue == randrEventValue) {
-            logger.logDebug("::eventLoop::received randr event")
-            handleRandrEvent(
-                system,
-                logger,
-                windowManagerState,
-                image,
-                rootWindow,
-                graphicsContexts
-            )
-            nativeHeap.free(xEvent)
-            continue
-        }
-
-        if (EVENT_HANDLERS.containsKey(xEvent.type)) {
-            val stop = EVENT_HANDLERS[xEvent.type]!!.invoke(system, logger, windowManagerState, xEvent, image, rootWindow, graphicsContexts)
-            if (stop) {
-                logger.logInfo("::eventLoop::received stop ... exiting loop")
-                break
-            }
-        } else {
-            logger.logInfo("::eventLoop::unhandled event: ${xEvent.type}")
+        if (eventManager.handleEvent(xEvent)) {
+            break
         }
 
         nativeHeap.free(xEvent)
