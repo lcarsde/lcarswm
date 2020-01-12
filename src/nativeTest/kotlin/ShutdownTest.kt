@@ -150,7 +150,7 @@ class ShutdownTest {
                 super.nextEvent(event)
                 event.pointed.type = KeyRelease
                 event.pointed.xkey.keycode = keySyms.getValue(XK_Q).convert()
-                event.pointed.xkey.state = modifiers[winModifierPosition].convert()
+                event.pointed.xkey.state = 0x40.convert()
                 return 0
             }
         }
