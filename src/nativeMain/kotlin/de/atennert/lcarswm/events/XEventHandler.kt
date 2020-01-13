@@ -2,6 +2,9 @@ package de.atennert.lcarswm.events
 
 import xlib.XEvent
 
+/**
+ * Interface for handlers of X events.
+ */
 interface XEventHandler {
     /** The handled X event type */
     val xEventType: Int
