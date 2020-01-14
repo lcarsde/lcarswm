@@ -110,7 +110,6 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
     fun grabInputControls() {
 //        grabModifierKeys()
         grabModifiedKeys()
-        grabUnmodifiedKeys()
     }
 
 //    private fun grabModifierKeys() {
@@ -120,11 +119,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
 //    }
 
     private fun grabModifiedKeys() {
-        grabKeysForKeySyms(LCARS_WM_KEY_SYMS, WM_MODIFIER_KEY)
-    }
-
-    private fun grabUnmodifiedKeys() {
-        grabKeysForKeySyms(LCARS_NO_MASK_KEY_SYMS, AnyModifier)
+        grabKeysForKeySyms(LCARS_WM_KEY_SYMS, modMasks.getValue(Modifiers.SUPER))
     }
 
     private fun grabKeysForKeySyms(keySyms: List<Int>, modifierKey: Int) {
