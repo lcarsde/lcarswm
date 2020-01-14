@@ -7,13 +7,7 @@ const val LOG_FILE_PATH = "/var/log/lcarswm.log"
 const val X_FALSE = 0
 const val X_TRUE = 1
 
-const val NO_RANDR_BASE = -1
-
 const val KEY_CONFIG_FILE = "key-config.properties"
-
-const val WM_MODIFIER_KEY = Mod4Mask // should be windows key
-
-const val ALT_MODIFIER_KEY = Mod1Mask
 
 val LCARS_WM_KEY_SYMS = listOf(
     XK_Tab, // toggle through windows
