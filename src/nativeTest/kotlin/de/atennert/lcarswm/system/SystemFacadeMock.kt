@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.system
 
+import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import platform.posix.FILE
@@ -468,7 +469,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun getenv(name: String): CPointer<ByteVar>? {
         return when(name) {
-            "XDG_CONFIG_HOME" -> "/home/me"
+            HOME_CONFIG_DIR_PROPERTY -> "/home/me"
             else -> error("getenv with unsimulated key: $name")
         }.encodeToByteArray().pin().addressOf(0)
     }

@@ -4,10 +4,14 @@ import xlib.*
 
 const val LOG_FILE_PATH = "/var/log/lcarswm.log"
 
+const val HOME_CONFIG_DIR_PROPERTY = "XDG_CONFIG_HOME"
+
+const val LCARS_WM_DIR = "lcarswm"
+
+const val KEY_CONFIG_FILE = "/$LCARS_WM_DIR/key-config.properties"
+
 const val X_FALSE = 0
 const val X_TRUE = 1
-
-const val KEY_CONFIG_FILE = "key-config.properties"
 
 val LCARS_WM_KEY_SYMS = listOf(
     XK_Tab, // toggle through windows

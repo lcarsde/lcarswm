@@ -106,9 +106,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         setupScreen(system, rootWindow, windowRegistration)
 
-        val configPathBytes = system.getenv("XDG_CONFIG_HOME") ?: return
+        val configPathBytes = system.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return
         val configPath = configPathBytes.toKString()
-        val keyConfiguration = "$configPath/lcarswm/$KEY_CONFIG_FILE"
+        val keyConfiguration = "$configPath$KEY_CONFIG_FILE"
 
         val keyConfigurationProvider = ConfigurationProvider(system, keyConfiguration)
 
