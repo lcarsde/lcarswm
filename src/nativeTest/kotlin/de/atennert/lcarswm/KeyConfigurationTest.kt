@@ -2,10 +2,7 @@ package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
-import xlib.XK_A
-import xlib.XK_B
-import xlib.XK_C
-import xlib.XK_X
+import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -15,6 +12,8 @@ class KeyConfigurationTest {
     fun `load simple key configuration`() {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+
+        systemApi.functionCalls.clear()
 
         val configurationProvider = object : Properties {
             override fun get(propertyKey: String): String? {
@@ -52,6 +51,9 @@ class KeyConfigurationTest {
             keyConfiguration.getCommandForKey(XK_C.convert(), 0.convert()),
             "The config should not provide an unknown key binding"
         )
+
+        configurationProvider.getProperyNames()
+            .forEach { key -> checkGrabKey(systemApi, key) }
     }
 
     @Test
@@ -93,6 +95,8 @@ class KeyConfigurationTest {
             keyConfiguration.getCommandForKey(XK_X.convert(), keyManager.modMasks.getValue(Modifiers.ALT).convert()),
             "The config should load the third key binding"
         )
+
+        // TODO check grab key
     }
 
     @Test
@@ -118,9 +122,12 @@ class KeyConfigurationTest {
 
         assertEquals(
             "commandA",
-            keyConfiguration.getCommandForKey(XK_A.convert(),
-                getMask(keyManager,
-                listOf(Modifiers.CONTROL, Modifiers.ALT))
+            keyConfiguration.getCommandForKey(
+                XK_A.convert(),
+                getMask(
+                    keyManager,
+                    listOf(Modifiers.CONTROL, Modifiers.ALT)
+                )
             ),
             "The config should load the first key binding"
         )
@@ -140,11 +147,26 @@ class KeyConfigurationTest {
             ),
             "The config should load the third key binding"
         )
+
+        // TODO check grab key
     }
 
     private fun getMask(keyManager: KeyManager, l: List<Modifiers>): UInt {
         return l.fold(0) { acc, m ->
             acc or keyManager.modMasks.getValue(m)
         }.convert()
+    }
+
+    private fun checkGrabKey(
+        systemApi: SystemFacadeMock,
+        key: String
+    ) {
+        val grabKeyCall1 = systemApi.functionCalls.removeAt(0)
+
+        assertEquals("grabKey", grabKeyCall1.name, "Grab key needs to be called to grab $key with ...")
+        assertEquals(systemApi.keySyms[systemApi.keyStrings[key]], grabKeyCall1.parameters[0], "Grab key needs to be called with the keyCode for $key (modifier ...)")
+        assertEquals(0.toUInt(), grabKeyCall1.parameters[1], "The modifier for $key should be ...")
+        assertEquals(systemApi.rootWindowId, grabKeyCall1.parameters[2], "The key should be grabbed for the root window")
+        assertEquals(GrabModeAsync, grabKeyCall1.parameters[3], "The mode for the grabbed key should be GrabModeAsync")
     }
 }
