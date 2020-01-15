@@ -107,18 +107,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
         return modifierMasks
     }
 
-    fun grabInputControls() {
-//        grabModifierKeys()
-        grabModifiedKeys()
-    }
-
-//    private fun grabModifierKeys() {
-//        modifiers.forEach { keyCode ->
-//            inputApi.grabKey(keyCode.convert(), AnyModifier.convert(), rootWindowId, GrabModeAsync)
-//        }
-//    }
-
-    private fun grabModifiedKeys() {
+    fun grabInternalKeys() {
         grabKeysForKeySyms(LCARS_WM_KEY_SYMS, modMasks.getValue(Modifiers.SUPER))
     }
 

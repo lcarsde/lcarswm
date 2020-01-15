@@ -2,7 +2,6 @@ package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
-import xlib.AnyModifier
 import xlib.ControlMask
 import xlib.LockMask
 import xlib.ShiftMask
@@ -37,7 +36,7 @@ class KeyManagerTest {
 
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
 
-        keyManager.grabInputControls()
+        keyManager.grabInternalKeys()
 
         val inputCalls = systemApi.functionCalls
 

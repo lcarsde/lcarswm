@@ -86,7 +86,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         val uiDrawer = RootWindowDrawer(system, monitorManager, screen)
 
         val keyManager = KeyManager(system, rootWindow)
-        keyManager.grabInputControls()
+        keyManager.grabInternalKeys()
 
         val focusHandler = WindowFocusHandler()
 
