@@ -54,7 +54,7 @@ class KeyReleaseHandlerTest {
         val focusHandler = WindowFocusHandler()
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
         val atomLibrary = AtomLibrary(systemApi)
-        keyManager.grabInputControls()
+        keyManager.grabInternalKeys()
 
         systemApi.functionCalls.clear()
 
@@ -84,7 +84,7 @@ class KeyReleaseHandlerTest {
         val windowId = systemApi.getNewWindowId()
         val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
-        keyManager.grabInputControls()
+        keyManager.grabInternalKeys()
 
         systemApi.functionCalls.clear()
 
@@ -121,7 +121,7 @@ class KeyReleaseHandlerTest {
         val windowId = systemApi.getNewWindowId()
         val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
-        keyManager.grabInputControls()
+        keyManager.grabInternalKeys()
 
         systemApi.functionCalls.clear()
 
@@ -149,7 +149,7 @@ class KeyReleaseHandlerTest {
         val windowId = systemApi.getNewWindowId()
         val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
-        keyManager.grabInputControls()
+        keyManager.grabInternalKeys()
 
         systemApi.functionCalls.clear()
 
@@ -186,7 +186,7 @@ class KeyReleaseHandlerTest {
         val windowId = systemApi.getNewWindowId()
         val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
-        keyManager.grabInputControls()
+        keyManager.grabInternalKeys()
 
         val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
 
