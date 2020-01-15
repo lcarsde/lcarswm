@@ -179,7 +179,7 @@ open class SystemFacadeMock : SystemApi {
 
     private var startKeyCode = 0
 
-    private val keyStrings = mapOf(
+    val keyStrings = mapOf(
         Pair("Tab", XK_Tab),
         Pair("A", XK_A),
         Pair("B", XK_B),
