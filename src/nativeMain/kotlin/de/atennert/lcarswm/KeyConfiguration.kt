@@ -28,6 +28,8 @@ class KeyConfiguration(
             val mask = getMask(modifierStrings)
             val keySym = getKeySym(keyString)
 
+            keyManager.grabKey(keySym, mask)
+
             keySymCommands[Pair(keySym, mask)] = configurationProvider[keyConfig]!!
         }
     }

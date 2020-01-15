@@ -120,5 +120,14 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
             }
     }
 
+    fun grabKey(keySym: KeySym, modifiers: Int) {
+        val keyCode = inputApi.keysymToKeycode(keySym)
+
+        if (keyCode.convert<Int>() != 0) {
+            grabbedKeys[keyCode] = keySym
+            inputApi.grabKey(keyCode.convert(), modifiers.convert(), rootWindowId, GrabModeAsync)
+        }
+    }
+
     fun getKeySym(keyCode: KeyCode): KeySym? = grabbedKeys[keyCode]
 }
