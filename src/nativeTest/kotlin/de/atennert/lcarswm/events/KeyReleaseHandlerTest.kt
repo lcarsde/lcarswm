@@ -86,14 +86,14 @@ class KeyReleaseHandlerTest {
         focusHandler.setFocusedWindow(windowId)
         keyManager.grabInternalKeys()
 
-        systemApi.functionCalls.clear()
-
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
         keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
 
         val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
+
+        systemApi.functionCalls.clear()
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
@@ -123,14 +123,14 @@ class KeyReleaseHandlerTest {
         focusHandler.setFocusedWindow(windowId)
         keyManager.grabInternalKeys()
 
-        systemApi.functionCalls.clear()
-
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
         keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
 
         val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
+
+        systemApi.functionCalls.clear()
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
@@ -151,14 +151,14 @@ class KeyReleaseHandlerTest {
         focusHandler.setFocusedWindow(windowId)
         keyManager.grabInternalKeys()
 
-        systemApi.functionCalls.clear()
-
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
         keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
 
         val keyReleaseHandler = KeyReleaseHandler(systemApi, focusHandler, keyManager, atomLibrary, configurationProvider)
+
+        systemApi.functionCalls.clear()
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)
 
