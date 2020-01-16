@@ -138,12 +138,12 @@ class MonitorManagerImplTest {
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
         monitorManager.toggleScreenMode()
-        assertEquals(ScreenMode.MAXIMIZED, monitorManager.getScreenMode(), "")
+        assertEquals(ScreenMode.MAXIMIZED, monitorManager.getScreenMode(), "The second mode should be maximized")
 
         monitorManager.toggleScreenMode()
-        assertEquals(ScreenMode.FULLSCREEN, monitorManager.getScreenMode(), "")
+        assertEquals(ScreenMode.FULLSCREEN, monitorManager.getScreenMode(), "The third mode should be fullscreen")
 
         monitorManager.toggleScreenMode()
-        assertEquals(ScreenMode.NORMAL, monitorManager.getScreenMode(), "")
+        assertEquals(ScreenMode.NORMAL, monitorManager.getScreenMode(), "Finally it should wrap around back to normal")
     }
 }
