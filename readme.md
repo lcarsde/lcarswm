@@ -20,13 +20,7 @@ Thank you very much to the creators of the following resources:
 * Windows-key + Up/Down moves the active window to other monitors
 * Windows-key + M toggles the display mode between normal, maximized and fullscreen
 * Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
-* The following keys can be configured via a key configuration file:
-  * Windows-key + T
-  * Windows-key + B
-  * Windows-key + I
-  * XF86AudioMute
-  * XF86AudioRaiseVolume
-  * XF86AudioLowerVolume
+* Other key combinations can be connected to commands via a key configuration file
 
 ## Pictures
 Yay, it's starting to get usable. So here are some pictures from the VirtualBox test environment.
