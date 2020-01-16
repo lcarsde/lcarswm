@@ -130,4 +130,20 @@ class MonitorManagerImplTest {
     }
 
     // TODO add change of screen mode
+
+    @Test
+    fun `change the screen mode`() {
+        val systemApi = SystemFacadeMock()
+
+        val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+
+        monitorManager.toggleScreenMode()
+        assertEquals(ScreenMode.MAXIMIZED, monitorManager.getScreenMode(), "")
+
+        monitorManager.toggleScreenMode()
+        assertEquals(ScreenMode.FULLSCREEN, monitorManager.getScreenMode(), "")
+
+        monitorManager.toggleScreenMode()
+        assertEquals(ScreenMode.NORMAL, monitorManager.getScreenMode(), "")
+    }
 }

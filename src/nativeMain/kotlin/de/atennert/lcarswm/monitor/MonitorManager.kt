@@ -12,4 +12,6 @@ interface MonitorManager {
     fun getCombinedScreenSize(): Pair<Int, Int>
 
     fun getScreenMode(): ScreenMode
+
+    fun toggleScreenMode()
 }

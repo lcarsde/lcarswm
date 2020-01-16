@@ -88,4 +88,7 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
     override fun getScreenMode(): ScreenMode {
         return ScreenMode.NORMAL
     }
+
+    override fun toggleScreenMode() {
+    }
 }

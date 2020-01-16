@@ -19,4 +19,8 @@ open class MonitorManagerMock : MonitorManager {
     override fun getCombinedScreenSize(): Pair<Int, Int> = Pair(1920, 1080)
 
     override fun getScreenMode(): ScreenMode = ScreenMode.NORMAL
+
+    override fun toggleScreenMode() {
+        functionCalls.add(FunctionCall("toggleScreenMode"))
+    }
 }
