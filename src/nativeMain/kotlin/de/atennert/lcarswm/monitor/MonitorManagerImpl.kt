@@ -12,6 +12,8 @@ import kotlin.math.max
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager {
     private var monitors: List<Monitor> = emptyList()
 
+    private var screenMode = ScreenMode.NORMAL
+
     override fun updateMonitorList() {
         val monitorData = getMonitorData()
         val monitorIds = getMonitorIds(monitorData)
@@ -86,9 +88,14 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         }
 
     override fun getScreenMode(): ScreenMode {
-        return ScreenMode.NORMAL
+        return screenMode
     }
 
     override fun toggleScreenMode() {
+        screenMode = when (screenMode) {
+            ScreenMode.NORMAL -> ScreenMode.MAXIMIZED
+            ScreenMode.MAXIMIZED -> ScreenMode.FULLSCREEN
+            ScreenMode.FULLSCREEN -> ScreenMode.NORMAL
+        }
     }
 }
