@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.FramedWindow
+import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.FunctionCall
@@ -175,6 +176,39 @@ class ActiveWindowCoordinatorTest {
         activeWindowCoordinator.moveWindowToPreviousMonitor(window.id)
         assertEquals(monitorManager.primaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the primary monitor")
         checkMoveWindowCalls(systemCalls, window)
+    }
+
+    @Test
+    fun `test realign windows`() {
+        val systemApi = SystemFacadeMock()
+        val window = FramedWindow(systemApi.getNewWindowId())
+        window.frame = systemApi.getNewWindowId()
+        lateinit var monitor: Monitor
+        val monitorManager = object : MonitorManagerMock() {
+            override fun getPrimaryMonitor(): Monitor = monitor
+        }
+        monitor = Monitor(monitorManager, 21.convert(), "", true)
+
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        activeWindowCoordinator.addWindowToMonitor(window)
+
+        monitorManager.screenMode = ScreenMode.MAXIMIZED
+        activeWindowCoordinator.realignWindows()
+        var measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
+        assertEquals(listOf(40, 48, 720, 504), measurments, "")
+        checkMoveWindowCalls(systemApi.functionCalls, window)
+
+        monitorManager.screenMode = ScreenMode.FULLSCREEN
+        activeWindowCoordinator.realignWindows()
+        measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
+        assertEquals(listOf(0, 0, 800, 600), measurments, "")
+        checkMoveWindowCalls(systemApi.functionCalls, window)
+
+        monitorManager.screenMode = ScreenMode.NORMAL
+        activeWindowCoordinator.realignWindows()
+        measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
+        assertEquals(listOf(208, 242, 552, 292), measurments, "")
+        checkMoveWindowCalls(systemApi.functionCalls, window)
     }
 
     private fun checkMoveWindowCalls(
