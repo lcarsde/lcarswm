@@ -23,4 +23,6 @@ interface WindowCoordinator {
     fun getWindowMeasurements(windowId: Window): List<Int>
 
     fun stackWindowToTheTop(windowId: Window)
+
+    fun realignWindows()
 }

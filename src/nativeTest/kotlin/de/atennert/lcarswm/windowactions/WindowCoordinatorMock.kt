@@ -43,4 +43,8 @@ class WindowCoordinatorMock : WindowCoordinator {
     override fun stackWindowToTheTop(windowId: Window) {
         functionCalls.add(FunctionCall("stackWindowToTheTop", windowId))
     }
+
+    override fun realignWindows() {
+        functionCalls.add(FunctionCall("realignWindows"))
+    }
 }

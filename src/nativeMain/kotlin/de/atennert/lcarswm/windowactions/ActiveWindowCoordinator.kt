@@ -80,4 +80,8 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
 
         eventApi.configureWindow(window.frame, CWStackMode.convert(), windowChanges.ptr)
     }
+
+    override fun realignWindows() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
