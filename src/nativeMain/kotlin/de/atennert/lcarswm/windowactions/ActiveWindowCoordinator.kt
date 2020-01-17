@@ -82,6 +82,10 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
     }
 
     override fun realignWindows() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        windowsOnMonitors.forEach { (window, monitor) ->
+            adjustWindowPositionAndSize(
+                eventApi, monitor.getWindowMeasurements(), window
+            )
+        }
     }
 }
