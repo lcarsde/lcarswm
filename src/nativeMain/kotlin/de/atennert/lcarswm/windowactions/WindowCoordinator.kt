@@ -4,6 +4,9 @@ import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.monitor.Monitor
 import xlib.Window
 
+/**
+ * Interface for class that manages the mapping of windows to monitors
+ */
 interface WindowCoordinator {
     fun rearrangeActiveWindows()
 
