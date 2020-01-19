@@ -56,7 +56,7 @@ class KeyPressHandler(
 
     private fun toggleScreenMode() {
         monitorManager.toggleScreenMode()
-        uiDrawer.drawWindowManagerFrame()
         windowCoordinator.realignWindows()
+        uiDrawer.drawWindowManagerFrame()
     }
 }
