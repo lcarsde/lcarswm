@@ -1,7 +1,9 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.KeyManager
+import de.atennert.lcarswm.Modifiers
 import de.atennert.lcarswm.UIDrawingMock
+import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import de.atennert.lcarswm.windowactions.WindowCoordinatorMock
@@ -23,7 +25,8 @@ class KeyPressHandlerTest {
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawing = UIDrawingMock()
-        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawing)
+        val monitorManager = MonitorManagerMock()
+        val keyPressHandler = KeyPressHandler(keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawing)
 
         assertEquals(KeyPress, keyPressHandler.xEventType, "The key press handler should have the correct type")
     }
@@ -35,15 +38,16 @@ class KeyPressHandlerTest {
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
+        val monitorManager = MonitorManagerMock()
         keyManager.grabInternalKeys()
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
-        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Up).convert()
-        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.SUPER).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -64,15 +68,16 @@ class KeyPressHandlerTest {
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
+        val monitorManager = MonitorManagerMock()
         keyManager.grabInternalKeys()
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
-        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Down).convert()
-        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.SUPER).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -93,14 +98,15 @@ class KeyPressHandlerTest {
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
+        val monitorManager = MonitorManagerMock()
         keyManager.grabInternalKeys()
 
-        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Up).convert()
-        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.SUPER).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -118,14 +124,15 @@ class KeyPressHandlerTest {
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
+        val monitorManager = MonitorManagerMock()
         keyManager.grabInternalKeys()
 
-        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Down).convert()
-        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.SUPER).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -150,6 +157,7 @@ class KeyPressHandlerTest {
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
+        val monitorManager = MonitorManagerMock()
         val window1 = systemApi.getNewWindowId()
         val window2 = systemApi.getNewWindowId()
         val window3 = systemApi.getNewWindowId()
@@ -159,12 +167,12 @@ class KeyPressHandlerTest {
         windowFocusHandler.setFocusedWindow(window3)
         windowFocusHandler.setFocusedWindow(window1)
 
-        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = 42.convert()
-        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.SUPER).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -203,19 +211,47 @@ class KeyPressHandlerTest {
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
+        val monitorManager = MonitorManagerMock()
         keyManager.grabInternalKeys()
 
-        val keyPressHandler = KeyPressHandler(keyManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = 42.convert()
-        keyPressEvent.xkey.state = systemApi.modifiers[systemApi.winModifierPosition].convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.SUPER).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
         assertFalse(shutdownValue, "Handling the up-key shouldn't trigger a shutdown")
 
         assertEquals(0, windowCoordinator.functionCalls.size, "There is no window to restack")
+    }
+
+    @Test
+    fun `toggle screen mode on M`() {
+        val systemApi = SystemFacadeMock()
+        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val windowCoordinator = WindowCoordinatorMock()
+        val windowFocusHandler = WindowFocusHandler()
+        val uiDrawer = UIDrawingMock()
+        val monitorManager = MonitorManagerMock()
+        keyManager.grabInternalKeys()
+        windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
+
+        val keyPressHandler = KeyPressHandler(keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
+
+        val keyPressEvent = nativeHeap.alloc<XEvent>()
+        keyPressEvent.type = KeyPress
+        keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_M).convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.SUPER).convert()
+
+        val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
+
+        assertFalse(shutdownValue, "Handling the M-key shouldn't trigger a shutdown.")
+
+        val monitorModeToggleCall = monitorManager.functionCalls.removeAt(0)
+        assertEquals("toggleScreenMode", monitorModeToggleCall.name, "The screen mode should be toggled.")
+        // TODO update windows positions and measurements
     }
 }
