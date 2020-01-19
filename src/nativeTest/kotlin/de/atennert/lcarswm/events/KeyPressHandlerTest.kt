@@ -252,6 +252,8 @@ class KeyPressHandlerTest {
 
         val monitorModeToggleCall = monitorManager.functionCalls.removeAt(0)
         assertEquals("toggleScreenMode", monitorModeToggleCall.name, "The screen mode should be toggled.")
-        // TODO update windows positions and measurements
+
+        val realignWindowsCall = windowCoordinator.functionCalls.removeAt(0)
+        assertEquals("realignWindows", realignWindowsCall.name, "The windows need to be realigned after toggling the screen mode.")
     }
 }
