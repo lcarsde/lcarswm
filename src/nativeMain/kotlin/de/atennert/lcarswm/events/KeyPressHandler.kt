@@ -2,6 +2,7 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.KeyManager
 import de.atennert.lcarswm.UIDrawing
+import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.windowactions.WindowCoordinator
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
 import kotlinx.cinterop.convert
@@ -9,6 +10,7 @@ import xlib.*
 
 class KeyPressHandler(
     private val keyManager: KeyManager,
+    private val monitorManager: MonitorManager,
     private val windowCoordinator: WindowCoordinator,
     private val windowFocusHandler: WindowFocusHandler,
     private val uiDrawer: UIDrawing
@@ -22,6 +24,8 @@ class KeyPressHandler(
             XK_Up -> moveWindowToNextMonitor()
             XK_Down -> moveWindowToPreviousMonitor()
             XK_Tab -> toggleFocusedWindow()
+            XK_M -> toggleScreenMode()
+            // TODO check for mask
         }
 
         return false
@@ -43,5 +47,9 @@ class KeyPressHandler(
         windowFocusHandler.toggleWindowFocus()
         val newFocusedWindow = windowFocusHandler.getFocusedWindow() ?: return
         windowCoordinator.stackWindowToTheTop(newFocusedWindow)
+    }
+
+    private fun toggleScreenMode() {
+        monitorManager.toggleScreenMode()
     }
 }

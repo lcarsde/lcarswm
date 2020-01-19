@@ -115,6 +115,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         val eventManager = createEventManager(
             system,
             logger,
+            monitorManager,
             windowRegistration,
             windowCoordinator,
             focusHandler,
@@ -216,6 +217,7 @@ private fun setupRandr(
 private fun createEventManager(
     system: SystemApi,
     logger: Logger,
+    monitorManager: MonitorManager,
     windowRegistration: WindowRegistration,
     windowCoordinator: WindowCoordinator,
     focusHandler: WindowFocusHandler,
@@ -229,7 +231,7 @@ private fun createEventManager(
     return EventManager.Builder(logger)
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration))
-        .addEventHandler(KeyPressHandler(keyManager, windowCoordinator, focusHandler, uiDrawer))
+        .addEventHandler(KeyPressHandler(keyManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
         .addEventHandler(KeyReleaseHandler(system, focusHandler, keyManager, atomLibrary, keyConfigurationProvider))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
         .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
