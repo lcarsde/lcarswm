@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.KeyManager
+import de.atennert.lcarswm.Modifiers
 import de.atennert.lcarswm.UIDrawing
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.windowactions.WindowCoordinator
@@ -19,13 +20,17 @@ class KeyPressHandler(
 
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
+        val winKeyMask = keyManager.modMasks.getValue(Modifiers.SUPER)
+
+        if (event.xkey.state.convert<Int>() != winKeyMask) {
+            return false
+        }
 
         when (keyManager.getKeySym(keyCode.convert())?.convert<Int>()) {
             XK_Up -> moveWindowToNextMonitor()
             XK_Down -> moveWindowToPreviousMonitor()
             XK_Tab -> toggleFocusedWindow()
             XK_M -> toggleScreenMode()
-            // TODO check for mask
         }
 
         return false
