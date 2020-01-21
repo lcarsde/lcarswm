@@ -106,6 +106,9 @@ data class Monitor(
         )
     }
 
+    /**
+     * Return the monitors screen mode. Normal is converted to maximized for non-primary monitors.
+     */
     fun getScreenMode(): ScreenMode = when {
         !isPrimary && monitorManager.getScreenMode() == ScreenMode.NORMAL -> ScreenMode.MAXIMIZED
         else -> monitorManager.getScreenMode()
