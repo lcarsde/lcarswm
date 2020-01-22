@@ -22,7 +22,7 @@ class KeyConfiguration(
     )
 
     init {
-        for (keyConfig in configurationProvider.getProperyNames()) {
+        for (keyConfig in configurationProvider.getPropertyNames()) {
             val (modifierStrings, keyString) = separateKeySymAndModifiers(keyConfig)
 
             val mask = getMask(modifierStrings)

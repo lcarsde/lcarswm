@@ -25,7 +25,7 @@ class KeyConfigurationTest {
                 }
             }
 
-            override fun getProperyNames(): Set<String> {
+            override fun getPropertyNames(): Set<String> {
                 return setOf("A", "B", "X")
             }
         }
@@ -52,7 +52,7 @@ class KeyConfigurationTest {
             "The config should not provide an unknown key binding"
         )
 
-        configurationProvider.getProperyNames()
+        configurationProvider.getPropertyNames()
             .forEach { key -> checkGrabKey(systemApi, keyManager, key, emptyList()) }
     }
 
@@ -71,7 +71,7 @@ class KeyConfigurationTest {
                 }
             }
 
-            override fun getProperyNames(): Set<String> {
+            override fun getPropertyNames(): Set<String> {
                 return setOf("A", "Ctrl+B", "Alt+X")
             }
         }
@@ -96,7 +96,7 @@ class KeyConfigurationTest {
             "The config should load the third key binding"
         )
 
-        configurationProvider.getProperyNames()
+        configurationProvider.getPropertyNames()
             .zip(listOf(emptyList(), listOf(Modifiers.CONTROL), listOf(Modifiers.ALT)))
             .forEach { (key, modifiers) -> checkGrabKey(systemApi, keyManager, key, modifiers) }
     }
@@ -116,7 +116,7 @@ class KeyConfigurationTest {
                 }
             }
 
-            override fun getProperyNames(): Set<String> {
+            override fun getPropertyNames(): Set<String> {
                 return setOf("Ctrl+Alt+A", "Win+Shift+Meta+B", "Hyper+Super+X")
             }
         }
@@ -150,7 +150,7 @@ class KeyConfigurationTest {
             "The config should load the third key binding"
         )
 
-        configurationProvider.getProperyNames()
+        configurationProvider.getPropertyNames()
             .zip(listOf(
                 listOf(Modifiers.CONTROL, Modifiers.ALT),
                 listOf(Modifiers.SUPER, Modifiers.SHIFT, Modifiers.META),

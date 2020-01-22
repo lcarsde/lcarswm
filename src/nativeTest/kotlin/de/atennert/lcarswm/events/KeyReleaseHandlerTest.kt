@@ -27,7 +27,7 @@ class KeyReleaseHandlerTest {
             }
         }
 
-        override fun getProperyNames(): Set<String> {
+        override fun getPropertyNames(): Set<String> {
             return setOf("Ctrl+F4")
         }
     }

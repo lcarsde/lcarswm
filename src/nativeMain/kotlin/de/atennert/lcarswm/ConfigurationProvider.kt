@@ -43,5 +43,5 @@ class ConfigurationProvider(posixApi: PosixApi, configurationFilePath: String) :
 
     override operator fun get(propertyKey: String): String? = properties[propertyKey]
 
-    override fun getProperyNames(): Set<String> = properties.keys
+    override fun getPropertyNames(): Set<String> = properties.keys
 }
