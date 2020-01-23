@@ -159,10 +159,10 @@ class ShutdownTest {
 
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "nextEvent" }
+            .dropWhile { it.name == "nextEvent" }
             .toMutableList()
 
         checkThatTheLoggerIsClosed(logger)
-        checkRequestOfNextEvent(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
         checkFreeingOfGraphicsContexts(functionCalls)
