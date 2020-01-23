@@ -19,7 +19,7 @@ class MapRequestHandler(
 
         val isWindowKnown = windowRegistration.isWindowManaged(mapEvent.window)
 
-        logger.logDebug("::handleMapRequest::map request for window ${mapEvent.window}, parent: ${mapEvent.parent}, is known: $isWindowKnown")
+        logger.logDebug("MapRequestHandler::handleEvent::map request for window ${mapEvent.window}, parent: ${mapEvent.parent}, is known: $isWindowKnown")
 
         if (!isWindowKnown) {
             windowRegistration.addWindow(mapEvent.window, false)
