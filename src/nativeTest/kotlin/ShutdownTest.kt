@@ -253,10 +253,6 @@ class ShutdownTest {
         )
     }
 
-    private fun checkRequestOfNextEvent(functionCalls: MutableList<FunctionCall>) {
-        assertEquals("nextEvent", functionCalls.removeAt(0).name, "The window manager should react to events")
-    }
-
     private fun checkFreeingOfColors(functionCalls: MutableList<FunctionCall>) {
         assertEquals("freeColors", functionCalls.removeAt(0).name, "the acquired colors need to be freed on shutdown")
     }
