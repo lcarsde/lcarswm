@@ -253,7 +253,7 @@ private fun createEventManager(
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration))
         .addEventHandler(KeyPressHandler(logger, keyManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
-        .addEventHandler(KeyReleaseHandler(system, focusHandler, keyManager, atomLibrary, keyConfigurationProvider))
+        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, atomLibrary, keyConfigurationProvider))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
         .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
         .addEventHandler(screenChangeHandler)

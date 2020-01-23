@@ -3,6 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
 import kotlinx.cinterop.*
@@ -12,6 +13,7 @@ import xlib.*
  *
  */
 class KeyReleaseHandler(
+    private val logger: Logger,
     private val systemApi: SystemApi,
     private val focusHandler: WindowFocusHandler,
     private val keyManager: KeyManager,
@@ -26,6 +28,9 @@ class KeyReleaseHandler(
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
         val keyMask = event.xkey.state
+
+        logger.logDebug("KeyReleaseHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
+
         val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
         val winKeyMask = keyManager.modMasks.getValue(Modifiers.SUPER)
 
@@ -34,6 +39,7 @@ class KeyReleaseHandler(
             Pair(XK_Q, winKeyMask) -> return true
             else -> {
                 keyConfiguration.getCommandForKey(keySym, keyMask)?.let { command ->
+                    logger.logDebug("KeyReleaseHandler::handleEvent::run command: $command")
                     val commandParts = command.split(' ')
                     runProgram(systemApi, commandParts[0], commandParts)
                 }
@@ -44,6 +50,8 @@ class KeyReleaseHandler(
 
     private fun closeActiveWindow() {
         val focusedWindow = focusHandler.getFocusedWindow() ?: return
+
+        logger.logDebug("KeyReleaseHandler::closeActiveWindow::focused window: $focusedWindow")
 
         val supportedProtocols = nativeHeap.allocArrayOfPointersTo<AtomVar>()
         val numSupportedProtocols = IntArray(1).pin()
