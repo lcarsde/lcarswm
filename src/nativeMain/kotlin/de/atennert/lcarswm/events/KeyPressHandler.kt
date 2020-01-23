@@ -3,6 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.KeyManager
 import de.atennert.lcarswm.Modifiers
 import de.atennert.lcarswm.UIDrawing
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.windowactions.WindowCoordinator
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
@@ -10,6 +11,7 @@ import kotlinx.cinterop.convert
 import xlib.*
 
 class KeyPressHandler(
+    private val logger: Logger,
     private val keyManager: KeyManager,
     private val monitorManager: MonitorManager,
     private val windowCoordinator: WindowCoordinator,
@@ -21,6 +23,8 @@ class KeyPressHandler(
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
         val winKeyMask = keyManager.modMasks.getValue(Modifiers.SUPER)
+
+        logger.logDebug("KeyPressHandler::handleEvent::key code: $keyCode, key mask: ${event.xkey.state}")
 
         if (event.xkey.state.convert<Int>() != winKeyMask) {
             return false
@@ -38,12 +42,14 @@ class KeyPressHandler(
 
     private fun moveWindowToPreviousMonitor() {
         val focusedWindow = windowFocusHandler.getFocusedWindow() ?: return
+        logger.logDebug("KeyPressHandler::moveWindowToPreviousMonitor::focused window: $focusedWindow")
         windowCoordinator.moveWindowToPreviousMonitor(focusedWindow)
         uiDrawer.drawWindowManagerFrame()
     }
 
     private fun moveWindowToNextMonitor() {
         val focusedWindow = windowFocusHandler.getFocusedWindow() ?: return
+        logger.logDebug("KeyPressHandler::moveWindowToNextMonitor::focused window: $focusedWindow")
         windowCoordinator.moveWindowToNextMonitor(focusedWindow)
         uiDrawer.drawWindowManagerFrame()
     }
@@ -51,10 +57,12 @@ class KeyPressHandler(
     private fun toggleFocusedWindow() {
         windowFocusHandler.toggleWindowFocus()
         val newFocusedWindow = windowFocusHandler.getFocusedWindow() ?: return
+        logger.logDebug("KeyPressHandler::toggleFocusedWindow::new focused window: $newFocusedWindow")
         windowCoordinator.stackWindowToTheTop(newFocusedWindow)
     }
 
     private fun toggleScreenMode() {
+        logger.logDebug("KeyPressHandler::toggleScreenMode::")
         monitorManager.toggleScreenMode()
         windowCoordinator.realignWindows()
         uiDrawer.drawWindowManagerFrame()
