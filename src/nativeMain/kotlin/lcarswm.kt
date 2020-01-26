@@ -11,11 +11,6 @@ import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.system.api.WindowUtilApi
 import de.atennert.lcarswm.windowactions.*
 import kotlinx.cinterop.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import xlib.*
 
 private var wmDetected = false
@@ -37,7 +32,7 @@ fun main() {
     runWindowManager(system, logger)
 }
 
-fun runWindowManager(system: SystemApi, logger: Logger) = runBlocking {
+fun runWindowManager(system: SystemApi, logger: Logger) {
     logger.logInfo("::runWindowManager::start lcarswm initialization")
 
     memScoped {
@@ -45,14 +40,14 @@ fun runWindowManager(system: SystemApi, logger: Logger) = runBlocking {
         if (!system.openDisplay()) {
             logger.logError("::runWindowManager::got no display")
             logger.close()
-            return@runBlocking
+            return
         }
         val screen = system.defaultScreenOfDisplay()?.pointed
         if (screen == null) {
             logger.logError("::runWindowManager::got no screen")
             logger.close()
             system.closeDisplay()
-            return@runBlocking
+            return
         }
         val rootWindow = screen.root
 
@@ -63,7 +58,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) = runBlocking {
         if (!rootWindowPropertyHandler.becomeScreenOwner()) {
             logger.logError("::runWindowManager::Detected another active window manager")
             cleanup(logger, system, rootWindowPropertyHandler)
-            return@runBlocking
+            return
         }
 
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
@@ -74,7 +69,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) = runBlocking {
         if (wmDetected) {
             logger.logError("::runWindowManager::Detected another active window manager")
             cleanup(logger, system, rootWindowPropertyHandler)
-            return@runBlocking
+            return
         }
 
         rootWindowPropertyHandler.setSupportWindowProperties()
@@ -112,7 +107,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) = runBlocking {
         setupScreen(system, rootWindow, windowRegistration)
 
         // TODO move this up
-        val configPathBytes = system.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return@runBlocking
+        val configPathBytes = system.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return
         val configPath = configPathBytes.toKString()
         val keyConfiguration = "$configPath$KEY_CONFIG_FILE"
 
@@ -133,21 +128,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) = runBlocking {
         )
 
         eventLoop(system, eventManager)
-
-//        val events = produceEvents(system)
-//        coroutineScope {
-//            launch {
-//                for (event in events) {
-//                    if (eventManager.handleEvent(event)) {
-//                        nativeHeap.free(event)
-//                        break
-//                    }
-//                    nativeHeap.free(event)
-//                }
-//            }
-//        }
-//
-//        events.cancel()
 
         shutdown(system, uiDrawer, rootWindow, logger, rootWindowPropertyHandler)
     }
@@ -275,11 +255,3 @@ private fun eventLoop(
         nativeHeap.free(xEvent)
     }
 }
-//
-//private fun CoroutineScope.produceEvents(eventApi: EventApi) = produce {
-//    while (true) {
-//        val xEvent = nativeHeap.alloc<XEvent>()
-//        eventApi.nextEvent(xEvent.ptr)
-//        send(xEvent)
-//    }
-//}
