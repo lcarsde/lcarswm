@@ -10,7 +10,7 @@ import kotlinx.cinterop.*
 import xlib.*
 
 /**
- *
+ * Handles key release events. This covers a few internal codes as well as configured key bindings.
  */
 class KeyReleaseHandler(
     private val logger: Logger,
@@ -36,7 +36,7 @@ class KeyReleaseHandler(
 
         when (Pair(keySym.convert<Int>(), keyMask.convert<Int>())) {
             Pair(XK_F4, winKeyMask) -> closeActiveWindow()
-            Pair(XK_Q, winKeyMask) -> return true
+            Pair(XK_Q, winKeyMask) -> return true // shutdown the WM
             else -> {
                 keyConfiguration.getCommandForKey(keySym, keyMask)?.let { command ->
                     logger.logDebug("KeyReleaseHandler::handleEvent::run command: $command")
