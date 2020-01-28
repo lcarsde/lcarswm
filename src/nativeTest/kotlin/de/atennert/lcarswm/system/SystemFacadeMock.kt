@@ -391,7 +391,7 @@ open class SystemFacadeMock : SystemApi {
 
         protocolCountReturn.pointed.value = protocols.size
         protocolsReturn.pointed.value = atomArray
-        return 0
+        return 1
     }
 
     override fun setErrorHandler(handler: XErrorHandler): XErrorHandler? {
