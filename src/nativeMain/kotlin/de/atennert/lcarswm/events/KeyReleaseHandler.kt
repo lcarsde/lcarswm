@@ -53,19 +53,19 @@ class KeyReleaseHandler(
 
         logger.logInfo("KeyReleaseHandler::closeActiveWindow::focused window: $focusedWindow")
 
-        val supportedProtocols = nativeHeap.allocArrayOfPointersTo<AtomVar>()
+        val supportedProtocols = nativeHeap.allocPointerTo<AtomVar>()
         val numSupportedProtocols = IntArray(1).pin()
 
         val protocolsResult =
-            systemApi.getWMProtocols(focusedWindow, supportedProtocols, numSupportedProtocols.addressOf(0))
+            systemApi.getWMProtocols(focusedWindow, supportedProtocols.ptr, numSupportedProtocols.addressOf(0))
 
-        if (protocolsResult != 0) {
+        if (protocolsResult == 0) {
             logger.logDebug("KeyReleaseHandler::closeActiveWindow::kill window due to erroneous protocols")
             systemApi.killClient(focusedWindow)
             return
         }
 
-        val protocols = ULongArray(numSupportedProtocols.get()[0]) { supportedProtocols.pointed.value!![it] }
+        val protocols = ULongArray(numSupportedProtocols.get()[0]) { supportedProtocols.value!![it] }
 
         if (!protocols.contains(atomLibrary[Atoms.WM_DELETE_WINDOW])) {
             logger.logDebug("KeyReleaseHandler::closeActiveWindow::kill window due to missing WM_DELETE_WINDOW")
