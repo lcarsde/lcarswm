@@ -38,7 +38,7 @@ class WindowHandler(
 
         if (windowAttributes.override_redirect != X_FALSE ||
             (isSetup && windowAttributes.map_state != IsViewable)) {
-            logger.logInfo("WindowRegistration::addWindow::skipping window $windowId")
+            logger.logInfo("WindowHandler::addWindow::skipping window $windowId")
 
             if (!isSetup) {
                 system.mapWindow(windowId)
@@ -53,6 +53,8 @@ class WindowHandler(
         val measurements = windowCoordinator.addWindowToMonitor(window)
 
         window.frame = system.createSimpleWindow(rootWindow, measurements)
+
+        logger.logDebug("WindowHandler::addWindow::reparenting $windowId to ${window.frame}")
 
         system.selectInput(window.frame, frameEventMask)
 
@@ -78,6 +80,7 @@ class WindowHandler(
     override fun isWindowManaged(windowId: Window): Boolean = registeredWindows.containsKey(windowId)
 
     override fun removeWindow(windowId: Window) {
+        logger.logDebug("WindowHandler::removeWindow::remove window $windowId ... is known: ${isWindowManaged(windowId)}")
         val framedWindow = registeredWindows.remove(windowId)!!
         
         system.unmapWindow(framedWindow.frame)
