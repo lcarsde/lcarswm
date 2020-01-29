@@ -4,6 +4,9 @@ import de.atennert.lcarswm.system.api.InputApi
 import kotlinx.cinterop.convert
 import xlib.KeySym
 
+/**
+ * Loads the key configuration of the users and provides the corresponding key bindings.
+ */
 class KeyConfiguration(
     private val inputApi: InputApi,
     configurationProvider: Properties,
