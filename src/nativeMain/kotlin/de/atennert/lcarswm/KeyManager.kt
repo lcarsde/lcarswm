@@ -107,6 +107,9 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
         return modifierMasks
     }
 
+    /**
+     * Grab the internal keys from the XServer.
+     */
     fun grabInternalKeys() {
         grabKeysForKeySyms(LCARS_WM_KEY_SYMS, modMasks.getValue(Modifiers.SUPER))
     }
@@ -120,6 +123,9 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
             }
     }
 
+    /**
+     * Grab a key binding consisting of a key sym and a key modifier
+     */
     fun grabKey(keySym: KeySym, modifiers: Int) {
         val keyCode = inputApi.keysymToKeycode(keySym)
 
@@ -129,5 +135,8 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
         }
     }
 
+    /**
+     * 
+     */
     fun getKeySym(keyCode: KeyCode): KeySym? = grabbedKeys[keyCode]
 }
