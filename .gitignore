@@ -1,5 +1,6 @@
 .project
 .settings
+.vscode
 .gradle
 build
 gradle.properties
