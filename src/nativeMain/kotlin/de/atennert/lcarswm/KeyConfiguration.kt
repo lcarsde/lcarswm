@@ -55,6 +55,9 @@ class KeyConfiguration(
         return inputApi.stringToKeysym(keyString)
     }
 
+    /**
+     * @return command for a key binding consisting of key sym and key mask. null if there's no command registered for the given key sym+key mask
+     */
     fun getCommandForKey(keySym: KeySym, keyMask: UInt): String? {
         return keySymCommands[Pair(keySym, filterMask(keyMask))]
     }
