@@ -128,6 +128,10 @@ class SystemFacade : SystemApi {
         return XDisplayString(this.display)?.toKString() ?: ""
     }
 
+    override fun free(xObject: CPointer<*>?) {
+        XFree(xObject)
+    }
+
     override fun sync(discardQueuedEvents: Boolean): Int {
         return XSync(display, convertToXBoolean(discardQueuedEvents))
     }
@@ -305,6 +309,10 @@ class SystemFacade : SystemApi {
 
     override fun stringToKeysym(s: String): KeySym {
         return XStringToKeysym(s)
+    }
+
+    override fun freeModifiermap(modifierMap: CPointer<XModifierKeymap>?) {
+        XFreeModifiermap(modifierMap)
     }
 
     override fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int {

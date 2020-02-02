@@ -26,4 +26,6 @@ interface InputApi {
     fun keysymToKeycode(keySym: KeySym): KeyCode
 
     fun stringToKeysym(s: String): KeySym
+
+    fun freeModifiermap(modifierMap: CPointer<XModifierKeymap>?)
 }

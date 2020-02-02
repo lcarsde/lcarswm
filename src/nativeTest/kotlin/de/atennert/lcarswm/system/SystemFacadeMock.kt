@@ -248,6 +248,11 @@ open class SystemFacadeMock : SystemApi {
         return keyStrings.getValue(s).convert()
     }
 
+    override fun freeModifiermap(modifierMap: CPointer<XModifierKeymap>?) {
+        functionCalls.add(FunctionCall("freeModifiermap", modifierMap))
+        modifierMap?.let { nativeHeap.free(it) }
+    }
+
     override fun sync(discardQueuedEvents: Boolean): Int {
         functionCalls.add(FunctionCall("sync", discardQueuedEvents))
         return 0
@@ -465,6 +470,11 @@ open class SystemFacadeMock : SystemApi {
     override fun getDisplayString(): String {
         functionCalls.add(FunctionCall("getDisplayString"))
         return displayString
+    }
+
+    override fun free(xObject: CPointer<*>?) {
+        functionCalls.add(FunctionCall("free", xObject))
+        xObject?.let { nativeHeap.free(it) }
     }
 
     override fun getenv(name: String): CPointer<ByteVar>? {
