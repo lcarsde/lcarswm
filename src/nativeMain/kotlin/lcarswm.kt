@@ -242,6 +242,7 @@ private fun createEventManager(
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
         .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
         .addEventHandler(screenChangeHandler)
+        .addEventHandler(ReparentNotifyHandler(logger, windowRegistration))
         .build()
 }
 
