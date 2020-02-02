@@ -232,9 +232,9 @@ private fun createEventManager(
     atomLibrary: AtomLibrary,
     keyConfigurationProvider: ConfigurationProvider,
     screenChangeHandler: XEventHandler
-): EventManager {
+): EventDistributor {
 
-    return EventManager.Builder(logger)
+    return EventDistributor.Builder(logger)
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration))
         .addEventHandler(KeyPressHandler(logger, keyManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
@@ -247,13 +247,13 @@ private fun createEventManager(
 
 private fun eventLoop(
     eventApi: EventApi,
-    eventManager: EventManager
+    eventDistributor: EventDistributor
 ) {
     while (true) {
         val xEvent = nativeHeap.alloc<XEvent>()
         eventApi.nextEvent(xEvent.ptr)
 
-        if (eventManager.handleEvent(xEvent)) {
+        if (eventDistributor.handleEvent(xEvent)) {
             break
         }
 

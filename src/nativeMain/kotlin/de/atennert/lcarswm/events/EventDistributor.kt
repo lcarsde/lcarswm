@@ -4,7 +4,7 @@ import de.atennert.lcarswm.log.Logger
 import xlib.XEvent
 
 /** Use the EventManager.Builder to create this */
-class EventManager private constructor(
+class EventDistributor private constructor(
     private val eventHandlers: Map<Int, XEventHandler>,
     private val logger: Logger
 ) {
@@ -31,9 +31,9 @@ class EventManager private constructor(
             return this
         }
 
-        fun build(): EventManager {
+        fun build(): EventDistributor {
             val mappedEventHandlers = eventHandlers.associateBy { it.xEventType }
-            return EventManager(mappedEventHandlers, logger)
+            return EventDistributor(mappedEventHandlers, logger)
         }
     }
 }

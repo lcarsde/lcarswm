@@ -9,12 +9,12 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class EventManagerTest {
+class EventDistributorTest {
 
     @Test
     fun `handle event`() {
         val eventHandler = TestEventHandler()
-        val eventManager = EventManager.Builder(LoggerMock())
+        val eventManager = EventDistributor.Builder(LoggerMock())
             .addEventHandler(eventHandler)
             .build()
 
@@ -31,7 +31,7 @@ class EventManagerTest {
     @Test
     fun `don't handle event`() {
         val eventHandler = TestEventHandler()
-        val eventManager = EventManager.Builder(LoggerMock())
+        val eventManager = EventDistributor.Builder(LoggerMock())
             .addEventHandler(eventHandler)
             .build()
 
