@@ -23,4 +23,9 @@ interface WindowRegistration {
      * @param windowId ID of the window to unregister
      */
     fun removeWindow(windowId: Window)
+
+    /**
+     * @return true if the parent is the registered windows parent, false otherwise
+     */
+    fun isWindowParentedBy(windowId: Window, parentId: Window): Boolean
 }

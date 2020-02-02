@@ -79,8 +79,17 @@ class WindowHandler(
 
     override fun isWindowManaged(windowId: Window): Boolean = registeredWindows.containsKey(windowId)
 
+    override fun isWindowParentedBy(windowId: Window, parentId: Window): Boolean {
+        val framedWindow = registeredWindows[windowId] ?: return false
+        return framedWindow.frame == parentId
+    }
+
     override fun removeWindow(windowId: Window) {
-        logger.logDebug("WindowHandler::removeWindow::remove window $windowId ... is known: ${isWindowManaged(windowId)}")
+        val isWindowKnown = isWindowManaged(windowId)
+        logger.logDebug("WindowHandler::removeWindow::remove window $windowId ... is known: $isWindowKnown")
+        if (!isWindowKnown) {
+            return
+        }
         val framedWindow = registeredWindows.remove(windowId)!!
         
         system.unmapWindow(framedWindow.frame)

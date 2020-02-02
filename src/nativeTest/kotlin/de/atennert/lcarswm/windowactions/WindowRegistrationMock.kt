@@ -21,4 +21,8 @@ open class WindowRegistrationMock : WindowRegistration {
         functionCalls.add(FunctionCall("removeWindow", windowId))
         managedWindowIds.remove(windowId)
     }
+
+    override fun isWindowParentedBy(windowId: Window, parentId: Window): Boolean {
+        return true
+    }
 }

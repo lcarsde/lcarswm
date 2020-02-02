@@ -265,4 +265,31 @@ class WindowHandlerTest {
 
         assertNull(focusHandler.getFocusedWindow(), "The focused window needs to be unset")
     }
+
+    @Test
+    fun `check for window parent`() {
+        val systemApi = SystemFacadeMock()
+
+        val rootWindowId = systemApi.rootWindowId
+        val windowId = systemApi.getNewWindowId()
+        val parentId = systemApi.nextWindowId
+
+        val windowCoordinator = WindowCoordinatorMock()
+        val atomLibrary = AtomLibrary(systemApi)
+        val focusHandler = WindowFocusHandler()
+
+        val windowRegistration = WindowHandler(
+            systemApi,
+            LoggerMock(),
+            windowCoordinator,
+            focusHandler,
+            atomLibrary,
+            rootWindowId
+        )
+        windowRegistration.addWindow(windowId, false)
+
+        assertTrue(windowRegistration.isWindowParentedBy(windowId, parentId), "Return true for the registered window parent")
+        assertFalse(windowRegistration.isWindowParentedBy(windowId, rootWindowId), "Return false for unknown window parents")
+        assertFalse(windowRegistration.isWindowParentedBy(rootWindowId, rootWindowId), "Return false for unmanaged windows")
+    }
 }
