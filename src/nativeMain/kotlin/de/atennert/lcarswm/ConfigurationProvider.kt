@@ -4,6 +4,10 @@ import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 
+/**
+ * Reads configuration files in style of Java properties files.
+ * Comments are not supported.
+ */
 class ConfigurationProvider(posixApi: PosixApi, configurationFilePath: String) : Properties {
 
     private val readBufferSize = 60
