@@ -129,7 +129,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         eventLoop(system, eventManager)
 
-        shutdown(system, uiDrawer, rootWindow, logger, rootWindowPropertyHandler)
+        shutdown(system, uiDrawer, rootWindow, logger, rootWindowPropertyHandler, keyManager)
     }
 }
 
@@ -138,13 +138,16 @@ private fun shutdown(
     rootWindowDrawer: RootWindowDrawer,
     rootWindow: Window,
     logger: Logger,
-    rootWindowPropertyHandler: RootWindowPropertyHandler
+    rootWindowPropertyHandler: RootWindowPropertyHandler,
+    keyManager: KeyManager
 ) {
     rootWindowDrawer.cleanupColorMap(system)
     rootWindowDrawer.cleanupGraphicsContexts()
 
     system.selectInput(rootWindow, NoEventMask)
     rootWindowPropertyHandler.unsetWindowProperties()
+
+    keyManager.cleanup()
 
     cleanup(logger, system, rootWindowPropertyHandler)
 }

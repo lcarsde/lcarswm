@@ -19,16 +19,21 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
         Mod5Mask
     )
 
-    val modMasks = getAllModifierKeys()
+    private var modifierKeymapReference: CPointer<XModifierKeymap>? = null
+
+    private var keymap: CPointer<KeySymVar>? = null
 
     private val grabbedKeys = mutableMapOf<KeyCode, KeySym>()
 
+    val modMasks = getAllModifierKeys()
+
     private fun getAllModifierKeys(): Map<Modifiers, Int> {
-        val modifierKeymap = inputApi.getModifierMapping()?.pointed ?: return emptyMap()
+        modifierKeymapReference = inputApi.getModifierMapping()
+        val modifierKeymap = modifierKeymapReference?.pointed ?: return emptyMap()
         val (minKeyCodes, maxKeyCodes) = inputApi.getDisplayKeyCodeMinMaxCounts()
 
         val keySymsPerKeyCode = IntArray(1)
-        val keymap = inputApi.getKeyboardMapping(
+        keymap = inputApi.getKeyboardMapping(
             minKeyCodes.convert(),
             (maxKeyCodes - minKeyCodes + 1).convert(),
             keySymsPerKeyCode.pin().addressOf(0))!!
@@ -50,7 +55,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
                 val keyCode = modifierKeymap.modifiermap!![i * modifierKeymap.max_keypermod + j].convert<Int>()
                 if (keyCode != 0) {
                     for (k in 0 until keySymsPerKeyCode[0]) {
-                        val keySym = keymap[(keyCode - minKeyCodes) * keySymsPerKeyCode[0] + k]
+                        val keySym = keymap!![(keyCode - minKeyCodes) * keySymsPerKeyCode[0] + k]
                         if (keySym.convert<Long>() != NoSymbol) {
                             when (keySym.convert<Int>()) {
                                 XK_Num_Lock -> modifierMasks[Modifiers.NUM_LOCK] =
@@ -139,4 +144,15 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
      * @return key sym for a given key code
      */
     fun getKeySym(keyCode: KeyCode): KeySym? = grabbedKeys[keyCode]
+
+    /**
+     * Cleanup acquired X data
+     */
+    fun cleanup() {
+        inputApi.freeModifiermap(modifierKeymapReference)
+        modifierKeymapReference = null
+
+        inputApi.free(keymap)
+        keymap = null
+    }
 }
