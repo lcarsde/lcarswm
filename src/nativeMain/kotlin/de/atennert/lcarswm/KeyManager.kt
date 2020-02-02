@@ -136,7 +136,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
     }
 
     /**
-     * 
+     * @return key sym for a given key code
      */
     fun getKeySym(keyCode: KeyCode): KeySym? = grabbedKeys[keyCode]
 }
