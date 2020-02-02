@@ -250,7 +250,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun freeModifiermap(modifierMap: CPointer<XModifierKeymap>?) {
         functionCalls.add(FunctionCall("freeModifiermap", modifierMap))
-        modifierMap?.let { nativeHeap.free(it) }
+        // TODO free memory after testing
     }
 
     override fun sync(discardQueuedEvents: Boolean): Int {
@@ -474,7 +474,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun free(xObject: CPointer<*>?) {
         functionCalls.add(FunctionCall("free", xObject))
-        xObject?.let { nativeHeap.free(it) }
+        // TODO free memory after testing
     }
 
     override fun getenv(name: String): CPointer<ByteVar>? {
