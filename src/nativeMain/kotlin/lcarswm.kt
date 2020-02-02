@@ -129,6 +129,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         eventLoop(system, eventManager)
 
+        system.sync(false)
+
         shutdown(system, uiDrawer, rootWindow, logger, rootWindowPropertyHandler, keyManager)
     }
 }

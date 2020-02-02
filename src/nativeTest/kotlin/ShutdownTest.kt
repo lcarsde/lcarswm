@@ -179,6 +179,7 @@ class ShutdownTest {
             .toMutableList()
 
         checkThatTheLoggerIsClosed(logger)
+        checkFinalizingSync(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
         checkFreeingOfGraphicsContexts(functionCalls)
@@ -194,6 +195,10 @@ class ShutdownTest {
 
     private fun checkThatTheLoggerIsClosed(logger: LoggerMock) {
         assertTrue(logger.closed, "The logger needs to be closed")
+    }
+
+    private fun checkFinalizingSync(functionCalls: MutableList<FunctionCall>) {
+        assertEquals("sync", functionCalls.removeAt(0).name, "Call sync before cleaning up")
     }
 
     private fun checkForTryingToOpenDisplay(functionCalls: MutableList<FunctionCall>) {
