@@ -28,4 +28,6 @@ interface InputApi {
     fun stringToKeysym(s: String): KeySym
 
     fun freeModifiermap(modifierMap: CPointer<XModifierKeymap>?)
+
+    fun free(xObject: CPointer<*>?)
 }
