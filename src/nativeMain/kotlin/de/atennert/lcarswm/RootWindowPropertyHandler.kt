@@ -85,7 +85,14 @@ class RootWindowPropertyHandler(
     private fun getSupportedProperties(): UByteArray {
         val supportedProperties = arrayOf(
             NET_SUPPORTING_WM_CHECK,
-            NET_WM_NAME
+            NET_WM_NAME,
+            NET_WM_DESKTOP,
+            NET_WM_STATE,
+            NET_CLOSE_WINDOW,
+            NET_ACTIVE_WINDOW,
+            NET_WM_MOVERESIZE,
+            NET_MOVERESIZE_WINDOW,
+            NET_RESTACK_WINDOW
         )
 
         return supportedProperties
