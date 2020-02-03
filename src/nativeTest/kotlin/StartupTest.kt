@@ -42,14 +42,7 @@ class StartupTest {
             Pair(rootWindow, "_NET_SUPPORTING_WM_CHECK"),
             Pair(rootWindow, "_NET_SUPPORTED"),
             Pair(supportWindow, "_NET_SUPPORTING_WM_CHECK"),
-            Pair(supportWindow, "_NET_WM_NAME"),
-            Pair(supportWindow, "_NET_WM_DESKTOP"),
-            Pair(supportWindow, "_NET_WM_STATE"),
-            Pair(supportWindow, "_NET_CLOSE_WINDOW"),
-            Pair(supportWindow, "_NET_ACTIVE_WINDOW"),
-            Pair(supportWindow, "_NET_MOVERESIZE_WINDOW"),
-            Pair(supportWindow, "_NET_WM_MOVERESIZE"),
-            Pair(supportWindow, "_NET_RESTACK_WINDOW")
+            Pair(supportWindow, "_NET_WM_NAME")
         )
 
         expectedProperties.forEach { (window, atomName) ->
