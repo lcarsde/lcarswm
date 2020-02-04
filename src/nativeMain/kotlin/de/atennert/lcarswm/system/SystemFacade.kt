@@ -128,6 +128,10 @@ class SystemFacade : SystemApi {
         return XDisplayString(this.display)?.toKString() ?: ""
     }
 
+    override fun flush() {
+        XFlush(this.display)
+    }
+
     override fun free(xObject: CPointer<*>?) {
         XFree(xObject)
     }

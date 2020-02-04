@@ -319,6 +319,10 @@ open class SystemFacadeMock : SystemApi {
         return this.display
     }
 
+    override fun flush() {
+        functionCalls.add(FunctionCall("flush"))
+    }
+
     override fun openDisplay(): Boolean {
         functionCalls.add(FunctionCall("openDisplay"))
         this.display = nativeHeap.allocPointerTo<Display>().value
