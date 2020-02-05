@@ -28,6 +28,8 @@ interface WindowUtilApi {
 
     fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int
 
+    fun changeWindowAttributes(window: Window, mask: ULong, attributes: CPointer<XSetWindowAttributes>): Int
+
     fun getWMProtocols(window: Window, protocolsReturn: CPointer<CPointerVar<AtomVar>>, protocolCountReturn: CPointer<IntVar>): Int
 
     fun setErrorHandler(handler: XErrorHandler): XErrorHandler?

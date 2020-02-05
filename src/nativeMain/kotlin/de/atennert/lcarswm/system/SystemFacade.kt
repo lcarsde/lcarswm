@@ -65,6 +65,10 @@ class SystemFacade : SystemApi {
         return XGetWindowAttributes(display, window, attributes)
     }
 
+    override fun changeWindowAttributes(window: Window, mask: ULong, attributes: CPointer<XSetWindowAttributes>): Int {
+        return XChangeWindowAttributes(display, window, mask, attributes)
+    }
+
     override fun getWMProtocols(
         window: Window,
         protocolsReturn: CPointer<CPointerVar<AtomVar>>,

@@ -387,6 +387,11 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun changeWindowAttributes(window: Window, mask: ULong, attributes: CPointer<XSetWindowAttributes>): Int {
+        functionCalls.add(FunctionCall("changeWindowAttributes", window, mask, attributes))
+        return 0
+    }
+
     override fun getWMProtocols(
         window: Window,
         protocolsReturn: CPointer<CPointerVar<AtomVar>>,
