@@ -100,6 +100,8 @@ class WindowHandler(
             return
         }
         val framedWindow = registeredWindows.remove(windowId)!!
+
+        system.selectInput(windowId, NoEventMask)
         
         system.unmapWindow(framedWindow.frame)
         system.reparentWindow(windowId, rootWindow, 0, 0)
