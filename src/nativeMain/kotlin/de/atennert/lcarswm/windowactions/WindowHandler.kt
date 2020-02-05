@@ -26,6 +26,10 @@ class WindowHandler(
     private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or EnterWindowMask or
             LeaveWindowMask or ButtonPressMask or ButtonReleaseMask
 
+    private val clientEventMask = PropertyChangeMask or StructureNotifyMask or ColormapChangeMask
+
+    private val clientNoPropagateMask = ButtonPressMask or ButtonReleaseMask or ButtonMotionMask
+
     private val wmStateData = listOf<ULong>(NormalState.convert(), None.convert())
         .map { it.toUByteArray() }
         .combine()
@@ -51,6 +55,11 @@ class WindowHandler(
         val window = FramedWindow(windowId)
 
         val measurements = windowCoordinator.addWindowToMonitor(window)
+
+        val attributeSet = nativeHeap.alloc<XSetWindowAttributes>()
+        attributeSet.event_mask = clientEventMask
+        attributeSet.do_not_propagate_mask = clientNoPropagateMask
+        system.changeWindowAttributes(windowId, (CWEventMask or CWDontPropagate).convert(), attributeSet.ptr)
 
         window.frame = system.createSimpleWindow(rootWindow, measurements)
 
