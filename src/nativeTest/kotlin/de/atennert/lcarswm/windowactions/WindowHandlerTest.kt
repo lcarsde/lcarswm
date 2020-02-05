@@ -243,6 +243,11 @@ class WindowHandlerTest {
 
         val unregisterSystemCalls = systemApi.functionCalls
 
+        val selectInputCall = unregisterSystemCalls.removeAt(0)
+        assertEquals("selectInput", selectInputCall.name, "Unselect the input")
+        assertEquals(windowId, selectInputCall.parameters[0], "unselect the input from the unregistered window")
+        assertEquals(NoEventMask, selectInputCall.parameters[1], "set no event mask for events from unregistered window")
+
         val unmapFrameCall = unregisterSystemCalls.removeAt(0)
         assertEquals("unmapWindow", unmapFrameCall.name, "The frame of the removed window needs to be _unmapped_")
 
