@@ -84,6 +84,7 @@ class WindowHandlerTest {
 
         val setupCalls = systemApi.functionCalls
 
+        assertEquals("changeWindowAttributes", setupCalls.removeAt(0).name, "register for client events")
         assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "frame window should be created")
         assertEquals("selectInput", setupCalls.removeAt(0).name, "select the input on the window frame")
         assertEquals("addToSaveSet", setupCalls.removeAt(0).name, "add the windows frame to the save set")
