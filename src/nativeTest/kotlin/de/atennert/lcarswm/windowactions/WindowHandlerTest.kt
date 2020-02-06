@@ -254,6 +254,11 @@ class WindowHandlerTest {
 
         assertEquals("flush", unregisterSystemCalls.removeAt(0).name, "flush to speed up unmapping")
 
+        val resetWindowBorderWidthCall = unregisterSystemCalls.removeAt(0)
+        assertEquals("setWindowBorderWidth", resetWindowBorderWidthCall.name, "Reset the window border")
+        assertEquals(windowId, resetWindowBorderWidthCall.parameters[0], "The clients window border should be reset")
+        assertEquals(systemApi.windowBorderWidth.toUInt(), resetWindowBorderWidthCall.parameters[1], "The window border needs to be reset to before")
+
         val reparentCall = unregisterSystemCalls.removeAt(0)
         assertEquals("reparentWindow", reparentCall.name, "We need to _reparent_ the window back to root")
         assertEquals(windowId, reparentCall.parameters[0], "We need to reparent the _window_ back to root")

@@ -52,7 +52,7 @@ class WindowHandler(
             return
         }
 
-        val window = FramedWindow(windowId)
+        val window = FramedWindow(windowId, windowAttributes.border_width)
 
         val measurements = windowCoordinator.addWindowToMonitor(window)
 
@@ -107,6 +107,8 @@ class WindowHandler(
         
         system.unmapWindow(framedWindow.frame)
         system.flush()
+
+        system.setWindowBorderWidth(windowId, framedWindow.borderWidth.convert())
 
         system.reparentWindow(windowId, rootWindow, 0, 0)
         system.removeFromSaveSet(windowId)
