@@ -252,6 +252,8 @@ class WindowHandlerTest {
         val unmapFrameCall = unregisterSystemCalls.removeAt(0)
         assertEquals("unmapWindow", unmapFrameCall.name, "The frame of the removed window needs to be _unmapped_")
 
+        assertEquals("flush", unregisterSystemCalls.removeAt(0).name, "flush to speed up unmapping")
+
         val reparentCall = unregisterSystemCalls.removeAt(0)
         assertEquals("reparentWindow", reparentCall.name, "We need to _reparent_ the window back to root")
         assertEquals(windowId, reparentCall.parameters[0], "We need to reparent the _window_ back to root")

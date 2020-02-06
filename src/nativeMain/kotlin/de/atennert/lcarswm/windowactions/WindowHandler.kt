@@ -106,6 +106,8 @@ class WindowHandler(
         system.selectInput(windowId, NoEventMask)
         
         system.unmapWindow(framedWindow.frame)
+        system.flush()
+
         system.reparentWindow(windowId, rootWindow, 0, 0)
         system.removeFromSaveSet(windowId)
         system.destroyWindow(framedWindow.frame)
