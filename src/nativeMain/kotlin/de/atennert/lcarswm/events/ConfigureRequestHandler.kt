@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.EventApi
 import de.atennert.lcarswm.windowactions.WindowCoordinator
@@ -8,10 +9,7 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
-import xlib.ConfigureRequest
-import xlib.XConfigureRequestEvent
-import xlib.XEvent
-import xlib.XWindowChanges
+import xlib.*
 
 /**
  * Depending on whether we know or don't know the window of the configure request event, we adjust the windows
@@ -44,7 +42,19 @@ class ConfigureRequestHandler(
     private fun adjustWindowToScreen(configureEvent: XConfigureRequestEvent) {
         val measurements = windowCoordinator.getWindowMeasurements(configureEvent.window)
 
-        sendConfigureNotify(eventApi, configureEvent.window, measurements)
+        val e = nativeHeap.alloc<XEvent>()
+        e.type = ConfigureNotify
+        e.xconfigure.display = eventApi.getDisplay()
+        e.xconfigure.event = configureEvent.window
+        e.xconfigure.window = configureEvent.window
+        e.xconfigure.x = measurements[0]
+        e.xconfigure.y = measurements[1]
+        e.xconfigure.width = measurements[2]
+        e.xconfigure.height = measurements[3]
+        e.xconfigure.border_width = configureEvent.border_width
+        e.xconfigure.above = None.convert()
+        e.xconfigure.override_redirect = X_FALSE
+        eventApi.sendEvent(configureEvent.window, false, StructureNotifyMask, e.ptr)
     }
 
     private fun forwardConfigureRequest(configureEvent: XConfigureRequestEvent) {
@@ -53,9 +63,9 @@ class ConfigureRequestHandler(
         windowChanges.y = configureEvent.y
         windowChanges.width = configureEvent.width
         windowChanges.height = configureEvent.height
+        windowChanges.border_width = configureEvent.border_width
         windowChanges.sibling = configureEvent.above
         windowChanges.stack_mode = configureEvent.detail
-        windowChanges.border_width = 0
         eventApi.configureWindow(configureEvent.window, configureEvent.value_mask.convert(), windowChanges.ptr)
     }
 }

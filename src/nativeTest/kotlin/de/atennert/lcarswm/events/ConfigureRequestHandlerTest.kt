@@ -61,7 +61,7 @@ class ConfigureRequestHandlerTest {
         assertEquals(windowMeasurements[1], configureEvent.y, "The y value should match the corresponding window measurement")
         assertEquals(windowMeasurements[2], configureEvent.width, "The width should match the corresponding window measurement")
         assertEquals(windowMeasurements[3], configureEvent.height, "The height should match the corresponding window measurement")
-        assertEquals(0, configureEvent.border_width, "The border width should be 0")
+        assertEquals(configureRequestEvent.xconfigurerequest.border_width, configureEvent.border_width, "The border width should be the same")
         assertEquals(None.convert(), configureEvent.above, "The above value should be None") // TODO this shouldn't be None, we need to keep that with the window data
         assertEquals(X_FALSE, configureEvent.override_redirect, "Override redirect should be false as we don't handle popups")
     }
@@ -94,7 +94,7 @@ class ConfigureRequestHandlerTest {
         assertEquals(configureRequestEvent.xconfigurerequest.height, windowChanges.height, "The height should be the same")
         assertEquals(configureRequestEvent.xconfigurerequest.above, windowChanges.sibling, "The sibling should be the same as the above value")
         assertEquals(configureRequestEvent.xconfigurerequest.detail, windowChanges.stack_mode, "The stack mode should be the same as the detail value")
-        assertEquals(0, windowChanges.border_width, "The windows border width should be 0")
+        assertEquals(configureRequestEvent.xconfigurerequest.border_width, windowChanges.border_width, "The windows border width should be the same")
     }
 
     private fun createConfigureRequestEvent(windowId: Window): XEvent {
@@ -105,6 +105,7 @@ class ConfigureRequestHandlerTest {
         configureRequestEvent.xconfigurerequest.y = 3
         configureRequestEvent.xconfigurerequest.width = 4
         configureRequestEvent.xconfigurerequest.height = 5
+        configureRequestEvent.xconfigurerequest.border_width = 10
         configureRequestEvent.xconfigurerequest.above = 6.convert()
         configureRequestEvent.xconfigurerequest.detail = 7
         return configureRequestEvent
