@@ -69,6 +69,8 @@ class WindowHandler(
 
         system.addToSaveSet(windowId)
 
+        system.setWindowBorderWidth(windowId, 0.convert())
+
         system.reparentWindow(windowId, window.frame, 0, 0)
 
         system.resizeWindow(window.id, measurements[2].convert(), measurements[3].convert())
