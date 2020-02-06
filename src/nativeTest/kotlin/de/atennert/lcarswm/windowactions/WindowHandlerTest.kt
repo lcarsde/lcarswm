@@ -88,6 +88,7 @@ class WindowHandlerTest {
         assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "frame window should be created")
         assertEquals("selectInput", setupCalls.removeAt(0).name, "select the input on the window frame")
         assertEquals("addToSaveSet", setupCalls.removeAt(0).name, "add the windows frame to the save set")
+        assertEquals("setWindowBorderWidth", setupCalls.removeAt(0).name, "Set the border width of the window to 0")
         assertEquals("reparentWindow", setupCalls.removeAt(0).name, "child window should be reparented to frame")
         assertEquals("resizeWindow", setupCalls.removeAt(0).name, "resize window to monitor required dimensions")
         assertEquals("mapWindow", setupCalls.removeAt(0).name, "frame window should be mapped")
