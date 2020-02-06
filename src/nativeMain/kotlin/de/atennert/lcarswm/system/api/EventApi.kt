@@ -19,6 +19,8 @@ interface EventApi {
 
     fun configureWindow(window: Window, configurationMask: UInt, configuration: CPointer<XWindowChanges>): Int
 
+    fun setWindowBorderWidth(window: Window, borderWidth: UInt): Int
+
     fun reparentWindow(window: Window, parent: Window, x: Int, y: Int): Int
 
     fun resizeWindow(window: Window, width: UInt, height: UInt): Int

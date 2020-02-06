@@ -167,6 +167,10 @@ class SystemFacade : SystemApi {
         return XConfigureWindow(display, window, configurationMask, configuration)
     }
 
+    override fun setWindowBorderWidth(window: Window, borderWidth: UInt): Int {
+        return XSetWindowBorderWidth(display, window, borderWidth)
+    }
+
     override fun reparentWindow(window: Window, parent: Window, x: Int, y: Int): Int {
         return XReparentWindow(display, window, parent, x, y)
     }

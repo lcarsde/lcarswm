@@ -277,6 +277,11 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun setWindowBorderWidth(window: Window, borderWidth: UInt): Int {
+        functionCalls.add(FunctionCall("setWindowBorderWidth", window, borderWidth))
+        return 0
+    }
+
     override fun reparentWindow(window: Window, parent: Window, x: Int, y: Int): Int {
         functionCalls.add(FunctionCall("reparentWindow", window, parent, x, y))
         return 0
