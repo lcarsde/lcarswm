@@ -4,6 +4,9 @@ import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.CPointer
 import platform.posix.FILE
 
+/**
+ * Logger that logs into a file at the given path.
+ */
 class FileLogger(private val posixApi: PosixApi, logFilePath: String) : Logger {
     private val file: CPointer<FILE> = posixApi.fopen(logFilePath, "w")
         ?: error("FileLogger::init::unable to get the log file $logFilePath")
