@@ -2,10 +2,7 @@ import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import xlib.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class StartupTest {
     @Test
@@ -25,6 +22,26 @@ class StartupTest {
             setenvCall.parameters[1],
             "the DISPLAY environment variable should be set to the return value of getDisplayString"
         )
+    }
+
+    @Test
+    fun `send client message informing that we are the WM`() {
+        val systemFacade = StartupFacadeMock()
+
+        runWindowManager(systemFacade, LoggerMock())
+
+        val startupCalls = systemFacade.functionCalls.takeWhile { it.name != "nextEvent" }
+
+        val sendEventCall = startupCalls.singleOrNull { it.name == "sendEvent" && it.parameters[0] == systemFacade.rootWindowId }
+
+        assertNotNull(sendEventCall, "We need to send an event to notify about lcarswm being the WM")
+
+        assertFalse(sendEventCall.parameters[1] as Boolean, "Don't propagate")
+
+        assertEquals(SubstructureNotifyMask, sendEventCall.parameters[2], "The event mask is substructure notify")
+
+        val eventData = sendEventCall.parameters[3] as CPointer<XEvent>
+        assertEquals(ClientMessage, eventData.pointed.xclient.type, "The event needs to be a client message")
     }
 
     @Test
