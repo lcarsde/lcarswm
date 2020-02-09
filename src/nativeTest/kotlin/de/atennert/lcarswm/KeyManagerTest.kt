@@ -11,6 +11,18 @@ import kotlin.test.assertNull
 
 class KeyManagerTest {
     @Test
+    fun `ungrab all keys on init`() {
+        val systemApi = SystemFacadeMock()
+
+        KeyManager(systemApi, systemApi.rootWindowId)
+
+        val ungrabKeysCall = systemApi.functionCalls.removeAt(0)
+
+        assertEquals("ungrabKey", ungrabKeysCall.name, "The keys need to be initially ungrabbed")
+        assertEquals(systemApi.rootWindowId, ungrabKeysCall.parameters[0], "The keys need to be ungrabbed for the root window")
+    }
+
+    @Test
     fun `load modifier keys`() {
         val systemApi = SystemFacadeMock()
 
@@ -35,6 +47,7 @@ class KeyManagerTest {
         val systemApi = SystemFacadeMock()
 
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        systemApi.functionCalls.clear()
 
         keyManager.grabInternalKeys()
 

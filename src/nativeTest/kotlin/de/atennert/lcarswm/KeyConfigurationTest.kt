@@ -60,6 +60,7 @@ class KeyConfigurationTest {
     fun `load key config including one modifier`() {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        systemApi.functionCalls.clear()
 
         val configurationProvider = object : Properties {
             override fun get(propertyKey: String): String? {
@@ -105,6 +106,7 @@ class KeyConfigurationTest {
     fun `load key config with multiple modifiers`() {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        systemApi.functionCalls.clear()
 
         val configurationProvider = object : Properties {
             override fun get(propertyKey: String): String? {
