@@ -8,6 +8,7 @@ LCARSWM displays one window at a time per screen although that might change in t
 ## Acknowledgements
 Thank you very much to the creators of the following resources:
 * [Chuan Ji - How X Window Managers Work, And How To Write One](https://jichu4n.com/posts/how-x-window-managers-work-and-how-to-write-one-part-i/)
+* [openbox on github](https://github.com/danakj/openbox)
 * [mcwm on GitHub](https://github.com/mchackorg/mcwm)
 * [XCB implementation of TinyWM on GitHub](https://github.com/stefanbidi/tinywm-xcb)
 * [XCB tutorial](https://www.x.org/releases/X11R7.7/doc/libxcb/tutorial/index.html)
