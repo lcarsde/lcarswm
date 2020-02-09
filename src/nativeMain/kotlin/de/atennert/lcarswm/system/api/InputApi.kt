@@ -14,6 +14,8 @@ interface InputApi {
 
     fun grabKey(keyCode: Int, modifiers: UInt, window: Window, keyboardMode: Int): Int
 
+    fun ungrabKey(window: Window)
+
     fun grabButton(button: UInt, modifiers: UInt, window: Window, ownerEvents: Boolean,
                    mask: UInt, pointerMode: Int, keyboardMode: Int, windowToConfineTo: Window, cursor: Cursor): Int
 

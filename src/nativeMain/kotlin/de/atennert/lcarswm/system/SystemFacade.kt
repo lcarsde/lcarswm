@@ -281,6 +281,10 @@ class SystemFacade : SystemApi {
         return XGrabKey(display, keyCode, modifiers, window, X_FALSE, GrabModeAsync, keyboardMode)
     }
 
+    override fun ungrabKey(window: Window) {
+        XUngrabKey(display, AnyKey.convert(), AnyModifier, window)
+    }
+
     override fun grabButton(
         button: UInt,
         modifiers: UInt,

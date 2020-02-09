@@ -158,6 +158,10 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun ungrabKey(window: Window) {
+        functionCalls.add(FunctionCall("ungrabKey", window))
+    }
+
     override fun grabButton(
         button: UInt,
         modifiers: UInt,
