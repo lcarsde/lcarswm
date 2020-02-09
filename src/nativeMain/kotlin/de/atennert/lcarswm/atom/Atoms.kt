@@ -7,6 +7,7 @@ enum class Atoms(val atomName: String) {
     WINDOW("WINDOW"),
     ATOM("ATOM"),
     UTF_STRING("UTF8_STRING"),
+    MANAGER("MANAGER"),
 
     WM_DELETE_WINDOW("WM_DELETE_WINDOW"),
     WM_PROTOCOLS("WM_PROTOCOLS"),
