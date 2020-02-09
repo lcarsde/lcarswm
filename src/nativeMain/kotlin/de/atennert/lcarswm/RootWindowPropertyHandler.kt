@@ -44,13 +44,32 @@ class RootWindowPropertyHandler(
             return false
         }
 
-        system.setSelectionOwner(wmSn, ewmhSupportWindow, CurrentTime.convert())
+        val timeStamp = CurrentTime // TODO get event based timestamp
+        system.setSelectionOwner(wmSn, ewmhSupportWindow, timeStamp.convert())
 
         if (system.getSelectionOwner(wmSn) != ewmhSupportWindow) {
             return false
         }
 
+        sendWmNotification(wmSn, timeStamp)
+
         return true
+    }
+
+    private fun sendWmNotification(wmSn: Atom, timeStamp: Long) {
+        val event = nativeHeap.alloc<XEvent>()
+        event.xclient.type = ClientMessage
+        event.xclient.message_type = atomLibrary[MANAGER]
+        event.xclient.display = system.getDisplay()
+        event.xclient.window = rootWindow
+        event.xclient.format = 32
+        event.xclient.data.l[0] = timeStamp
+        event.xclient.data.l[1] = wmSn.convert()
+        event.xclient.data.l[2] = this.ewmhSupportWindow.convert()
+        event.xclient.data.l[3] = 0
+        event.xclient.data.l[4] = 0
+
+        system.sendEvent(rootWindow, false, SubstructureNotifyMask, event.ptr)
     }
 
     fun setSupportWindowProperties() {
