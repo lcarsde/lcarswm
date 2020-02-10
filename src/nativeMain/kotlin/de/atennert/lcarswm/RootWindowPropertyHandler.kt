@@ -17,7 +17,7 @@ class RootWindowPropertyHandler(
     private val atomLibrary: AtomLibrary,
     rootVisual: CPointer<Visual>?
 ) {
-    private val ewmhSupportWindow: Window
+    val ewmhSupportWindow: Window
 
     init {
         val windowAttributes = nativeHeap.alloc<XSetWindowAttributes>()

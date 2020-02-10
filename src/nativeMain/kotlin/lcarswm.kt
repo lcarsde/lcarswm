@@ -107,7 +107,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, rootWindow)
 
-        setupScreen(system, rootWindow, windowRegistration)
+        setupScreen(system, rootWindow, rootWindowPropertyHandler, windowRegistration)
 
         val eventManager = createEventManager(
             system,
@@ -168,6 +168,7 @@ fun setDisplayEnvironment(system: SystemApi) {
 fun setupScreen(
     system: SystemApi,
     rootWindow: Window,
+    rootWindowPropertyHandler: RootWindowPropertyHandler,
     windowRegistration: WindowHandler) {
     system.grabServer()
 
@@ -184,6 +185,7 @@ fun setupScreen(
 
     ULongArray(topLevelWindowCount[0].toInt()) { topLevelWindows.value!![it] }
         .filter { childId -> childId != rootWindow }
+        .filter { childId -> childId != rootWindowPropertyHandler.ewmhSupportWindow }
         .forEach { childId ->
             windowRegistration.addWindow(childId, true)
         }
