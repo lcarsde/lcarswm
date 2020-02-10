@@ -7,6 +7,7 @@ import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.EventApi
+import de.atennert.lcarswm.system.api.PosixApi
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.system.api.WindowUtilApi
 import de.atennert.lcarswm.windowactions.*
@@ -72,6 +73,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             return
         }
 
+        val keyConfigurationProvider = loadKeyConfiguration(system) ?: return
+
         rootWindowPropertyHandler.setSupportWindowProperties()
 
         setDisplayEnvironment(system)
@@ -105,13 +108,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, rootWindow)
 
         setupScreen(system, rootWindow, windowRegistration)
-
-        // TODO move this up
-        val configPathBytes = system.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return
-        val configPath = configPathBytes.toKString()
-        val keyConfiguration = "$configPath$KEY_CONFIG_FILE"
-
-        val keyConfigurationProvider = ConfigurationProvider(system, keyConfiguration)
 
         val eventManager = createEventManager(
             system,
@@ -194,6 +190,14 @@ fun setupScreen(
 
     nativeHeap.free(topLevelWindows)
     system.ungrabServer()
+}
+
+fun loadKeyConfiguration(posixApi: PosixApi): ConfigurationProvider? {
+    val configPathBytes = posixApi.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return null
+    val configPath = configPathBytes.toKString()
+    val keyConfiguration = "$configPath$KEY_CONFIG_FILE"
+
+    return ConfigurationProvider(posixApi, keyConfiguration)
 }
 
 /**
