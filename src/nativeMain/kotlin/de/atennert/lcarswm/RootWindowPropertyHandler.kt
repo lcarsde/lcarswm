@@ -14,8 +14,7 @@ import xlib.*
 class RootWindowPropertyHandler(
     private val system: SystemApi,
     private val rootWindow: Window,
-    private val atomLibrary: AtomLibrary,
-    rootVisual: CPointer<Visual>?
+    private val atomLibrary: AtomLibrary
 ) {
     val ewmhSupportWindow: Window
 
@@ -27,7 +26,7 @@ class RootWindowPropertyHandler(
         this.ewmhSupportWindow = system.createWindow(
             rootWindow,
             listOf(-100, -100, 1, 1),
-            CopyFromParent.convert(),
+            CopyFromParent.toCPointer(),
             (CWEventMask or CWOverrideRedirect).convert(),
             windowAttributes.ptr
         )
