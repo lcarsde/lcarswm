@@ -492,6 +492,10 @@ open class SystemFacadeMock : SystemApi {
         return displayString
     }
 
+    override fun synchronize(sync: Boolean) {
+        functionCalls.add(FunctionCall("synchronize", sync))
+    }
+
     override fun free(xObject: CPointer<*>?) {
         functionCalls.add(FunctionCall("free", xObject))
         // TODO free memory after testing

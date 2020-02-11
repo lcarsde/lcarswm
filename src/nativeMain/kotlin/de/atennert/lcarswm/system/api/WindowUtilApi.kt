@@ -52,5 +52,7 @@ interface WindowUtilApi {
 
     fun getDisplayString(): String
 
+    fun synchronize(sync: Boolean)
+
     fun free(xObject: CPointer<*>?)
 }

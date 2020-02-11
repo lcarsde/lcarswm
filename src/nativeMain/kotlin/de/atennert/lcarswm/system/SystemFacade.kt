@@ -136,6 +136,10 @@ class SystemFacade : SystemApi {
         XFlush(this.display)
     }
 
+    override fun synchronize(sync: Boolean) {
+        XSynchronize(display, convertToXBoolean(sync))
+    }
+
     override fun free(xObject: CPointer<*>?) {
         XFree(xObject)
     }
