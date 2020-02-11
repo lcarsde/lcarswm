@@ -27,7 +27,7 @@ class RootWindowPropertyHandler(
         this.ewmhSupportWindow = system.createWindow(
             rootWindow,
             listOf(-100, -100, 1, 1),
-            rootVisual,
+            CopyFromParent.convert(),
             (CWEventMask or CWOverrideRedirect).convert(),
             windowAttributes.ptr
         )
