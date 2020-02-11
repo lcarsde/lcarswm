@@ -52,6 +52,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         }
         system.synchronize(false)
 
+        setDisplayEnvironment(system)
+
         val rootWindow = screen.root
 
         val atomLibrary = AtomLibrary(system)
@@ -78,8 +80,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         val keyConfigurationProvider = loadKeyConfiguration(system) ?: return
 
         rootWindowPropertyHandler.setSupportWindowProperties()
-
-        setDisplayEnvironment(system)
 
         staticLogger = logger
         system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
