@@ -50,6 +50,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             system.closeDisplay()
             return
         }
+        system.synchronize(false)
+
         val rootWindow = screen.root
 
         val atomLibrary = AtomLibrary(system)
