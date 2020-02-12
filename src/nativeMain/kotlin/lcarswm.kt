@@ -77,12 +77,12 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             return
         }
 
+        staticLogger = logger
+        system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
+
         val keyConfigurationProvider = loadKeyConfiguration(system) ?: return
 
         rootWindowPropertyHandler.setSupportWindowProperties()
-
-        staticLogger = logger
-        system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
         logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
