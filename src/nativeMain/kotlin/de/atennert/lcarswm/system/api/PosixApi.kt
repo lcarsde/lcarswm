@@ -40,4 +40,6 @@ interface PosixApi {
     fun execvp(fileName: String, args: List<String>): Int
 
     fun gettimeofday(): Long
+
+    fun usleep(time: UInt)
 }

@@ -587,4 +587,8 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("gettimeofday"))
         return 0
     }
+
+    override fun usleep(time: UInt) {
+        functionCalls.add(FunctionCall("usleep", time))
+    }
 }
