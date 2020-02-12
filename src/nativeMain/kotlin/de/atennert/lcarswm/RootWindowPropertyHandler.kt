@@ -8,6 +8,8 @@ import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
 
+private const val OTHER_WM_SHUTDOWN_TIMEOUT = 15000000
+
 /**
  * Class for handling property (atom) related actions.
  */
@@ -39,8 +41,14 @@ class RootWindowPropertyHandler(
         val wmSnName = "WM_S${system.defaultScreenNumber()}"
         val wmSn = system.internAtom(wmSnName)
 
-        if (system.getSelectionOwner(wmSn) != None.convert<Window>()) {
-            return false
+        var currentWmSnOwner = system.getSelectionOwner(wmSn)
+        if (currentWmSnOwner == ewmhSupportWindow) {
+            currentWmSnOwner = None.convert()
+        }
+        if (currentWmSnOwner != None.convert<Window>()) {
+            system.selectInput(currentWmSnOwner, StructureNotifyMask)
+            system.sync(false)
+            // TODO check for display error
         }
 
         val timeStamp = CurrentTime // TODO get event based timestamp
@@ -48,6 +56,20 @@ class RootWindowPropertyHandler(
 
         if (system.getSelectionOwner(wmSn) != ewmhSupportWindow) {
             return false
+        }
+
+        if (currentWmSnOwner != None.convert()) {
+            var wait = 0.toUInt()
+
+            if (wait < OTHER_WM_SHUTDOWN_TIMEOUT.convert()) {
+                // TODO break when message came in
+                system.usleep((OTHER_WM_SHUTDOWN_TIMEOUT / 10).convert())
+                wait += (OTHER_WM_SHUTDOWN_TIMEOUT / 10).convert()
+            }
+
+            if (wait >= OTHER_WM_SHUTDOWN_TIMEOUT.convert()) {
+                // return false
+            }
         }
 
         sendWmNotification(wmSn, timeStamp)
