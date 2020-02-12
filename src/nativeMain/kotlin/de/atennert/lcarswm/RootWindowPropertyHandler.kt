@@ -4,6 +4,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms.*
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -14,6 +15,7 @@ private const val OTHER_WM_SHUTDOWN_TIMEOUT = 15000000
  * Class for handling property (atom) related actions.
  */
 class RootWindowPropertyHandler(
+    private val logger: Logger,
     private val system: SystemApi,
     private val rootWindow: Window,
     private val atomLibrary: AtomLibrary
@@ -55,19 +57,20 @@ class RootWindowPropertyHandler(
         system.setSelectionOwner(wmSn, ewmhSupportWindow, timeStamp.convert())
 
         if (system.getSelectionOwner(wmSn) != ewmhSupportWindow) {
+            logger.logInfo("Unable to become selection owner on display")
             return false
         }
 
         if (currentWmSnOwner != None.convert()) {
-            var wait = 0.toUInt()
+            var wait = 0
 
-            if (wait < OTHER_WM_SHUTDOWN_TIMEOUT.convert()) {
+            if (wait < OTHER_WM_SHUTDOWN_TIMEOUT) {
                 // TODO break when message came in
                 system.usleep((OTHER_WM_SHUTDOWN_TIMEOUT / 10).convert())
-                wait += (OTHER_WM_SHUTDOWN_TIMEOUT / 10).convert()
+                wait += (OTHER_WM_SHUTDOWN_TIMEOUT / 10)
             }
 
-            if (wait >= OTHER_WM_SHUTDOWN_TIMEOUT.convert()) {
+            if (wait >= OTHER_WM_SHUTDOWN_TIMEOUT) {
                 // return false
             }
         }

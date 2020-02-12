@@ -58,7 +58,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val atomLibrary = AtomLibrary(system)
 
-        val rootWindowPropertyHandler = RootWindowPropertyHandler(system, rootWindow, atomLibrary)
+        val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, rootWindow, atomLibrary)
 
         if (!rootWindowPropertyHandler.becomeScreenOwner()) {
             logger.logError("::runWindowManager::Detected another active window manager")
