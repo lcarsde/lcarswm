@@ -161,6 +161,10 @@ class SystemFacade : SystemApi {
         return XNextEvent(display, event)
     }
 
+    override fun getQueuedEvents(mode: Int): Int {
+        return XEventsQueued(display, mode)
+    }
+
     override fun getDisplay(): CPointer<Display>? = this.display
 
     override fun configureWindow(

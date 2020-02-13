@@ -17,6 +17,8 @@ interface EventApi {
 
     fun nextEvent(event: CPointer<XEvent>): Int
 
+    fun getQueuedEvents(mode: Int): Int
+
     fun configureWindow(window: Window, configurationMask: UInt, configuration: CPointer<XWindowChanges>): Int
 
     fun setWindowBorderWidth(window: Window, borderWidth: UInt): Int

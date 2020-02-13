@@ -272,6 +272,10 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun getQueuedEvents(mode: Int): Int {
+        return 0
+    }
+
     override fun configureWindow(
         window: Window,
         configurationMask: UInt,
