@@ -47,35 +47,8 @@ class ShutdownTest {
     }
 
     @Test
-    fun `shutdown when there is already a screen owner`() {
-        val logger = LoggerMock()
-        val testFacade = object : SystemFacadeMock() {
-            override fun defaultScreenNumber(): Int {
-                return 23
-            }
-
-            override fun getSelectionOwner(atom: Atom): Window {
-                val defaultResponse = super.getSelectionOwner(atom)
-                return if (atom == atomMap["WM_S${defaultScreenNumber()}"]) {
-                    21.convert() // this screen is taken
-                } else {
-                    defaultResponse
-                }
-            }
-        }
-
-        runWindowManager(testFacade, logger)
-
-        val functionCalls = testFacade.functionCalls
-            .dropWhile { it.name != "getSelectionOwner" }
-            .toMutableList()
-
-        checkThatTheLoggerIsClosed(logger)
-        checkRequestForCurrentSelectionOwner(functionCalls)
-        checkThatSupportWindowWasDestroyed(functionCalls)
-        checkThatTheDisplayWasClosed(functionCalls)
-
-        checkThatThereIsNoUnexpectedInteraction(functionCalls)
+    fun `get notified on old wm shutdown and wait for it`() {
+        // TODO implement
     }
 
     @Test
