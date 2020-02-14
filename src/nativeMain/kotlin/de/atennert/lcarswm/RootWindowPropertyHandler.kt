@@ -61,7 +61,7 @@ class RootWindowPropertyHandler(
             return false
         }
 
-        if (currentWmSnOwner != None.convert()) {
+        if (currentWmSnOwner != None.toULong()) {
             var wait = 0
 
             if (wait < OTHER_WM_SHUTDOWN_TIMEOUT) {
