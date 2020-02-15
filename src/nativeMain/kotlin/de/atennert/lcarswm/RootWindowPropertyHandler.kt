@@ -4,6 +4,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms.*
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
+import de.atennert.lcarswm.events.EventBuffer
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -18,7 +19,8 @@ class RootWindowPropertyHandler(
     private val logger: Logger,
     private val system: SystemApi,
     private val rootWindow: Window,
-    private val atomLibrary: AtomLibrary
+    private val atomLibrary: AtomLibrary,
+    private val eventBuffer: EventBuffer
 ) {
     val ewmhSupportWindow: Window
 
@@ -64,14 +66,19 @@ class RootWindowPropertyHandler(
         if (currentWmSnOwner != None.toULong()) {
             var wait = 0
 
-            if (wait < OTHER_WM_SHUTDOWN_TIMEOUT) {
-                // TODO break when message came in
+            while (wait < OTHER_WM_SHUTDOWN_TIMEOUT) {
+                if (eventBuffer.findEvent(false) { event ->
+                        event.pointed.type == DestroyNotify && event.pointed.xany.window == currentWmSnOwner
+                    } != null) {
+                    break
+                }
                 system.usleep((OTHER_WM_SHUTDOWN_TIMEOUT / 10).convert())
                 wait += (OTHER_WM_SHUTDOWN_TIMEOUT / 10)
             }
 
             if (wait >= OTHER_WM_SHUTDOWN_TIMEOUT) {
-                // return false
+                logger.logInfo("The active WM is not exiting")
+                return false
             }
         }
 

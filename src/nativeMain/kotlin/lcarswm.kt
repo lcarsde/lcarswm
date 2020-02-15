@@ -6,7 +6,6 @@ import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
 import de.atennert.lcarswm.system.SystemFacade
-import de.atennert.lcarswm.system.api.EventApi
 import de.atennert.lcarswm.system.api.PosixApi
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.system.api.WindowUtilApi
@@ -60,7 +59,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val eventBuffer = EventBuffer(system)
 
-        val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, rootWindow, atomLibrary)
+        val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, rootWindow, atomLibrary, eventBuffer)
 
         if (!rootWindowPropertyHandler.becomeScreenOwner()) {
             logger.logError("::runWindowManager::Detected another active window manager")
