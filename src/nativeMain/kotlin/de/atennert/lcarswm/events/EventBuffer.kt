@@ -7,9 +7,17 @@ import xlib.QueuedAfterFlush
 import xlib.Success
 import xlib.XEvent
 
+/**
+ * Buffers events in an internal queue.
+ */
 class EventBuffer(private val eventApi: EventApi) {
     private val internalEventQueue = mutableListOf<CPointer<XEvent>>()
 
+    /**
+     * Find an event in the event buffer.
+     *
+     * @return Pointer to an event, or null if there is no event to be found
+     */
     fun findEvent(blocking: Boolean, predicate: Predicate<CPointer<XEvent>>): CPointer<XEvent>? {
         while (true) {
             val eventMatch = internalEventQueue.find(predicate)
@@ -23,6 +31,11 @@ class EventBuffer(private val eventApi: EventApi) {
         return null
     }
 
+    /**
+     * Get the next event from the buffer.
+     *
+     * @return Pointer to an event, or null if there is no event to be found
+     */
     fun getNextEvent(blocking: Boolean): CPointer<XEvent>? {
         if (internalEventQueue.isEmpty()) {
             readEvents(blocking)
