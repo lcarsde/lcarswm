@@ -58,6 +58,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val atomLibrary = AtomLibrary(system)
 
+        val eventBuffer = EventBuffer(system)
+
         val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, rootWindow, atomLibrary)
 
         if (!rootWindowPropertyHandler.becomeScreenOwner()) {
@@ -125,7 +127,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             screenChangeHandler
         )
 
-        eventLoop(system, eventManager)
+        eventLoop(eventManager, eventBuffer)
 
         system.sync(false)
 
@@ -256,12 +258,11 @@ private fun createEventManager(
 }
 
 private fun eventLoop(
-    eventApi: EventApi,
-    eventDistributor: EventDistributor
+    eventDistributor: EventDistributor,
+    eventBuffer: EventBuffer
 ) {
     while (true) {
-        val xEvent = nativeHeap.alloc<XEvent>()
-        eventApi.nextEvent(xEvent.ptr)
+        val xEvent = eventBuffer.getNextEvent(true)?.pointed ?: continue
 
         if (eventDistributor.handleEvent(xEvent)) {
             break
