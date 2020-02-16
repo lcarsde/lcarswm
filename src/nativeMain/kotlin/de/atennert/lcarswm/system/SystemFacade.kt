@@ -90,7 +90,8 @@ class SystemFacade : SystemApi {
         propertyAtom: Atom,
         typeAtom: Atom,
         data: UByteArray?,
-        format: Int
+        format: Int,
+        mode: Int
     ): Int {
         val bytesPerData = format.div(8)
         val dataCount = data?.size?.div(bytesPerData) ?: 0

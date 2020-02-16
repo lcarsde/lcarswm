@@ -36,7 +36,7 @@ interface WindowUtilApi {
 
     fun internAtom(name: String, onlyIfExists: Boolean = false): Atom
 
-    fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int): Int
+    fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int, mode: Int = PropModeReplace): Int
 
     fun deleteProperty(window: Window, propertyAtom: Atom): Int
 

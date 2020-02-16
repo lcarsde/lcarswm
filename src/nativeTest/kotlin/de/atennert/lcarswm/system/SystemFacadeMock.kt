@@ -437,8 +437,8 @@ open class SystemFacadeMock : SystemApi {
         return nextAtom
     }
 
-    override fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int): Int {
-        functionCalls.add(FunctionCall("changeProperty", window, propertyAtom, typeAtom, data, format))
+    override fun changeProperty(window: Window, propertyAtom: Atom, typeAtom: Atom, data: UByteArray?, format: Int, mode: Int): Int {
+        functionCalls.add(FunctionCall("changeProperty", window, propertyAtom, typeAtom, data, format, mode))
         return 0
     }
 
