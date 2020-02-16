@@ -6,6 +6,7 @@ package de.atennert.lcarswm.atom
 enum class Atoms(val atomName: String) {
     WINDOW("WINDOW"),
     ATOM("ATOM"),
+    STRING("STRING"),
     UTF_STRING("UTF8_STRING"),
     MANAGER("MANAGER"),
 
