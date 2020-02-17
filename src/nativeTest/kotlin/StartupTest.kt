@@ -72,13 +72,22 @@ class StartupTest {
     }
 
     private class StartupFacadeMock : SystemFacadeMock() {
+        var eventCount = 0
         override fun nextEvent(event: CPointer<XEvent>): Int {
-            // send closing key event to stop the window manager
-            super.nextEvent(event)
-            event.pointed.type = KeyRelease
-            event.pointed.xkey.keycode = keySyms.getValue(XK_Q).convert()
-            event.pointed.xkey.state = 0x40.convert()
-            return 0
+            when (eventCount) {
+                0 -> {
+                    event.pointed.type = PropertyNotify
+                    event.pointed.xproperty.time = 123.convert()
+                }
+                1 -> {
+                    super.nextEvent(event)
+                    event.pointed.type = KeyRelease
+                    event.pointed.xkey.keycode = keySyms.getValue(XK_Q).convert()
+                    event.pointed.xkey.state = 0x40.convert()
+                }
+            }
+            eventCount++
+            return Success
         }
     }
 }

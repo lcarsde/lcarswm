@@ -67,6 +67,22 @@ class ShutdownTest {
                     super.getSelectionOwner(atom)
                 }
             }
+
+            var used = false
+            override fun getQueuedEvents(mode: Int): Int {
+                return if (used) {
+                    0
+                } else {
+                    used = true
+                    1
+                }
+            }
+
+            override fun nextEvent(event: CPointer<XEvent>): Int {
+                event.pointed.type = PropertyNotify
+                event.pointed.xproperty.time = 123.convert()
+                return Success
+            }
         }
 
         runWindowManager(testFacade, logger)
@@ -98,6 +114,22 @@ class ShutdownTest {
                 this.errorHandler.invoke(null, null)
                 return super.sync(discardQueuedEvents)
             }
+
+            var used = false
+            override fun getQueuedEvents(mode: Int): Int {
+                return if (used) {
+                    0
+                } else {
+                    used = true
+                    1
+                }
+            }
+
+            override fun nextEvent(event: CPointer<XEvent>): Int {
+                event.pointed.type = PropertyNotify
+                event.pointed.xproperty.time = 123.convert()
+                return Success
+            }
         }
         runWindowManager(testFacade, logger)
 
@@ -121,12 +153,33 @@ class ShutdownTest {
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {
+
+            var used = false
+            override fun getQueuedEvents(mode: Int): Int {
+                return if (used) {
+                    0
+                } else {
+                    used = true
+                    1
+                }
+            }
+
+            var eventCount = 0
             override fun nextEvent(event: CPointer<XEvent>): Int {
-                super.nextEvent(event)
-                event.pointed.type = KeyRelease
-                event.pointed.xkey.keycode = keySyms.getValue(XK_Q).convert()
-                event.pointed.xkey.state = 0x40.convert()
-                return 0
+                when (eventCount) {
+                    0 -> {
+                        event.pointed.type = PropertyNotify
+                        event.pointed.xproperty.time = 123.convert()
+                    }
+                    1 -> {
+                        super.nextEvent(event)
+                        event.pointed.type = KeyRelease
+                        event.pointed.xkey.keycode = keySyms.getValue(XK_Q).convert()
+                        event.pointed.xkey.state = 0x40.convert()
+                    }
+                }
+                eventCount++
+                return Success
             }
 
             override fun getModifierMapping(): CPointer<XModifierKeymap>? {
