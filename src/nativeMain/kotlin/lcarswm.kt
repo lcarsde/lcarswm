@@ -61,7 +61,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, rootWindow, atomLibrary, eventBuffer)
 
-        if (!rootWindowPropertyHandler.becomeScreenOwner()) {
+        val eventTime = EventTime(system, eventBuffer, atomLibrary, rootWindowPropertyHandler)
+
+        if (!rootWindowPropertyHandler.becomeScreenOwner(eventTime)) {
             logger.logError("::runWindowManager::Detected another active window manager")
             cleanup(logger, system, rootWindowPropertyHandler)
             return
@@ -81,9 +83,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         staticLogger = logger
         system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
-        val keyConfigurationProvider = loadKeyConfiguration(system) ?: return
-
         rootWindowPropertyHandler.setSupportWindowProperties()
+
+        val keyConfigurationProvider = loadKeyConfiguration(system) ?: return
 
         logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
 
@@ -98,9 +100,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         focusHandler.registerObserver { activeWindow ->
             if (activeWindow != null) {
-                system.setInputFocus(activeWindow, RevertToParent, CurrentTime.convert())
+                system.setInputFocus(activeWindow, RevertToParent, eventTime.lastEventTime)
             } else {
-                system.setInputFocus(rootWindow, RevertToPointerRoot, CurrentTime.convert())
+                system.setInputFocus(rootWindow, RevertToPointerRoot, eventTime.lastEventTime)
             }
         }
 

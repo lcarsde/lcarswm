@@ -5,6 +5,7 @@ import de.atennert.lcarswm.atom.Atoms.*
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.events.EventBuffer
+import de.atennert.lcarswm.events.EventTime
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -41,7 +42,7 @@ class RootWindowPropertyHandler(
         system.lowerWindow(this.ewmhSupportWindow)
     }
 
-    fun becomeScreenOwner(): Boolean {
+    fun becomeScreenOwner(eventTime: EventTime): Boolean {
         val wmSnName = "WM_S${system.defaultScreenNumber()}"
         val wmSn = system.internAtom(wmSnName)
 
@@ -55,8 +56,8 @@ class RootWindowPropertyHandler(
             // TODO check for display error
         }
 
-        val timeStamp = CurrentTime // TODO get event based timestamp
-        system.setSelectionOwner(wmSn, ewmhSupportWindow, timeStamp.convert())
+        val timeStamp = eventTime.lastEventTime
+        system.setSelectionOwner(wmSn, ewmhSupportWindow, timeStamp)
 
         if (system.getSelectionOwner(wmSn) != ewmhSupportWindow) {
             logger.logInfo("Unable to become selection owner on display")
@@ -87,14 +88,14 @@ class RootWindowPropertyHandler(
         return true
     }
 
-    private fun sendWmNotification(wmSn: Atom, timeStamp: Long) {
+    private fun sendWmNotification(wmSn: Atom, timeStamp: Time) {
         val event = nativeHeap.alloc<XEvent>()
         event.xclient.type = ClientMessage
         event.xclient.message_type = atomLibrary[MANAGER]
         event.xclient.display = system.getDisplay()
         event.xclient.window = rootWindow
         event.xclient.format = 32
-        event.xclient.data.l[0] = timeStamp
+        event.xclient.data.l[0] = timeStamp.convert()
         event.xclient.data.l[1] = wmSn.convert()
         event.xclient.data.l[2] = this.ewmhSupportWindow.convert()
         event.xclient.data.l[3] = 0
