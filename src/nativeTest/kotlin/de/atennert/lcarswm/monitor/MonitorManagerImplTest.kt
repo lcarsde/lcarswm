@@ -129,8 +129,6 @@ class MonitorManagerImplTest {
         assertEquals(ScreenMode.NORMAL, monitorManager.getScreenMode(), "The default screen mode should be normal")
     }
 
-    // TODO add change of screen mode
-
     @Test
     fun `change the screen mode`() {
         val systemApi = SystemFacadeMock()
