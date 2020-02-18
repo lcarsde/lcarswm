@@ -76,8 +76,6 @@ Fullscreen mode
 TODO
 
 ### Other
-* Buffer events
-* Add time handling
 * Activate windows my clicking on them
 * Application selector
 * Content for the data bar (empty upper area in normal mode)
@@ -90,7 +88,6 @@ TODO
   * Data throughput of network interfaces
   * ...
 * GTK-Theme (if I can't find one)
-* WM switching (WM_S*)
 * Configuration for the colors
 * Monitors
   * Merge overlaying screens of same size
