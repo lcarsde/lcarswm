@@ -218,6 +218,74 @@ class ShutdownTest {
         checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
 
+    @Test
+    fun `shutdown after sending selection clear event`() {
+        val logger = LoggerMock()
+        lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
+        lateinit var keymapRef: CPointer<KeySymVar>
+        val testFacade = object : SystemFacadeMock() {
+
+            var used = false
+            override fun getQueuedEvents(mode: Int): Int {
+                return if (used) {
+                    0
+                } else {
+                    used = true
+                    1
+                }
+            }
+
+            var eventCount = 0
+            override fun nextEvent(event: CPointer<XEvent>): Int {
+                when (eventCount) {
+                    0 -> {
+                        event.pointed.type = PropertyNotify
+                        event.pointed.xproperty.time = 123.convert()
+                    }
+                    1 -> {
+                        super.nextEvent(event)
+                        event.pointed.type = SelectionClear
+                    }
+                }
+                eventCount++
+                return Success
+            }
+
+            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+                modifierKeymapRef = super.getModifierMapping()!!
+                return modifierKeymapRef
+            }
+
+            override fun getKeyboardMapping(
+                firstKeyCode: KeyCode,
+                keyCodeCount: Int,
+                keySymsPerKeyCode: CPointer<IntVar>
+            ): CPointer<KeySymVar>? {
+                keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
+                return keymapRef
+            }
+        }
+
+        runWindowManager(testFacade, logger)
+
+        val functionCalls = testFacade.functionCalls
+            .dropWhile { it.name != "nextEvent" }
+            .dropWhile { it.name == "nextEvent" }
+            .toMutableList()
+
+        checkThatTheLoggerIsClosed(logger)
+        checkFinalizingSync(functionCalls)
+        checkFreeingOfColors(functionCalls)
+        checkFreeingOfColorMap(functionCalls)
+        checkFreeingOfGraphicsContexts(functionCalls)
+        checkSelectInputSetting(functionCalls, NoEventMask)
+        checkWindowPropertyRemoval(functionCalls, testFacade.atomMap, "_NET_SUPPORTED")
+        checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
+        checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatTheDisplayWasClosed(functionCalls)
+
+        checkThatThereIsNoUnexpectedInteraction(functionCalls)
+    }
 
     private fun checkThatTheLoggerIsClosed(logger: LoggerMock) {
         assertTrue(logger.closed, "The logger needs to be closed")
