@@ -69,6 +69,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             return
         }
 
+        // TODO clear the event queue
+
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
         system.selectInput(rootWindow, ROOT_WINDOW_MASK)
@@ -84,6 +86,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
         rootWindowPropertyHandler.setSupportWindowProperties()
+
+        // TODO reset the event time
 
         val keyConfigurationProvider = loadKeyConfiguration(system) ?: return
 
@@ -255,6 +259,7 @@ private fun createEventManager(
         .addEventHandler(screenChangeHandler)
         .addEventHandler(ReparentNotifyHandler(logger, windowRegistration))
         .addEventHandler(ClientMessageHandler(logger, atomLibrary))
+        .addEventHandler(SelectionClearHandler(logger))
         .build()
 }
 
