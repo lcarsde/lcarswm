@@ -6,19 +6,16 @@ import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.WindowCoordinator
 import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.convert
 import kotlinx.cinterop.pin
 import xlib.RRScreenChangeNotify
-import xlib.Window
 import xlib.XEvent
 
 class RandrHandlerFactory(
-    private val systemApi: SystemApi,
+    systemApi: SystemApi,
     private val logger: Logger,
     private val monitorManager: MonitorManager,
     private val windowCoordinator: WindowCoordinator,
-    private val uiDrawer: UIDrawing,
-    private val rootWindowId: Window
+    private val uiDrawer: UIDrawing
 ) {
     private val randrEventBase: Int
     private val randrErrorBase: Int
