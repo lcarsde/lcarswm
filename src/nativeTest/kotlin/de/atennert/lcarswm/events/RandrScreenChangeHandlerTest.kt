@@ -21,9 +21,9 @@ class RandrScreenChangeHandlerTest {
         val uiDrawer = UIDrawingMock()
         val windowCoordinator = WindowCoordinatorMock()
 
-        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock(), monitorManager, windowCoordinator, uiDrawer)
+        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock())
 
-        val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler()
+        val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler(monitorManager, windowCoordinator, uiDrawer)
 
         assertEquals(systemApi.randrEventBase + RRScreenChangeNotify,
                 screenChangeHandler.xEventType,
@@ -37,9 +37,9 @@ class RandrScreenChangeHandlerTest {
         val uiDrawer = UIDrawingMock()
         val windowCoordinator = WindowCoordinatorMock()
 
-        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock(), monitorManager, windowCoordinator, uiDrawer)
+        val randrHandlerFactory = RandrHandlerFactory(systemApi, LoggerMock())
 
-        val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler()
+        val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler(monitorManager, windowCoordinator, uiDrawer)
 
         val screenChangeEvent = nativeHeap.alloc<XEvent>()
         screenChangeEvent.type = systemApi.randrEventBase + RRScreenChangeNotify

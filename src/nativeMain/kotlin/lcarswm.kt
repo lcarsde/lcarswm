@@ -222,10 +222,9 @@ private fun setupRandr(
     uiDrawer: UIDrawing,
     rootWindowId: Window
 ): XEventHandler {
-    val randrHandlerFactory =
-        RandrHandlerFactory(system, logger, monitorManager, windowCoordinator, uiDrawer)
+    val randrHandlerFactory = RandrHandlerFactory(system, logger)
 
-    val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler()
+    val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler(monitorManager, windowCoordinator, uiDrawer)
     val fakeEvent = nativeHeap.alloc<XEvent>()
     screenChangeHandler.handleEvent(fakeEvent)
     nativeHeap.free(fakeEvent)
