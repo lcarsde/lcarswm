@@ -49,6 +49,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             system.closeDisplay()
             return
         }
+
+        val randrHandlerFactory = RandrHandlerFactory(system, logger)
+
         system.synchronize(false)
 
         setDisplayEnvironment(system)
@@ -112,7 +115,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val windowCoordinator = ActiveWindowCoordinator(system, monitorManager)
 
-        val screenChangeHandler = setupRandr(system, logger, monitorManager, windowCoordinator, uiDrawer, rootWindow)
+        val screenChangeHandler = setupRandr(system, randrHandlerFactory, monitorManager, windowCoordinator, uiDrawer, rootWindow)
 
         val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, rootWindow)
 
@@ -216,14 +219,12 @@ fun loadKeyConfiguration(posixApi: PosixApi): ConfigurationProvider? {
  */
 private fun setupRandr(
     system: SystemApi,
-    logger: Logger,
+    randrHandlerFactory: RandrHandlerFactory,
     monitorManager: MonitorManager,
     windowCoordinator: WindowCoordinator,
     uiDrawer: UIDrawing,
     rootWindowId: Window
 ): XEventHandler {
-    val randrHandlerFactory = RandrHandlerFactory(system, logger)
-
     val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler(monitorManager, windowCoordinator, uiDrawer)
     val fakeEvent = nativeHeap.alloc<XEvent>()
     screenChangeHandler.handleEvent(fakeEvent)
