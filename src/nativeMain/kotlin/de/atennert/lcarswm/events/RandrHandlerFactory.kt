@@ -43,9 +43,6 @@ class RandrHandlerFactory(
 
             monitorManager.updateMonitorList()
 
-            val (width, height) = monitorManager.getCombinedScreenSize()
-            systemApi.resizeWindow(rootWindowId, width.convert(), height.convert())
-
             windowCoordinator.rearrangeActiveWindows()
 
             uiDrawer.drawWindowManagerFrame()

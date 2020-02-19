@@ -51,12 +51,6 @@ class RandrScreenChangeHandlerTest {
         val updateMonitorListCall = monitorManager.functionCalls.removeAt(0)
         assertEquals("updateMonitorList", updateMonitorListCall.name, "The monitor list needs to be updated")
 
-        val resizeRootWindowCall = systemApi.functionCalls.removeAt(0)
-        assertEquals("resizeWindow", resizeRootWindowCall.name, "The root window needs to be _resized_ to the new combined screen measurement")
-        assertEquals(systemApi.rootWindowId, resizeRootWindowCall.parameters[0], "The _root window_ needs to be resized to the new combined screen measurement")
-        assertEquals(1920.toUInt(), resizeRootWindowCall.parameters[1], "The root window needs to be resized to new _screen width_")
-        assertEquals(1080.toUInt(), resizeRootWindowCall.parameters[2], "The root window needs to be resized to new _screen height_")
-
         val windowCoordinatorCalls = windowCoordinator.functionCalls
         val rearrangeMonitorsCall = windowCoordinatorCalls.removeAt(0)
         assertEquals("rearrangeActiveWindows", rearrangeMonitorsCall.name, "The windows need to be rearranged when the screen configuration changes")
