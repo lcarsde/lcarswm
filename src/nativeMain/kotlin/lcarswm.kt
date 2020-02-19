@@ -223,7 +223,7 @@ private fun setupRandr(
     rootWindowId: Window
 ): XEventHandler {
     val randrHandlerFactory =
-        RandrHandlerFactory(system, logger, monitorManager, windowCoordinator, uiDrawer, rootWindowId)
+        RandrHandlerFactory(system, logger, monitorManager, windowCoordinator, uiDrawer)
 
     val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler()
     val fakeEvent = nativeHeap.alloc<XEvent>()
