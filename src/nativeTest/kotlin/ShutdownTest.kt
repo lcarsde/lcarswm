@@ -153,27 +153,21 @@ class ShutdownTest {
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {
-
-            var used = false
             override fun getQueuedEvents(mode: Int): Int {
-                return if (used) {
-                    0
-                } else {
-                    used = true
-                    1
-                }
+                return 1
             }
 
-            var eventCount = 0
+            var eventCount = 1
             override fun nextEvent(event: CPointer<XEvent>): Int {
                 when (eventCount) {
-                    0 -> {
+                    1, 2 -> {
                         event.pointed.type = PropertyNotify
-                        event.pointed.xproperty.time = 123.convert()
+                        event.pointed.xproperty.time = eventCount.convert()
                     }
-                    1 -> {
+                    else -> {
                         super.nextEvent(event)
                         event.pointed.type = KeyRelease
+                        event.pointed.xkey.time = 234.convert()
                         event.pointed.xkey.keycode = keySyms.getValue(XK_Q).convert()
                         event.pointed.xkey.state = 0x40.convert()
                     }
@@ -225,24 +219,18 @@ class ShutdownTest {
         lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {
 
-            var used = false
             override fun getQueuedEvents(mode: Int): Int {
-                return if (used) {
-                    0
-                } else {
-                    used = true
-                    1
-                }
+                return 1
             }
 
-            var eventCount = 0
+            var eventCount = 1
             override fun nextEvent(event: CPointer<XEvent>): Int {
                 when (eventCount) {
-                    0 -> {
+                    1, 2 -> {
                         event.pointed.type = PropertyNotify
-                        event.pointed.xproperty.time = 123.convert()
+                        event.pointed.xproperty.time = eventCount.convert()
                     }
-                    1 -> {
+                    else -> {
                         super.nextEvent(event)
                         event.pointed.type = SelectionClear
                     }
