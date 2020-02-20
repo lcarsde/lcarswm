@@ -135,7 +135,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             screenChangeHandler
         )
 
-        eventLoop(eventManager, eventBuffer)
+        eventLoop(eventManager, eventTime, eventBuffer)
 
         system.sync(false)
 
@@ -265,10 +265,13 @@ private fun createEventManager(
 
 private fun eventLoop(
     eventDistributor: EventDistributor,
+    eventTime: EventTime,
     eventBuffer: EventBuffer
 ) {
     while (true) {
         val xEvent = eventBuffer.getNextEvent(true)?.pointed ?: continue
+
+        eventTime.setTimeFromEvent(xEvent.ptr)
 
         if (eventDistributor.handleEvent(xEvent)) {
             break
