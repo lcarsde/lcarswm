@@ -90,7 +90,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         rootWindowPropertyHandler.setSupportWindowProperties()
 
-        // TODO reset the event time
+        eventTime.resetEventTime()
 
         val keyConfigurationProvider = loadKeyConfiguration(system) ?: return
 
