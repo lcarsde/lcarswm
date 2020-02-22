@@ -143,6 +143,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
     }
 }
 
+/**
+ * Full shutdown routines.
+ */
 private fun shutdown(
     system: SystemApi,
     rootWindowDrawer: RootWindowDrawer,
