@@ -11,10 +11,14 @@ interface WindowCoordinator {
     fun rearrangeActiveWindows()
 
     /**
+     * Register the window with the monitor
      * @return measurements
      */
     fun addWindowToMonitor(window: FramedWindow): List<Int>
-
+    
+    /**
+     * Unregister the window with the monitor
+     */
     fun removeWindow(window: FramedWindow)
 
     fun moveWindowToNextMonitor(windowId: Window)
