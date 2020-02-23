@@ -9,6 +9,9 @@ import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import xlib.*
 
+/**
+ * Tracks the time of events.
+ */
 class EventTime(
     private val windowUtilApi: WindowUtilApi,
     private val eventBuffer: EventBuffer,
@@ -16,6 +19,7 @@ class EventTime(
     private val rootWindowPropertyHandler: RootWindowPropertyHandler
 ) {
     private var _lastEventTime: Time = CurrentTime.convert()
+    /** The last known event time ... use to trigger other stuff */
     val lastEventTime: Time
         get() {
             if (_lastEventTime == CurrentTime.convert<Time>()) {
@@ -36,6 +40,9 @@ class EventTime(
         eventBuffer.findEvent(true) { this.findEvent(it) }
     }
 
+    /**
+     * Reset the known last event time.
+     */
     fun resetEventTime() {
         triggerTimeUpdate()
     }
@@ -50,6 +57,9 @@ class EventTime(
         }
     }
 
+    /**
+     * Set the last event time based on the given event.
+     */
     fun setTimeFromEvent(event: CPointer<XEvent>) {
         _lastEventTime = getTimeFromEvent(event)
     }
