@@ -23,6 +23,7 @@ class RootWindowPropertyHandler(
     private val atomLibrary: AtomLibrary,
     private val eventBuffer: EventBuffer
 ) {
+    /** used to set supported properties and track the WM screen ownership */
     val ewmhSupportWindow: Window
 
     init {
