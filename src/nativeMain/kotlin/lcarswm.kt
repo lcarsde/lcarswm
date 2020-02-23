@@ -209,6 +209,9 @@ fun setupScreen(
     system.ungrabServer()
 }
 
+/**
+ * Load the key configuration from the users key configuration file.
+ */
 fun loadKeyConfiguration(posixApi: PosixApi): ConfigurationProvider? {
     val configPathBytes = posixApi.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return null
     val configPath = configPathBytes.toKString()
@@ -238,6 +241,9 @@ private fun setupRandr(
     return screenChangeHandler
 }
 
+/**
+ * Create the event handling for the event loop.
+ */
 private fun createEventManager(
     system: SystemApi,
     logger: Logger,
