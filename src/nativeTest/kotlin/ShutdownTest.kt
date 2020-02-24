@@ -64,32 +64,20 @@ class ShutdownTest {
                 return newSelectionOwner
             }
 
-            var eventCounter = 0
-            override fun getQueuedEvents(mode: Int): Int = eventCounter
-
-            override fun changeProperty(
-                window: Window,
-                propertyAtom: Atom,
-                typeAtom: Atom,
-                data: UByteArray?,
-                format: Int,
-                mode: Int
-            ): Int {
-                if (mode == PropModeAppend && data == null) {
-                    eventCounter++
+            var used = false
+            override fun getQueuedEvents(mode: Int): Int {
+                return if (used) {
+                    0
+                } else {
+                    used = true
+                    1
                 }
-                return super.changeProperty(window, propertyAtom, typeAtom, data, format, mode)
             }
 
             override fun nextEvent(event: CPointer<XEvent>): Int {
-                return if (eventCounter > 0) {
-                    eventCounter--
-                    event.pointed.type = PropertyNotify
-                    event.pointed.xproperty.time = 123.convert()
-                    Success
-                } else {
-                    BadRequest
-                }
+                event.pointed.type = PropertyNotify
+                event.pointed.xproperty.time = 123.convert()
+                return Success
             }
 
             override fun usleep(time: UInt) {}
