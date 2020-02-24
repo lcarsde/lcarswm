@@ -47,8 +47,55 @@ class ShutdownTest {
     }
 
     @Test
-    fun `get notified on old wm shutdown and wait for it`() {
-        // TODO implement
+    fun `shutdown when the old WM doesn't`() {
+        val logger = LoggerMock()
+        val testFacade = object : SystemFacadeMock() {
+            var selectionOwnerCounter = 0
+
+            override fun defaultScreenNumber(): Int = 23
+
+            var newSelectionOwner: Window = 123456
+            override fun setSelectionOwner(atom: Atom, window: Window, timestamp: Time) {
+                super.setSelectionOnwer(atom, window, timestamp)
+                newSelectionOwner = window
+            }
+
+            override fun getSelectionOwner(atom: Atom): Window {
+                return newSelectionOwner
+            }
+
+            var used = false
+            override fun getQueuedEvents(mode: Int): Int {
+                return if (used) {
+                    0
+                } else {
+                    used = true
+                    1
+                }
+            }
+
+            override fun nextEvent(event: CPointer<XEvent>): Int {
+                event.pointed.type = PropertyNotify
+                event.pointed.xproperty.time = 123.convert()
+                return Success
+            }
+        }
+
+        runWindowManager(testFacade, logger)
+
+        val functionCalls = testFacade.functionCalls
+                .dropWhile { it.name != "getSelectionOwner" }
+                .dropWhile { it.name == "getSelectionOwner" }
+                .dropWhile { it.name != "getQueuedEvents" }
+                .dropWhile { it.name == "getQueuedEvents" }
+                .toMutableList()
+
+        checkThatTheLoggerIsClosed(logger)
+        checkRequestForCurrentSelectionOwner(functionCalls)
+        checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatTheDisplayWasClosed(functionCalls)
+
+        checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
 
     @Test
