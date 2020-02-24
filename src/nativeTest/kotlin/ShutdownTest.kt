@@ -50,44 +50,56 @@ class ShutdownTest {
     fun `shutdown when the old WM doesn't`() {
         val logger = LoggerMock()
         val testFacade = object : SystemFacadeMock() {
-            var selectionOwnerCounter = 0
-
             override fun defaultScreenNumber(): Int = 23
 
-            var newSelectionOwner: Window = 123456
-            override fun setSelectionOwner(atom: Atom, window: Window, timestamp: Time) {
-                super.setSelectionOnwer(atom, window, timestamp)
+            var newSelectionOwner: Window = 123456.convert()
+            override fun setSelectionOwner(atom: Atom, window: Window, time: Time): Int {
+                super.setSelectionOwner(atom, window, time)
                 newSelectionOwner = window
+                return 0
             }
 
             override fun getSelectionOwner(atom: Atom): Window {
+                super.getSelectionOwner(atom)
                 return newSelectionOwner
             }
 
-            var used = false
-            override fun getQueuedEvents(mode: Int): Int {
-                return if (used) {
-                    0
-                } else {
-                    used = true
-                    1
+            var eventCounter = 0
+            override fun getQueuedEvents(mode: Int): Int = eventCounter
+
+            override fun changeProperty(
+                window: Window,
+                propertyAtom: Atom,
+                typeAtom: Atom,
+                data: UByteArray?,
+                format: Int,
+                mode: Int
+            ): Int {
+                if (mode == PropModeAppend && data == null) {
+                    eventCounter++
                 }
+                return super.changeProperty(window, propertyAtom, typeAtom, data, format, mode)
             }
 
             override fun nextEvent(event: CPointer<XEvent>): Int {
-                event.pointed.type = PropertyNotify
-                event.pointed.xproperty.time = 123.convert()
-                return Success
+                return if (eventCounter > 0) {
+                    eventCounter--
+                    event.pointed.type = PropertyNotify
+                    event.pointed.xproperty.time = 123.convert()
+                    Success
+                } else {
+                    BadRequest
+                }
             }
+
+            override fun usleep(time: UInt) {}
         }
 
         runWindowManager(testFacade, logger)
 
         val functionCalls = testFacade.functionCalls
+                .dropWhile { it.name != "setSelectionOwner" }
                 .dropWhile { it.name != "getSelectionOwner" }
-                .dropWhile { it.name == "getSelectionOwner" }
-                .dropWhile { it.name != "getQueuedEvents" }
-                .dropWhile { it.name == "getQueuedEvents" }
                 .toMutableList()
 
         checkThatTheLoggerIsClosed(logger)
