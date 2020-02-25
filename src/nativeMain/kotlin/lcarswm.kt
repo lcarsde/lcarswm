@@ -72,8 +72,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             return
         }
 
-        // TODO clear the event queue
-
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
         system.selectInput(rootWindow, ROOT_WINDOW_MASK)
