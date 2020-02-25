@@ -22,4 +22,8 @@ enum class Signal(val signalValue: Int) {
     CHLD(SIGCHLD),
     TTIN(SIGTTIN),
     TTOU(SIGTTOU);
+
+    companion object {
+        val CORE_DUMP_SIGNALS = setOf(ABRT, SEGV, FPE, ILL, QUIT, TRAP, SYS, BUS, XCPU, XFSZ)
+    }
 }
