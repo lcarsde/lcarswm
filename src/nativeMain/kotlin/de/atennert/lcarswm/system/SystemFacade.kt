@@ -2,10 +2,12 @@ package de.atennert.lcarswm.system
 
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.X_TRUE
+import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
-import platform.posix.FILE
+import platform.posix.*
 import platform.posix.__pid_t
+import platform.posix.sigset_t
 import platform.posix.timeval
 import xlib.*
 
@@ -279,6 +281,22 @@ class SystemFacade : SystemApi {
 
     override fun abort() {
         platform.posix.abort()
+    }
+
+    override fun sigFillSet(sigset: CPointer<sigset_t>) {
+        sigfillset(sigset)
+    }
+
+    override fun sigEmptySet(sigset: CPointer<sigset_t>) {
+        sigemptyset(sigset)
+    }
+
+    override fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>?, oldSigAction: CPointer<sigaction>?) {
+        sigaction(signal.signalValue, newSigAction, oldSigAction)
+    }
+
+    override fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?) {
+        sigprocmask(how, newSigset, oldSigset)
     }
 
     override fun selectInput(window: Window, mask: Long): Int {

@@ -1,10 +1,13 @@
 package de.atennert.lcarswm.system.api
 
+import de.atennert.lcarswm.signal.Signal
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.CPointerVar
+import kotlinx.cinterop.CValuesRef
 import platform.posix.FILE
 import platform.posix.__pid_t
+import platform.posix.sigaction
+import platform.posix.sigset_t
 
 /**
  * Interface for accessing POSIX functions
@@ -44,4 +47,12 @@ interface PosixApi {
     fun usleep(time: UInt)
 
     fun abort()
+
+    fun sigFillSet(sigset: CPointer<sigset_t>)
+
+    fun sigEmptySet(sigset: CPointer<sigset_t>)
+
+    fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>?, oldSigAction: CPointer<sigaction>?)
+
+    fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?)
 }

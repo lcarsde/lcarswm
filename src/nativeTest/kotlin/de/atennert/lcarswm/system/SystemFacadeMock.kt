@@ -1,10 +1,13 @@
 package de.atennert.lcarswm.system
 
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
+import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import platform.posix.FILE
 import platform.posix.__pid_t
+import platform.posix.sigaction
+import platform.posix.sigset_t
 import xlib.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -598,5 +601,21 @@ open class SystemFacadeMock : SystemApi {
 
     override fun abort() {
         functionCalls.add(FunctionCall("abort"))
+    }
+
+    override fun sigFillSet(sigset: CPointer<sigset_t>) {
+        functionCalls.add(FunctionCall("sigFillSet", sigset))
+    }
+
+    override fun sigEmptySet(sigset: CPointer<sigset_t>) {
+        functionCalls.add(FunctionCall("sigEmptySet", sigset))
+    }
+
+    override fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>?, oldSigAction: CPointer<sigaction>?) {
+        functionCalls.add(FunctionCall("sigAction", signal, newSigAction, oldSigAction))
+    }
+
+    override fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?) {
+        functionCalls.add(FunctionCall("sigProcMask", how, newSigset, oldSigset))
     }
 }
