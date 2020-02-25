@@ -3,7 +3,6 @@ package de.atennert.lcarswm.system.api
 import de.atennert.lcarswm.signal.Signal
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.CValuesRef
 import platform.posix.FILE
 import platform.posix.__pid_t
 import platform.posix.sigaction
