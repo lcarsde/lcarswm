@@ -42,4 +42,6 @@ interface PosixApi {
     fun gettimeofday(): Long
 
     fun usleep(time: UInt)
+
+    fun abort()
 }

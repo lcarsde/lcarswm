@@ -595,4 +595,8 @@ open class SystemFacadeMock : SystemApi {
     override fun usleep(time: UInt) {
         functionCalls.add(FunctionCall("usleep", time))
     }
+
+    override fun abort() {
+        functionCalls.add(FunctionCall("abort"))
+    }
 }

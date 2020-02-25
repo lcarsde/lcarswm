@@ -277,6 +277,10 @@ class SystemFacade : SystemApi {
         platform.posix.usleep(time)
     }
 
+    override fun abort() {
+        platform.posix.abort()
+    }
+
     override fun selectInput(window: Window, mask: Long): Int {
         return XSelectInput(display, window, mask)
     }
