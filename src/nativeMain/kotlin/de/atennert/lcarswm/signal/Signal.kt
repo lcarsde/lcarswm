@@ -2,6 +2,9 @@ package de.atennert.lcarswm.signal
 
 import platform.posix.*
 
+/**
+ * Signals that we handle
+ */
 enum class Signal(val signalValue: Int) {
     ABRT(SIGABRT),
     SEGV(SIGSEGV),
@@ -24,6 +27,9 @@ enum class Signal(val signalValue: Int) {
     TTOU(SIGTTOU);
 
     companion object {
+        /**
+         * Signals that trigger us to core-dump
+         */
         val CORE_DUMP_SIGNALS = setOf(ABRT, SEGV, FPE, ILL, QUIT, TRAP, SYS, BUS, XCPU, XFSZ)
     }
 }
