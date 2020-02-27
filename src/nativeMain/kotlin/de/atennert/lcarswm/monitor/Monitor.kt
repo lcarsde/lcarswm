@@ -13,16 +13,19 @@ data class Monitor(
     val name: String,
     val isPrimary: Boolean
 ) {
-
+    /** x coordinate of monitor on total screen surface */
     var x = 0
         private set
 
+    /** y coordinate of monitor on total screen surface */
     var y = 0
         private set
 
+    /** width of monitor pixel setting */
     var width = 800
         private set
 
+    /** height of monitor pixel setting */
     var height = 600
         private set
 
@@ -38,12 +41,9 @@ data class Monitor(
 
     private val fullscreenWindowSize get() = Pair(width, height)
 
-    var isFullyInitialized = false
-        private set
+    private var isFullyInitialized = false
 
-    override fun hashCode(): Int {
-        return id.convert()
-    }
+    override fun hashCode(): Int = id.convert()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
