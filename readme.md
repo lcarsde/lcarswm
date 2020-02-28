@@ -22,6 +22,22 @@ Thank you very much to the creators of the following resources:
 * Windows-key + M toggles the display mode between normal, maximized and fullscreen
 * Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
 * Other key combinations can be connected to commands via a key configuration file
+  * The key configuration file is expected to be `~/.config/lcarswm/key-config.properties`
+  * Modifier keys are
+    * Shift
+    * Ctrl
+    * Alt
+    * Win / Lin / Super
+    * Meta
+    * Hyper
+  * An example layout is this:
+  ```properties
+    Alt+T=lxterminal
+    Alt+B=firefox
+    XF86AudioMute=amixer -q set Master toggle
+    XF86AudioRaiseVolume=amixer -q set Master 3%+
+    XF86AudioLowerVolume=amixer -q set Master 3%-
+  ```
 
 ## Pictures
 Yay, it's starting to get usable. So here are some pictures from the VirtualBox test environment.
