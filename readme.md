@@ -76,6 +76,7 @@ Fullscreen mode
 TODO
 
 ### Other
+* Signal handling
 * Activate windows my clicking on them
 * Application selector
 * Content for the data bar (empty upper area in normal mode)
