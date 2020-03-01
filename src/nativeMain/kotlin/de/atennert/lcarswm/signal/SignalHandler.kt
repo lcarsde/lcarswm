@@ -41,5 +41,6 @@ class SignalHandler(private val posixApi: PosixApi) {
         oldActions.forEach { (signalValue, action) ->
             posixApi.sigAction(signalValue, action.ptr, null)
         }
+        oldActions.clear()
     }
 }
