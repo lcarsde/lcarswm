@@ -20,15 +20,15 @@ class ShutdownTest {
         }
         runWindowManager(testFacade, logger)
 
-        checkThatTheLoggerIsClosed(logger)
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "openDisplay" }
             .toMutableList()
 
+        checkThatTheLoggerIsClosed(logger)
         checkForTryingToOpenDisplay(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
-        checkThatThereIsNoUnexpectedInteraction(testFacade.functionCalls)
+        checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
 
     @Test
@@ -479,7 +479,7 @@ class ShutdownTest {
     private fun checkThatThereIsNoUnexpectedInteraction(functionCalls: MutableList<FunctionCall>) {
         assertTrue(
             functionCalls.isEmpty(),
-            "There should be no more calls to the system, when we can't get a display"
+            "There should be no more calls to the system"
         )
     }
 }
