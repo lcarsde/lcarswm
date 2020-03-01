@@ -35,6 +35,6 @@ class SignalHandler(posixApi: PosixApi) {
                 val oldSignal = nativeHeap.alloc<sigaction>()
                 posixApi.sigAction(it, action.ptr, oldSignal.ptr)
                 oldActions[it.signalValue] = oldSignal
-        }
+            }
     }
 }
