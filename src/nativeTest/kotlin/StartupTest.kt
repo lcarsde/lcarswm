@@ -1,10 +1,36 @@
 import de.atennert.lcarswm.log.LoggerMock
+import de.atennert.lcarswm.signal.Signal
+import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import xlib.*
 import kotlin.test.*
 
 class StartupTest {
+    @Test
+    fun `check startup`() {
+        val systemFacade = StartupFacadeMock()
+
+        runWindowManager(systemFacade, LoggerMock())
+
+        val startupCalls = systemFacade.functionCalls
+
+        checkCoreSignalRegistration(startupCalls)
+    }
+
+    private fun checkCoreSignalRegistration(startupCalls: MutableList<FunctionCall>) {
+        assertEquals("sigFillSet", startupCalls.removeAt(0).name, "Initialize the signal set")
+        assertEquals("sigEmptySet", startupCalls.removeAt(0).name, "Initialize the action signal set")
+
+        Signal.CORE_DUMP_SIGNALS
+            .filter { it != Signal.ABRT }
+            .forEach {
+                val signalRegistrationCall = startupCalls.removeAt(0)
+                assertEquals("sigAction", signalRegistrationCall.name, "Initialize signal $it")
+                assertEquals(it, signalRegistrationCall.parameters[0], "Initialize signal _${it}_")
+            }
+    }
+
     @Test
     fun `set DISPLAY environment variable during startup`() {
         val systemFacade = StartupFacadeMock()
