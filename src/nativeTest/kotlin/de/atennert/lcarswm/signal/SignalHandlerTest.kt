@@ -8,7 +8,7 @@ class SignalHandlerTest {
     @Test
     fun `register for core signals on startup`() {
         val system = SystemFacadeMock()
-        val signalHandler = SignalHandler(system)
+        SignalHandler(system)
 
         val signalInitCalls = system.functionCalls
         assertEquals("sigFillSet", signalInitCalls.removeAt(0).name, "Initialize the signal set")
