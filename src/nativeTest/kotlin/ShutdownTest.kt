@@ -1,4 +1,5 @@
 import de.atennert.lcarswm.log.LoggerMock
+import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
@@ -20,7 +21,13 @@ class ShutdownTest {
         runWindowManager(testFacade, logger)
 
         checkThatTheLoggerIsClosed(logger)
-        checkForTryingToOpenDisplay(testFacade.functionCalls)
+        val functionCalls = testFacade.functionCalls
+            .dropWhile { it.name != "openDisplay" }
+            .toMutableList()
+
+        checkForTryingToOpenDisplay(functionCalls)
+        checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
+
         checkThatThereIsNoUnexpectedInteraction(testFacade.functionCalls)
     }
 
@@ -42,6 +49,7 @@ class ShutdownTest {
         checkThatTheLoggerIsClosed(logger)
         checkRequestForDisplaysDefaultScreen(functionCalls)
         checkThatTheDisplayWasClosed(functionCalls)
+        checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
         checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
@@ -94,6 +102,7 @@ class ShutdownTest {
         checkRequestForCurrentSelectionOwner(functionCalls)
         checkThatSupportWindowWasDestroyed(functionCalls)
         checkThatTheDisplayWasClosed(functionCalls)
+        checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
         checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
@@ -142,6 +151,7 @@ class ShutdownTest {
         checkRequestForCurrentSelectionOwner(functionCalls)
         checkThatSupportWindowWasDestroyed(functionCalls)
         checkThatTheDisplayWasClosed(functionCalls)
+        checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
         checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
@@ -190,6 +200,7 @@ class ShutdownTest {
         checkSynchronizationRequest(functionCalls)
         checkThatSupportWindowWasDestroyed(functionCalls)
         checkThatTheDisplayWasClosed(functionCalls)
+        checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
         checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
@@ -255,6 +266,7 @@ class ShutdownTest {
         checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatSupportWindowWasDestroyed(functionCalls)
         checkThatTheDisplayWasClosed(functionCalls)
+        checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
         checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
@@ -318,12 +330,19 @@ class ShutdownTest {
         checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatSupportWindowWasDestroyed(functionCalls)
         checkThatTheDisplayWasClosed(functionCalls)
+        checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
         checkThatThereIsNoUnexpectedInteraction(functionCalls)
     }
 
     private fun checkThatTheLoggerIsClosed(logger: LoggerMock) {
         assertTrue(logger.closed, "The logger needs to be closed")
+    }
+
+    private fun checkCleanupOfSignals(functionCalls: MutableList<FunctionCall>, registeredSignals: Set<Signal>) {
+        repeat(registeredSignals.size) {
+            assertEquals("sigAction", functionCalls.removeAt(0).name, "Unregister signal")
+        }
     }
 
     private fun checkFinalizingSync(functionCalls: MutableList<FunctionCall>) {
