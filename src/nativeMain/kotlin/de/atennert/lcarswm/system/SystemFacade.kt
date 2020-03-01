@@ -291,7 +291,7 @@ class SystemFacade : SystemApi {
         sigemptyset(sigset)
     }
 
-    override fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>?, oldSigAction: CPointer<sigaction>?) {
+    override fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>, oldSigAction: CPointer<sigaction>?) {
         sigaction(signal.signalValue, newSigAction, oldSigAction)
     }
 

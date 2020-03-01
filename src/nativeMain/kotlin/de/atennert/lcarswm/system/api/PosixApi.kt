@@ -51,7 +51,7 @@ interface PosixApi {
 
     fun sigEmptySet(sigset: CPointer<sigset_t>)
 
-    fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>?, oldSigAction: CPointer<sigaction>?)
+    fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>, oldSigAction: CPointer<sigaction>?)
 
     fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?)
 }

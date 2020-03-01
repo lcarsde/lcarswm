@@ -611,7 +611,7 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("sigEmptySet", sigset))
     }
 
-    override fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>?, oldSigAction: CPointer<sigaction>?) {
+    override fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>, oldSigAction: CPointer<sigaction>?) {
         functionCalls.add(FunctionCall("sigAction", signal, newSigAction, oldSigAction))
     }
 
