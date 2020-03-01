@@ -37,12 +37,13 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
     logger.logInfo("::runWindowManager::start lcarswm initialization")
 
     memScoped {
-        SignalHandler(system)
+        val signalHandler = SignalHandler(system)
 
         wmDetected = false
         if (!system.openDisplay()) {
             logger.logError("::runWindowManager::got no display")
             logger.close()
+            signalHandler.cleanup()
             return
         }
         val screen = system.defaultScreenOfDisplay()?.pointed
@@ -50,6 +51,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             logger.logError("::runWindowManager::got no screen")
             logger.close()
             system.closeDisplay()
+            signalHandler.cleanup()
             return
         }
 
@@ -71,7 +73,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         if (!rootWindowPropertyHandler.becomeScreenOwner(eventTime)) {
             logger.logError("::runWindowManager::Detected another active window manager")
-            cleanup(logger, system, rootWindowPropertyHandler)
+            cleanup(logger, system, rootWindowPropertyHandler, signalHandler)
             return
         }
 
@@ -82,7 +84,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         if (wmDetected) {
             logger.logError("::runWindowManager::Detected another active window manager")
-            cleanup(logger, system, rootWindowPropertyHandler)
+            cleanup(logger, system, rootWindowPropertyHandler, signalHandler)
             return
         }
 
@@ -140,7 +142,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         system.sync(false)
 
-        shutdown(system, uiDrawer, rootWindow, logger, rootWindowPropertyHandler, keyManager)
+        shutdown(system, uiDrawer, rootWindow, logger, rootWindowPropertyHandler, keyManager, signalHandler)
     }
 }
 
@@ -153,7 +155,8 @@ private fun shutdown(
     rootWindow: Window,
     logger: Logger,
     rootWindowPropertyHandler: RootWindowPropertyHandler,
-    keyManager: KeyManager
+    keyManager: KeyManager,
+    signalHandler: SignalHandler
 ) {
     rootWindowDrawer.cleanupColorMap(system)
     rootWindowDrawer.cleanupGraphicsContexts()
@@ -163,13 +166,20 @@ private fun shutdown(
 
     keyManager.cleanup()
 
-    cleanup(logger, system, rootWindowPropertyHandler)
+    cleanup(logger, system, rootWindowPropertyHandler, signalHandler)
 }
 
-fun cleanup(logger: Logger, windowUtils: WindowUtilApi, rootWindowPropertyHandler: RootWindowPropertyHandler) {
+fun cleanup(
+    logger: Logger,
+    windowUtils: WindowUtilApi,
+    rootWindowPropertyHandler: RootWindowPropertyHandler,
+    signalHandler: SignalHandler
+) {
     rootWindowPropertyHandler.destroySupportWindow()
 
     windowUtils.closeDisplay()
+
+    signalHandler.cleanup()
 
     staticLogger = null
     logger.logInfo("::runWindowManager::lcarswm stopped")

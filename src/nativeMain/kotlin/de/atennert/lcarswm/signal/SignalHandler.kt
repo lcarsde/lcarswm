@@ -12,11 +12,10 @@ private fun handleCoreSignal() {
     globalPosixApi?.abort()
 }
 
-class SignalHandler(posixApi: PosixApi) {
-
+class SignalHandler(private val posixApi: PosixApi) {
     private val allSignals: sigset_t = nativeHeap.alloc()
 
-    private val oldActions = mutableMapOf<Int, sigaction>()
+    private val oldActions = mutableMapOf<Signal, sigaction>()
 
     init {
         globalPosixApi = posixApi
@@ -34,7 +33,13 @@ class SignalHandler(posixApi: PosixApi) {
             .forEach {
                 val oldSignal = nativeHeap.alloc<sigaction>()
                 posixApi.sigAction(it, action.ptr, oldSignal.ptr)
-                oldActions[it.signalValue] = oldSignal
+                oldActions[it] = oldSignal
             }
+    }
+
+    fun cleanup() {
+        oldActions.forEach { (signalValue, action) ->
+            posixApi.sigAction(signalValue, action.ptr, null)
+        }
     }
 }
