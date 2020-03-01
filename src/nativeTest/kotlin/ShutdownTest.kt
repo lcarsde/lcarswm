@@ -22,10 +22,10 @@ class ShutdownTest {
 
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "openDisplay" }
+            .drop(1)
             .toMutableList()
 
         checkThatTheLoggerIsClosed(logger)
-        checkForTryingToOpenDisplay(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
         checkThatThereIsNoUnexpectedInteraction(functionCalls)
@@ -44,10 +44,10 @@ class ShutdownTest {
 
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "defaultScreenOfDisplay" }
+            .drop(1)
             .toMutableList()
 
         checkThatTheLoggerIsClosed(logger)
-        checkRequestForDisplaysDefaultScreen(functionCalls)
         checkThatTheDisplayWasClosed(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
@@ -95,7 +95,7 @@ class ShutdownTest {
 
         val functionCalls = testFacade.functionCalls
                 .dropWhile { it.name != "setSelectionOwner" }
-                .dropWhile { it.name != "getSelectionOwner" }
+                .drop(1)
                 .toMutableList()
 
         checkThatTheLoggerIsClosed(logger)
@@ -347,22 +347,6 @@ class ShutdownTest {
 
     private fun checkFinalizingSync(functionCalls: MutableList<FunctionCall>) {
         assertEquals("sync", functionCalls.removeAt(0).name, "Call sync before cleaning up")
-    }
-
-    private fun checkForTryingToOpenDisplay(functionCalls: MutableList<FunctionCall>) {
-        assertEquals(
-            "openDisplay",
-            functionCalls.removeAt(0).name,
-            "startup should try to get display"
-        )
-    }
-
-    private fun checkRequestForDisplaysDefaultScreen(functionCalls: MutableList<FunctionCall>) {
-        assertEquals(
-            "defaultScreenOfDisplay",
-            functionCalls.removeAt(0).name,
-            "startup needs to request the default display for the screen"
-        )
     }
 
     private fun checkRequestForCurrentSelectionOwner(functionCalls: MutableList<FunctionCall>) {
