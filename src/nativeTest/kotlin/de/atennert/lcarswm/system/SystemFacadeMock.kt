@@ -611,8 +611,10 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("sigEmptySet", sigset))
     }
 
+    val signalActions = mutableMapOf<Signal, CPointer<sigaction>>()
     override fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>, oldSigAction: CPointer<sigaction>?) {
         functionCalls.add(FunctionCall("sigAction", signal, newSigAction, oldSigAction))
+        signalActions[signal] = newSigAction
     }
 
     override fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?) {
