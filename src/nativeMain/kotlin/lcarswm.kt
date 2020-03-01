@@ -5,6 +5,7 @@ import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
+import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.PosixApi
 import de.atennert.lcarswm.system.api.SystemApi
@@ -36,6 +37,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
     logger.logInfo("::runWindowManager::start lcarswm initialization")
 
     memScoped {
+        SignalHandler(system)
+
         wmDetected = false
         if (!system.openDisplay()) {
             logger.logError("::runWindowManager::got no display")
