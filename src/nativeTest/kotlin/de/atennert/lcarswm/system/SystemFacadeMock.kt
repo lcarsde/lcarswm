@@ -495,7 +495,6 @@ open class SystemFacadeMock : SystemApi {
 
     val displayString = "TheDisplay"
     override fun getDisplayString(): String {
-        functionCalls.add(FunctionCall("getDisplayString"))
         return displayString
     }
 
