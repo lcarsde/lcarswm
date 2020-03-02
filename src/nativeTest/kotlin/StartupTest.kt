@@ -20,6 +20,8 @@ class StartupTest {
         assertEquals("openDisplay", startupCalls.removeAt(0).name, "try to open the display")
 
         assertEquals("defaultScreenOfDisplay", startupCalls.removeAt(0).name, "try to get the displays screen")
+
+        assertEquals("synchronize", startupCalls.removeAt(0).name, "synchronize after getting the display and randr resources")
     }
 
     private fun checkCoreSignalRegistration(startupCalls: MutableList<FunctionCall>) {
