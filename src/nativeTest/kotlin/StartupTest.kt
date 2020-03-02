@@ -22,6 +22,8 @@ class StartupTest {
         assertEquals("defaultScreenOfDisplay", startupCalls.removeAt(0).name, "try to get the displays screen")
 
         assertEquals("synchronize", startupCalls.removeAt(0).name, "synchronize after getting the display and randr resources")
+
+        checkForSettingDisplayEnvironmentVariable(startupCalls, systemFacade)
     }
 
     private fun checkCoreSignalRegistration(startupCalls: MutableList<FunctionCall>) {
@@ -37,21 +39,15 @@ class StartupTest {
             }
     }
 
-    @Test
-    fun `set DISPLAY environment variable during startup`() {
-        val systemFacade = StartupFacadeMock()
+    private fun checkForSettingDisplayEnvironmentVariable(startupCalls: MutableList<FunctionCall>, system: SystemFacadeMock) {
+        val setDisplayCall = startupCalls.removeAt(0)
 
-        runWindowManager(systemFacade, LoggerMock())
-
-        val startupCalls = systemFacade.functionCalls.takeWhile { it.name != "nextEvent" }
-
-        val setenvCall = startupCalls.singleOrNull { it.name == "setenv" && it.parameters[0] == "DISPLAY" }
-
-        assertNotNull(setenvCall, "setenv should be called to set the DISPLAY name")
+        assertEquals("setenv", setDisplayCall.name, "setenv should be called to set the DISPLAY name")
+        assertEquals("DISPLAY", setDisplayCall.parameters[0], "setenv should be called to set the _DISPLAY_ name")
 
         assertEquals(
-            systemFacade.displayString,
-            setenvCall.parameters[1],
+            system.displayString,
+            setDisplayCall.parameters[1],
             "the DISPLAY environment variable should be set to the return value of getDisplayString"
         )
     }
