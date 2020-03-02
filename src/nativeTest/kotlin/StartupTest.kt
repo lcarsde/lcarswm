@@ -16,6 +16,8 @@ class StartupTest {
         val startupCalls = systemFacade.functionCalls
 
         checkCoreSignalRegistration(startupCalls)
+
+        assertEquals("openDisplay", startupCalls.removeAt(0).name, "open the display")
     }
 
     private fun checkCoreSignalRegistration(startupCalls: MutableList<FunctionCall>) {
