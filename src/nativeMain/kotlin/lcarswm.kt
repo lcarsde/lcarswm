@@ -89,7 +89,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         }
 
         staticLogger = logger
-        system.setErrorHandler(staticCFunction { _, err -> staticLogger!!.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
+        system.setErrorHandler(staticCFunction { _, err -> staticLogger?.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
         rootWindowPropertyHandler.setSupportWindowProperties()
 
