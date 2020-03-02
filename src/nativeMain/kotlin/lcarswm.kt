@@ -61,13 +61,11 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         setDisplayEnvironment(system)
 
-        val rootWindow = screen.root
-
         val atomLibrary = AtomLibrary(system)
 
         val eventBuffer = EventBuffer(system)
 
-        val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, rootWindow, atomLibrary, eventBuffer)
+        val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, screen.root, atomLibrary, eventBuffer)
 
         val eventTime = EventTime(system, eventBuffer, atomLibrary, rootWindowPropertyHandler)
 
@@ -79,7 +77,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
-        system.selectInput(rootWindow, ROOT_WINDOW_MASK)
+        system.selectInput(screen.root, ROOT_WINDOW_MASK)
         system.sync(false)
 
         if (wmDetected) {
@@ -97,13 +95,13 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val keyConfigurationProvider = loadKeyConfiguration(system) ?: return
 
-        logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: $rootWindow")
+        logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: ${screen.root}")
 
-        val monitorManager = MonitorManagerImpl(system, rootWindow)
+        val monitorManager = MonitorManagerImpl(system, screen.root)
 
         val uiDrawer = RootWindowDrawer(system, monitorManager, screen)
 
-        val keyManager = KeyManager(system, rootWindow)
+        val keyManager = KeyManager(system, screen.root)
         keyManager.grabInternalKeys()
 
         val focusHandler = WindowFocusHandler()
@@ -112,17 +110,17 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             if (activeWindow != null) {
                 system.setInputFocus(activeWindow, RevertToParent, eventTime.lastEventTime)
             } else {
-                system.setInputFocus(rootWindow, RevertToPointerRoot, eventTime.lastEventTime)
+                system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
             }
         }
 
         val windowCoordinator = ActiveWindowCoordinator(system, monitorManager)
 
-        val screenChangeHandler = setupRandr(system, randrHandlerFactory, monitorManager, windowCoordinator, uiDrawer, rootWindow)
+        val screenChangeHandler = setupRandr(system, randrHandlerFactory, monitorManager, windowCoordinator, uiDrawer, screen.root)
 
-        val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, rootWindow)
+        val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, screen.root)
 
-        setupScreen(system, rootWindow, rootWindowPropertyHandler, windowRegistration)
+        setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
 
         val eventManager = createEventManager(
             system,
@@ -142,7 +140,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         system.sync(false)
 
-        shutdown(system, uiDrawer, rootWindow, logger, rootWindowPropertyHandler, keyManager, signalHandler)
+        shutdown(system, uiDrawer, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler)
     }
 }
 
