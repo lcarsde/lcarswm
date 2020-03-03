@@ -46,6 +46,11 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             signalHandler.cleanup()
             return
         }
+
+        val randrHandlerFactory = RandrHandlerFactory(system, logger)
+
+        val atomLibrary = AtomLibrary(system)
+
         val screen = system.defaultScreenOfDisplay()?.pointed
         if (screen == null) {
             logger.logError("::runWindowManager::got no screen")
@@ -55,13 +60,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             return
         }
 
-        val randrHandlerFactory = RandrHandlerFactory(system, logger)
-
         system.synchronize(false)
 
         setDisplayEnvironment(system)
-
-        val atomLibrary = AtomLibrary(system)
 
         val eventBuffer = EventBuffer(system)
 
