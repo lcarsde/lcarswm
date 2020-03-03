@@ -11,10 +11,10 @@ import kotlin.test.assertNull
 
 class KeyManagerTest {
     @Test
-    fun `ungrab all keys on init`() {
+    fun `ungrab all keys`() {
         val systemApi = SystemFacadeMock()
 
-        KeyManager(systemApi, systemApi.rootWindowId)
+        KeyManager(systemApi, systemApi.rootWindowId).ungrabAllKeys()
 
         val ungrabKeysCall = systemApi.functionCalls.removeAt(0)
 
