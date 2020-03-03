@@ -9,7 +9,7 @@ enum class Modifiers {
     CONTROL,
     NUM_LOCK,
     SCROLL_LOCK,
-    SUPER,
+    SUPER, // win, lin
     HYPER,
     META,
     ALT
