@@ -3,6 +3,7 @@ package de.atennert.lcarswm
 import de.atennert.lcarswm.system.api.InputApi
 import kotlinx.cinterop.convert
 import xlib.KeySym
+import xlib.Window
 
 /**
  * Loads the key configuration of the users and provides the corresponding key bindings.
@@ -10,7 +11,8 @@ import xlib.KeySym
 class KeyConfiguration(
     private val inputApi: InputApi,
     configurationProvider: Properties,
-    private val keyManager: KeyManager
+    private val keyManager: KeyManager,
+    rootWindowId: Window
 ) {
 
     private val keySymCommands = mutableMapOf<Pair<KeySym, Int>, String>()
@@ -31,7 +33,7 @@ class KeyConfiguration(
             val mask = getMask(modifierStrings)
             val keySym = getKeySym(keyString)
 
-            keyManager.grabKey(keySym, mask)
+            keyManager.grabKey(keySym, mask, rootWindowId)
 
             keySymCommands[Pair(keySym, mask)] = configurationProvider[keyConfig]!!
         }

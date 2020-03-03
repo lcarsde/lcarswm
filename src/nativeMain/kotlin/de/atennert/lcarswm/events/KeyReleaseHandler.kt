@@ -18,12 +18,13 @@ class KeyReleaseHandler(
     private val focusHandler: WindowFocusHandler,
     private val keyManager: KeyManager,
     private val atomLibrary: AtomLibrary,
-    configurationProvider: Properties
+    configurationProvider: Properties,
+    rootWindowId: Window
 ) :
     XEventHandler {
     override val xEventType = KeyRelease
 
-    private val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager)
+    private val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, rootWindowId)
 
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode

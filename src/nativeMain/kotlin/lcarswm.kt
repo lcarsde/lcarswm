@@ -51,6 +51,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val atomLibrary = AtomLibrary(system)
 
+        val keyManager = KeyManager(system)
+
         val screen = system.defaultScreenOfDisplay()?.pointed
         if (screen == null) {
             logger.logError("::runWindowManager::got no screen")
@@ -102,8 +104,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val uiDrawer = RootWindowDrawer(system, monitorManager, screen)
 
-        val keyManager = KeyManager(system, screen.root)
-        keyManager.grabInternalKeys()
+        keyManager.grabInternalKeys(screen.root)
 
         val focusHandler = WindowFocusHandler()
 
@@ -134,7 +135,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             uiDrawer,
             atomLibrary,
             keyConfigurationProvider,
-            screenChangeHandler
+            screenChangeHandler,
+            screen.root
         )
 
         eventLoop(eventManager, eventTime, eventBuffer)
@@ -265,14 +267,15 @@ private fun createEventManager(
     uiDrawer: UIDrawing,
     atomLibrary: AtomLibrary,
     keyConfigurationProvider: ConfigurationProvider,
-    screenChangeHandler: XEventHandler
+    screenChangeHandler: XEventHandler,
+    rootWindowId: Window
 ): EventDistributor {
 
     return EventDistributor.Builder(logger)
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration))
         .addEventHandler(KeyPressHandler(logger, keyManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
-        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, atomLibrary, keyConfigurationProvider))
+        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, atomLibrary, keyConfigurationProvider, rootWindowId))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
         .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
         .addEventHandler(screenChangeHandler)

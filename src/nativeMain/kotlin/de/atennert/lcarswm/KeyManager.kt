@@ -7,7 +7,7 @@ import xlib.*
 /**
  * This class handles the registration of keys for keyboard commands.
  */
-class KeyManager(private val inputApi: InputApi, private val rootWindowId: Window) {
+class KeyManager(private val inputApi: InputApi) {
     private val modifierIndexes = arrayOf(
         ShiftMask,
         LockMask,
@@ -112,18 +112,18 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
         return modifierMasks
     }
 
-    fun ungrabAllKeys() {
+    fun ungrabAllKeys(rootWindowId: Window) {
         inputApi.ungrabKey(rootWindowId)
     }
 
     /**
      * Grab the internal keys from the XServer.
      */
-    fun grabInternalKeys() {
-        grabKeysForKeySyms(LCARS_WM_KEY_SYMS, modMasks.getValue(Modifiers.SUPER))
+    fun grabInternalKeys(rootWindowId: Window) {
+        grabKeysForKeySyms(LCARS_WM_KEY_SYMS, modMasks.getValue(Modifiers.SUPER), rootWindowId)
     }
 
-    private fun grabKeysForKeySyms(keySyms: List<Int>, modifierKey: Int) {
+    private fun grabKeysForKeySyms(keySyms: List<Int>, modifierKey: Int, rootWindowId: Window) {
         keySyms.map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
             .filterNot { (_, keyCode) -> keyCode.convert<Int>() == 0 }
             .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
@@ -135,7 +135,7 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
     /**
      * Grab a key binding consisting of a key sym and a key modifier
      */
-    fun grabKey(keySym: KeySym, modifiers: Int) {
+    fun grabKey(keySym: KeySym, modifiers: Int, rootWindowId: Window) {
         val keyCode = inputApi.keysymToKeycode(keySym)
 
         if (keyCode.convert<Int>() != 0) {

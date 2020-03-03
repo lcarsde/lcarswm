@@ -11,7 +11,7 @@ class KeyConfigurationTest {
     @Test
     fun `load simple key configuration`() {
         val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         systemApi.functionCalls.clear()
 
@@ -29,7 +29,7 @@ class KeyConfigurationTest {
                 return setOf("A", "B", "X")
             }
         }
-        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager)
+        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, systemApi.rootWindowId)
 
         assertEquals(
             "commandA",
@@ -59,7 +59,7 @@ class KeyConfigurationTest {
     @Test
     fun `load key config including one modifier`() {
         val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         systemApi.functionCalls.clear()
 
         val configurationProvider = object : Properties {
@@ -76,7 +76,7 @@ class KeyConfigurationTest {
                 return setOf("A", "Ctrl+B", "Alt+X")
             }
         }
-        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager)
+        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, systemApi.rootWindowId)
 
         assertEquals(
             "commandA",
@@ -105,7 +105,7 @@ class KeyConfigurationTest {
     @Test
     fun `load key config with multiple modifiers`() {
         val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         systemApi.functionCalls.clear()
 
         val configurationProvider = object : Properties {
@@ -122,7 +122,7 @@ class KeyConfigurationTest {
                 return setOf("Ctrl+Alt+A", "Win+Shift+Meta+B", "Hyper+Super+X")
             }
         }
-        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager)
+        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, systemApi.rootWindowId)
 
         assertEquals(
             "commandA",

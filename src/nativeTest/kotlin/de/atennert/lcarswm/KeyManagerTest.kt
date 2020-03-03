@@ -14,7 +14,7 @@ class KeyManagerTest {
     fun `ungrab all keys`() {
         val systemApi = SystemFacadeMock()
 
-        KeyManager(systemApi, systemApi.rootWindowId).ungrabAllKeys()
+        KeyManager(systemApi).ungrabAllKeys(systemApi.rootWindowId)
 
         val ungrabKeysCall = systemApi.functionCalls.removeAt(0)
 
@@ -26,7 +26,7 @@ class KeyManagerTest {
     fun `load modifier keys`() {
         val systemApi = SystemFacadeMock()
 
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         val expectedModifiers = mutableMapOf(
             Pair(Modifiers.CAPS_LOCK, LockMask),
@@ -46,10 +46,10 @@ class KeyManagerTest {
     fun `grab input controls`() {
         val systemApi = SystemFacadeMock()
 
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         systemApi.functionCalls.clear()
 
-        keyManager.grabInternalKeys()
+        keyManager.grabInternalKeys(systemApi.rootWindowId)
 
         val inputCalls = systemApi.functionCalls
 
@@ -86,7 +86,7 @@ class KeyManagerTest {
     fun `return null on unknown key`() {
         val systemApi = SystemFacadeMock()
 
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         assertNull(keyManager.getKeySym((-1).convert()), "The key manager should return null for unknown key codes")
     }

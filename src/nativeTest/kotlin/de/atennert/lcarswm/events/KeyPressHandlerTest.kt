@@ -22,7 +22,7 @@ class KeyPressHandlerTest {
     @Test
     fun `return the event type KeyPressHandler`() {
         val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawing = UIDrawingMock()
@@ -35,12 +35,12 @@ class KeyPressHandlerTest {
     @Test
     fun `move active window to the next monitor`() {
         val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        keyManager.grabInternalKeys()
+        keyManager.grabInternalKeys(systemApi.rootWindowId)
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
@@ -65,12 +65,12 @@ class KeyPressHandlerTest {
     @Test
     fun `move active window to the previous monitor`() {
         val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        keyManager.grabInternalKeys()
+        keyManager.grabInternalKeys(systemApi.rootWindowId)
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
@@ -95,12 +95,12 @@ class KeyPressHandlerTest {
     @Test
     fun `don't react on move to next monitor without a focusable window`() {
         val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        keyManager.grabInternalKeys()
+        keyManager.grabInternalKeys(systemApi.rootWindowId)
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
@@ -121,12 +121,12 @@ class KeyPressHandlerTest {
     @Test
     fun `don't react on move to previous monitor without a focusable window`() {
         val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        keyManager.grabInternalKeys()
+        keyManager.grabInternalKeys(systemApi.rootWindowId)
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
@@ -154,7 +154,7 @@ class KeyPressHandlerTest {
                 return super.keysymToKeycode(keySym)
             }
         }
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
@@ -162,7 +162,7 @@ class KeyPressHandlerTest {
         val window1 = systemApi.getNewWindowId()
         val window2 = systemApi.getNewWindowId()
         val window3 = systemApi.getNewWindowId()
-        keyManager.grabInternalKeys()
+        keyManager.grabInternalKeys(systemApi.rootWindowId)
         windowFocusHandler.setFocusedWindow(window1)
         windowFocusHandler.setFocusedWindow(window2)
         windowFocusHandler.setFocusedWindow(window3)
@@ -208,12 +208,12 @@ class KeyPressHandlerTest {
                 return super.keysymToKeycode(keySym)
             }
         }
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        keyManager.grabInternalKeys()
+        keyManager.grabInternalKeys(systemApi.rootWindowId)
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
@@ -232,12 +232,12 @@ class KeyPressHandlerTest {
     @Test
     fun `toggle screen mode on M`() {
         val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi, systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        keyManager.grabInternalKeys()
+        keyManager.grabInternalKeys(systemApi.rootWindowId)
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
