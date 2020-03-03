@@ -1,3 +1,4 @@
+import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.FunctionCall
@@ -19,6 +20,8 @@ class StartupTest {
 
         assertEquals("openDisplay", startupCalls.removeAt(0).name, "try to open the display")
 
+        checkForAtomRegistration(startupCalls)
+
         assertEquals("defaultScreenOfDisplay", startupCalls.removeAt(0).name, "try to get the displays screen")
 
         assertEquals("synchronize", startupCalls.removeAt(0).name, "synchronize after getting the display and randr resources")
@@ -37,6 +40,14 @@ class StartupTest {
                 assertEquals("sigAction", signalRegistrationCall.name, "Initialize signal $it")
                 assertEquals(it, signalRegistrationCall.parameters[0], "Initialize signal _${it}_")
             }
+    }
+
+    private fun checkForAtomRegistration(startupCalls: MutableList<FunctionCall>) {
+        Atoms.values().forEach { atom ->
+            val registrationCall = startupCalls.removeAt(0)
+            assertEquals("internAtom", registrationCall.name, "$atom needs to be registered")
+            assertEquals(atom.atomName, registrationCall.parameters[0], "_${atom}_ needs to be registered")
+        }
     }
 
     private fun checkForSettingDisplayEnvironmentVariable(startupCalls: MutableList<FunctionCall>, system: SystemFacadeMock) {
