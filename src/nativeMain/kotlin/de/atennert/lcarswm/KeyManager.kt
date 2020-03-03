@@ -27,11 +27,6 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
 
     val modMasks = getAllModifierKeys()
 
-    init {
-        // ungrab all keys from possible earlier WM sessions
-        inputApi.ungrabKey(rootWindowId)
-    }
-
     private fun getAllModifierKeys(): Map<Modifiers, Int> {
         modifierKeymapReference = inputApi.getModifierMapping()
         val modifierKeymap = modifierKeymapReference?.pointed ?: return emptyMap()
@@ -115,6 +110,10 @@ class KeyManager(private val inputApi: InputApi, private val rootWindowId: Windo
         }
 
         return modifierMasks
+    }
+
+    fun ungrabAllKeys() {
+        inputApi.ungrabKey(rootWindowId)
     }
 
     /**
