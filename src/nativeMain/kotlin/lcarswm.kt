@@ -53,6 +53,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val keyManager = KeyManager(system)
 
+        val eventBuffer = EventBuffer(system)
+
         val screen = system.defaultScreenOfDisplay()?.pointed
         if (screen == null) {
             logger.logError("::runWindowManager::got no screen")
@@ -65,8 +67,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         system.synchronize(false)
 
         setDisplayEnvironment(system)
-
-        val eventBuffer = EventBuffer(system)
 
         val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, screen.root, atomLibrary, eventBuffer)
 
