@@ -78,6 +78,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             return
         }
 
+        system.sync(false)
         system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
         system.selectInput(screen.root, ROOT_WINDOW_MASK)
