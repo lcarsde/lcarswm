@@ -124,8 +124,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, screen.root)
 
-        setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
-
         val eventManager = createEventManager(
             system,
             logger,
@@ -140,6 +138,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             screenChangeHandler,
             screen.root
         )
+
+        setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
 
         eventLoop(eventManager, eventTime, eventBuffer)
 
