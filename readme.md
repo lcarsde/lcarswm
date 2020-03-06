@@ -59,6 +59,7 @@ Fullscreen mode
 * Video players crash displaylink driver when using lcarswm - if you know or guess something that could help, then write me ... seriously, I'm out of ideas on this one :-(
 * The frame window is drawing over the background and not scaling with popups
 * If screens lay over one another they are not "merged" but draw over one another
+* UI doesn't load until some action is done (i.e. clicking)
 
 ## To Do
 ### ICCCM
