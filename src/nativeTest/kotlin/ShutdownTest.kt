@@ -167,9 +167,9 @@ class ShutdownTest {
                 return super.setErrorHandler(handler)
             }
 
-            override fun sync(discardQueuedEvents: Boolean): Int {
+            override fun selectInput(window: Window, mask: Long): Int {
                 this.errorHandler.invoke(null, null)
-                return super.sync(discardQueuedEvents)
+                return super.selectInput(window, mask)
             }
 
             var used = false
