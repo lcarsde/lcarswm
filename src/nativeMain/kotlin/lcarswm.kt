@@ -300,6 +300,7 @@ private fun eventLoop(
         if (eventDistributor.handleEvent(xEvent)) {
             break
         }
+        eventTime.unsetEventTime()
 
         nativeHeap.free(xEvent)
     }
