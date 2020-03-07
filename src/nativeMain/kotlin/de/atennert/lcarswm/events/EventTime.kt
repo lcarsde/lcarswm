@@ -47,6 +47,10 @@ class EventTime(
         triggerTimeUpdate()
     }
 
+    fun unsetEventTime() {
+        _lastEventTime = CurrentTime.convert()
+    }
+
     private fun findEvent(event: CPointer<XEvent>): Boolean {
         val newTime = getTimeFromEvent(event)
         return if (newTime != CurrentTime.convert<Time>() && newTime != _lastEventTime) {
