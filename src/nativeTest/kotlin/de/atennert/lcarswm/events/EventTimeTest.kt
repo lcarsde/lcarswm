@@ -112,4 +112,33 @@ class EventTimeTest {
 
         assertTrue(system.functionCalls.isEmpty(), "The time should be only requested once")
     }
+
+    @Test
+    fun `unset the event time`() {
+        val system = object : SystemFacadeMock() {
+            var time = 1
+            override fun getQueuedEvents(mode: Int): Int {
+                time++
+                return 1
+            }
+
+            override fun nextEvent(event: CPointer<XEvent>): Int {
+                event.pointed.type = PropertyNotify
+                event.pointed.xproperty.time = time.convert()
+                return Success
+            }
+        }
+        val atomLibrary = AtomLibrary(system)
+        val eventBuffer = EventBuffer(system)
+        val rootWindowPropertyHandler = RootWindowPropertyHandler(LoggerMock(), system, system.rootWindowId, atomLibrary, eventBuffer)
+
+        val eventTime = EventTime(system, eventBuffer, atomLibrary, rootWindowPropertyHandler)
+
+        assertEquals(2.convert(), eventTime.lastEventTime, "The event time should match with the time of the available event")
+
+        eventBuffer.getNextEvent(false)
+        eventTime.unsetEventTime()
+
+        assertEquals(3.convert(), eventTime.lastEventTime, "The event time should match with the time of the available event")
+    }
 }
