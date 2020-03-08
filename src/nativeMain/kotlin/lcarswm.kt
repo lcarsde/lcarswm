@@ -11,6 +11,7 @@ import de.atennert.lcarswm.system.api.PosixApi
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.system.api.WindowUtilApi
 import de.atennert.lcarswm.windowactions.*
+import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -18,6 +19,8 @@ private var wmDetected = false
 
 // this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
 private var staticLogger: Logger? = null
+
+private val exitState = atomic(-1)
 
 const val ROOT_WINDOW_MASK = SubstructureRedirectMask or SubstructureNotifyMask or PropertyChangeMask or
         EnterWindowMask or LeaveWindowMask or FocusChangeMask or ButtonPressMask or ButtonReleaseMask
@@ -35,6 +38,7 @@ fun main() {
 
 fun runWindowManager(system: SystemApi, logger: Logger) {
     logger.logInfo("::runWindowManager::start lcarswm initialization")
+    exitState.value = -1
 
     memScoped {
         val signalHandler = SignalHandler(system)
@@ -292,13 +296,13 @@ private fun eventLoop(
     eventTime: EventTime,
     eventBuffer: EventBuffer
 ) {
-    while (true) {
+    while (exitState.value == -1) {
         val xEvent = eventBuffer.getNextEvent(true)?.pointed ?: continue
 
         eventTime.setTimeFromEvent(xEvent.ptr)
 
         if (eventDistributor.handleEvent(xEvent)) {
-            break
+            exitState.value = 0
         }
         eventTime.unsetEventTime()
 
