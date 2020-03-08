@@ -20,7 +20,7 @@ private var wmDetected = false
 // this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
 private var staticLogger: Logger? = null
 
-private val exitState = atomic(-1)
+private val exitState = atomic<Int?>(null)
 
 const val ROOT_WINDOW_MASK = SubstructureRedirectMask or SubstructureNotifyMask or PropertyChangeMask or
         EnterWindowMask or LeaveWindowMask or FocusChangeMask or ButtonPressMask or ButtonReleaseMask
@@ -35,12 +35,12 @@ fun main() {
 
     runWindowManager(system, logger)
 
-    system.exit(exitState.value)
+    system.exit(exitState.value ?: -1)
 }
 
 fun runWindowManager(system: SystemApi, logger: Logger) {
     logger.logInfo("::runWindowManager::start lcarswm initialization")
-    exitState.value = -1
+    exitState.value = null
 
     memScoped {
         val signalHandler = SignalHandler(system)
@@ -298,7 +298,7 @@ private fun eventLoop(
     eventTime: EventTime,
     eventBuffer: EventBuffer
 ) {
-    while (exitState.value == -1) {
+    while (exitState.value == null) {
         val xEvent = eventBuffer.getNextEvent(true)?.pointed ?: continue
 
         eventTime.setTimeFromEvent(xEvent.ptr)
