@@ -34,6 +34,8 @@ fun main() {
     val logger = FileLogger(system, LOG_FILE_PATH)
 
     runWindowManager(system, logger)
+
+    system.exit(exitState.value)
 }
 
 fun runWindowManager(system: SystemApi, logger: Logger) {
