@@ -5,6 +5,7 @@ import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
+import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.PosixApi
@@ -13,6 +14,8 @@ import de.atennert.lcarswm.system.api.WindowUtilApi
 import de.atennert.lcarswm.windowactions.*
 import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.*
+import platform.posix.WNOHANG
+import platform.posix.waitpid
 import xlib.*
 
 private var wmDetected = false
@@ -41,6 +44,7 @@ fun main() {
 fun runWindowManager(system: SystemApi, logger: Logger) {
     logger.logInfo("::runWindowManager::start lcarswm initialization")
     exitState.value = null
+    staticLogger = logger
 
     memScoped {
         val signalHandler = SignalHandler(system)
@@ -96,7 +100,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             return
         }
 
-        staticLogger = logger
         system.setErrorHandler(staticCFunction { _, err -> staticLogger?.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
         rootWindowPropertyHandler.setSupportWindowProperties()
@@ -152,6 +155,24 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         system.sync(false)
 
         shutdown(system, uiDrawer, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler)
+    }
+}
+
+/**
+ * Signal handler for usual stuff.
+ */
+private fun handleSignal(signalValue: Int) {
+    val signal = Signal.values().single { it.signalValue == signalValue }
+    staticLogger?.logDebug("::handleSignal::signal: $signal")
+    when (signal) {
+        Signal.USR1 -> staticLogger?.logInfo("Ignoring signal $signal")
+        Signal.USR2 -> staticLogger?.logInfo("Ignoring signal $signal")
+        Signal.TTIN -> staticLogger?.logInfo("Ignoring signal $signal")
+        Signal.TTOU -> staticLogger?.logInfo("Ignoring signal $signal")
+        Signal.CHLD -> while (waitpid(-1, null, WNOHANG) > 0);
+        Signal.TERM -> exitState.value = 0
+        Signal.INT  -> exitState.value = 0
+        else -> exitState.value = 1
     }
 }
 
