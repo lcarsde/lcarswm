@@ -65,6 +65,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val eventBuffer = EventBuffer(system)
 
+        listOf(Signal.USR1, Signal.USR2, Signal.TERM, Signal.INT, Signal.HUP, Signal.PIPE, Signal.CHLD, Signal.TTIN, Signal.TTOU)
+            .forEach { signalHandler.addSignalCallback(it, staticCFunction { signal -> handleSignal(signal) }) }
+
         val screen = system.defaultScreenOfDisplay()?.pointed
         if (screen == null) {
             logger.logError("::runWindowManager::got no screen")
