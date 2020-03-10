@@ -22,6 +22,8 @@ class StartupTest {
 
         checkForAtomRegistration(startupCalls)
 
+        checkUserSignalRegistration(startupCalls)
+
         assertEquals("defaultScreenOfDisplay", startupCalls.removeAt(0).name, "try to get the displays screen")
 
         assertEquals("synchronize", startupCalls.removeAt(0).name, "synchronize after getting the display and randr resources")
@@ -48,6 +50,16 @@ class StartupTest {
             assertEquals("internAtom", registrationCall.name, "$atom needs to be registered")
             assertEquals(atom.atomName, registrationCall.parameters[0], "_${atom}_ needs to be registered")
         }
+    }
+
+    private fun checkUserSignalRegistration(startupCalls: MutableList<FunctionCall>) {
+        listOf(Signal.USR1, Signal.USR2, Signal.TERM, Signal.INT, Signal.HUP, Signal.PIPE, Signal.CHLD, Signal.TTIN, Signal.TTOU)
+            .forEach {
+                assertEquals("sigEmptySet", startupCalls.removeAt(0).name, "Initialize the action signal set")
+                val signalRegistrationCall = startupCalls.removeAt(0)
+                assertEquals("sigAction", signalRegistrationCall.name, "Initialize signal $it")
+                assertEquals(it, signalRegistrationCall.parameters[0], "Initialize signal _${it}_")
+            }
     }
 
     private fun checkForSettingDisplayEnvironmentVariable(startupCalls: MutableList<FunctionCall>, system: SystemFacadeMock) {
