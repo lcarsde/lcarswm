@@ -37,6 +37,17 @@ class SignalHandler(private val posixApi: PosixApi) {
             }
     }
 
+    fun addSignalCallback(signal: Signal, signalHandler: CPointer<CFunction<(Int) -> Unit>>) {
+        val action = nativeHeap.alloc<sigaction>()
+        posixApi.sigEmptySet(action.sa_mask.ptr)
+        action.__sigaction_handler.sa_handler = signalHandler
+        action.sa_flags = SA_NOCLDSTOP
+
+        val oldSignal = nativeHeap.alloc<sigaction>()
+        posixApi.sigAction(signal, action.ptr, oldSignal.ptr)
+        oldActions[signal] = oldSignal
+    }
+
     fun cleanup() {
         oldActions.forEach { (signalValue, action) ->
             posixApi.sigAction(signalValue, action.ptr, null)
