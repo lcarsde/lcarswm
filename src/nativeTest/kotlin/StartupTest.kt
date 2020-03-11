@@ -123,6 +123,10 @@ class StartupTest {
     }
 
     private class StartupFacadeMock : SystemFacadeMock() {
+        override fun getQueuedEvents(mode: Int): Int {
+            return 1
+        }
+
         var eventCount = 1
         override fun nextEvent(event: CPointer<XEvent>): Int {
             when (eventCount) {
