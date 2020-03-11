@@ -1,7 +1,6 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.api.InputApi
-import kotlinx.cinterop.convert
 import xlib.KeySym
 import xlib.Window
 
@@ -60,15 +59,7 @@ class KeyConfiguration(
     /**
      * @return command for a key binding consisting of key sym and key mask. null if there's no command registered for the given key sym+key mask
      */
-    fun getCommandForKey(keySym: KeySym, keyMask: UInt): String? {
-        return keySymCommands[Pair(keySym, filterMask(keyMask))]
-    }
-
-    private fun filterMask(keyMask: UInt): Int {
-        var filteredMask = keyMask.convert<Int>() and 0xFF
-        filteredMask = filteredMask and keyManager.modMasks.getOrElse(Modifiers.CAPS_LOCK, { 0 }).inv()
-        filteredMask = filteredMask and keyManager.modMasks.getOrElse(Modifiers.NUM_LOCK, { 0 }).inv()
-        filteredMask = filteredMask and keyManager.modMasks.getOrElse(Modifiers.SCROLL_LOCK, { 0 }).inv()
-        return filteredMask
+    fun getCommandForKey(keySym: KeySym, keyMask: Int): String? {
+        return keySymCommands[Pair(keySym, keyMask)]
     }
 }

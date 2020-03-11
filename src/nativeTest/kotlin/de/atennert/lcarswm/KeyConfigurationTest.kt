@@ -33,22 +33,22 @@ class KeyConfigurationTest {
 
         assertEquals(
             "commandA",
-            keyConfiguration.getCommandForKey(XK_A.convert(), 0.convert()),
+            keyConfiguration.getCommandForKey(XK_A.convert(), 0),
             "The config should load the first key binding"
         )
         assertEquals(
             "commandB",
-            keyConfiguration.getCommandForKey(XK_B.convert(), 0.convert()),
+            keyConfiguration.getCommandForKey(XK_B.convert(), 0),
             "The config should load the second key binding"
         )
         assertEquals(
             "commandX",
-            keyConfiguration.getCommandForKey(XK_X.convert(), 0.convert()),
+            keyConfiguration.getCommandForKey(XK_X.convert(), 0),
             "The config should load the third key binding"
         )
 
         assertNull(
-            keyConfiguration.getCommandForKey(XK_C.convert(), 0.convert()),
+            keyConfiguration.getCommandForKey(XK_C.convert(), 0),
             "The config should not provide an unknown key binding"
         )
 
@@ -80,20 +80,20 @@ class KeyConfigurationTest {
 
         assertEquals(
             "commandA",
-            keyConfiguration.getCommandForKey(XK_A.convert(), 0.convert()),
+            keyConfiguration.getCommandForKey(XK_A.convert(), 0),
             "The config should load the first key binding"
         )
         assertEquals(
             "commandB",
             keyConfiguration.getCommandForKey(
                 XK_B.convert(),
-                keyManager.modMasks.getValue(Modifiers.CONTROL).convert()
+                keyManager.modMasks.getValue(Modifiers.CONTROL)
             ),
             "The config should load the second key binding"
         )
         assertEquals(
             "commandX",
-            keyConfiguration.getCommandForKey(XK_X.convert(), keyManager.modMasks.getValue(Modifiers.ALT).convert()),
+            keyConfiguration.getCommandForKey(XK_X.convert(), keyManager.modMasks.getValue(Modifiers.ALT)),
             "The config should load the third key binding"
         )
 
@@ -160,10 +160,10 @@ class KeyConfigurationTest {
             .forEach { (key, modifiers) -> checkGrabKey(systemApi, keyManager, key, modifiers) }
     }
 
-    private fun getMask(keyManager: KeyManager, l: List<Modifiers>): UInt {
+    private fun getMask(keyManager: KeyManager, l: List<Modifiers>): Int {
         return l.fold(0) { acc, m ->
             acc or keyManager.modMasks.getValue(m)
-        }.convert()
+        }
     }
 
     private fun checkGrabKey(
@@ -177,7 +177,7 @@ class KeyConfigurationTest {
 
         assertEquals("grabKey", grabKeyCall1.name, "Grab key needs to be called to grab $key with ...")
         assertEquals(systemApi.keySyms[systemApi.keyStrings[keyPart]], grabKeyCall1.parameters[0], "Grab key needs to be called with the keyCode for $key (modifier ...)")
-        assertEquals(getMask(keyManager, modifiers), grabKeyCall1.parameters[1], "The modifier for $key should be ...")
+        assertEquals(getMask(keyManager, modifiers).toUInt(), grabKeyCall1.parameters[1], "The modifier for $key should be ...")
         assertEquals(systemApi.rootWindowId, grabKeyCall1.parameters[2], "The key should be grabbed for the root window")
         assertEquals(GrabModeAsync, grabKeyCall1.parameters[3], "The mode for the grabbed key should be GrabModeAsync")
     }

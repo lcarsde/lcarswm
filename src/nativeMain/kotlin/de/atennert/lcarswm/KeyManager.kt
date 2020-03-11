@@ -160,3 +160,12 @@ class KeyManager(private val inputApi: InputApi) {
         keymap = null
     }
 }
+
+    fun filterMask(keyMask: UInt): Int {
+        var filteredMask = keyMask.convert<Int>() and 0xFF
+        filteredMask = filteredMask and modMasks.getOrElse(Modifiers.CAPS_LOCK, { 0 }).inv()
+        filteredMask = filteredMask and modMasks.getOrElse(Modifiers.NUM_LOCK, { 0 }).inv()
+        filteredMask = filteredMask and modMasks.getOrElse(Modifiers.SCROLL_LOCK, { 0 }).inv()
+        return filteredMask
+    }
+}
