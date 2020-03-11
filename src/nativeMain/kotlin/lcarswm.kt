@@ -26,7 +26,9 @@ private var staticLogger: Logger? = null
 private val exitState = atomic<Int?>(null)
 
 const val ROOT_WINDOW_MASK = SubstructureRedirectMask or SubstructureNotifyMask or PropertyChangeMask or
-        EnterWindowMask or LeaveWindowMask or FocusChangeMask or ButtonPressMask or ButtonReleaseMask
+        EnterWindowMask or LeaveWindowMask or FocusChangeMask or
+        ButtonPressMask or ButtonReleaseMask or
+        KeyPressMask or KeyReleaseMask
 
 const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotifyMask or
         RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
