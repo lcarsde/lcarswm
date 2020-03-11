@@ -1,9 +1,12 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.*
+import de.atennert.lcarswm.KeyConfiguration
+import de.atennert.lcarswm.KeyManager
+import de.atennert.lcarswm.Modifiers
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.runProgram
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
 import kotlinx.cinterop.*
@@ -17,14 +20,11 @@ class KeyReleaseHandler(
     private val systemApi: SystemApi,
     private val focusHandler: WindowFocusHandler,
     private val keyManager: KeyManager,
-    private val atomLibrary: AtomLibrary,
-    configurationProvider: Properties,
-    rootWindowId: Window
+    private val keyConfiguration: KeyConfiguration,
+    private val atomLibrary: AtomLibrary
 ) :
     XEventHandler {
     override val xEventType = KeyRelease
-
-    private val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, rootWindowId)
 
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode

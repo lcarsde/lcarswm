@@ -120,6 +120,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         keyManager.ungrabAllKeys(screen.root)
         keyManager.grabInternalKeys(screen.root)
 
+        val keyConfiguration = KeyConfiguration(system, keyConfigurationProvider, keyManager, screen.root)
+
         val focusHandler = WindowFocusHandler()
 
         focusHandler.registerObserver { activeWindow ->
@@ -146,8 +148,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             keyManager,
             uiDrawer,
             atomLibrary,
-            keyConfigurationProvider,
             screenChangeHandler,
+            keyConfiguration,
             screen.root
         )
 
@@ -298,8 +300,8 @@ private fun createEventManager(
     keyManager: KeyManager,
     uiDrawer: UIDrawing,
     atomLibrary: AtomLibrary,
-    keyConfigurationProvider: ConfigurationProvider,
     screenChangeHandler: XEventHandler,
+    keyConfiguration: KeyConfiguration,
     rootWindowId: Window
 ): EventDistributor {
 
@@ -307,7 +309,7 @@ private fun createEventManager(
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration))
         .addEventHandler(KeyPressHandler(logger, keyManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
-        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, atomLibrary, keyConfigurationProvider, rootWindowId))
+        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, atomLibrary))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
         .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
         .addEventHandler(screenChangeHandler)
