@@ -28,14 +28,14 @@ class KeyReleaseHandler(
 
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
-        val keyMask = event.xkey.state
+        val keyMask = keyManager.filterMask(event.xkey.state)
 
         logger.logDebug("KeyReleaseHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
 
         val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
         val winKeyMask = keyManager.modMasks.getValue(Modifiers.SUPER)
 
-        when (Pair(keySym.convert<Int>(), keyMask.convert<Int>())) {
+        when (Pair(keySym.convert<Int>(), keyMask)) {
             Pair(XK_F4, winKeyMask) -> closeActiveWindow()
             Pair(XK_Q, winKeyMask) -> return true // shutdown the WM
             else -> {

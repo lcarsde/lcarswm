@@ -22,11 +22,12 @@ class KeyPressHandler(
 
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
+        val keyMask = keyManager.filterMask(event.xkey.state)
         val winKeyMask = keyManager.modMasks.getValue(Modifiers.SUPER)
 
-        logger.logDebug("KeyPressHandler::handleEvent::key code: $keyCode, key mask: ${event.xkey.state}")
+        logger.logDebug("KeyPressHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
 
-        if (event.xkey.state.convert<Int>() != winKeyMask) {
+        if (keyMask != winKeyMask) {
             return false
         }
 
