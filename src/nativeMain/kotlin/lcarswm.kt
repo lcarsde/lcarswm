@@ -153,7 +153,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
 
-        eventLoop(eventManager, eventTime, eventBuffer)
+        eventLoop(system, eventManager, eventTime, eventBuffer)
 
         system.sync(false)
 
@@ -242,7 +242,7 @@ fun setupScreen(
         topLevelWindowCount.toCValues()
     )
 
-    ULongArray(topLevelWindowCount[0].toInt()) { topLevelWindows.value!![it] }
+    ULongArray(topLevelWindowCount[0].convert()) { topLevelWindows.value!![it] }
         .filter { childId -> childId != rootWindow }
         .filter { childId -> childId != rootWindowPropertyHandler.ewmhSupportWindow }
         .forEach { childId ->
@@ -318,12 +318,18 @@ private fun createEventManager(
 }
 
 private fun eventLoop(
+    posixApi: PosixApi,
     eventDistributor: EventDistributor,
     eventTime: EventTime,
     eventBuffer: EventBuffer
 ) {
     while (exitState.value == null) {
-        val xEvent = eventBuffer.getNextEvent(true)?.pointed ?: continue
+        val xEvent = eventBuffer.getNextEvent(false)?.pointed
+
+        if (xEvent == null) {
+            posixApi.usleep(100.convert())
+            continue
+        }
 
         eventTime.setTimeFromEvent(xEvent.ptr)
 
