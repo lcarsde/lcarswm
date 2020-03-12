@@ -60,6 +60,7 @@ Fullscreen mode
 * The frame window is drawing over the background and not scaling with popups
 * If screens lay over one another they are not "merged" but draw over one another
 * UI doesn't load until some action is done (i.e. clicking)
+* Key events don't work once a window is opened
 
 ## To Do
 ### ICCCM
