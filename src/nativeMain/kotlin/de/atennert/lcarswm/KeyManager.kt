@@ -153,13 +153,16 @@ class KeyManager(private val inputApi: InputApi) {
      * Cleanup acquired X data
      */
     fun cleanup() {
-        inputApi.freeModifiermap(modifierKeymapReference)
-        modifierKeymapReference = null
+        if (modifierKeymapReference != null) {
+            inputApi.freeModifiermap(modifierKeymapReference)
+            modifierKeymapReference = null
+        }
 
-        inputApi.free(keymap)
-        keymap = null
+        if (keymap != null) {
+            inputApi.free(keymap)
+            keymap = null
+        }
     }
-}
 
     fun filterMask(keyMask: UInt): Int {
         var filteredMask = keyMask.convert<Int>() and 0xFF
