@@ -30,7 +30,7 @@ class KeyManager(private val inputApi: InputApi) {
     var modMasks = getAllModifierKeys()
         private set
 
-    val filteredModifierCombinations = mutableListOf<Int>()
+    private val filteredModifierCombinations = mutableListOf<Int>()
 
     private fun getAllModifierKeys(): Map<Modifiers, Int> {
         modifierKeymapReference = inputApi.getModifierMapping()
