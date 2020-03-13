@@ -25,7 +25,12 @@ class KeyManager(private val inputApi: InputApi) {
 
     private val grabbedKeys = mutableMapOf<KeyCode, KeySym>()
 
-    val modMasks = getAllModifierKeys()
+    private val grabbedKeyCombos = mutableListOf<Pair<KeyCode, Int>>()
+
+    var modMasks = getAllModifierKeys()
+        private set
+
+    val filteredModifierCombinations = mutableListOf<Int>()
 
     private fun getAllModifierKeys(): Map<Modifiers, Int> {
         modifierKeymapReference = inputApi.getModifierMapping()
@@ -109,11 +114,31 @@ class KeyManager(private val inputApi: InputApi) {
             }
         }
 
+        val num = modifierMasks[Modifiers.NUM_LOCK]!!
+        val caps = modifierMasks[Modifiers.CAPS_LOCK]!!
+        val scroll = modifierMasks[Modifiers.SCROLL_LOCK]!!
+        filteredModifierCombinations.clear()
+        filteredModifierCombinations.add(0)
+        filteredModifierCombinations.add(num)
+        filteredModifierCombinations.add(caps)
+        filteredModifierCombinations.add(scroll)
+        filteredModifierCombinations.add(num or caps)
+        filteredModifierCombinations.add(num or scroll)
+        filteredModifierCombinations.add(caps or scroll)
+        filteredModifierCombinations.add(num or caps or scroll)
+
         return modifierMasks
     }
 
     fun ungrabAllKeys(rootWindowId: Window) {
         inputApi.ungrabKey(rootWindowId)
+        grabbedKeys.clear()
+        grabbedKeyCombos.clear()
+    }
+
+    fun reloadConfig() {
+        cleanup()
+        modMasks = getAllModifierKeys()
     }
 
     /**
@@ -127,8 +152,11 @@ class KeyManager(private val inputApi: InputApi) {
         keySyms.map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
             .filterNot { (_, keyCode) -> keyCode.convert<Int>() == 0 }
             .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
+            .onEach { (_, keyCode) -> grabbedKeyCombos.add(Pair(keyCode, modifierKey)) }
             .forEach { (_, keyCode) ->
-                inputApi.grabKey(keyCode.convert(), modifierKey.convert(), rootWindowId, GrabModeAsync)
+                filteredModifierCombinations.forEach {
+                    inputApi.grabKey(keyCode.convert(), (modifierKey or it).convert(), rootWindowId, GrabModeAsync)
+                }
             }
     }
 
@@ -140,7 +168,10 @@ class KeyManager(private val inputApi: InputApi) {
 
         if (keyCode.convert<Int>() != 0) {
             grabbedKeys[keyCode] = keySym
-            inputApi.grabKey(keyCode.convert(), modifiers.convert(), rootWindowId, GrabModeAsync)
+            grabbedKeyCombos.add(Pair(keyCode, modifiers))
+            filteredModifierCombinations.forEach {
+                inputApi.grabKey(keyCode.convert(), (modifiers or it).convert(), rootWindowId, GrabModeAsync)
+            }
         }
     }
 
