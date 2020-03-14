@@ -130,12 +130,18 @@ class KeyManager(private val inputApi: InputApi) {
         return modifierMasks
     }
 
+    /**
+     * Ungrab all grabbed keys
+     */
     fun ungrabAllKeys(rootWindowId: Window) {
         inputApi.ungrabKey(rootWindowId)
         grabbedKeys.clear()
         grabbedKeyCombos.clear()
     }
 
+    /**
+     * Reload the modifier mask configuration.
+     */
     fun reloadConfig() {
         cleanup()
         modMasks = getAllModifierKeys()
@@ -195,6 +201,9 @@ class KeyManager(private val inputApi: InputApi) {
         }
     }
 
+    /**
+     * @return filtered given modifier mask from CAPS / NUM and SCROLL lock
+     */
     fun filterMask(keyMask: UInt): Int {
         var filteredMask = keyMask.convert<Int>() and 0xFF
         filteredMask = filteredMask and modMasks.getOrElse(Modifiers.CAPS_LOCK, { 0 }).inv()
