@@ -12,7 +12,7 @@ import kotlinx.cinterop.*
 import xlib.*
 
 /**
- *
+ * Manages the all handled client windows.
  */
 class WindowHandler(
     private val system: SystemApi,
