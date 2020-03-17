@@ -1,6 +1,5 @@
 package de.atennert.lcarswm
 
-import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.InputApi
 import kotlinx.cinterop.*
 import xlib.*
