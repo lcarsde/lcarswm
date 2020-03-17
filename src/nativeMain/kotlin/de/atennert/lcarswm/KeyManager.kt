@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.InputApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -25,12 +26,11 @@ class KeyManager(private val inputApi: InputApi) {
 
     private val grabbedKeys = mutableMapOf<KeyCode, KeySym>()
 
-    private val grabbedKeyCombos = mutableListOf<Pair<KeyCode, Int>>()
+    /** We need to grab the modifier key codes of the WM modifier key to run our commands */
+    private val modifierKeyCodes = mutableListOf<Int>()
 
     var modMasks = getAllModifierKeys()
         private set
-
-    private val filteredModifierCombinations = mutableListOf<Int>()
 
     private fun getAllModifierKeys(): Map<Modifiers, Int> {
         modifierKeymapReference = inputApi.getModifierMapping()
@@ -59,23 +59,34 @@ class KeyManager(private val inputApi: InputApi) {
             for (j in 0 until modifierKeymap.max_keypermod) {
                 val keyCode = modifierKeymap.modifiermap!![i * modifierKeymap.max_keypermod + j].convert<Int>()
                 if (keyCode != 0) {
+                    var usedForModifier = false
                     for (k in 0 until keySymsPerKeyCode[0]) {
                         val keySym = keymap!![(keyCode - minKeyCodes) * keySymsPerKeyCode[0] + k]
                         if (keySym.convert<Long>() != NoSymbol) {
                             when (keySym.convert<Int>()) {
-                                XK_Num_Lock -> modifierMasks[Modifiers.NUM_LOCK] =
-                                    modifierMasks.getOrElse(Modifiers.NUM_LOCK, {0}).or(mask)
-                                XK_Scroll_Lock -> modifierMasks[Modifiers.SCROLL_LOCK] =
-                                    modifierMasks.getOrElse(Modifiers.SCROLL_LOCK, {0}).or(mask)
-
-                                XK_Super_L -> modifierMasks[Modifiers.SUPER] = if (superLUsed) {
-                                    modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
-                                } else {
-                                    superLUsed = true
-                                    mask // overwrite any super-r stuff
+                                XK_Num_Lock -> {
+                                    modifierMasks[Modifiers.NUM_LOCK] =
+                                        modifierMasks.getOrElse(Modifiers.NUM_LOCK, {0}).or(mask)
                                 }
-                                XK_Super_R -> if (!superLUsed) {
-                                    modifierMasks[Modifiers.SUPER] = modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
+                                XK_Scroll_Lock -> {
+                                    modifierMasks[Modifiers.SCROLL_LOCK] =
+                                        modifierMasks.getOrElse(Modifiers.SCROLL_LOCK, {0}).or(mask)
+                                }
+
+                                XK_Super_L -> {
+                                    usedForModifier = true
+                                    modifierMasks[Modifiers.SUPER] = if (superLUsed) {
+                                        modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
+                                    } else {
+                                        superLUsed = true
+                                        mask // overwrite any super-r stuff
+                                    }
+                                }
+                                XK_Super_R -> {
+                                    usedForModifier = true
+                                    if (!superLUsed) {
+                                        modifierMasks[Modifiers.SUPER] = modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
+                                    }
                                 }
 
                                 XK_Hyper_L -> modifierMasks[Modifiers.HYPER] = if (hyperLUsed) {
@@ -110,22 +121,12 @@ class KeyManager(private val inputApi: InputApi) {
                             }
                         }
                     }
+                    if (usedForModifier) {
+                        modifierKeyCodes.add(keyCode)
+                    }
                 }
             }
         }
-
-        val num = modifierMasks[Modifiers.NUM_LOCK]!!
-        val caps = modifierMasks[Modifiers.CAPS_LOCK]!!
-        val scroll = modifierMasks[Modifiers.SCROLL_LOCK]!!
-        filteredModifierCombinations.clear()
-        filteredModifierCombinations.add(0)
-        filteredModifierCombinations.add(num)
-        filteredModifierCombinations.add(caps)
-        filteredModifierCombinations.add(scroll)
-        filteredModifierCombinations.add(num or caps)
-        filteredModifierCombinations.add(num or scroll)
-        filteredModifierCombinations.add(caps or scroll)
-        filteredModifierCombinations.add(num or caps or scroll)
 
         return modifierMasks
     }
@@ -136,7 +137,6 @@ class KeyManager(private val inputApi: InputApi) {
     fun ungrabAllKeys(rootWindowId: Window) {
         inputApi.ungrabKey(rootWindowId)
         grabbedKeys.clear()
-        grabbedKeyCombos.clear()
     }
 
     /**
@@ -151,6 +151,10 @@ class KeyManager(private val inputApi: InputApi) {
      * Grab the internal keys from the XServer.
      */
     fun grabInternalKeys(rootWindowId: Window) {
+        modifierKeyCodes.forEach { keyCode ->
+            inputApi.grabKey(keyCode, AnyModifier.convert(), rootWindowId, GrabModeAsync)
+        }
+
         grabKeysForKeySyms(LCARS_WM_KEY_SYMS, modMasks.getValue(Modifiers.SUPER), rootWindowId)
     }
 
@@ -158,11 +162,8 @@ class KeyManager(private val inputApi: InputApi) {
         keySyms.map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
             .filterNot { (_, keyCode) -> keyCode.convert<Int>() == 0 }
             .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
-            .onEach { (_, keyCode) -> grabbedKeyCombos.add(Pair(keyCode, modifierKey)) }
             .forEach { (_, keyCode) ->
-                filteredModifierCombinations.forEach {
-                    inputApi.grabKey(keyCode.convert(), (modifierKey or it).convert(), rootWindowId, GrabModeAsync)
-                }
+                inputApi.grabKey(keyCode.convert(), modifierKey.convert(), rootWindowId, GrabModeAsync)
             }
     }
 
@@ -174,10 +175,7 @@ class KeyManager(private val inputApi: InputApi) {
 
         if (keyCode.convert<Int>() != 0) {
             grabbedKeys[keyCode] = keySym
-            grabbedKeyCombos.add(Pair(keyCode, modifiers))
-            filteredModifierCombinations.forEach {
-                inputApi.grabKey(keyCode.convert(), (modifiers or it).convert(), rootWindowId, GrabModeAsync)
-            }
+            inputApi.grabKey(keyCode.convert(), modifiers.convert(), rootWindowId, GrabModeAsync)
         }
     }
 
@@ -190,6 +188,8 @@ class KeyManager(private val inputApi: InputApi) {
      * Cleanup acquired X data
      */
     fun cleanup() {
+        modifierKeyCodes.clear()
+
         if (modifierKeymapReference != null) {
             inputApi.freeModifiermap(modifierKeymapReference)
             modifierKeymapReference = null
