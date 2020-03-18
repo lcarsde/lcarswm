@@ -6,6 +6,7 @@ import xlib.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.fail
 
 class KeyConfigurationTest {
     @Test
@@ -180,5 +181,46 @@ class KeyConfigurationTest {
         assertEquals(getMask(keyManager, modifiers).toUInt(), grabKeyCall1.parameters[1], "The modifier for $key should be ...")
         assertEquals(systemApi.rootWindowId, grabKeyCall1.parameters[2], "The key should be grabbed for the root window")
         assertEquals(GrabModeAsync, grabKeyCall1.parameters[3], "The mode for the grabbed key should be GrabModeAsync")
+    }
+
+    @Test
+    fun `reload configuration`() {
+        val systemApi = SystemFacadeMock()
+        val keyManager = KeyManager(systemApi)
+
+        systemApi.functionCalls.clear()
+
+        val configurationProvider = object : Properties {
+            val changingEntries = listOf("A", "B")
+            var entryIndex = -1
+
+            override fun get(propertyKey: String): String? {
+                if (propertyKey == changingEntries[entryIndex]) {
+                    return "command${changingEntries[entryIndex]}"
+                } else {
+                    fail("unknown propertyKey $propertyKey")
+                }
+            }
+
+            override fun getPropertyNames(): Set<String> {
+                ++entryIndex
+                return setOf(changingEntries[entryIndex])
+            }
+        }
+        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, systemApi.rootWindowId)
+
+        assertEquals(
+            "commandA",
+            keyConfiguration.getCommandForKey(XK_A.convert(), 0),
+            "The config should load the first key binding"
+        )
+
+        keyConfiguration.reloadConfig()
+
+        assertEquals(
+            "commandB",
+            keyConfiguration.getCommandForKey(XK_B.convert(), 0),
+            "The config should load the second key binding"
+        )
     }
 }
