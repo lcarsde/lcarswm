@@ -9,9 +9,9 @@ import xlib.Window
  */
 class KeyConfiguration(
     private val inputApi: InputApi,
-    configurationProvider: Properties,
+    private val configurationProvider: Properties,
     private val keyManager: KeyManager,
-    rootWindowId: Window
+    private val rootWindowId: Window
 ) {
 
     private val keySymCommands = mutableMapOf<Pair<KeySym, Int>, String>()
@@ -26,6 +26,10 @@ class KeyConfiguration(
     )
 
     init {
+        reloadConfig()
+    }
+
+    fun reloadConfig() {
         for (keyConfig in configurationProvider.getPropertyNames()) {
             val (modifierStrings, keyString) = separateKeySymAndModifiers(keyConfig)
 
