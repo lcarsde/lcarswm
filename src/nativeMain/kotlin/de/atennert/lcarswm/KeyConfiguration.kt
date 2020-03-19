@@ -1,6 +1,7 @@
 package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.api.InputApi
+import xlib.AnyModifier
 import xlib.KeySym
 import xlib.Window
 
@@ -34,9 +35,10 @@ class KeyConfiguration(
             val (modifierStrings, keyString) = separateKeySymAndModifiers(keyConfig)
 
             val mask = getMask(modifierStrings)
+            val grabbedMask = if (mask == 0) AnyModifier else mask
             val keySym = getKeySym(keyString)
 
-            keyManager.grabKey(keySym, mask, rootWindowId)
+            keyManager.grabKey(keySym, grabbedMask, rootWindowId)
 
             keySymCommands[Pair(keySym, mask)] = configurationProvider[keyConfig]!!
         }

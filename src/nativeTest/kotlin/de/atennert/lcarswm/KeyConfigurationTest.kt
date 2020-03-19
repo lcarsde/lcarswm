@@ -162,8 +162,13 @@ class KeyConfigurationTest {
     }
 
     private fun getMask(keyManager: KeyManager, l: List<Modifiers>): Int {
-        return l.fold(0) { acc, m ->
+        val mask = l.fold(0) { acc, m ->
             acc or keyManager.modMasks.getValue(m)
+        }
+        return if (mask == 0) {
+            AnyModifier
+        } else {
+            mask
         }
     }
 
