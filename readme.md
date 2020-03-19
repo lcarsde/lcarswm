@@ -34,9 +34,9 @@ Thank you very much to the creators of the following resources:
   ```properties
     Alt+T=lxterminal
     Alt+B=firefox
-    XF86AudioMute=amixer -q set Master toggle
-    XF86AudioRaiseVolume=amixer -q set Master 3%+
-    XF86AudioLowerVolume=amixer -q set Master 3%-
+    XF86AudioMute=amixer set Master toggle
+    XF86AudioRaiseVolume=amixer set Master 3%+
+    XF86AudioLowerVolume=amixer set Master 3%-
   ```
 
 ## Pictures
