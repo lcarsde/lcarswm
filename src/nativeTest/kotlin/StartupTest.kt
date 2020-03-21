@@ -31,6 +31,8 @@ class StartupTest {
         checkForSettingDisplayEnvironmentVariable(startupCalls, systemFacade)
 
         checkCreatingTheSupportWindow(startupCalls, systemFacade)
+
+        checkBecomeScreenOwner(startupCalls)
     }
 
 
@@ -91,6 +93,12 @@ class StartupTest {
 
         assertEquals("lowerWindow", lowerSupportWindowCall.name, "Lower the EWHM support window")
         assertEquals((system.rootWindowId + 1.convert<Window>()), lowerSupportWindowCall.parameters[0], "Lower the _EWHM support window_")
+    }
+
+    private fun checkBecomeScreenOwner(startupCalls: MutableList<FunctionCall>) {
+        val wmsnAtomCall = startupCalls.removeAt(0)
+        assertEquals("internAtom", wmsnAtomCall.name, "WMSN needs to be registered")
+        assertEquals("WM_S42", wmsnAtomCall.parameters[0], "_WMSN_ needs to be registered")
     }
 
     @Test
