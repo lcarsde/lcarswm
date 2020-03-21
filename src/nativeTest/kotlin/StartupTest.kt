@@ -29,7 +29,10 @@ class StartupTest {
         assertEquals("synchronize", startupCalls.removeAt(0).name, "synchronize after getting the display and randr resources")
 
         checkForSettingDisplayEnvironmentVariable(startupCalls, systemFacade)
+
+        checkCreatingTheSupportWindow(startupCalls, systemFacade)
     }
+
 
     private fun checkCoreSignalRegistration(startupCalls: MutableList<FunctionCall>) {
         assertEquals("sigFillSet", startupCalls.removeAt(0).name, "Initialize the signal set")
@@ -73,6 +76,21 @@ class StartupTest {
             setDisplayCall.parameters[1],
             "the DISPLAY environment variable should be set to the return value of getDisplayString"
         )
+    }
+
+    private fun checkCreatingTheSupportWindow(startupCalls: MutableList<FunctionCall>, system: SystemFacadeMock) {
+        val createSupportWindowCall = startupCalls.removeAt(0)
+        val mapSupportWindowCall = startupCalls.removeAt(0)
+        val lowerSupportWindowCall = startupCalls.removeAt(0)
+
+        assertEquals("createWindow", createSupportWindowCall.name, "Create the EWHM support window")
+        assertEquals(system.rootWindowId, createSupportWindowCall.parameters[0], "Create the EWHM support window as parent of root")
+
+        assertEquals("mapWindow", mapSupportWindowCall.name, "Map the EWHM support window")
+        assertEquals((system.rootWindowId + 1.convert<Window>()), mapSupportWindowCall.parameters[0], "Map the _EWHM support window_")
+
+        assertEquals("lowerWindow", lowerSupportWindowCall.name, "Lower the EWHM support window")
+        assertEquals((system.rootWindowId + 1.convert<Window>()), lowerSupportWindowCall.parameters[0], "Lower the _EWHM support window_")
     }
 
     @Test
