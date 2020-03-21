@@ -364,8 +364,7 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun defaultScreenNumber(): Int {
-        functionCalls.add(FunctionCall("defaultScreenNumber"))
-        return 0
+        return 42
     }
 
     override fun grabServer(): Int {
