@@ -200,7 +200,7 @@ private fun shutdown(
     keyManager: KeyManager,
     signalHandler: SignalHandler
 ) {
-    rootWindowDrawer.cleanupColorMap(system)
+    rootWindowDrawer.cleanupColorMap()
     rootWindowDrawer.cleanupGraphicsContexts()
 
     system.selectInput(rootWindow, NoEventMask)

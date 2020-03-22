@@ -46,9 +46,7 @@ class RootWindowDrawer(
         graphicsContexts.forEach { drawApi.freeGC(it) }
     }
 
-    fun cleanupColorMap(
-        drawApi: DrawApi
-    ) {
+    fun cleanupColorMap() {
         val colorPixels = ULongArray(colorMap.second.size) { colorMap.second[it] }
         drawApi.freeColors(colorMap.first, colorPixels.toCValues(), colorPixels.size)
         drawApi.freeColormap(colorMap.first)
