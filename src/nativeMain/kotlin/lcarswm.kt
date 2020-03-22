@@ -1,5 +1,6 @@
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.drawing.RootWindowDrawer
 import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger

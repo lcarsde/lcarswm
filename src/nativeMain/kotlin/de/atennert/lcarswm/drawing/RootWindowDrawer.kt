@@ -1,5 +1,7 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.drawing
 
+import de.atennert.lcarswm.ScreenMode
+import de.atennert.lcarswm.UIDrawing
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.DrawApi
