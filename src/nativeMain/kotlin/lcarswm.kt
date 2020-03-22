@@ -1,5 +1,6 @@
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.drawing.Colors
 import de.atennert.lcarswm.drawing.RootWindowDrawer
 import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.log.FileLogger
@@ -118,7 +119,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val monitorManager = MonitorManagerImpl(system, screen.root)
 
-        val uiDrawer = RootWindowDrawer(system, monitorManager, screen)
+        val colorHandler = Colors()
+        val uiDrawer = RootWindowDrawer(system, monitorManager, screen, colorHandler)
 
         keyManager.ungrabAllKeys(screen.root)
         keyManager.grabInternalKeys(screen.root)

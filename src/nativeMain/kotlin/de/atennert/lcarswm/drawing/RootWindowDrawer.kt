@@ -6,7 +6,10 @@ import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
-import xlib.*
+import xlib.Screen
+import xlib.XArc
+import xlib.XImage
+import xlib.XRectangle
 
 /**
  * Class for drawing the root window decorations.
@@ -14,23 +17,12 @@ import xlib.*
 class RootWindowDrawer(
     private val drawApi: DrawApi,
     private val monitorManager: MonitorManager,
-    screen: Screen
+    screen: Screen,
+    colors: Colors
 ) : UIDrawing {
-    private val colors = listOf(
-        Triple(0, 0, 0), // black
-        Triple(0xFFFF, 0x9999, 0), // yellow
-        Triple(0xCCCC, 0x9999, 0xCCCC), // orchid
-        Triple(0x9999, 0x9999, 0xCCCC), // dampened purple
-        Triple(0xCCCC, 0x6666, 0x6666), // dark red
-        Triple(0xFFFF, 0xCCCC, 0x9999), // sand
-        Triple(0x9999, 0x9999, 0xFFFF), // bright purple
-        Triple(0xFFFF, 0x9999, 0x6666), // orange
-        Triple(0xCCCC, 0x6666, 0x9999)  // dark pink
-    )
-
     private val rootWindow = screen.root
-    private val colorMap = allocateColorMap(drawApi, screen.root_visual!!, rootWindow)
-    private val graphicsContexts = loadGraphicContexts(drawApi, rootWindow, colorMap.second)
+    private val colorMap = colors.allocateCompleteColorMap(drawApi, screen.root_visual!!, rootWindow)
+    private val graphicsContexts = colors.loadForegroundGraphicContexts(drawApi, rootWindow, colorMap.second)
 
     private val logoImage: CPointer<XImage>
 
@@ -49,44 +41,6 @@ class RootWindowDrawer(
             }
         }
     }
-
-    private fun allocateColorMap(
-        drawApi: DrawApi,
-        visual: CPointer<Visual>,
-        windowId: Window
-    ): Pair<Colormap, List<ULong>> {
-        val colorMapId = drawApi.createColormap(windowId, visual, AllocNone)
-
-        val colorReplies = colors
-            .asSequence()
-            .map { (red, green, blue) ->
-                val color = nativeHeap.alloc<XColor>()
-                color.red = red.convert()
-                color.green = green.convert()
-                color.blue = blue.convert()
-                drawApi.allocColor(colorMapId, color.ptr)
-                color.pixel
-            }
-            .filterNotNull()
-            .toList()
-
-        return Pair(colorMapId, colorReplies)
-    }
-
-    private fun loadGraphicContexts(
-        drawApi: DrawApi,
-        window: Window,
-        colors: List<ULong>
-    ): List<GC> = colors
-        .map { color ->
-            val gcValues = nativeHeap.alloc<XGCValues>()
-            gcValues.foreground = color
-            gcValues.graphics_exposures = 0
-            gcValues.arc_mode = ArcPieSlice
-
-            val mask = GCForeground or GCGraphicsExposures or GCArcMode
-            drawApi.createGC(window, mask.convert(), gcValues.ptr)!!
-        }
 
     fun cleanupGraphicsContexts() {
         graphicsContexts.forEach { drawApi.freeGC(it) }
