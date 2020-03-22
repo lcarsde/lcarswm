@@ -119,7 +119,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val monitorManager = MonitorManagerImpl(system, screen.root)
 
-        val colorHandler = Colors()
+        val colorHandler = Colors(system)
         val uiDrawer = RootWindowDrawer(system, monitorManager, screen, colorHandler)
 
         keyManager.ungrabAllKeys(screen.root)

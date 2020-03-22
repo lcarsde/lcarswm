@@ -21,8 +21,8 @@ class RootWindowDrawer(
     colors: Colors
 ) : UIDrawing {
     private val rootWindow = screen.root
-    private val colorMap = colors.allocateCompleteColorMap(drawApi, screen.root_visual!!, rootWindow)
-    private val graphicsContexts = colors.loadForegroundGraphicContexts(drawApi, rootWindow, colorMap.second)
+    private val colorMap = colors.allocateCompleteColorMap(screen.root_visual!!, rootWindow)
+    private val graphicsContexts = colors.loadForegroundGraphicContexts(rootWindow, colorMap.second)
 
     private val logoImage: CPointer<XImage>
 
