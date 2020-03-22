@@ -17,15 +17,15 @@ class RootWindowDrawer(
     screen: Screen
 ) : UIDrawing {
     private val colors = listOf(
-        Triple(0, 0, 0),
-        Triple(0xFFFF, 0x9999, 0),
-        Triple(0xCCCC, 0x9999, 0xCCCC),
-        Triple(0x9999, 0x9999, 0xCCCC),
-        Triple(0xCCCC, 0x6666, 0x6666),
-        Triple(0xFFFF, 0xCCCC, 0x9999),
-        Triple(0x9999, 0x9999, 0xFFFF),
-        Triple(0xFFFF, 0x9999, 0x6666),
-        Triple(0xCCCC, 0x6666, 0x9999)
+        Triple(0, 0, 0), // black
+        Triple(0xFFFF, 0x9999, 0), // yellow
+        Triple(0xCCCC, 0x9999, 0xCCCC), // orchid
+        Triple(0x9999, 0x9999, 0xCCCC), // dampened purple
+        Triple(0xCCCC, 0x6666, 0x6666), // dark red
+        Triple(0xFFFF, 0xCCCC, 0x9999), // sand
+        Triple(0x9999, 0x9999, 0xFFFF), // bright purple
+        Triple(0xFFFF, 0x9999, 0x6666), // orange
+        Triple(0xCCCC, 0x6666, 0x9999)  // dark pink
     )
 
     private val rootWindow = screen.root
