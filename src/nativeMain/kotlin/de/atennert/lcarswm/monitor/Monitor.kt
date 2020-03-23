@@ -33,13 +33,19 @@ data class Monitor(
 
     private val defaultWindowSize get() = Pair(width - 248, height - 308)
 
+    private val defaultFrameHeight get() = height - 244
+
     private val maximizedWindowPosition get() = Pair(x + 40, y + 48)
 
     private val maximizedWindowSize get() = Pair(width - 80, height - 96)
 
+    private val maximizedFrameHeight get() = height - 48
+
     private val fullscreenWindowPosition get() = Pair(x, y)
 
     private val fullscreenWindowSize get() = Pair(width, height)
+
+    private val fullscreenFrameHeight get() = height
 
     private var isFullyInitialized = false
 
@@ -94,15 +100,18 @@ data class Monitor(
     fun getWindowMeasurements(): List<Int> = when (getScreenMode()) {
         ScreenMode.NORMAL -> windowMeasurementsToList(
             this.defaultWindowPosition,
-            this.defaultWindowSize
+            this.defaultWindowSize,
+            this.defaultFrameHeight
         )
         ScreenMode.MAXIMIZED -> windowMeasurementsToList(
             this.maximizedWindowPosition,
-            this.maximizedWindowSize
+            this.maximizedWindowSize,
+            this.maximizedFrameHeight
         )
         ScreenMode.FULLSCREEN -> windowMeasurementsToList(
             this.fullscreenWindowPosition,
-            this.fullscreenWindowSize
+            this.fullscreenWindowSize,
+            this.fullscreenFrameHeight
         )
     }
 
@@ -115,12 +124,12 @@ data class Monitor(
     }
 
     companion object {
-        private fun windowMeasurementsToList(position: Pair<Int, Int>, size: Pair<Int, Int>): List<Int> {
+        private fun windowMeasurementsToList(position: Pair<Int, Int>, size: Pair<Int, Int>, frameHeight: Int): List<Int> {
             val (x, y) = position
             val (width, height) = size
 
             // why a list and not an array you ask? because no toCValues() on the array created with arrayOf :-(
-            return listOf(x, y, width, height)
+            return listOf(x, y, width, height, frameHeight)
         }
     }
 }
