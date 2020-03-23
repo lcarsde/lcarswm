@@ -6,7 +6,9 @@ import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import platform.posix.*
+import platform.posix.FILE
 import platform.posix.__pid_t
+import platform.posix.sigaction
 import platform.posix.sigset_t
 import platform.posix.timeval
 import xlib.*
@@ -120,7 +122,7 @@ class SystemFacade : SystemApi {
 
     override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
         return XCreateSimpleWindow(display, parentWindow, measurements[0], measurements[1],
-            measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
+            measurements[2].convert(), measurements[4].convert(), 0.convert(), 0.convert(), 0.convert())
     }
 
     override fun getSelectionOwner(atom: Atom): Window {
