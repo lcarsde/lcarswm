@@ -33,7 +33,7 @@ data class Monitor(
 
     private val defaultWindowSize get() = Pair(width - 248, height - 308)
 
-    private val defaultFrameHeight get() = height - 244
+    private val defaultFrameHeight get() = height - 242
 
     private val maximizedWindowPosition get() = Pair(x + 40, y + 48)
 
