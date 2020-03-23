@@ -17,7 +17,7 @@ fun adjustWindowPositionAndSize(
         windowMeasurements[0],
         windowMeasurements[1],
         windowMeasurements[2].convert(),
-        windowMeasurements[3].convert()
+        windowMeasurements[4].convert()
     )
 
     eventApi.resizeWindow(
