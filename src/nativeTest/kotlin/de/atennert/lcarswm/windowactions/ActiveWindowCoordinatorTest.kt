@@ -207,7 +207,7 @@ class ActiveWindowCoordinatorTest {
         monitorManager.screenMode = ScreenMode.NORMAL
         activeWindowCoordinator.realignWindows()
         measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
-        assertEquals(listOf(208, 242, 552, 292, 356), measurments, "")
+        assertEquals(listOf(208, 242, 552, 292, 358), measurments, "")
         checkMoveWindowCalls(systemApi.functionCalls, window)
     }
 
