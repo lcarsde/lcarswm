@@ -15,6 +15,7 @@ enum class Atoms(val atomName: String) {
     WM_STATE("WM_STATE"),
     WM_CHANGE_STATE("WM_CHANGE_STATE"),
     WM_CLASS("WM_CLASS"),
+    WM_NAME("WM_NAME"),
 
     NET_WM_NAME("_NET_WM_NAME"),
     NET_SUPPORTED("_NET_SUPPORTED"),
