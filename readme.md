@@ -114,7 +114,7 @@ TODO
 * Height of top and bottom bar: 40px
 * Width of height and bottom bar ends: 32px
 * Width of bar gaps: 8px
-* Corner pieces have an inner corner with radius: 10px
+* Corner pieces have an inner corner with radius: 16px
 * Random data area height: 100px
 * Width of normal mode side bar: 184px
 
