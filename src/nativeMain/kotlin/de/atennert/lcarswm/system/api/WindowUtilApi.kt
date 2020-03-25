@@ -40,6 +40,8 @@ interface WindowUtilApi {
 
     fun deleteProperty(window: Window, propertyAtom: Atom): Int
 
+    fun getTextProperty(window: Window, textProperty: CPointer<XTextProperty>, propertyAtom: Atom): Int
+
     fun killClient(window: Window): Int
 
     fun createWindow(parentWindow: Window, measurements: List<Int>, visual: CPointer<Visual>?, attributeMask: ULong, attributes: CPointer<XSetWindowAttributes>): Window
