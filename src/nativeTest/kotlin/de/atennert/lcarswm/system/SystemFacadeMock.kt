@@ -449,6 +449,10 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun getTextProperty(window: Window, textProperty: CPointer<XTextProperty>, propertyAtom: Atom): Int {
+        return 0
+    }
+
     override fun killClient(window: Window): Int {
         functionCalls.add(FunctionCall("killClient", window))
         return 0
