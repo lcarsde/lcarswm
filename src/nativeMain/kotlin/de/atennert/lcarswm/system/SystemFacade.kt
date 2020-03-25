@@ -106,6 +106,10 @@ class SystemFacade : SystemApi {
         return XDeleteProperty(display, window, propertyAtom)
     }
 
+    override fun getTextProperty(window: Window, textProperty: CPointer<XTextProperty>, propertyAtom: Atom): Int {
+        return XGetTextProperty(display, window, textProperty, propertyAtom)
+    }
+
     override fun killClient(window: Window): Int {
         return XKillClient(display, window)
     }
