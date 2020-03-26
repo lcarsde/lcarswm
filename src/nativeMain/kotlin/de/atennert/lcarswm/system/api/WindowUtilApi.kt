@@ -42,6 +42,12 @@ interface WindowUtilApi {
 
     fun getTextProperty(window: Window, textProperty: CPointer<XTextProperty>, propertyAtom: Atom): Int
 
+    fun xmbTextPropertyToTextList(
+        textProperty: CPointer<XTextProperty>,
+        resultList: CPointer<CPointerVar<CPointerVar<ByteVar>>>,
+        stringCount: CPointer<IntVar>
+    ): Int
+
     fun killClient(window: Window): Int
 
     fun createWindow(parentWindow: Window, measurements: List<Int>, visual: CPointer<Visual>?, attributeMask: ULong, attributes: CPointer<XSetWindowAttributes>): Window
