@@ -118,4 +118,18 @@ class WindowHandler(
         windowCoordinator.removeWindow(framedWindow)
         focusHandler.removeWindow(windowId)
     }
+
+
+    private fun getByteArrayList(textProperty: XTextProperty): List<ByteArray> {
+        return UByteArray(textProperty.nitems.convert()) { textProperty.value?.get(it)!! }
+            .fold(mutableListOf(mutableListOf<UByte>())) { list, ub ->
+                if (ub.convert<Int>() == 0) {
+                    list.add(mutableListOf())
+                } else {
+                    list.last().add(ub)
+                }
+                list
+            }
+            .map { ByteArray(it.size) { i -> it[i].convert() } }
+    }
 }
