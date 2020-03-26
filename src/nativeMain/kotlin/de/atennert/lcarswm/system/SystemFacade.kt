@@ -110,6 +110,14 @@ class SystemFacade : SystemApi {
         return XGetTextProperty(display, window, textProperty, propertyAtom)
     }
 
+    override fun xmbTextPropertyToTextList(
+        textProperty: CPointer<XTextProperty>,
+        resultList: CPointer<CPointerVar<CPointerVar<ByteVar>>>,
+        stringCount: CPointer<IntVar>
+    ): Int {
+        return XmbTextPropertyToTextList(display, textProperty, resultList, stringCount)
+    }
+
     override fun killClient(window: Window): Int {
         return XKillClient(display, window)
     }

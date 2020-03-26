@@ -453,6 +453,14 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun xmbTextPropertyToTextList(
+        textProperty: CPointer<XTextProperty>,
+        resultList: CPointer<CPointerVar<CPointerVar<ByteVar>>>,
+        stringCount: CPointer<IntVar>
+    ): Int {
+        return 0
+    }
+
     override fun killClient(window: Window): Int {
         functionCalls.add(FunctionCall("killClient", window))
         return 0
