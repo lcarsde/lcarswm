@@ -9,6 +9,7 @@ enum class Atoms(val atomName: String) {
     STRING("STRING"),
     UTF_STRING("UTF8_STRING"),
     MANAGER("MANAGER"),
+    COMPOUND_TEXT("COMPOUND_TEXT"),
 
     WM_DELETE_WINDOW("WM_DELETE_WINDOW"),
     WM_PROTOCOLS("WM_PROTOCOLS"),
