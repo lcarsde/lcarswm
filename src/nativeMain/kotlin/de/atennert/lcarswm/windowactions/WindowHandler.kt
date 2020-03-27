@@ -132,6 +132,7 @@ class WindowHandler(
             index++
             value = resultList.value?.get(0)?.get(index)
         }
+        byteList.add(0)
         nativeHeap.free(resultList)
         return byteList.toByteArray()
     }
@@ -139,10 +140,9 @@ class WindowHandler(
     private fun getByteArray(textProperty: XTextProperty): ByteArray {
         return UByteArray(textProperty.nitems.convert()) { textProperty.value?.get(it)!! }
             .fold(mutableListOf<Byte>()) { list, ub ->
+                list.add(ub.convert())
                 if (ub.convert<Int>() == 0) {
                     return@fold list
-                } else {
-                    list.add(ub.convert())
                 }
                 list
             }
