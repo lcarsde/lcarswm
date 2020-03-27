@@ -121,15 +121,14 @@ class WindowHandler(
 
     private fun getByteArray(textProperty: XTextProperty): ByteArray {
         return UByteArray(textProperty.nitems.convert()) { textProperty.value?.get(it)!! }
-            .fold(mutableListOf(mutableListOf<UByte>())) { list, ub ->
+            .fold(mutableListOf<Byte>()) { list, ub ->
                 if (ub.convert<Int>() == 0) {
-                    list.add(mutableListOf())
+                    return@fold list
                 } else {
-                    list.last().add(ub)
+                    list.add(ub.convert())
                 }
                 list
             }
-            .map { ByteArray(it.size) { i -> it[i].convert() } }
-            .first()
+            .toByteArray()
     }
 }
