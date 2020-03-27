@@ -119,6 +119,23 @@ class WindowHandler(
         focusHandler.removeWindow(windowId)
     }
 
+    private fun getByteArrayListFromCompound(textProperty: XTextProperty): ByteArray {
+        val resultList = nativeHeap.allocPointerTo<CPointerVar<ByteVar>>()
+        val listCount = IntArray(1).pin()
+        system.xmbTextPropertyToTextList(textProperty.ptr, resultList.ptr, listCount.addressOf(0))
+
+        val byteList = mutableListOf<Byte>()
+        var index = 0
+        var value = resultList.value?.get(0)?.get(0)
+        while (value != null && value != 0.convert()) {
+            byteList.add(value)
+            index++
+            value = resultList.value?.get(0)?.get(index)
+        }
+        nativeHeap.free(resultList)
+        return byteList.toByteArray()
+    }
+
     private fun getByteArray(textProperty: XTextProperty): ByteArray {
         return UByteArray(textProperty.nitems.convert()) { textProperty.value?.get(it)!! }
             .fold(mutableListOf<Byte>()) { list, ub ->
