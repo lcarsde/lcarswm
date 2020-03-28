@@ -5,7 +5,9 @@ import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
-import platform.posix.*
+import platform.posix.sigfillset
+import platform.posix.sigemptyset
+import platform.posix.sigprocmask
 import platform.posix.FILE
 import platform.posix.__pid_t
 import platform.posix.sigaction
