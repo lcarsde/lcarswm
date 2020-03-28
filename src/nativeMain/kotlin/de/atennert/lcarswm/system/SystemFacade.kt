@@ -118,6 +118,14 @@ class SystemFacade : SystemApi {
         return XmbTextPropertyToTextList(display, textProperty, resultList, stringCount)
     }
 
+    override fun localeToUtf8(
+        localeString: String,
+        stringSize: Long,
+        bytesRead: CPointer<ULongVar>?
+    ): CPointer<ByteVar>? {
+        return g_locale_to_utf8(localeString, stringSize, bytesRead, null, null)
+    }
+
     override fun killClient(window: Window): Int {
         return XKillClient(display, window)
     }

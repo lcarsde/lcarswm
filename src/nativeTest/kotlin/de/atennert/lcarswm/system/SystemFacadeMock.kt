@@ -461,6 +461,14 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun localeToUtf8(
+        localeString: String,
+        stringSize: Long,
+        bytesRead: CPointer<ULongVar>?
+    ): CPointer<ByteVar>? {
+        return null
+    }
+
     override fun killClient(window: Window): Int {
         functionCalls.add(FunctionCall("killClient", window))
         return 0
