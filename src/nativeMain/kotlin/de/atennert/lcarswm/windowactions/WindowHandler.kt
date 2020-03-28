@@ -127,7 +127,7 @@ class WindowHandler(
         val byteList = mutableListOf<Byte>()
         var index = 0
         var value = resultList.value?.get(0)?.get(0)
-        while (value != null && value != 0.convert()) {
+        while (value != null && value.toInt() != 0) {
             byteList.add(value)
             index++
             value = resultList.value?.get(0)?.get(index)
