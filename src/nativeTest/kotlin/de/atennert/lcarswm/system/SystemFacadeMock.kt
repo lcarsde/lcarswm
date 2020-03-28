@@ -469,6 +469,14 @@ open class SystemFacadeMock : SystemApi {
         return null
     }
 
+    override fun convertLatinToUtf8(
+        latinString: String,
+        stringSize: Long,
+        bytesRead: CPointer<ULongVar>?
+    ): CPointer<ByteVar>? {
+        return null
+    }
+
     override fun killClient(window: Window): Int {
         functionCalls.add(FunctionCall("killClient", window))
         return 0

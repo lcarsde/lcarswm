@@ -50,6 +50,8 @@ interface WindowUtilApi {
 
     fun localeToUtf8(localeString: String, stringSize: Long, bytesRead: CPointer<ULongVar>?): CPointer<ByteVar>?
 
+    fun convertLatinToUtf8(latinString: String, stringSize: Long, bytesRead: CPointer<ULongVar>?): CPointer<ByteVar>?
+
     fun killClient(window: Window): Int
 
     fun createWindow(parentWindow: Window, measurements: List<Int>, visual: CPointer<Visual>?, attributeMask: ULong, attributes: CPointer<XSetWindowAttributes>): Window

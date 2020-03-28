@@ -126,6 +126,15 @@ class SystemFacade : SystemApi {
         return g_locale_to_utf8(localeString, stringSize, bytesRead, null, null)
     }
 
+    override fun convertLatinToUtf8(
+        latinString: String,
+        stringSize: Long,
+        bytesRead: CPointer<ULongVar>?
+    ): CPointer<ByteVar>? {
+        return g_convert(latinString, stringSize, "utf-8", "iso-8859-1",
+            bytesRead, null, null)
+    }
+
     override fun killClient(window: Window): Int {
         return XKillClient(display, window)
     }
