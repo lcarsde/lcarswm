@@ -1,3 +1,14 @@
-headers = X11/Xlib.h X11/keysym.h X11/keysymdef.h X11/Xutil.h X11/xpm.h X11/extensions/Xrandr.h X11/XF86keysym.h
-compilerOpts = -I/usr/include
-linkerOpts = -L/usr/lib -lX11 -lXpm -lXrandr
+headers = X11/Xlib.h \
+    X11/keysym.h \
+    X11/keysymdef.h \
+    X11/Xutil.h \
+    X11/xpm.h \
+    X11/extensions/Xrandr.h \
+    X11/XF86keysym.h \
+    pango/pango.h
+compilerOpts = -I/usr/include \
+    -I/usr/include/pango-1.0 \
+    -I/usr/include/glib-2.0 \
+    -I/usr/lib/glib-2.0/include \
+    -I/usr/include/harfbuzz
+linkerOpts = -L/usr/lib -lX11 -lXpm -lXrandr -lpango-1.0

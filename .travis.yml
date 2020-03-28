@@ -11,7 +11,10 @@ notifications:
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -y libx11-dev libxpm-dev libxrandr-dev
+  - sudo apt-get install -y libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev
   - sudo ln -s /usr/lib/x86_64-linux-gnu/libX11.so /usr/lib/libX11.so
   - sudo ln -s /usr/lib/x86_64-linux-gnu/libXpm.so /usr/lib/libXpm.so
   - sudo ln -s /usr/lib/x86_64-linux-gnu/libXrandr.so /usr/lib/libXrandr.so
+  - sudo ln -s /usr/lib/x86_64-linux-gnu/libpango-1.0.so /usr/lib/libpango-1.0.so
+  - sudo ln -s /usr/lib/x86_64-linux-gnu/libXrandr.so /usr/lib/libXrandr.so
+  - sudo ln -s /usr/lib/x86_64-linux-gnu/glib-2.0 /usr/lib/glib-2.0
