@@ -11,4 +11,4 @@ compilerOpts = -I/usr/include \
     -I/usr/include/glib-2.0 \
     -I/usr/lib/glib-2.0/include \
     -I/usr/include/harfbuzz
-linkerOpts = -L/usr/lib -lX11 -lXpm -lXrandr -lgmodule-2.0 -lpango-1.0
+linkerOpts = -L/usr/lib -lX11 -lXpm -lXrandr -lglib-2.0 -lgmodule-2.0 -lpango-1.0
