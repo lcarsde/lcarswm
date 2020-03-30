@@ -11,5 +11,6 @@ compilerOpts = -I/usr/include \
     -I/usr/include/pango-1.0 \
     -I/usr/include/glib-2.0 \
     -I/usr/lib/glib-2.0/include \
-    -I/usr/include/harfbuzz
+    -I/usr/include/harfbuzz \
+    -I/usr/include/freetype2
 linkerOpts = -L/usr/lib -lX11 -lXpm -lXrandr -lglib-2.0 -lpango-1.0
