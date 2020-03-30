@@ -5,7 +5,8 @@ headers = X11/Xlib.h \
     X11/xpm.h \
     X11/extensions/Xrandr.h \
     X11/XF86keysym.h \
-    pango/pango.h
+    pango/pango.h \
+    pango/pangoxft.h
 compilerOpts = -I/usr/include \
     -I/usr/include/pango-1.0 \
     -I/usr/include/glib-2.0 \
