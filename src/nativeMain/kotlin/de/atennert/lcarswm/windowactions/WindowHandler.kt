@@ -3,7 +3,7 @@ package de.atennert.lcarswm.windowactions
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.atom.AtomLibrary
-import de.atennert.lcarswm.atom.Atoms.WM_STATE
+import de.atennert.lcarswm.atom.Atoms.*
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.log.Logger
@@ -62,9 +62,11 @@ class WindowHandler(
         attributeSet.do_not_propagate_mask = clientNoPropagateMask
         system.changeWindowAttributes(windowId, (CWEventMask or CWDontPropagate).convert(), attributeSet.ptr)
 
+        window.name = getWindowName(windowId)
+
         window.frame = system.createSimpleWindow(rootWindow, measurements)
 
-        logger.logDebug("WindowHandler::addWindow::reparenting $windowId to ${window.frame}")
+        logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}")
 
         system.selectInput(window.frame, frameEventMask)
 
@@ -117,6 +119,51 @@ class WindowHandler(
 
         windowCoordinator.removeWindow(framedWindow)
         focusHandler.removeWindow(windowId)
+    }
+
+    private fun getWindowName(windowId: Window): String {
+        val textProperty = nativeHeap.alloc<XTextProperty>()
+        var result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[NET_WM_NAME])
+
+        if (result != 0 || textProperty.encoding != atomLibrary[UTF_STRING]) {
+            result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[WM_NAME])
+            if (result == 0) {
+                return "No name"
+            }
+        }
+
+        val name = when (textProperty.encoding) {
+            atomLibrary[COMPOUND_TEXT] -> {
+                val localeString = getByteArrayListFromCompound(textProperty).toKString()
+                val readBytes = ULongArray(1).pin()
+                val utfBytes = system.localeToUtf8(localeString, (-1).convert(), readBytes.addressOf(0))
+                    ?: system.localeToUtf8(localeString, readBytes.get()[0].convert(), null)
+                    ?: return "No locale name"
+                ByteArray(readBytes.get()[0].convert()) {utfBytes[it]}.toKString()
+            }
+            atomLibrary[UTF_STRING] -> {
+                getByteArray(textProperty).toKString()
+            }
+            atomLibrary[STRING] -> {
+                val latinString = getByteArray(textProperty).takeWhile { c ->
+                    // filter forbidden control characters
+                    c.toInt() == 9 ||
+                            c.toInt() == 10 ||
+                            c.toInt() in 33..126 ||
+                            c.toInt() > 160
+                }.toByteArray()
+                    .toKString()
+                val readBytes = ULongArray(1).pin()
+                val utfBytes = system.convertLatinToUtf8(latinString, (-1).convert(), readBytes.addressOf(0))
+                    ?: system.convertLatinToUtf8(latinString, readBytes.get()[0].convert(), null)
+                    ?: return "No latin name"
+                ByteArray(readBytes.get()[0].convert()) {utfBytes[it]}.toKString()
+            }
+            else -> ""
+        }
+        system.free(textProperty.value)
+        nativeHeap.free(textProperty)
+        return name.toUpperCase()
     }
 
     private fun getByteArrayListFromCompound(textProperty: XTextProperty): ByteArray {
