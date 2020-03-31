@@ -646,4 +646,8 @@ open class SystemFacadeMock : SystemApi {
     override fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?) {
         functionCalls.add(FunctionCall("sigProcMask", how, newSigset, oldSigset))
     }
+
+    override fun xftGetContext(screen: Int): CPointer<PangoContext>? {
+        return nativeHeap.allocPointerTo<PangoContext>().value
+    }
 }

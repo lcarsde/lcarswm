@@ -513,6 +513,10 @@ class SystemFacade : SystemApi {
         return XpmReadFileToImage(display, imagePath, imageBuffer, null, null)
     }
 
+    override fun xftGetContext(screen: Int): CPointer<PangoContext>? {
+        return pango_xft_get_context(display, screen)
+    }
+
     private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE
