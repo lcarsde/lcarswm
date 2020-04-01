@@ -517,6 +517,10 @@ class SystemFacade : SystemApi {
         return pango_xft_get_context(display, screen)
     }
 
+    override fun newLayout(pango: CPointer<PangoContext>?): CPointer<PangoLayout>? {
+        return pango_layout_new(pango)
+    }
+
     private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE

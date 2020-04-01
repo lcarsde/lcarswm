@@ -650,4 +650,8 @@ open class SystemFacadeMock : SystemApi {
     override fun xftGetContext(screen: Int): CPointer<PangoContext>? {
         return nativeHeap.allocPointerTo<PangoContext>().value
     }
+
+    override fun newLayout(pango: CPointer<PangoContext>?): CPointer<PangoLayout>? {
+        return nativeHeap.allocPointerTo<PangoLayout>().value
+    }
 }
