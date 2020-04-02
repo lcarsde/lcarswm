@@ -521,6 +521,10 @@ class SystemFacade : SystemApi {
         return pango_layout_new(pango)
     }
 
+    override fun getFontDescription(): CPointer<PangoFontDescription>? {
+        return pango_font_description_new()
+    }
+
     private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE
