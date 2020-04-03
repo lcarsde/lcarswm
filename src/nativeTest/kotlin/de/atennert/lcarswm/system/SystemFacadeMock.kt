@@ -141,6 +141,10 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun createPixmap(drawable: Drawable, width: UInt, height: UInt, depth: UInt): Pixmap {
+        return 0.convert()
+    }
+
     override fun selectInput(window: Window, mask: Long): Int {
         functionCalls.add(FunctionCall("selectInput", window, mask))
         return 0

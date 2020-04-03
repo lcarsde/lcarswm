@@ -513,6 +513,10 @@ class SystemFacade : SystemApi {
         return XpmReadFileToImage(display, imagePath, imageBuffer, null, null)
     }
 
+    override fun createPixmap(drawable: Drawable, width: UInt, height: UInt, depth: UInt): Pixmap {
+        return XCreatePixmap(display, drawable, width, height, depth)
+    }
+
     override fun xftGetContext(screen: Int): CPointer<PangoContext>? {
         return pango_xft_get_context(display, screen)
     }
