@@ -32,4 +32,6 @@ interface DrawApi {
     fun freeColormap(colorMap: Colormap): Int
 
     fun readXpmFileToImage(imagePath: String, imageBuffer: CPointer<CPointerVar<XImage>>): Int
+
+    fun createPixmap(drawable: Drawable, width: UInt, height: UInt, depth: UInt): Pixmap
 }
