@@ -34,4 +34,6 @@ interface DrawApi {
     fun readXpmFileToImage(imagePath: String, imageBuffer: CPointer<CPointerVar<XImage>>): Int
 
     fun createPixmap(drawable: Drawable, width: UInt, height: UInt, depth: UInt): Pixmap
+
+    fun xftDrawCreate(drawable: Drawable, visual: CValuesRef<Visual>, colorMap: Colormap): CPointer<XftDraw>?
 }
