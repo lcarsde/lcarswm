@@ -145,6 +145,10 @@ open class SystemFacadeMock : SystemApi {
         return 0.convert()
     }
 
+    override fun xftDrawCreate(drawable: Drawable, visual: CValuesRef<Visual>, colorMap: Colormap): CPointer<XftDraw>? {
+        return nativeHeap.allocPointerTo<XftDraw>().value
+    }
+
     override fun selectInput(window: Window, mask: Long): Int {
         functionCalls.add(FunctionCall("selectInput", window, mask))
         return 0
