@@ -533,6 +533,10 @@ class SystemFacade : SystemApi {
         return pango_font_description_new()
     }
 
+    override fun getDefaultLanguage(): CPointer<PangoLanguage>? {
+        return pango_language_get_default()
+    }
+
     private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE

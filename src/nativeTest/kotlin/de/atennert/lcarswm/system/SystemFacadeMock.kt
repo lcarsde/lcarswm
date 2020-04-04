@@ -666,4 +666,8 @@ open class SystemFacadeMock : SystemApi {
     override fun getFontDescription(): CPointer<PangoFontDescription>? {
         return nativeHeap.allocPointerTo<PangoFontDescription>().value
     }
+
+    override fun getDefaultLanguage(): CPointer<PangoLanguage>? {
+        return nativeHeap.allocPointerTo<PangoLanguage>().value
+    }
 }
