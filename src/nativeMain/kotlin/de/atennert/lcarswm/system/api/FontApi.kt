@@ -6,6 +6,9 @@ import xlib.PangoFontDescription
 import xlib.PangoLanguage
 import xlib.PangoLayout
 
+/**
+ * API for font and text handling
+ */
 interface FontApi {
     fun xftGetContext(screen: Int): CPointer<PangoContext>?
 
