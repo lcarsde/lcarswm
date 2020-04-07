@@ -673,4 +673,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun setFontDescriptionFamily(font: CPointer<PangoFontDescription>?, family: String) {
     }
+
+    override fun setFontDescriptionWeight(font: CPointer<PangoFontDescription>?, weight: PangoWeight) {
+    }
 }
