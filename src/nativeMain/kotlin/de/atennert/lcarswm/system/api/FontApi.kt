@@ -18,5 +18,5 @@ interface FontApi {
 
     fun getDefaultLanguage(): CPointer<PangoLanguage>?
 
-    fun setFontDescriptionFamily(font: CPointer<PangoFontDescription>, family: String)
+    fun setFontDescriptionFamily(font: CPointer<PangoFontDescription>?, family: String)
 }

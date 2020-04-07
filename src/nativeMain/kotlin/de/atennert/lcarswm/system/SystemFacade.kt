@@ -537,7 +537,7 @@ class SystemFacade : SystemApi {
         return pango_language_get_default()
     }
 
-    override fun setFontDescriptionFamily(font: CPointer<PangoFontDescription>, family: String) {
+    override fun setFontDescriptionFamily(font: CPointer<PangoFontDescription>?, family: String) {
         pango_font_description_set_family(font, family)
     }
 
