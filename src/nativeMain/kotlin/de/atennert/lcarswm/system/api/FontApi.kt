@@ -1,10 +1,7 @@
 package de.atennert.lcarswm.system.api
 
 import kotlinx.cinterop.CPointer
-import xlib.PangoContext
-import xlib.PangoFontDescription
-import xlib.PangoLanguage
-import xlib.PangoLayout
+import xlib.*
 
 /**
  * API for font and text handling
@@ -19,4 +16,6 @@ interface FontApi {
     fun getDefaultLanguage(): CPointer<PangoLanguage>?
 
     fun setFontDescriptionFamily(font: CPointer<PangoFontDescription>?, family: String)
+
+    fun setFontDescriptionWeight(font: CPointer<PangoFontDescription>?, weight: PangoWeight)
 }
