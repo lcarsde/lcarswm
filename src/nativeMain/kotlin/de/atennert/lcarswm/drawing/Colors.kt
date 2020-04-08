@@ -4,7 +4,7 @@ import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
 import xlib.*
 
-class Colors(private val drawApi: DrawApi) {
+class Colors(private val drawApi: DrawApi, private val screen: Screen) {
     private val colors = listOf(
         Triple(0, 0, 0), // black
         Triple(0xFFFF, 0x9999, 0), // yellow
@@ -17,11 +17,10 @@ class Colors(private val drawApi: DrawApi) {
         Triple(0xCCCC, 0x6666, 0x9999)  // dark pink
     )
 
-    fun allocateCompleteColorMap(
-        visual: CPointer<Visual>,
-        windowId: Window
-    ): Pair<Colormap, List<ULong>> {
-        val colorMapId = drawApi.createColormap(windowId, visual, AllocNone)
+    val colorMap = allocateCompleteColorMap()
+
+    private fun allocateCompleteColorMap(): Pair<Colormap, List<ULong>> {
+        val colorMapId = drawApi.createColormap(screen.root, screen.root_visual!!, AllocNone)
 
         val colorReplies = colors
             .asSequence()
@@ -37,6 +36,12 @@ class Colors(private val drawApi: DrawApi) {
             .toList()
 
         return Pair(colorMapId, colorReplies)
+    }
+
+    fun cleanupColorMap() {
+        val colorPixels = ULongArray(colorMap.second.size) { colorMap.second[it] }
+        drawApi.freeColors(colorMap.first, colorPixels.toCValues(), colorPixels.size)
+        drawApi.freeColormap(colorMap.first)
     }
 
     fun loadForegroundGraphicContexts(

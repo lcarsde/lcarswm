@@ -119,7 +119,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val monitorManager = MonitorManagerImpl(system, screen.root)
 
-        val colorHandler = Colors(system)
+        val colorHandler = Colors(system, screen)
         val uiDrawer = RootWindowDrawer(system, monitorManager, screen, colorHandler)
 
         keyManager.ungrabAllKeys(screen.root)
@@ -166,7 +166,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         system.sync(false)
 
-        shutdown(system, uiDrawer, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler)
+        shutdown(system, uiDrawer, colorHandler, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler)
     }
 }
 
@@ -194,13 +194,14 @@ private fun handleSignal(signalValue: Int) {
 private fun shutdown(
     system: SystemApi,
     rootWindowDrawer: RootWindowDrawer,
+    colors: Colors,
     rootWindow: Window,
     logger: Logger,
     rootWindowPropertyHandler: RootWindowPropertyHandler,
     keyManager: KeyManager,
     signalHandler: SignalHandler
 ) {
-    rootWindowDrawer.cleanupColorMap()
+    colors.cleanupColorMap()
     rootWindowDrawer.cleanupGraphicsContexts()
 
     system.selectInput(rootWindow, NoEventMask)

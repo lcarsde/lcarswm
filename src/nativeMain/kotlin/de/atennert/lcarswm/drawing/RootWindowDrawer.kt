@@ -21,8 +21,7 @@ class RootWindowDrawer(
     colors: Colors
 ) : UIDrawing {
     private val rootWindow = screen.root
-    private val colorMap = colors.allocateCompleteColorMap(screen.root_visual!!, rootWindow)
-    private val graphicsContexts = colors.loadForegroundGraphicContexts(rootWindow, colorMap.second)
+   private val graphicsContexts = colors.loadForegroundGraphicContexts(rootWindow, colors.colorMap.second)
 
     private val logoImage: CPointer<XImage>
 
@@ -44,12 +43,6 @@ class RootWindowDrawer(
 
     fun cleanupGraphicsContexts() {
         graphicsContexts.forEach { drawApi.freeGC(it) }
-    }
-
-    fun cleanupColorMap() {
-        val colorPixels = ULongArray(colorMap.second.size) { colorMap.second[it] }
-        drawApi.freeColors(colorMap.first, colorPixels.toCValues(), colorPixels.size)
-        drawApi.freeColormap(colorMap.first)
     }
 
     private fun drawMaximizedFrame(monitor: Monitor) {
