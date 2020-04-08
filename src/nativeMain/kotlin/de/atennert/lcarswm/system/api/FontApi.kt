@@ -18,4 +18,6 @@ interface FontApi {
     fun setFontDescriptionFamily(font: CPointer<PangoFontDescription>?, family: String)
 
     fun setFontDescriptionWeight(font: CPointer<PangoFontDescription>?, weight: PangoWeight)
+
+    fun setFontDescriptionStyle(font: CPointer<PangoFontDescription>?, style: PangoStyle)
 }
