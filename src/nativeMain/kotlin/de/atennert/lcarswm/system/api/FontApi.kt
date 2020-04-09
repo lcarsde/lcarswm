@@ -20,4 +20,6 @@ interface FontApi {
     fun setFontDescriptionWeight(font: CPointer<PangoFontDescription>?, weight: PangoWeight)
 
     fun setFontDescriptionStyle(font: CPointer<PangoFontDescription>?, style: PangoStyle)
+
+    fun setFontDescriptionSize(font: CPointer<PangoFontDescription>?, size: Int)
 }
