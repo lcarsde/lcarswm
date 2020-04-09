@@ -679,4 +679,7 @@ open class SystemFacadeMock : SystemApi {
 
     override fun setFontDescriptionStyle(font: CPointer<PangoFontDescription>?, style: PangoStyle) {
     }
+
+    override fun setFontDescriptionSize(font: CPointer<PangoFontDescription>?, size: Int) {
+    }
 }
