@@ -553,6 +553,10 @@ class SystemFacade : SystemApi {
         pango_font_description_set_size(font, size)
     }
 
+    override fun freeFontDescription(font: CPointer<PangoFontDescription>?) {
+        pango_font_description_free(font)
+    }
+
     private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE
