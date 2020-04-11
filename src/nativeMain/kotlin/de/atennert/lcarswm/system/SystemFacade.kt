@@ -144,11 +144,12 @@ class SystemFacade : SystemApi {
     override fun createWindow(
         parentWindow: Window,
         measurements: List<Int>,
+        depth: Int,
         visual: CPointer<Visual>?,
         attributeMask: ULong,
         attributes: CPointer<XSetWindowAttributes>
     ): Window {
-        return XCreateWindow(display, parentWindow, measurements[0], measurements[1], measurements[2].convert(), measurements[3].convert(), 0.convert(), CopyFromParent.convert(), InputOutput, visual, attributeMask, attributes)
+        return XCreateWindow(display, parentWindow, measurements[0], measurements[1], measurements[2].convert(), measurements[3].convert(), 0.convert(), depth, InputOutput, visual, attributeMask, attributes)
     }
 
     override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {

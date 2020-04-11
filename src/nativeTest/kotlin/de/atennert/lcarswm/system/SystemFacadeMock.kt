@@ -502,6 +502,7 @@ open class SystemFacadeMock : SystemApi {
     override fun createWindow(
         parentWindow: Window,
         measurements: List<Int>,
+        depth: Int,
         visual: CPointer<Visual>?,
         attributeMask: ULong,
         attributes: CPointer<XSetWindowAttributes>

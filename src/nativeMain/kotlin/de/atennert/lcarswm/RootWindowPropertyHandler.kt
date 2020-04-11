@@ -34,6 +34,7 @@ class RootWindowPropertyHandler(
         this.ewmhSupportWindow = system.createWindow(
             rootWindow,
             listOf(-100, -100, 1, 1),
+            CopyFromParent.convert(),
             CopyFromParent.toCPointer(),
             (CWEventMask or CWOverrideRedirect).convert(),
             windowAttributes.ptr
