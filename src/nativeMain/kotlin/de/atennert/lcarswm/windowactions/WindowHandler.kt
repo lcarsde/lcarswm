@@ -47,6 +47,7 @@ class WindowHandler(
         if (windowAttributes.override_redirect != X_FALSE ||
             (isSetup && windowAttributes.map_state != IsViewable)) {
             logger.logInfo("WindowHandler::addWindow::skipping window $windowId")
+            system.ungrabServer()
 
             if (!isSetup) {
                 system.mapWindow(windowId)
