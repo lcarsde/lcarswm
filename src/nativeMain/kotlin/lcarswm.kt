@@ -1,6 +1,7 @@
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.drawing.Colors
+import de.atennert.lcarswm.drawing.FrameDrawer
 import de.atennert.lcarswm.drawing.RootWindowDrawer
 import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.log.FileLogger
@@ -121,6 +122,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val colorHandler = Colors(system, screen)
         val uiDrawer = RootWindowDrawer(system, monitorManager, screen, colorHandler)
+        val frameDrawer = FrameDrawer(system, system, colorHandler, system.defaultScreenNumber(), screen)
 
         keyManager.ungrabAllKeys(screen.root)
         keyManager.grabInternalKeys(screen.root)
@@ -139,11 +141,11 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             }
         }
 
-        val windowCoordinator = ActiveWindowCoordinator(system, monitorManager)
+        val windowCoordinator = ActiveWindowCoordinator(system, monitorManager, frameDrawer)
 
         val screenChangeHandler = setupRandr(system, randrHandlerFactory, monitorManager, windowCoordinator, uiDrawer, screen.root)
 
-        val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, screen.root)
+        val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, screen, frameDrawer)
 
         val eventManager = createEventManager(
             system,
@@ -166,7 +168,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         system.sync(false)
 
-        shutdown(system, uiDrawer, colorHandler, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler)
+        shutdown(system, uiDrawer, colorHandler, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler, frameDrawer)
     }
 }
 
@@ -199,10 +201,12 @@ private fun shutdown(
     logger: Logger,
     rootWindowPropertyHandler: RootWindowPropertyHandler,
     keyManager: KeyManager,
-    signalHandler: SignalHandler
+    signalHandler: SignalHandler,
+    frameDrawer: FrameDrawer
 ) {
-    colors.cleanupColorMap()
     rootWindowDrawer.cleanupGraphicsContexts()
+    frameDrawer.close()
+    colors.cleanupColorMap()
 
     system.selectInput(rootWindow, NoEventMask)
     rootWindowPropertyHandler.unsetWindowProperties()
