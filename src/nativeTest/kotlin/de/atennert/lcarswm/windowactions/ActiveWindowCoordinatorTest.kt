@@ -216,9 +216,13 @@ class ActiveWindowCoordinatorTest {
         systemCalls: MutableList<FunctionCall>,
         window: FramedWindow
     ) {
-        val moveResizeWindowCall = systemCalls.removeAt(0)
-        assertEquals("moveResizeWindow", moveResizeWindowCall.name, "The frame needs to be moved/resized")
-        assertEquals(window.frame, moveResizeWindowCall.parameters[0], "The _frame_ needs to be moved/resized")
+        val moveResizeTitleBarCall = systemCalls.removeAt(0)
+        assertEquals("moveResizeWindow", moveResizeTitleBarCall.name, "The title bar needs to be moved/resized")
+        assertEquals(window.titleBar, moveResizeTitleBarCall.parameters[0], "The _title bar_ needs to be moved/resized")
+
+        val moveResizeFrameCall = systemCalls.removeAt(0)
+        assertEquals("moveResizeWindow", moveResizeFrameCall.name, "The frame needs to be moved/resized")
+        assertEquals(window.frame, moveResizeFrameCall.parameters[0], "The _frame_ needs to be moved/resized")
 
         val resizeWindowCall = systemCalls.removeAt(0)
         assertEquals("resizeWindow", resizeWindowCall.name, "The window needs to be resized")

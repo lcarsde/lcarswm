@@ -25,19 +25,23 @@ class WindowHandlerTest {
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
+        val screen = nativeHeap.alloc<Screen>()
+
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            nativeHeap.alloc(),
+            screen,
             FrameDrawerMock()
         )
 
         windowRegistration.addWindow(windowId, false)
 
         checkWindowAddProcedure(systemApi, windowId, windowCoordinator, focusHandler)
+
+        nativeHeap.free(screen)
     }
 
     @Test
@@ -56,19 +60,23 @@ class WindowHandlerTest {
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
+        val screen = nativeHeap.alloc<Screen>()
+
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            nativeHeap.alloc(),
+            screen,
             FrameDrawerMock()
         )
 
         windowRegistration.addWindow(windowId, true)
 
         checkWindowAddProcedure(systemApi, windowId, windowCoordinator, focusHandler)
+
+        nativeHeap.free(screen)
     }
 
     private fun checkWindowAddProcedure(
@@ -83,14 +91,18 @@ class WindowHandlerTest {
 
         val setupCalls = systemApi.functionCalls
 
+        assertEquals("grabServer", setupCalls.removeAt(0).name, "grab the server to block interrupting updates")
         assertEquals("changeWindowAttributes", setupCalls.removeAt(0).name, "register for client events")
         assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "frame window should be created")
+        assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "title bar window should be created")
         assertEquals("selectInput", setupCalls.removeAt(0).name, "select the input on the window frame")
         assertEquals("addToSaveSet", setupCalls.removeAt(0).name, "add the windows frame to the save set")
         assertEquals("setWindowBorderWidth", setupCalls.removeAt(0).name, "Set the border width of the window to 0")
         assertEquals("reparentWindow", setupCalls.removeAt(0).name, "child window should be reparented to frame")
         assertEquals("resizeWindow", setupCalls.removeAt(0).name, "resize window to monitor required dimensions")
+        assertEquals("ungrabServer", setupCalls.removeAt(0).name, "ungrab the server to allow updates again")
         assertEquals("mapWindow", setupCalls.removeAt(0).name, "frame window should be mapped")
+        assertEquals("mapWindow", setupCalls.removeAt(0).name, "title bar window should be mapped")
         assertEquals("mapWindow", setupCalls.removeAt(0).name, "child window should be mapped")
 
         val changePropertyCall = setupCalls.removeAt(0)
@@ -136,19 +148,24 @@ class WindowHandlerTest {
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
+        val screen = nativeHeap.alloc<Screen>()
+
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            nativeHeap.alloc(),
+            screen,
             FrameDrawerMock()
         )
 
         windowRegistration.addWindow(windowId, true)
 
-        assertEquals(0, systemApi.functionCalls.size, "There should no system call")
+        assertEquals("grabServer", systemApi.functionCalls.removeAt(0).name, "call grabServer")
+        assertEquals("ungrabServer", systemApi.functionCalls.removeAt(0).name, "call ungrabServer")
+
+        nativeHeap.free(screen)
     }
 
     @Test
@@ -167,13 +184,15 @@ class WindowHandlerTest {
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
+        val screen = nativeHeap.alloc<Screen>()
+
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            nativeHeap.alloc(),
+            screen,
             FrameDrawerMock()
         )
 
@@ -181,11 +200,15 @@ class WindowHandlerTest {
 
         val setupCalls = systemApi.functionCalls
 
-        assertEquals(1, setupCalls.size, "There should only be one call to map the popup")
+        assertEquals("grabServer", setupCalls.removeAt(0).name, "call grabServer")
+
+        assertEquals("ungrabServer", setupCalls.removeAt(0).name, "call ungrabServer")
 
         val mapCall = setupCalls.removeAt(0)
         assertEquals("mapWindow", mapCall.name, "We need to map the popup")
         assertEquals(windowId, mapCall.parameters[0], "The popup needs to be mapped")
+
+        nativeHeap.free(screen)
     }
 
     @Test
@@ -198,13 +221,15 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
 
+        val screen = nativeHeap.alloc<Screen>()
+
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            nativeHeap.alloc(),
+            screen,
             FrameDrawerMock()
         )
 
@@ -213,6 +238,8 @@ class WindowHandlerTest {
         windowRegistration.addWindow(windowId, false)
 
         assertTrue(windowRegistration.isWindowManaged(windowId), "A known window should be reported managed")
+
+        nativeHeap.free(screen)
     }
 
     @Test
@@ -226,13 +253,16 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
 
+        val screen = nativeHeap.alloc<Screen>()
+        screen.root = rootWindowId
+
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            nativeHeap.alloc(),
+            screen,
             FrameDrawerMock()
         )
         windowRegistration.addWindow(windowId, false)
@@ -249,6 +279,8 @@ class WindowHandlerTest {
         assertEquals(windowId, selectInputCall.parameters[0], "unselect the input from the unregistered window")
         assertEquals(NoEventMask, selectInputCall.parameters[1], "set no event mask for events from unregistered window")
 
+        val unmapTitleBarCall = unregisterSystemCalls.removeAt(0)
+        assertEquals("unmapWindow", unmapTitleBarCall.name, "The title bar of the removed window needs to be _unmapped_")
         val unmapFrameCall = unregisterSystemCalls.removeAt(0)
         assertEquals("unmapWindow", unmapFrameCall.name, "The frame of the removed window needs to be _unmapped_")
 
@@ -278,6 +310,8 @@ class WindowHandlerTest {
         assertFalse(windowRegistration.isWindowManaged(windowId), "The window should not be managed anymore")
 
         assertNull(focusHandler.getFocusedWindow(), "The focused window needs to be unset")
+
+        nativeHeap.free(screen)
     }
 
     @Test
@@ -292,13 +326,16 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
 
+        val screen = nativeHeap.alloc<Screen>()
+        screen.root = rootWindowId
+
         val windowRegistration = WindowHandler(
             systemApi,
             LoggerMock(),
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            nativeHeap.alloc(),
+            screen,
             FrameDrawerMock()
         )
         windowRegistration.addWindow(windowId, false)
@@ -306,5 +343,7 @@ class WindowHandlerTest {
         assertTrue(windowRegistration.isWindowParentedBy(windowId, parentId), "Return true for the registered window parent")
         assertFalse(windowRegistration.isWindowParentedBy(windowId, rootWindowId), "Return false for unknown window parents")
         assertFalse(windowRegistration.isWindowParentedBy(rootWindowId, rootWindowId), "Return false for unmanaged windows")
+
+        nativeHeap.free(screen)
     }
 }
