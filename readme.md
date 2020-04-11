@@ -52,6 +52,7 @@ Fullscreen mode
 ![lcarswm in normal mode](doc/images/screen-fullscreen-mode.png)
 
 ## Required
+* Ubuntu Condensed font: It comes close enough to LCARS letters and is used by lcarswm for writing.
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
 * header files and libraries for XLib, randr and xpm. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
 
