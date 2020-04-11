@@ -1,5 +1,6 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.drawing
 
+import de.atennert.lcarswm.UIDrawing
 import de.atennert.lcarswm.system.FunctionCall
 
 class UIDrawingMock : UIDrawing {

@@ -154,7 +154,7 @@ class SystemFacade : SystemApi {
 
     override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
         return XCreateSimpleWindow(display, parentWindow, measurements[0], measurements[1],
-            measurements[2].convert(), measurements[4].convert(), 0.convert(), 0.convert(), 0.convert())
+            measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
     }
 
     override fun getSelectionOwner(atom: Atom): Window {

@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.UIDrawingMock
+import de.atennert.lcarswm.drawing.UIDrawingMock
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.windowactions.WindowRegistrationMock
 import kotlinx.cinterop.alloc
@@ -20,7 +20,9 @@ import kotlin.test.assertTrue
 class UnmapNotifyHandlerTest {
     @Test
     fun `return correct message type`() {
-        val unmapNotifyHandler = UnmapNotifyHandler(LoggerMock(), WindowRegistrationMock(), UIDrawingMock())
+        val unmapNotifyHandler = UnmapNotifyHandler(LoggerMock(), WindowRegistrationMock(),
+            UIDrawingMock()
+        )
 
         assertEquals(UnmapNotify, unmapNotifyHandler.xEventType, "UnmapNotifyHandler should have type UnmapNotify")
     }

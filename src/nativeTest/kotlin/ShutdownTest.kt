@@ -258,9 +258,9 @@ class ShutdownTest {
 
         checkThatTheLoggerIsClosed(logger)
         checkFinalizingSync(functionCalls)
+        checkFreeingOfGraphicsContexts(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
-        checkFreeingOfGraphicsContexts(functionCalls)
         checkSelectInputSetting(functionCalls, NoEventMask)
         checkWindowPropertyRemoval(functionCalls, testFacade.atomMap, "_NET_SUPPORTED")
         checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
@@ -322,9 +322,9 @@ class ShutdownTest {
 
         checkThatTheLoggerIsClosed(logger)
         checkFinalizingSync(functionCalls)
+        checkFreeingOfGraphicsContexts(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
-        checkFreeingOfGraphicsContexts(functionCalls)
         checkSelectInputSetting(functionCalls, NoEventMask)
         checkWindowPropertyRemoval(functionCalls, testFacade.atomMap, "_NET_SUPPORTED")
         checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
