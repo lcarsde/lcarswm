@@ -2,6 +2,7 @@ package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.ScreenMode
+import de.atennert.lcarswm.drawing.FrameDrawerMock
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.FunctionCall
@@ -21,10 +22,10 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `add windows to a monitor`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(), 0)
+        val window = FramedWindow(systemApi.getNewWindowId(), "", 0)
         val monitorManager = MonitorManagerMock()
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
 
         val measurements = activeWindowCoordinator.addWindowToMonitor(window)
 
@@ -42,10 +43,10 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `remove window from coordinator`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(), 0)
+        val window = FramedWindow(systemApi.getNewWindowId(), "", 0)
         val monitorManager = MonitorManagerMock()
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
 
         activeWindowCoordinator.addWindowToMonitor(window)
 
@@ -57,10 +58,10 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `get measurements for window`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(), 0)
+        val window = FramedWindow(systemApi.getNewWindowId(), "", 0)
         val monitorManager = MonitorManagerMock()
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
         activeWindowCoordinator.addWindowToMonitor(window)
 
         val measurements = activeWindowCoordinator.getWindowMeasurements(window.id)
@@ -72,7 +73,7 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `rearrange registered window`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(), 0)
+        val window = FramedWindow(systemApi.getNewWindowId(), "", 0)
         window.frame = systemApi.getNewWindowId()
         lateinit var monitor: Monitor
         val monitorManager = object : MonitorManagerMock() {
@@ -80,7 +81,7 @@ class ActiveWindowCoordinatorTest {
         }
         monitor = Monitor(monitorManager, 21.convert(), "", true)
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
         activeWindowCoordinator.addWindowToMonitor(window)
 
         monitor = Monitor(monitorManager, 42.convert(), "", true)
@@ -96,11 +97,11 @@ class ActiveWindowCoordinatorTest {
     @Test
     private fun `restack a window to the top`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(), 0)
+        val window = FramedWindow(systemApi.getNewWindowId(), "", 0)
         window.frame = systemApi.getNewWindowId()
         val monitorManager = MonitorManagerMock()
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
         activeWindowCoordinator.addWindowToMonitor(window)
 
         activeWindowCoordinator.stackWindowToTheTop(window.id)
@@ -115,7 +116,7 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `move window to next monitor`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(), 0)
+        val window = FramedWindow(systemApi.getNewWindowId(), "", 0)
         window.frame = systemApi.getNewWindowId()
         lateinit var secondaryMonitor: Monitor
         lateinit var tertiaryMonitor: Monitor
@@ -127,7 +128,7 @@ class ActiveWindowCoordinatorTest {
         secondaryMonitor = Monitor(monitorManager, 3.convert(), "", false)
         tertiaryMonitor = Monitor(monitorManager, 4.convert(), "", false)
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
         activeWindowCoordinator.addWindowToMonitor(window)
 
         val systemCalls = systemApi.functionCalls
@@ -148,7 +149,7 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `move window to previous monitor`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(), 0)
+        val window = FramedWindow(systemApi.getNewWindowId(), "", 0)
         window.frame = systemApi.getNewWindowId()
         lateinit var secondaryMonitor: Monitor
         lateinit var tertiaryMonitor: Monitor
@@ -160,7 +161,7 @@ class ActiveWindowCoordinatorTest {
         secondaryMonitor = Monitor(monitorManager, 3.convert(), "", false)
         tertiaryMonitor = Monitor(monitorManager, 4.convert(), "", false)
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
         activeWindowCoordinator.addWindowToMonitor(window)
 
         val systemCalls = systemApi.functionCalls
@@ -181,7 +182,7 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `test realign windows`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(), 0)
+        val window = FramedWindow(systemApi.getNewWindowId(), "", 0)
         window.frame = systemApi.getNewWindowId()
         lateinit var monitor: Monitor
         val monitorManager = object : MonitorManagerMock() {
@@ -189,7 +190,7 @@ class ActiveWindowCoordinatorTest {
         }
         monitor = Monitor(monitorManager, 21.convert(), "", true)
 
-        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager)
+        val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
         activeWindowCoordinator.addWindowToMonitor(window)
 
         monitorManager.screenMode = ScreenMode.MAXIMIZED

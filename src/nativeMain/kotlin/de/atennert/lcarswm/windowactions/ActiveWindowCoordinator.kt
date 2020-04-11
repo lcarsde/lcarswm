@@ -2,6 +2,7 @@ package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.adjustWindowPositionAndSize
+import de.atennert.lcarswm.drawing.IFrameDrawer
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.EventApi
@@ -9,15 +10,16 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
-import xlib.Above
-import xlib.CWStackMode
-import xlib.Window
-import xlib.XWindowChanges
+import xlib.*
 
 /**
  *
  */
-class ActiveWindowCoordinator(private val eventApi: EventApi, private val monitorManager: MonitorManager) :
+class ActiveWindowCoordinator(
+    private val eventApi: EventApi,
+    private val monitorManager: MonitorManager,
+    private val frameDrawer: IFrameDrawer
+) :
     WindowCoordinator {
     private val windowsOnMonitors = mutableMapOf<FramedWindow, Monitor>()
 
@@ -29,6 +31,7 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
             .map { (window, _) -> Pair(window, primaryMonitor) }
             .onEach { (window, monitor) ->
                 adjustWindowPositionAndSize(eventApi, monitor.getWindowMeasurements(), window)
+                frameDrawer.drawFrame(window, monitor)
             }
         windowsOnMonitors.putAll(updatedWindows)
     }
@@ -51,6 +54,7 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
         val nextMonitor = monitors[nextMonitorIndex]
         windowsOnMonitors[window] = nextMonitor
         adjustWindowPositionAndSize(eventApi, nextMonitor.getWindowMeasurements(), window)
+        frameDrawer.drawFrame(window, nextMonitor)
     }
 
     override fun moveWindowToPreviousMonitor(windowId: Window) {
@@ -62,6 +66,7 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
         val nextMonitor = monitors[nextMonitorIndex]
         windowsOnMonitors[window] = nextMonitor
         adjustWindowPositionAndSize(eventApi, nextMonitor.getWindowMeasurements(), window)
+        frameDrawer.drawFrame(window, nextMonitor)
     }
 
     override fun getMonitorForWindow(windowId: Window): Monitor {
@@ -86,6 +91,7 @@ class ActiveWindowCoordinator(private val eventApi: EventApi, private val monito
             adjustWindowPositionAndSize(
                 eventApi, monitor.getWindowMeasurements(), window
             )
+            frameDrawer.drawFrame(window, monitor)
         }
     }
 }
