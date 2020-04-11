@@ -13,6 +13,14 @@ fun adjustWindowPositionAndSize(
     framedWindow: FramedWindow
 ) {
     eventApi.moveResizeWindow(
+        framedWindow.titleBar,
+        0,
+        windowMeasurements[4] - 41,
+        windowMeasurements[2].convert(),
+        41.convert()
+    )
+
+    eventApi.moveResizeWindow(
         framedWindow.frame,
         windowMeasurements[0],
         windowMeasurements[1],
