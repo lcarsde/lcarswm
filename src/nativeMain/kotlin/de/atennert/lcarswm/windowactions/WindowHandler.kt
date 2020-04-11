@@ -6,6 +6,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms.*
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
+import de.atennert.lcarswm.drawing.IFrameDrawer
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -20,7 +21,8 @@ class WindowHandler(
     private val windowCoordinator: WindowCoordinator,
     private val focusHandler: WindowFocusHandler,
     private val atomLibrary: AtomLibrary,
-    private val rootWindow: Window
+    private val screen: Screen,
+    private val frameDrawer: IFrameDrawer
 ) : WindowRegistration {
 
     private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or
@@ -38,6 +40,7 @@ class WindowHandler(
     private val registeredWindows = mutableMapOf<Window, FramedWindow>()
 
     override fun addWindow(windowId: Window, isSetup: Boolean) {
+        system.grabServer()
         val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
         system.getWindowAttributes(windowId, windowAttributes.ptr)
 
@@ -53,18 +56,24 @@ class WindowHandler(
             return
         }
 
-        val window = FramedWindow(windowId, windowAttributes.border_width)
-
-        val measurements = windowCoordinator.addWindowToMonitor(window)
-
         val attributeSet = nativeHeap.alloc<XSetWindowAttributes>()
         attributeSet.event_mask = clientEventMask
         attributeSet.do_not_propagate_mask = clientNoPropagateMask
         system.changeWindowAttributes(windowId, (CWEventMask or CWDontPropagate).convert(), attributeSet.ptr)
 
-        window.name = getWindowName(windowId)
+        val windowName = getWindowName(windowId)
 
-        window.frame = system.createSimpleWindow(rootWindow, measurements)
+        val window = FramedWindow(windowId, windowName, windowAttributes.border_width)
+
+        val measurements = windowCoordinator.addWindowToMonitor(window)
+
+        window.frame = system.createSimpleWindow(screen.root,
+            listOf(measurements[0], measurements[1], measurements[2], measurements[4]))
+
+        window.titleBar = system.createSimpleWindow(window.frame,
+            listOf(0, measurements[4] - 41, measurements[2], 41))
+
+        frameDrawer.drawFrame(window, windowCoordinator.getMonitorForWindow(window.id))
 
         logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}")
 
@@ -78,7 +87,11 @@ class WindowHandler(
 
         system.resizeWindow(window.id, measurements[2].convert(), measurements[3].convert())
 
+        system.ungrabServer()
+
         system.mapWindow(window.frame)
+
+        system.mapWindow(window.titleBar)
 
         system.mapWindow(window.id)
 
@@ -107,14 +120,16 @@ class WindowHandler(
         val framedWindow = registeredWindows.remove(windowId)!!
 
         system.selectInput(windowId, NoEventMask)
-        
+
+        system.unmapWindow(framedWindow.titleBar)
         system.unmapWindow(framedWindow.frame)
         system.flush()
 
         system.setWindowBorderWidth(windowId, framedWindow.borderWidth.convert())
 
-        system.reparentWindow(windowId, rootWindow, 0, 0)
+        system.reparentWindow(windowId, screen.root, 0, 0)
         system.removeFromSaveSet(windowId)
+        system.destroyWindow(framedWindow.titleBar)
         system.destroyWindow(framedWindow.frame)
 
         windowCoordinator.removeWindow(framedWindow)
@@ -128,7 +143,7 @@ class WindowHandler(
         if (result != 0 || textProperty.encoding != atomLibrary[UTF_STRING]) {
             result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[WM_NAME])
             if (result == 0) {
-                return "No name"
+                return "UNKNOWN"
             }
         }
 
@@ -138,7 +153,7 @@ class WindowHandler(
                 val readBytes = ULongArray(1).pin()
                 val utfBytes = system.localeToUtf8(localeString, (-1).convert(), readBytes.addressOf(0))
                     ?: system.localeToUtf8(localeString, readBytes.get()[0].convert(), null)
-                    ?: return "No locale name"
+                    ?: return "unknown"
                 ByteArray(readBytes.get()[0].convert()) {utfBytes[it]}.toKString()
             }
             atomLibrary[UTF_STRING] -> {
@@ -156,14 +171,18 @@ class WindowHandler(
                 val readBytes = ULongArray(1).pin()
                 val utfBytes = system.convertLatinToUtf8(latinString, (-1).convert(), readBytes.addressOf(0))
                     ?: system.convertLatinToUtf8(latinString, readBytes.get()[0].convert(), null)
-                    ?: return "No latin name"
+                    ?: return "unknown"
                 ByteArray(readBytes.get()[0].convert()) {utfBytes[it]}.toKString()
             }
             else -> ""
         }
         system.free(textProperty.value)
         nativeHeap.free(textProperty)
-        return name.toUpperCase()
+        return if (name.isEmpty()) {
+            "-"
+        } else {
+            name.toUpperCase()
+        }
     }
 
     private fun getByteArrayListFromCompound(textProperty: XTextProperty): ByteArray {

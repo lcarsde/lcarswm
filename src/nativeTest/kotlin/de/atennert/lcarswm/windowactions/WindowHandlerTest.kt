@@ -3,11 +3,10 @@ package de.atennert.lcarswm.windowactions
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.drawing.FrameDrawerMock
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.pointed
+import kotlinx.cinterop.*
 import xlib.*
 import kotlin.test.*
 
@@ -18,7 +17,6 @@ class WindowHandlerTest {
     @Test
     fun `check window initialization`() {
         val systemApi = SystemFacadeMock()
-        val rootWindowId: Window = systemApi.rootWindowId
         val windowId: Window = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
@@ -33,7 +31,8 @@ class WindowHandlerTest {
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            rootWindowId
+            nativeHeap.alloc(),
+            FrameDrawerMock()
         )
 
         windowRegistration.addWindow(windowId, false)
@@ -49,7 +48,6 @@ class WindowHandlerTest {
                 return 0
             }
         }
-        val rootWindowId: Window = systemApi.rootWindowId
         val windowId: Window = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
@@ -64,7 +62,8 @@ class WindowHandlerTest {
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            rootWindowId
+            nativeHeap.alloc(),
+            FrameDrawerMock()
         )
 
         windowRegistration.addWindow(windowId, true)
@@ -129,7 +128,6 @@ class WindowHandlerTest {
     }
 
     private fun testForNoActionDuringSetup(systemApi: SystemFacadeMock) {
-        val rootWindowId: Window = systemApi.rootWindowId
         val windowId: Window = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
@@ -144,7 +142,8 @@ class WindowHandlerTest {
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            rootWindowId
+            nativeHeap.alloc(),
+            FrameDrawerMock()
         )
 
         windowRegistration.addWindow(windowId, true)
@@ -160,7 +159,6 @@ class WindowHandlerTest {
                 return 0
             }
         }
-        val rootWindowId: Window = systemApi.rootWindowId
         val windowId: Window = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
@@ -175,7 +173,8 @@ class WindowHandlerTest {
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            rootWindowId
+            nativeHeap.alloc(),
+            FrameDrawerMock()
         )
 
         windowRegistration.addWindow(windowId, false)
@@ -193,7 +192,6 @@ class WindowHandlerTest {
     fun `provide info about whether we know a certain window`() {
         val systemApi = SystemFacadeMock()
 
-        val rootWindowId = systemApi.rootWindowId
         val windowId = systemApi.getNewWindowId()
 
         val windowCoordinator = WindowCoordinatorMock()
@@ -206,7 +204,8 @@ class WindowHandlerTest {
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            rootWindowId
+            nativeHeap.alloc(),
+            FrameDrawerMock()
         )
 
         assertFalse(windowRegistration.isWindowManaged(windowId), "An unknown window should not be reported managed")
@@ -233,7 +232,8 @@ class WindowHandlerTest {
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            rootWindowId
+            nativeHeap.alloc(),
+            FrameDrawerMock()
         )
         windowRegistration.addWindow(windowId, false)
 
@@ -298,7 +298,8 @@ class WindowHandlerTest {
             windowCoordinator,
             focusHandler,
             atomLibrary,
-            rootWindowId
+            nativeHeap.alloc(),
+            FrameDrawerMock()
         )
         windowRegistration.addWindow(windowId, false)
 
