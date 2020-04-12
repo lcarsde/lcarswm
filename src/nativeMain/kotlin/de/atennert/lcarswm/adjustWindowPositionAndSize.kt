@@ -15,9 +15,9 @@ fun adjustWindowPositionAndSize(
     eventApi.moveResizeWindow(
         framedWindow.titleBar,
         0,
-        windowMeasurements[4] - 41,
+        windowMeasurements[4] - BAR_HEIGHT_WITH_OFFSET,
         windowMeasurements[2].convert(),
-        41.convert()
+        BAR_HEIGHT_WITH_OFFSET.convert()
     )
 
     eventApi.moveResizeWindow(

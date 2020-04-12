@@ -21,3 +21,11 @@ val LCARS_WM_KEY_SYMS = listOf(
     XK_Q, // quit
     XK_F4 // close window
 )
+
+// layout values
+
+const val BAR_HEIGHT = 40
+const val TITLE_BAR_OFFSET = 1
+const val BAR_HEIGHT_WITH_OFFSET = BAR_HEIGHT + TITLE_BAR_OFFSET // accommodate the font layout with a required extra pixel
+
+const val WINDOW_TITLE_FONT_SIZE = BAR_HEIGHT

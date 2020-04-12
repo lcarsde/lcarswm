@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.drawing
 
-import de.atennert.lcarswm.FramedWindow
-import de.atennert.lcarswm.X_TRUE
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.api.DrawApi
 import de.atennert.lcarswm.system.api.FontApi
@@ -68,7 +67,7 @@ class FrameDrawer(
         fontApi.setFontDescriptionFamily(font, "Ubuntu Condensed")
         fontApi.setFontDescriptionWeight(font, PANGO_WEIGHT_BOLD)
         fontApi.setFontDescriptionStyle(font, PangoStyle.PANGO_STYLE_NORMAL)
-        fontApi.setFontDescriptionSize(font, 40 * PANGO_SCALE)
+        fontApi.setFontDescriptionSize(font, WINDOW_TITLE_FONT_SIZE * PANGO_SCALE)
 
         pango_layout_set_font_description(layout, font)
         pango_layout_set_wrap(layout, PangoWrapMode.PANGO_WRAP_WORD_CHAR)
@@ -84,7 +83,7 @@ class FrameDrawer(
     override fun drawFrame(window: FramedWindow, monitor: Monitor) {
         val screenMeasurements = monitor.getWindowMeasurements()
         val textW = monitor.width - 390 // a little wider the normal layout lower corner
-        val textH = 41 // we need one more pixel to accommodate the font
+        val textH = BAR_HEIGHT_WITH_OFFSET
         val rect = nativeHeap.alloc<PangoRectangle>()
 
         val textY = (((textH * PANGO_SCALE)
@@ -100,8 +99,8 @@ class FrameDrawer(
         pango_layout_set_single_paragraph_mode(layout, X_TRUE)
 
         pango_layout_get_pixel_extents(layout, null, rect.ptr)
-
         val textX = screenMeasurements[2] - rect.width
+
         XftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  screenMeasurements[2].convert(), textH.convert())
 
         val line = pango_layout_get_line_readonly(layout, 0)
@@ -110,11 +109,11 @@ class FrameDrawer(
         if (monitor.isPrimary) {
             val primBarWidth = 104
             val secBarWidth = textX - primBarWidth - 14 // 8 + 8 - 1 because of first letter offset
-            XftDrawRect(xftDraw, primaryBarColor.ptr, 0, 1,  primBarWidth.convert(), 40.convert())
-            XftDrawRect(xftDraw, secondaryBarColor.ptr, primBarWidth + 8, 1,  secBarWidth.convert(), 40.convert())
+            XftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  primBarWidth.convert(), BAR_HEIGHT.convert())
+            XftDrawRect(xftDraw, secondaryBarColor.ptr, primBarWidth + 8, TITLE_BAR_OFFSET,  secBarWidth.convert(), BAR_HEIGHT.convert())
         } else {
             val barWidth = textX - 7 // 8 - 1 because of first letter offset
-            XftDrawRect(xftDraw, primaryBarColor.ptr, 0, 1,  barWidth.convert(), 40.convert())
+            XftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  barWidth.convert(), BAR_HEIGHT.convert())
         }
 
         XSetWindowBackgroundPixmap(screen.display, window.titleBar, pixmap)

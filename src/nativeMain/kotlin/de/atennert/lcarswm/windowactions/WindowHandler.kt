@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.BAR_HEIGHT_WITH_OFFSET
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.atom.AtomLibrary
@@ -72,7 +73,7 @@ class WindowHandler(
             listOf(measurements[0], measurements[1], measurements[2], measurements[4]))
 
         window.titleBar = system.createSimpleWindow(window.frame,
-            listOf(0, measurements[4] - 41, measurements[2], 41))
+            listOf(0, measurements[4] - BAR_HEIGHT_WITH_OFFSET, measurements[2], BAR_HEIGHT_WITH_OFFSET))
 
         frameDrawer.drawFrame(window, windowCoordinator.getMonitorForWindow(window.id))
 
