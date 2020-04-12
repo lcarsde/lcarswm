@@ -83,8 +83,8 @@ class FrameDrawer(
 
     override fun drawFrame(window: FramedWindow, monitor: Monitor) {
         val screenMeasurements = monitor.getWindowMeasurements()
-        val textW = monitor.width - 390
-        val textH = 41
+        val textW = monitor.width - 390 // a little wider the normal layout lower corner
+        val textH = 41 // we need one more pixel to accommodate the font
         val rect = nativeHeap.alloc<PangoRectangle>()
 
         val textY = (((textH * PANGO_SCALE)
@@ -109,22 +109,28 @@ class FrameDrawer(
 
         if (monitor.isPrimary) {
             val primBarWidth = 104
-            val secBarWidth = textX - primBarWidth - 16
+            val secBarWidth = textX - primBarWidth - 14 // 8 + 8 - 1 because of first letter offset
             XftDrawRect(xftDraw, primaryBarColor.ptr, 0, 1,  primBarWidth.convert(), 40.convert())
             XftDrawRect(xftDraw, secondaryBarColor.ptr, primBarWidth + 8, 1,  secBarWidth.convert(), 40.convert())
         } else {
-            val barWidth = textX - 8
+            val barWidth = textX - 7 // 8 - 1 because of first letter offset
             XftDrawRect(xftDraw, primaryBarColor.ptr, 0, 1,  barWidth.convert(), 40.convert())
         }
 
         XSetWindowBackgroundPixmap(screen.display, window.titleBar, pixmap)
         XClearWindow(screen.display, window.titleBar)
         XFreePixmap(screen.display, pixmap)
+        nativeHeap.free(rect.rawPtr)
     }
 
     fun close() {
         layout?.let { nativeHeap.free(it.rawValue) }
         pango_font_description_free(font)
         pango?.let { nativeHeap.free(it.rawValue) }
+
+        nativeHeap.free(textColor.rawPtr)
+        nativeHeap.free(primaryBarColor.rawPtr)
+        nativeHeap.free(secondaryBarColor.rawPtr)
+        nativeHeap.free(backgroundColor.rawPtr)
     }
 }
