@@ -16,6 +16,7 @@ Thank you very much to the creators of the following resources:
 * [libXpm API](https://fossies.org/dox/libXpm-4.7/files.html)
 
 ## Functionality
+* Window title bar, with window name and different colors for active and inactive windows
 * Windows-key + Q closes the window manager
 * Windows-key + Tab toggles through the windows
 * Windows-key + Up/Down moves the active window to other monitors
@@ -52,9 +53,13 @@ Fullscreen mode
 ![lcarswm in normal mode](doc/images/screen-fullscreen-mode.png)
 
 ## Required
-* Ubuntu Condensed font: It comes close enough to LCARS letters and is used by lcarswm for writing.
+### For compiling
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
-* header files and libraries for XLib, randr and xpm. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
+* header files and development libraries for XLib, randr, xpm, glib and pango. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
+
+### For using
+* Ubuntu Condensed font: It comes close enough to LCARS letters and is used by lcarswm for writing.
+* Libraries for XLib, randr, xpm, glib and pango. Check the travis yaml for details via the corresponding dev libs.
 
 ## Known issues
 * The frame window is drawing over the background and not scaling with popups
@@ -62,41 +67,12 @@ Fullscreen mode
 * UI doesn't load until some action is done (i.e. clicking)
 
 ## To Do
-### ICCCM
-* Client properties (stuff to use)
-  * WM_ICON_NAME ?
-  * WM_NORMAL_HINTS
-  * WM_HINTS
-  * WM_CLASS ?
-  * WM_TRANSIENT_FOR
-  * WM_PROTOCOLS
-    * WM_TAKE_FOCUS
-    * ...
-  * WM_COLORMAP_WINDOWS
-* Window manager properties (stuff to set)
-  * WM_ICON_SIZE ?
-* State transitions
-  * Thinks about handling iconic states (ClientMessage)
-* Configuration of clients
-  * Fix the handling of ConfigureRequests according to defined window manager responses
-* Input handling
-  * adjust handling according to WM_HINTS.inputField and WM_TAKE_FOCUS
-* Handle ColormapChanges ?
-* Icon handling ?
-* Popup handling
-  * window groups (WM_HINTS)
-  * WM_TRANSIENT_FOR
-  * override redirect
-
-### EWMH
-TODO
-
-### Other
 * Associate child screens with their parents
 * Activate windows my clicking on them
 * Center popups and adjust the frame to their size
-* Application selector
+* Application menu
 * Content for the data bar (empty upper area in normal mode)
+  * Configurable plugin framework
   * Time
   * Master volume
   * Heat signature
