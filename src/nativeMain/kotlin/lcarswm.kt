@@ -3,6 +3,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.drawing.Colors
 import de.atennert.lcarswm.drawing.FrameDrawer
 import de.atennert.lcarswm.drawing.RootWindowDrawer
+import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger

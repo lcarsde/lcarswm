@@ -1,4 +1,4 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.drawing
 
 
 /**

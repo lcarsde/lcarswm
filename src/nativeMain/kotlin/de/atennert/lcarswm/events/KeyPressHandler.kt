@@ -2,7 +2,7 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.KeyManager
 import de.atennert.lcarswm.Modifiers
-import de.atennert.lcarswm.UIDrawing
+import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.windowactions.WindowCoordinator
