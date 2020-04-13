@@ -48,9 +48,9 @@ class FrameDrawer(
 
         inactiveTextColor.color.red = 0xcccc.convert()
         inactiveTextColor.color.green = 0x6666.convert()
-        inactiveTextColor.color.blue = 0x9999.convert()
+        inactiveTextColor.color.blue = 0x6666.convert()
         inactiveTextColor.color.alpha = 0xffff.convert()
-        inactiveTextColor.pixel = colors.colorMap.second[8]
+        inactiveTextColor.pixel = colors.colorMap.second[4]
 
         primaryBarColor.color.red = 0xcccc.convert()
         primaryBarColor.color.green = 0x9999.convert()

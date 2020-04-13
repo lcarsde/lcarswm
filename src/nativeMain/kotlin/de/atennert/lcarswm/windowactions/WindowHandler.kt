@@ -75,8 +75,6 @@ class WindowHandler(
         window.titleBar = system.createSimpleWindow(window.frame,
             listOf(0, measurements[4] - BAR_HEIGHT_WITH_OFFSET, measurements[2], BAR_HEIGHT_WITH_OFFSET))
 
-        frameDrawer.drawFrame(window, windowCoordinator.getMonitorForWindow(window.id))
-
         logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}")
 
         system.selectInput(window.frame, frameEventMask)

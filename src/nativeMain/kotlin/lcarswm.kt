@@ -133,7 +133,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val focusHandler = WindowFocusHandler()
 
-        focusHandler.registerObserver { activeWindow ->
+        focusHandler.registerObserver { activeWindow, _ ->
             if (activeWindow != null) {
                 system.setInputFocus(activeWindow, RevertToParent, eventTime.lastEventTime)
             } else {
@@ -148,6 +148,14 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         val screenChangeHandler = setupRandr(system, randrHandlerFactory, monitorManager, windowCoordinator, uiDrawer, screen.root)
 
         val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, screen, frameDrawer)
+
+        focusHandler.registerObserver { activeWindow, oldWindow ->
+            listOf(oldWindow, activeWindow).forEach {
+                it?.let { ow -> windowRegistration[ow]?.let { fw ->
+                    frameDrawer.drawFrame(fw, windowCoordinator.getMonitorForWindow(ow))
+                } }
+            }
+        }
 
         val eventManager = createEventManager(
             system,
