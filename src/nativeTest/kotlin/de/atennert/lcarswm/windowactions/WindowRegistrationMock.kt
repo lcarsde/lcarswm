@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.system.FunctionCall
 import xlib.Window
 
@@ -16,6 +17,8 @@ open class WindowRegistrationMock : WindowRegistration {
     }
 
     override fun isWindowManaged(windowId: Window): Boolean = managedWindowIds.contains(windowId)
+
+    override fun get(windowId: Window): FramedWindow? = null
 
     override fun removeWindow(windowId: Window) {
         functionCalls.add(FunctionCall("removeWindow", windowId))
