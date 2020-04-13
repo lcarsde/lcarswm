@@ -123,7 +123,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val colorHandler = Colors(system, screen)
         val uiDrawer = RootWindowDrawer(system, monitorManager, screen, colorHandler)
-        val frameDrawer = FrameDrawer(system, system, colorHandler, system.defaultScreenNumber(), screen)
 
         keyManager.ungrabAllKeys(screen.root)
         keyManager.grabInternalKeys(screen.root)
@@ -141,6 +140,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
                 system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
             }
         }
+
+        val frameDrawer = FrameDrawer(system, system, focusHandler, colorHandler, system.defaultScreenNumber(), screen)
 
         val windowCoordinator = ActiveWindowCoordinator(system, monitorManager, frameDrawer)
 

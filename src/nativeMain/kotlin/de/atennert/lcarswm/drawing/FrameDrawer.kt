@@ -4,6 +4,7 @@ import de.atennert.lcarswm.*
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.api.DrawApi
 import de.atennert.lcarswm.system.api.FontApi
+import de.atennert.lcarswm.windowactions.WindowFocusHandler
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
@@ -13,6 +14,7 @@ import xlib.*
 class FrameDrawer(
     private val fontApi: FontApi,
     private val drawApi: DrawApi,
+    private val focusHandler: WindowFocusHandler,
     colors: Colors,
     screenId: Int,
     private val screen: Screen
@@ -24,7 +26,8 @@ class FrameDrawer(
     private var ascent: Int
     private var descent: Int
 
-    private val textColor = nativeHeap.alloc<XftColor>()
+    private val activeTextColor = nativeHeap.alloc<XftColor>()
+    private val inactiveTextColor = nativeHeap.alloc<XftColor>()
     private val primaryBarColor = nativeHeap.alloc<XftColor>()
     private val secondaryBarColor = nativeHeap.alloc<XftColor>()
     private val backgroundColor = nativeHeap.alloc<XftColor>()
@@ -37,11 +40,17 @@ class FrameDrawer(
 
         colorMap = colors.colorMap.first
 
-        textColor.color.red = 0xffff.convert()
-        textColor.color.green = 0x9999.convert()
-        textColor.color.blue = 0x0000.convert()
-        textColor.color.alpha = 0xffff.convert()
-        textColor.pixel = colors.colorMap.second[1]
+        activeTextColor.color.red = 0xffff.convert()
+        activeTextColor.color.green = 0x9999.convert()
+        activeTextColor.color.blue = 0x0000.convert()
+        activeTextColor.color.alpha = 0xffff.convert()
+        activeTextColor.pixel = colors.colorMap.second[1]
+
+        inactiveTextColor.color.red = 0xcccc.convert()
+        inactiveTextColor.color.green = 0x6666.convert()
+        inactiveTextColor.color.blue = 0x9999.convert()
+        inactiveTextColor.color.alpha = 0xffff.convert()
+        inactiveTextColor.pixel = colors.colorMap.second[8]
 
         primaryBarColor.color.red = 0xcccc.convert()
         primaryBarColor.color.green = 0x9999.convert()
@@ -93,6 +102,12 @@ class FrameDrawer(
         val pixmap = drawApi.createPixmap(screen.root, screenMeasurements[2].convert(), textH.convert(), screen.root_depth.convert())
         val xftDraw = drawApi.xftDrawCreate(pixmap, screen.root_visual!!, colorMap)
 
+        val textColor = if (focusHandler.getFocusedWindow() == window.id) {
+            activeTextColor
+        } else {
+            inactiveTextColor
+        }
+
         pango_layout_set_text(layout, window.name, window.name.length)
         pango_layout_set_width(layout, textW * PANGO_SCALE)
         pango_layout_set_ellipsize(layout, PangoEllipsizeMode.PANGO_ELLIPSIZE_END)
@@ -127,7 +142,8 @@ class FrameDrawer(
         pango_font_description_free(font)
         pango?.let { nativeHeap.free(it.rawValue) }
 
-        nativeHeap.free(textColor.rawPtr)
+        nativeHeap.free(activeTextColor.rawPtr)
+        nativeHeap.free(inactiveTextColor.rawPtr)
         nativeHeap.free(primaryBarColor.rawPtr)
         nativeHeap.free(secondaryBarColor.rawPtr)
         nativeHeap.free(backgroundColor.rawPtr)
