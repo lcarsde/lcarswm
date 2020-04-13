@@ -2,25 +2,28 @@ package de.atennert.lcarswm.windowactions
 
 import xlib.Window
 
+typealias FocusObserver = (Window?, Window?) -> Unit
+
 class WindowFocusHandler {
     private var activeWindow: Window? = null
 
     private val windowIdList = mutableSetOf<Window>()
 
-    private val observers = mutableListOf<(Window?) -> Unit>()
+    private val observers = mutableListOf<FocusObserver>()
 
     fun getFocusedWindow(): Window? {
         return activeWindow
     }
 
-    fun registerObserver(observer: (Window?) -> Unit) {
+    fun registerObserver(observer: FocusObserver) {
         this.observers.add(observer)
-        observer(activeWindow)
+        observer(activeWindow, null)
     }
 
     fun setFocusedWindow(activeWindow: Window) {
+        val oldActiveWindow = this.activeWindow
         this.activeWindow = activeWindow
-        this.observers.forEach { it(activeWindow) }
+        this.observers.forEach { it(activeWindow, oldActiveWindow) }
         if (!windowIdList.contains(activeWindow)) {
             windowIdList.add(activeWindow)
         }
@@ -33,7 +36,7 @@ class WindowFocusHandler {
         } else {
             windowIdList.first()
         }
-        this.observers.forEach { it(this.activeWindow) }
+        this.observers.forEach { it(this.activeWindow, window) }
     }
 
     fun toggleWindowFocus() {

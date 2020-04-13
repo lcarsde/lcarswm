@@ -14,23 +14,31 @@ class WindowFocusHandlerTest {
         assertNull(windowFocusHandler.getFocusedWindow(), "There is no focused window")
 
         var activeWindow: Window? = 42.convert()
-        windowFocusHandler.registerObserver {activeWindow = it}
+        var oldWindow: Window? = 64.convert()
+        windowFocusHandler.registerObserver { n, o -> activeWindow = n; oldWindow = o}
         assertNull(activeWindow, "The observer should get null window")
+        assertNull(oldWindow, "The observer should get no old window")
     }
 
     @Test
     fun `update focused window`() {
         val windowFocusHandler = WindowFocusHandler()
-        val testWindow = 21.convert<Window>()
-        var activeWindow: Window? = 42.convert()
+        val testWindow1 = 21.convert<Window>()
+        val testWindow2 = 22.convert<Window>()
+        var newWindow: Window? = 42.convert()
+        var oldWindow: Window? = 64.convert()
 
-        windowFocusHandler.registerObserver {activeWindow = it}
+        windowFocusHandler.registerObserver { n, o -> newWindow = n; oldWindow = o}
 
-        windowFocusHandler.setFocusedWindow(testWindow)
+        windowFocusHandler.setFocusedWindow(testWindow1)
+        assertEquals(testWindow1, windowFocusHandler.getFocusedWindow(), "The focused window should be updated (1)")
+        assertEquals(testWindow1, newWindow, "The observer should get the updated window (1)")
+        assertNull(oldWindow, "The observer should get the old window (1)")
 
-        assertEquals(testWindow, windowFocusHandler.getFocusedWindow(), "The focused window should be updated")
-
-        assertEquals(testWindow, activeWindow, "The observer should get the updated window")
+        windowFocusHandler.setFocusedWindow(testWindow2)
+        assertEquals(testWindow2, windowFocusHandler.getFocusedWindow(), "The focused window should be updated (2)")
+        assertEquals(testWindow2, newWindow, "The observer should get the updated window (2)")
+        assertEquals(testWindow1, oldWindow, "The observer should get the old window (2)")
     }
 
     @Test
