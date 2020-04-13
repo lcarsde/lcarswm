@@ -39,7 +39,7 @@ class WindowHandlerTest {
 
         windowRegistration.addWindow(windowId, false)
 
-        checkWindowAddProcedure(systemApi, windowId, windowCoordinator, focusHandler)
+        checkWindowAddProcedure(systemApi, windowId, windowCoordinator, focusHandler, windowRegistration)
 
         nativeHeap.free(screen)
     }
@@ -74,7 +74,7 @@ class WindowHandlerTest {
 
         windowRegistration.addWindow(windowId, true)
 
-        checkWindowAddProcedure(systemApi, windowId, windowCoordinator, focusHandler)
+        checkWindowAddProcedure(systemApi, windowId, windowCoordinator, focusHandler, windowRegistration)
 
         nativeHeap.free(screen)
     }
@@ -83,7 +83,8 @@ class WindowHandlerTest {
         systemApi: SystemFacadeMock,
         windowId: Window,
         windowCoordinator: WindowCoordinatorMock,
-        focusHandler: WindowFocusHandler
+        focusHandler: WindowFocusHandler,
+        windowRegistration: WindowRegistration
     ) {
         val addWindowToMonitorCall = windowCoordinator.functionCalls.removeAt(0)
         assertEquals("addWindowToMonitor", addWindowToMonitorCall.name, "Add window to a monitor")
@@ -115,6 +116,8 @@ class WindowHandlerTest {
         )
 
         assertEquals(windowId, focusHandler.getFocusedWindow(), "The new window needs to be focused")
+
+        assertEquals(windowId, windowRegistration[windowId]?.id, "The window registration should provide the corresponding framed window")
     }
 
     @Test

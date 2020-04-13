@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.windowactions
 
+import de.atennert.lcarswm.FramedWindow
 import xlib.Window
 
 /**
@@ -17,6 +18,8 @@ interface WindowRegistration {
      * @return true, if the window with the given window ID is managed by the window manager, false otherwise
      */
     fun isWindowManaged(windowId: Window): Boolean
+
+    operator fun get(windowId: Window): FramedWindow?
 
     /**
      * Unregister a window from the window manager.

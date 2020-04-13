@@ -108,6 +108,8 @@ class WindowHandler(
 
     override fun isWindowManaged(windowId: Window): Boolean = registeredWindows.containsKey(windowId)
 
+    override operator fun get(windowId: Window): FramedWindow? = registeredWindows[windowId]
+
     override fun isWindowParentedBy(windowId: Window, parentId: Window): Boolean {
         val framedWindow = registeredWindows[windowId] ?: return false
         return framedWindow.frame == parentId
