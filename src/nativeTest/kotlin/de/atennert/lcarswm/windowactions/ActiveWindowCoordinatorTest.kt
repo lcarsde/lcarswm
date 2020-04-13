@@ -5,14 +5,12 @@ import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.drawing.FrameDrawerMock
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
-import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import xlib.Above
 import xlib.CWStackMode
-import xlib.StructureNotifyMask
 import xlib.XWindowChanges
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -89,7 +87,7 @@ class ActiveWindowCoordinatorTest {
 
         val systemCalls = systemApi.functionCalls
 
-        checkMoveWindowCalls(systemCalls, window)
+        checkMoveWindow(systemCalls, window)
 
         assertEquals(monitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the new monitor")
     }
@@ -135,15 +133,15 @@ class ActiveWindowCoordinatorTest {
 
         activeWindowCoordinator.moveWindowToNextMonitor(window.id)
         assertEquals(secondaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the first next monitor")
-        checkMoveWindowCalls(systemCalls, window)
+        checkMoveWindow(systemCalls, window)
 
         activeWindowCoordinator.moveWindowToNextMonitor(window.id)
         assertEquals(tertiaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the second next monitor")
-        checkMoveWindowCalls(systemCalls, window)
+        checkMoveWindow(systemCalls, window)
 
         activeWindowCoordinator.moveWindowToNextMonitor(window.id)
         assertEquals(monitorManager.primaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the primary monitor")
-        checkMoveWindowCalls(systemCalls, window)
+        checkMoveWindow(systemCalls, window)
     }
 
     @Test
@@ -168,15 +166,15 @@ class ActiveWindowCoordinatorTest {
 
         activeWindowCoordinator.moveWindowToPreviousMonitor(window.id)
         assertEquals(tertiaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the first previous monitor")
-        checkMoveWindowCalls(systemCalls, window)
+        checkMoveWindow(systemCalls, window)
 
         activeWindowCoordinator.moveWindowToPreviousMonitor(window.id)
         assertEquals(secondaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the second previous monitor")
-        checkMoveWindowCalls(systemCalls, window)
+        checkMoveWindow(systemCalls, window)
 
         activeWindowCoordinator.moveWindowToPreviousMonitor(window.id)
         assertEquals(monitorManager.primaryMonitor, activeWindowCoordinator.getMonitorForWindow(window.id), "The window should be moved to the primary monitor")
-        checkMoveWindowCalls(systemCalls, window)
+        checkMoveWindow(systemCalls, window)
     }
 
     @Test
@@ -197,44 +195,18 @@ class ActiveWindowCoordinatorTest {
         activeWindowCoordinator.realignWindows()
         var measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
         assertEquals(listOf(40, 48, 720, 504, 552), measurments, "")
-        checkMoveWindowCalls(systemApi.functionCalls, window)
+        checkMoveWindow(systemApi.functionCalls, window)
 
         monitorManager.screenMode = ScreenMode.FULLSCREEN
         activeWindowCoordinator.realignWindows()
         measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
         assertEquals(listOf(0, 0, 800, 600, 600), measurments, "")
-        checkMoveWindowCalls(systemApi.functionCalls, window)
+        checkMoveWindow(systemApi.functionCalls, window)
 
         monitorManager.screenMode = ScreenMode.NORMAL
         activeWindowCoordinator.realignWindows()
         measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
         assertEquals(listOf(208, 242, 552, 292, 358), measurments, "")
-        checkMoveWindowCalls(systemApi.functionCalls, window)
-    }
-
-    private fun checkMoveWindowCalls(
-        systemCalls: MutableList<FunctionCall>,
-        window: FramedWindow
-    ) {
-        val moveResizeTitleBarCall = systemCalls.removeAt(0)
-        assertEquals("moveResizeWindow", moveResizeTitleBarCall.name, "The title bar needs to be moved/resized")
-        assertEquals(window.titleBar, moveResizeTitleBarCall.parameters[0], "The _title bar_ needs to be moved/resized")
-
-        val moveResizeFrameCall = systemCalls.removeAt(0)
-        assertEquals("moveResizeWindow", moveResizeFrameCall.name, "The frame needs to be moved/resized")
-        assertEquals(window.frame, moveResizeFrameCall.parameters[0], "The _frame_ needs to be moved/resized")
-
-        val resizeWindowCall = systemCalls.removeAt(0)
-        assertEquals("resizeWindow", resizeWindowCall.name, "The window needs to be resized")
-        assertEquals(window.id, resizeWindowCall.parameters[0], "The _window_ needs to be resized")
-
-        val sendEventCall = systemCalls.removeAt(0)
-        assertEquals("sendEvent", sendEventCall.name, "The window needs to get a structure notify event")
-        assertEquals(window.id, sendEventCall.parameters[0], "The _window_ needs to get a structure notify event")
-        assertEquals(
-            StructureNotifyMask,
-            sendEventCall.parameters[2],
-            "The window needs to get a _structure notify_ event"
-        )
+        checkMoveWindow(systemApi.functionCalls, window)
     }
 }
