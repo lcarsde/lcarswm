@@ -62,7 +62,6 @@ Fullscreen mode
 * Libraries for XLib, randr, xpm, glib and pango. Check the travis yaml for details via the corresponding dev libs.
 
 ## Known issues
-* The frame window is drawing over the background and not scaling with popups
 * If screens lay over one another they are not "merged" but draw over one another
 
 ## To Do
