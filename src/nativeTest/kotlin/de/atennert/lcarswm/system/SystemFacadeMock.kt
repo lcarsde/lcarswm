@@ -152,6 +152,9 @@ open class SystemFacadeMock : SystemApi {
     override fun setWindowBackgroundPixmap(window: Window, pixmap: Pixmap) {
     }
 
+    override fun clearWindow(window: Window) {
+    }
+
     override fun selectInput(window: Window, mask: Long): Int {
         functionCalls.add(FunctionCall("selectInput", window, mask))
         return 0

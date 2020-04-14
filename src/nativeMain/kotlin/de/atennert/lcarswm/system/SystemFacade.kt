@@ -526,6 +526,10 @@ class SystemFacade : SystemApi {
         XSetWindowBackgroundPixmap(display, window, pixmap)
     }
 
+    override fun clearWindow(window: Window) {
+        XClearWindow(display, window)
+    }
+
     override fun xftGetContext(screen: Int): CPointer<PangoContext>? {
         return pango_xft_get_context(display, screen)
     }
