@@ -5,10 +5,7 @@ import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
-import xlib.Screen
-import xlib.XArc
-import xlib.XImage
-import xlib.XRectangle
+import xlib.*
 
 /**
  * Class for drawing the root window decorations.
@@ -16,11 +13,10 @@ import xlib.XRectangle
 class RootWindowDrawer(
     private val drawApi: DrawApi,
     private val monitorManager: MonitorManager,
-    screen: Screen,
+    private val screen: Screen,
     colors: Colors
 ) : UIDrawing {
-    private val rootWindow = screen.root
-   private val graphicsContexts = colors.loadForegroundGraphicContexts(rootWindow, colors.colorMap.second)
+    private val graphicsContexts = colors.loadForegroundGraphicContexts(screen.root, colors.colorMap.second)
 
     private val logoImage: CPointer<XImage>
 
@@ -31,25 +27,30 @@ class RootWindowDrawer(
     }
 
     override fun drawWindowManagerFrame() {
+        val screenSize = monitorManager.getCombinedScreenSize()
+        val pixmap = drawApi.createPixmap(screen.root, screenSize.first.convert(), screenSize.second.convert(), screen.root_depth.convert())
         monitorManager.getMonitors().forEach {
             when (it.getScreenMode()) {
-                ScreenMode.NORMAL -> drawNormalFrame(it)
-                ScreenMode.MAXIMIZED -> drawMaximizedFrame(it)
-                ScreenMode.FULLSCREEN -> clearScreen(it)
+                ScreenMode.NORMAL -> drawNormalFrame(it, pixmap)
+                ScreenMode.MAXIMIZED -> drawMaximizedFrame(it, pixmap)
+                ScreenMode.FULLSCREEN -> clearScreen(it, pixmap)
             }
         }
+        drawApi.setWindowBackgroundPixmap(screen.root, pixmap)
+        drawApi.clearWindow(screen.root)
+        drawApi.freePixmap(pixmap)
     }
 
     fun cleanupGraphicsContexts() {
         graphicsContexts.forEach { drawApi.freeGC(it) }
     }
 
-    private fun drawMaximizedFrame(monitor: Monitor) {
-        clearScreen(monitor)
+    private fun drawMaximizedFrame(monitor: Monitor, pixmap: Pixmap) {
+        clearScreen(monitor, pixmap)
 
         val gcPurple2 = graphicsContexts[6]
         val gcOrchid = graphicsContexts[2]
-        val gcCopyImage = drawApi.createGC(rootWindow, 0.convert(), null)!!
+        val gcCopyImage = drawApi.createGC(screen.root, 0.convert(), null)!!
 
         // TODO create bar ends as pixmaps
         val arcs = nativeHeap.allocArray<XArc>(4)
@@ -105,11 +106,11 @@ class RootWindowDrawer(
         bars[1].width = (monitor.width - 80).convert()
         bars[1].height = 40.convert()
 
-        drawApi.fillArcs(rootWindow, gcPurple2, arcs, 4)
-        drawApi.fillRectangles(rootWindow, gcPurple2, rects, 4)
-        drawApi.fillRectangles(rootWindow, gcOrchid, bars, 2)
+        drawApi.fillArcs(pixmap, gcPurple2, arcs, 4)
+        drawApi.fillRectangles(pixmap, gcPurple2, rects, 4)
+        drawApi.fillRectangles(pixmap, gcOrchid, bars, 2)
 
-        drawApi.putImage(rootWindow, gcCopyImage,
+        drawApi.putImage(pixmap, gcCopyImage,
             logoImage, monitor.x + 40, monitor.y,
             logoImage.pointed.width.convert(), logoImage.pointed.height.convert())
 
@@ -119,15 +120,15 @@ class RootWindowDrawer(
         drawApi.freeGC(gcCopyImage)
     }
 
-    private fun drawNormalFrame(monitor: Monitor) {
-        clearScreen(monitor)
+    private fun drawNormalFrame(monitor: Monitor, pixmap: Pixmap) {
+        clearScreen(monitor, pixmap)
 
         val gcBlack = graphicsContexts[0]
         val gcPurple2 = graphicsContexts[6]
         val gcOrchid = graphicsContexts[2]
         val gcPurple1 = graphicsContexts[3]
         val gcBrick = graphicsContexts[4]
-        val gcCopyImage = drawApi.createGC(rootWindow, 0.convert(), null)!!
+        val gcCopyImage = drawApi.createGC(screen.root, 0.convert(), null)!!
 
         // TODO create bar ends as pixmaps
         val arcs = nativeHeap.allocArray<XArc>(3)
@@ -282,25 +283,25 @@ class RootWindowDrawer(
         cornerInnerArcs[3].y = (monitor.y + monitor.height - 72).convert()
         cornerInnerArcs[3].angle1 = 180.shl(6)
 
-        drawApi.fillArcs(rootWindow, gcPurple2, arcs, 3)
-        drawApi.fillRectangles(rootWindow, gcPurple2, rects, 3)
-        drawApi.fillRectangles(rootWindow, gcPurple2, bigBars, 2)
+        drawApi.fillArcs(pixmap, gcPurple2, arcs, 3)
+        drawApi.fillRectangles(pixmap, gcPurple2, rects, 3)
+        drawApi.fillRectangles(pixmap, gcPurple2, bigBars, 2)
 
         // middle bars
-        drawApi.fillRectangles(rootWindow, gcPurple1, middleBars[0].ptr, 1)
-        drawApi.fillRectangles(rootWindow, gcBrick, middleBars[1].ptr, 1)
-        drawApi.fillRectangles(rootWindow, gcPurple2, middleBars[2].ptr, 1)
-        drawApi.fillRectangles(rootWindow, gcOrchid, middleBars[3].ptr, 1)
+        drawApi.fillRectangles(pixmap, gcPurple1, middleBars[0].ptr, 1)
+        drawApi.fillRectangles(pixmap, gcBrick, middleBars[1].ptr, 1)
+        drawApi.fillRectangles(pixmap, gcPurple2, middleBars[2].ptr, 1)
+        drawApi.fillRectangles(pixmap, gcOrchid, middleBars[3].ptr, 1)
 
         // side bars
-        drawApi.fillRectangles(rootWindow, gcPurple1, sideBars, 2)
+        drawApi.fillRectangles(pixmap, gcPurple1, sideBars, 2)
 
         // corner pieces
-        drawApi.fillArcs(rootWindow, gcOrchid, cornerOuterArcs, 4)
-        drawApi.fillRectangles(rootWindow, gcOrchid, cornerRects, 8)
-        drawApi.fillArcs(rootWindow, gcBlack, cornerInnerArcs, 4)
+        drawApi.fillArcs(pixmap, gcOrchid, cornerOuterArcs, 4)
+        drawApi.fillRectangles(pixmap, gcOrchid, cornerRects, 8)
+        drawApi.fillArcs(pixmap, gcBlack, cornerInnerArcs, 4)
 
-        drawApi.putImage(rootWindow, gcCopyImage,
+        drawApi.putImage(pixmap, gcCopyImage,
             logoImage, monitor.x + monitor.width - 40 - logoImage.pointed.width, monitor.y,
             logoImage.pointed.width.convert(), logoImage.pointed.height.convert())
 
@@ -316,7 +317,7 @@ class RootWindowDrawer(
         drawApi.freeGC(gcCopyImage)
     }
 
-    private fun clearScreen(monitor: Monitor) {
-        drawApi.fillRectangle(rootWindow, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
+    private fun clearScreen(monitor: Monitor, pixmap: Pixmap) {
+        drawApi.fillRectangle(pixmap, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
     }
 }
