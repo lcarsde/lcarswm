@@ -530,6 +530,10 @@ class SystemFacade : SystemApi {
         XClearWindow(display, window)
     }
 
+    override fun freePixmap(pixmap: Pixmap) {
+        XFreePixmap(display, pixmap)
+    }
+
     override fun xftGetContext(screen: Int): CPointer<PangoContext>? {
         return pango_xft_get_context(display, screen)
     }

@@ -39,5 +39,7 @@ interface DrawApi {
 
     fun clearWindow(window: Window)
 
+    fun freePixmap(pixmap: Pixmap)
+
     fun xftDrawCreate(drawable: Drawable, visual: CValuesRef<Visual>, colorMap: Colormap): CPointer<XftDraw>?
 }
