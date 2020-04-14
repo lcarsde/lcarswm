@@ -99,6 +99,8 @@ class EventTimeTest {
 
         eventTime.resetEventTime()
 
+        assertEquals(123.convert(), eventTime.lastEventTime, "The event time should match with the time of the available event")
+
         val changePropertyCall = system.functionCalls.removeAt(0)
         assertEquals("changeProperty", changePropertyCall.name, "Change property needs to be called to trigger getting a time")
         assertEquals(rootWindowPropertyHandler.ewmhSupportWindow, changePropertyCall.parameters[0], "Change the property for the EWMH support window")
@@ -107,8 +109,6 @@ class EventTimeTest {
         assertNull(changePropertyCall.parameters[3], "There should be no data to append")
         assertEquals(8, changePropertyCall.parameters[4], "The format is 8")
         assertEquals(PropModeAppend, changePropertyCall.parameters[5], "The mode should be append")
-
-        assertEquals(123.convert(), eventTime.lastEventTime, "The event time should match with the time of the available event")
 
         assertTrue(system.functionCalls.isEmpty(), "The time should be only requested once")
     }

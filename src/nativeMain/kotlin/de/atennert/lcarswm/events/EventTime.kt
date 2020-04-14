@@ -44,7 +44,7 @@ class EventTime(
      * Reset the known last event time.
      */
     fun resetEventTime() {
-        triggerTimeUpdate()
+        _lastEventTime == CurrentTime.convert<Time>()
     }
 
     fun unsetEventTime() {
