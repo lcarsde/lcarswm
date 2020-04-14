@@ -149,6 +149,9 @@ open class SystemFacadeMock : SystemApi {
         return nativeHeap.allocPointerTo<XftDraw>().value
     }
 
+    override fun setWindowBackgroundPixmap(window: Window, pixmap: Pixmap) {
+    }
+
     override fun selectInput(window: Window, mask: Long): Int {
         functionCalls.add(FunctionCall("selectInput", window, mask))
         return 0

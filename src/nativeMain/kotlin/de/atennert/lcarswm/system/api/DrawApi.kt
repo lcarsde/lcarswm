@@ -35,5 +35,7 @@ interface DrawApi {
 
     fun createPixmap(drawable: Drawable, width: UInt, height: UInt, depth: UInt): Pixmap
 
+    fun setWindowBackgroundPixmap(window: Window, pixmap: Pixmap)
+
     fun xftDrawCreate(drawable: Drawable, visual: CValuesRef<Visual>, colorMap: Colormap): CPointer<XftDraw>?
 }

@@ -522,6 +522,10 @@ class SystemFacade : SystemApi {
         return XftDrawCreate(display, drawable, visual, colorMap)
     }
 
+    override fun setWindowBackgroundPixmap(window: Window, pixmap: Pixmap) {
+        XSetWindowBackgroundPixmap(display, window, pixmap)
+    }
+
     override fun xftGetContext(screen: Int): CPointer<PangoContext>? {
         return pango_xft_get_context(display, screen)
     }
