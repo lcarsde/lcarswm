@@ -41,7 +41,7 @@ Thank you very much to the creators of the following resources:
   ```
 
 ## Pictures
-Yay, it's starting to get usable. So here are some pictures from the VirtualBox test environment.
+Here are some pictures from the VirtualBox test environment.
 
 Normal mode
 ![lcarswm in normal mode](doc/images/screen-normal-mode.png)
