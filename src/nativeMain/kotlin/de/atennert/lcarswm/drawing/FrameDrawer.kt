@@ -121,7 +121,7 @@ class FrameDrawer(
         val line = pango_layout_get_line_readonly(layout, 0)
         pango_xft_render_layout_line(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
 
-        if (monitor.isPrimary) {
+        if (monitor.getScreenMode() == ScreenMode.NORMAL) {
             val primBarWidth = 104
             val secBarWidth = textX - primBarWidth - 14 // 8 + 8 - 1 because of first letter offset
             XftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  primBarWidth.convert(), BAR_HEIGHT.convert())
