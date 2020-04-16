@@ -522,6 +522,10 @@ class SystemFacade : SystemApi {
         return XftDrawCreate(display, drawable, visual, colorMap)
     }
 
+    override fun xftDrawRect(xftDraw: CPointer<XftDraw>, color: CPointer<XftColor>, x: Int, y: Int, width: UInt, height: UInt) {
+        XftDrawRect(xftDraw, color, x, y, width, height)
+    }
+
     override fun setWindowBackgroundPixmap(window: Window, pixmap: Pixmap) {
         XSetWindowBackgroundPixmap(display, window, pixmap)
     }

@@ -149,6 +149,16 @@ open class SystemFacadeMock : SystemApi {
         return nativeHeap.allocPointerTo<XftDraw>().value
     }
 
+    override fun xftDrawRect(
+        xftDraw: CPointer<XftDraw>,
+        color: CPointer<XftColor>,
+        x: Int,
+        y: Int,
+        width: UInt,
+        height: UInt
+    ) {
+    }
+
     override fun setWindowBackgroundPixmap(window: Window, pixmap: Pixmap) {
     }
 
