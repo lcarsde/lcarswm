@@ -43,5 +43,5 @@ interface DrawApi {
 
     fun xftDrawCreate(drawable: Drawable, visual: CValuesRef<Visual>, colorMap: Colormap): CPointer<XftDraw>?
 
-    fun xftDrawRect(xftDraw: CPointer<XftDraw>, color: CPointer<XftColor>, x: Int, y: Int, width: UInt, height: UInt)
+    fun xftDrawRect(xftDraw: CPointer<XftDraw>?, color: CPointer<XftColor>, x: Int, y: Int, width: UInt, height: UInt)
 }

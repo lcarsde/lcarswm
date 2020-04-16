@@ -35,12 +35,12 @@ class FrameDrawer(
             get() = colors.colorMap.first
 
     init {
-        val ascDesc = loadFontGC()
+        val ascDesc = initializeFontObjects()
         ascent = ascDesc.first
         descent = ascDesc.second
     }
 
-    private fun loadFontGC(): Pair<Int, Int> {
+    private fun initializeFontObjects(): Pair<Int, Int> {
         val lang = fontApi.getDefaultLanguage()
         fontApi.setFontDescriptionFamily(font, "Ubuntu Condensed")
         fontApi.setFontDescriptionWeight(font, PANGO_WEIGHT_BOLD)
@@ -85,7 +85,7 @@ class FrameDrawer(
         pango_layout_get_pixel_extents(layout, null, rect.ptr)
         val textX = screenMeasurements[2] - rect.width
 
-        XftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  screenMeasurements[2].convert(), textH.convert())
+        drawApi.xftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  screenMeasurements[2].convert(), textH.convert())
 
         val line = pango_layout_get_line_readonly(layout, 0)
         pango_xft_render_layout_line(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
@@ -93,11 +93,11 @@ class FrameDrawer(
         if (monitor.getScreenMode() == ScreenMode.NORMAL) {
             val primBarWidth = 104
             val secBarWidth = textX - primBarWidth - 14 // 8 + 8 - 1 because of first letter offset
-            XftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  primBarWidth.convert(), BAR_HEIGHT.convert())
-            XftDrawRect(xftDraw, secondaryBarColor.ptr, primBarWidth + 8, TITLE_BAR_OFFSET,  secBarWidth.convert(), BAR_HEIGHT.convert())
+            drawApi.xftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  primBarWidth.convert(), BAR_HEIGHT.convert())
+            drawApi.xftDrawRect(xftDraw, secondaryBarColor.ptr, primBarWidth + 8, TITLE_BAR_OFFSET,  secBarWidth.convert(), BAR_HEIGHT.convert())
         } else {
             val barWidth = textX - 7 // 8 - 1 because of first letter offset
-            XftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  barWidth.convert(), BAR_HEIGHT.convert())
+            drawApi.xftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  barWidth.convert(), BAR_HEIGHT.convert())
         }
 
         drawApi.setWindowBackgroundPixmap(window.titleBar, pixmap)

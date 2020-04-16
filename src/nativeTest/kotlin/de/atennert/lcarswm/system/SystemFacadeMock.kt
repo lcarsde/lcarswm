@@ -150,7 +150,7 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun xftDrawRect(
-        xftDraw: CPointer<XftDraw>,
+        xftDraw: CPointer<XftDraw>?,
         color: CPointer<XftColor>,
         x: Int,
         y: Int,
