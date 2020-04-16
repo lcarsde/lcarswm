@@ -67,7 +67,7 @@ Fullscreen mode
 
 ## To Do
 * Associate child screens with their parents
-* Activate windows my clicking on them
+* Activate windows by clicking on them
 * Center popups and adjust the frame to their size
 * Application menu
 * Content for the data bar (empty upper area in normal mode)
