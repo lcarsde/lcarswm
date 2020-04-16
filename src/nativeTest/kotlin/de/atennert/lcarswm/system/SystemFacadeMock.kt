@@ -705,4 +705,10 @@ open class SystemFacadeMock : SystemApi {
 
     override fun freeFontDescription(font: CPointer<PangoFontDescription>?) {
     }
+
+    override fun setLayoutFontDescription(
+        layout: CPointer<PangoLayout>?,
+        fontDescription: CPointer<PangoFontDescription>?
+    ) {
+    }
 }

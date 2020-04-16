@@ -24,4 +24,6 @@ interface FontApi {
     fun setFontDescriptionSize(font: CPointer<PangoFontDescription>?, size: Int)
 
     fun freeFontDescription(font: CPointer<PangoFontDescription>?)
+
+    fun setLayoutFontDescription(layout: CPointer<PangoLayout>?, fontDescription: CPointer<PangoFontDescription>?)
 }
