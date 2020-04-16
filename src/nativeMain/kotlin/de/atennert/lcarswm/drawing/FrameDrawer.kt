@@ -52,7 +52,7 @@ class FrameDrawer(
 
         val metrics = fontApi.getFontMetrics(pango, font, lang)
         val ascDesc = fontApi.getFontAscentDescent(metrics)
-        pango_font_metrics_unref(metrics)
+        fontApi.freeFontMetrics(metrics)
 
         return ascDesc
     }

@@ -32,4 +32,6 @@ interface FontApi {
     fun getFontMetrics(context: CPointer<PangoContext>?, font: CPointer<PangoFontDescription>?, language: CPointer<PangoLanguage>?): CPointer<PangoFontMetrics>?
 
     fun getFontAscentDescent(metrics: CPointer<PangoFontMetrics>?): Pair<Int, Int>
+
+    fun freeFontMetrics(metrics: CPointer<PangoFontMetrics>?)
 }

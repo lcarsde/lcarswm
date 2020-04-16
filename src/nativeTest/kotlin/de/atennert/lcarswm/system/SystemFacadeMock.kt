@@ -726,4 +726,7 @@ open class SystemFacadeMock : SystemApi {
     override fun getFontAscentDescent(metrics: CPointer<PangoFontMetrics>?): Pair<Int, Int> {
         return Pair(0, 0)
     }
+
+    override fun freeFontMetrics(metrics: CPointer<PangoFontMetrics>?) {
+    }
 }

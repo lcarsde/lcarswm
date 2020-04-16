@@ -599,6 +599,10 @@ class SystemFacade : SystemApi {
         return Pair(ascent, descent)
     }
 
+    override fun freeFontMetrics(metrics: CPointer<PangoFontMetrics>?) {
+        pango_font_metrics_unref(metrics)
+    }
+
     private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE
