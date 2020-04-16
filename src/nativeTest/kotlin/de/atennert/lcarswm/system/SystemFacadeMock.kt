@@ -717,7 +717,7 @@ open class SystemFacadeMock : SystemApi {
         font: CPointer<PangoFontDescription>?,
         language: CPointer<PangoLanguage>?
     ): CPointer<PangoFontMetrics>? {
-        return nativeHeap.alloc<PangoFontMetrics>().ptr
+        return nativeHeap.allocPointerTo<PangoFontMetrics>().value
     }
 
     override fun setLayoutWrapMode(layout: CPointer<PangoLayout>?, wrapMode: PangoWrapMode) {
