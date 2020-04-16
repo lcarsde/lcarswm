@@ -57,4 +57,15 @@ class Colors(private val drawApi: DrawApi, private val screen: Screen) {
             val mask = GCForeground or GCGraphicsExposures or GCArcMode
             drawApi.createGC(window, mask.convert(), gcValues.ptr)!!
         }
+
+    fun getXftColor(colorIndex: Int): XftColor {
+        val color = nativeHeap.alloc<XftColor>()
+        val colorCode = colors[colorIndex]
+        color.color.red = colorCode.first.convert()
+        color.color.green = colorCode.second.convert()
+        color.color.blue = colorCode.third.convert()
+        color.color.alpha = 0xffff.convert()
+        color.pixel = colorMap.second[colorIndex]
+        return color
+    }
 }

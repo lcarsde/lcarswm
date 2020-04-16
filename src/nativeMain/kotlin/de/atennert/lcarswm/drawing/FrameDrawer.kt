@@ -15,7 +15,7 @@ class FrameDrawer(
     private val fontApi: FontApi,
     private val drawApi: DrawApi,
     private val focusHandler: WindowFocusHandler,
-    colors: Colors,
+    private val colors: Colors,
     screenId: Int,
     private val screen: Screen
 ) : IFrameDrawer {
@@ -26,49 +26,18 @@ class FrameDrawer(
     private var ascent: Int
     private var descent: Int
 
-    private val activeTextColor = nativeHeap.alloc<XftColor>()
-    private val inactiveTextColor = nativeHeap.alloc<XftColor>()
-    private val primaryBarColor = nativeHeap.alloc<XftColor>()
-    private val secondaryBarColor = nativeHeap.alloc<XftColor>()
-    private val backgroundColor = nativeHeap.alloc<XftColor>()
+    private val activeTextColor = colors.getXftColor(1)
+    private val inactiveTextColor = colors.getXftColor(4)
+    private val primaryBarColor = colors.getXftColor(6)
+    private val secondaryBarColor = colors.getXftColor(2)
+    private val backgroundColor = colors.getXftColor(0)
     override val colorMap: Colormap
+            get() = colors.colorMap.first
 
     init {
         val ascDesc = loadFontGC()
         ascent = ascDesc.first
         descent = ascDesc.second
-
-        colorMap = colors.colorMap.first
-
-        activeTextColor.color.red = 0xffff.convert()
-        activeTextColor.color.green = 0x9999.convert()
-        activeTextColor.color.blue = 0x0000.convert()
-        activeTextColor.color.alpha = 0xffff.convert()
-        activeTextColor.pixel = colors.colorMap.second[1]
-
-        inactiveTextColor.color.red = 0xcccc.convert()
-        inactiveTextColor.color.green = 0x6666.convert()
-        inactiveTextColor.color.blue = 0x6666.convert()
-        inactiveTextColor.color.alpha = 0xffff.convert()
-        inactiveTextColor.pixel = colors.colorMap.second[4]
-
-        primaryBarColor.color.red = 0xcccc.convert()
-        primaryBarColor.color.green = 0x9999.convert()
-        primaryBarColor.color.blue = 0xcccc.convert()
-        primaryBarColor.color.alpha = 0xffff.convert()
-        primaryBarColor.pixel = colors.colorMap.second[6]
-
-        secondaryBarColor.color.red = 0x9999.convert()
-        secondaryBarColor.color.green = 0x9999.convert()
-        secondaryBarColor.color.blue = 0xffff.convert()
-        secondaryBarColor.color.alpha = 0xffff.convert()
-        secondaryBarColor.pixel = colors.colorMap.second[2]
-
-        backgroundColor.color.red = 0x0000.convert()
-        backgroundColor.color.green = 0x0000.convert()
-        backgroundColor.color.blue = 0x0000.convert()
-        backgroundColor.color.alpha = 0xffff.convert()
-        backgroundColor.pixel = colors.colorMap.second[0]
     }
 
     private fun loadFontGC(): Pair<Int, Int> {
