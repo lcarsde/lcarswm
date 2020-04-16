@@ -100,9 +100,9 @@ class FrameDrawer(
             XftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  barWidth.convert(), BAR_HEIGHT.convert())
         }
 
-        XSetWindowBackgroundPixmap(screen.display, window.titleBar, pixmap)
-        XClearWindow(screen.display, window.titleBar)
-        XFreePixmap(screen.display, pixmap)
+        drawApi.setWindowBackgroundPixmap(window.titleBar, pixmap)
+        drawApi.clearWindow(window.titleBar)
+        drawApi.freePixmap(pixmap)
         nativeHeap.free(rect.rawPtr)
     }
 
