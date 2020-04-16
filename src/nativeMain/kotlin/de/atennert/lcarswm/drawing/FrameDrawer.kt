@@ -48,7 +48,7 @@ class FrameDrawer(
         fontApi.setFontDescriptionSize(font, WINDOW_TITLE_FONT_SIZE * PANGO_SCALE)
 
         fontApi.setLayoutFontDescription(layout, font)
-        pango_layout_set_wrap(layout, PangoWrapMode.PANGO_WRAP_WORD_CHAR)
+        fontApi.setLayoutWrapMode(layout, PangoWrapMode.PANGO_WRAP_WORD_CHAR)
 
         val metrics = pango_context_get_metrics(pango, font, lang)
         ascent = pango_font_metrics_get_ascent(metrics)

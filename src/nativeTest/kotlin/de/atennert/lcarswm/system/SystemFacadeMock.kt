@@ -711,4 +711,7 @@ open class SystemFacadeMock : SystemApi {
         fontDescription: CPointer<PangoFontDescription>?
     ) {
     }
+
+    override fun setLayoutWrapMode(layout: CPointer<PangoLayout>?, wrapMode: PangoWrapMode) {
+    }
 }

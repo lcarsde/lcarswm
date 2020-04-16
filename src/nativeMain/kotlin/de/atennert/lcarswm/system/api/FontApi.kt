@@ -26,4 +26,6 @@ interface FontApi {
     fun freeFontDescription(font: CPointer<PangoFontDescription>?)
 
     fun setLayoutFontDescription(layout: CPointer<PangoLayout>?, fontDescription: CPointer<PangoFontDescription>?)
+
+    fun setLayoutWrapMode(layout: CPointer<PangoLayout>?, wrapMode: PangoWrapMode)
 }

@@ -581,6 +581,10 @@ class SystemFacade : SystemApi {
         pango_layout_set_font_description(layout, fontDescription)
     }
 
+    override fun setLayoutWrapMode(layout: CPointer<PangoLayout>?, wrapMode: PangoWrapMode) {
+        pango_layout_set_wrap(layout, wrapMode)
+    }
+
     private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE
