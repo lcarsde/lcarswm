@@ -585,6 +585,14 @@ class SystemFacade : SystemApi {
         pango_layout_set_wrap(layout, wrapMode)
     }
 
+    override fun getFontMetrics(
+        context: CPointer<PangoContext>?,
+        font: CPointer<PangoFontDescription>?,
+        language: CPointer<PangoLanguage>?
+    ): CPointer<PangoFontMetrics>? {
+        return pango_context_get_metrics(context, font, language)
+    }
+
     private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE
