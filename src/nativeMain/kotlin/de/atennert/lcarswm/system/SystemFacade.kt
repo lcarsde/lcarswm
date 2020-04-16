@@ -593,6 +593,12 @@ class SystemFacade : SystemApi {
         return pango_context_get_metrics(context, font, language)
     }
 
+    override fun getFontAscentDescent(metrics: CPointer<PangoFontMetrics>?): Pair<Int, Int> {
+        val ascent = pango_font_metrics_get_ascent(metrics)
+        val descent = pango_font_metrics_get_descent(metrics)
+        return Pair(ascent, descent)
+    }
+
     private fun convertToXBoolean(ownerEvents: Boolean): Int = when (ownerEvents) {
         true  -> X_TRUE
         false -> X_FALSE

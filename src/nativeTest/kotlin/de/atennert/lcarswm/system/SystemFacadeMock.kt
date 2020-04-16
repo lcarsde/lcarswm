@@ -722,4 +722,8 @@ open class SystemFacadeMock : SystemApi {
 
     override fun setLayoutWrapMode(layout: CPointer<PangoLayout>?, wrapMode: PangoWrapMode) {
     }
+
+    override fun getFontAscentDescent(metrics: CPointer<PangoFontMetrics>?): Pair<Int, Int> {
+        return Pair(0, 0)
+    }
 }

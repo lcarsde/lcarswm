@@ -51,11 +51,10 @@ class FrameDrawer(
         fontApi.setLayoutWrapMode(layout, PangoWrapMode.PANGO_WRAP_WORD_CHAR)
 
         val metrics = fontApi.getFontMetrics(pango, font, lang)
-        ascent = pango_font_metrics_get_ascent(metrics)
-        descent = pango_font_metrics_get_descent(metrics)
+        val ascDesc = fontApi.getFontAscentDescent(metrics)
         pango_font_metrics_unref(metrics)
 
-        return Pair(ascent, descent)
+        return ascDesc
     }
 
     override fun drawFrame(window: FramedWindow, monitor: Monitor) {
