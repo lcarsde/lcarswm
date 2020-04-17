@@ -41,6 +41,8 @@ interface FontApi {
 
     fun getLayoutLineReadonly(layout: CPointer<PangoLayout>?, line: Int): CPointer<PangoLayoutLine>?
 
+    fun xftRenderLayoutLine(draw: CPointer<XftDraw>?, color: CPointer<XftColor>, line: CPointer<PangoLayoutLine>?, x: Int, y: Int)
+
     fun getFontMetrics(context: CPointer<PangoContext>?, font: CPointer<PangoFontDescription>?, language: CPointer<PangoLanguage>?): CPointer<PangoFontMetrics>?
 
     fun getFontAscentDescent(metrics: CPointer<PangoFontMetrics>?): Pair<Int, Int>

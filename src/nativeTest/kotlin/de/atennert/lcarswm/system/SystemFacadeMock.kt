@@ -731,6 +731,15 @@ open class SystemFacadeMock : SystemApi {
         return nativeHeap.allocPointerTo<PangoLayoutLine>().value
     }
 
+    override fun xftRenderLayoutLine(
+        draw: CPointer<XftDraw>?,
+        color: CPointer<XftColor>,
+        line: CPointer<PangoLayoutLine>?,
+        x: Int,
+        y: Int
+    ) {
+    }
+
     override fun getFontMetrics(
         context: CPointer<PangoContext>?,
         font: CPointer<PangoFontDescription>?,

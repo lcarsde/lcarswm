@@ -87,7 +87,7 @@ class FrameDrawer(
         drawApi.xftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  screenMeasurements[2].convert(), textH.convert())
 
         val line = fontApi.getLayoutLineReadonly(layout, 0)
-        pango_xft_render_layout_line(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
+        fontApi.xftRenderLayoutLine(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
 
         if (monitor.getScreenMode() == ScreenMode.NORMAL) {
             val primBarWidth = 104
