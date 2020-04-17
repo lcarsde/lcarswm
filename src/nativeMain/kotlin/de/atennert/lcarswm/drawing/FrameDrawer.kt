@@ -49,6 +49,8 @@ class FrameDrawer(
 
         fontApi.setLayoutFontDescription(layout, font)
         fontApi.setLayoutWrapMode(layout, PangoWrapMode.PANGO_WRAP_WORD_CHAR)
+        fontApi.setLayoutEllipsizeMode(layout, PangoEllipsizeMode.PANGO_ELLIPSIZE_END)
+        fontApi.setLayoutSingleParagraphMode(layout, true)
 
         val metrics = fontApi.getFontMetrics(pango, font, lang)
         val ascDesc = fontApi.getFontAscentDescent(metrics)
@@ -78,8 +80,6 @@ class FrameDrawer(
 
         fontApi.setLayoutText(layout, window.name)
         fontApi.setLayoutWidth(layout, textW * PANGO_SCALE)
-        fontApi.setLayoutEllipsizeMode(layout, PangoEllipsizeMode.PANGO_ELLIPSIZE_END)
-        fontApi.setLayoutSingleParagraphMode(layout, true)
 
         fontApi.getLayoutPixelExtents(layout, rect.ptr)
         val textX = screenMeasurements[2] - rect.width
