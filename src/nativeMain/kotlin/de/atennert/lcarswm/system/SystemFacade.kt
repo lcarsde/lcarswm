@@ -589,6 +589,10 @@ class SystemFacade : SystemApi {
         pango_layout_set_text(layout, text, text.length)
     }
 
+    override fun setLayoutWidth(layout: CPointer<PangoLayout>?, width: Int) {
+        pango_layout_set_width(layout, width)
+    }
+
     override fun getFontMetrics(
         context: CPointer<PangoContext>?,
         font: CPointer<PangoFontDescription>?,

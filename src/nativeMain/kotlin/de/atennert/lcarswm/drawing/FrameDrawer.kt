@@ -77,7 +77,7 @@ class FrameDrawer(
         }
 
         fontApi.setLayoutText(layout, window.name)
-        pango_layout_set_width(layout, textW * PANGO_SCALE)
+        fontApi.setLayoutWidth(layout, textW * PANGO_SCALE)
         pango_layout_set_ellipsize(layout, PangoEllipsizeMode.PANGO_ELLIPSIZE_END)
         pango_layout_set_single_paragraph_mode(layout, X_TRUE)
 
