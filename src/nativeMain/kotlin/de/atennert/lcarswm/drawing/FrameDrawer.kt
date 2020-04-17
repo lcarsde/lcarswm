@@ -28,8 +28,8 @@ class FrameDrawer(
 
     private val activeTextColor = colors.getXftColor(1)
     private val inactiveTextColor = colors.getXftColor(4)
-    private val primaryBarColor = colors.getXftColor(6)
-    private val secondaryBarColor = colors.getXftColor(2)
+    private val primaryBarColor = colors.getXftColor(2)
+    private val secondaryBarColor = colors.getXftColor(6)
     private val backgroundColor = colors.getXftColor(0)
     override val colorMap: Colormap
             get() = colors.colorMap.first
