@@ -35,6 +35,8 @@ interface FontApi {
 
     fun setLayoutEllipsizeMode(layout: CPointer<PangoLayout>?, ellipsizeMode: PangoEllipsizeMode)
 
+    fun setLayoutSingleParagraphMode(layout: CPointer<PangoLayout>?, setting: Boolean)
+
     fun getFontMetrics(context: CPointer<PangoContext>?, font: CPointer<PangoFontDescription>?, language: CPointer<PangoLanguage>?): CPointer<PangoFontMetrics>?
 
     fun getFontAscentDescent(metrics: CPointer<PangoFontMetrics>?): Pair<Int, Int>

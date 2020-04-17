@@ -597,6 +597,10 @@ class SystemFacade : SystemApi {
         pango_layout_set_ellipsize(layout, ellipsizeMode)
     }
 
+    override fun setLayoutSingleParagraphMode(layout: CPointer<PangoLayout>?, setting: Boolean) {
+        pango_layout_set_single_paragraph_mode(layout, convertToXBoolean(setting))
+    }
+
     override fun getFontMetrics(
         context: CPointer<PangoContext>?,
         font: CPointer<PangoFontDescription>?,

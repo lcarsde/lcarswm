@@ -79,7 +79,7 @@ class FrameDrawer(
         fontApi.setLayoutText(layout, window.name)
         fontApi.setLayoutWidth(layout, textW * PANGO_SCALE)
         fontApi.setLayoutEllipsizeMode(layout, PangoEllipsizeMode.PANGO_ELLIPSIZE_END)
-        pango_layout_set_single_paragraph_mode(layout, X_TRUE)
+        fontApi.setLayoutSingleParagraphMode(layout, true)
 
         pango_layout_get_pixel_extents(layout, null, rect.ptr)
         val textX = screenMeasurements[2] - rect.width
