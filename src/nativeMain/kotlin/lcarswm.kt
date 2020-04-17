@@ -158,7 +158,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         }
 
         focusHandler.registerObserver { activeWindow, _ ->
-            activeWindow?.let { windowCoordinator.stackWindowToTheTop(activeWindow) }
+            activeWindow?.let { windowCoordinator.stackWindowToTheTop(it) }
         }
 
         val eventManager = createEventManager(
