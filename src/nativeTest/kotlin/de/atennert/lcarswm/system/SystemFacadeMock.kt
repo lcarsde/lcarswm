@@ -718,6 +718,9 @@ open class SystemFacadeMock : SystemApi {
     override fun setLayoutWidth(layout: CPointer<PangoLayout>?, width: Int) {
     }
 
+    override fun setLayoutEllipsizeMode(layout: CPointer<PangoLayout>?, ellipsizeMode: PangoEllipsizeMode) {
+    }
+
     override fun getFontMetrics(
         context: CPointer<PangoContext>?,
         font: CPointer<PangoFontDescription>?,

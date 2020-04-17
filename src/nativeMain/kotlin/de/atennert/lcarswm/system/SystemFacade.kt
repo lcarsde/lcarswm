@@ -593,6 +593,10 @@ class SystemFacade : SystemApi {
         pango_layout_set_width(layout, width)
     }
 
+    override fun setLayoutEllipsizeMode(layout: CPointer<PangoLayout>?, ellipsizeMode: PangoEllipsizeMode) {
+        pango_layout_set_ellipsize(layout, ellipsizeMode)
+    }
+
     override fun getFontMetrics(
         context: CPointer<PangoContext>?,
         font: CPointer<PangoFontDescription>?,
