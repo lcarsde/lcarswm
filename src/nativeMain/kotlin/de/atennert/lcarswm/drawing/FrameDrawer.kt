@@ -86,7 +86,7 @@ class FrameDrawer(
 
         drawApi.xftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  screenMeasurements[2].convert(), textH.convert())
 
-        val line = pango_layout_get_line_readonly(layout, 0)
+        val line = fontApi.getLayoutLineReadonly(layout, 0)
         pango_xft_render_layout_line(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
 
         if (monitor.getScreenMode() == ScreenMode.NORMAL) {
