@@ -601,6 +601,10 @@ class SystemFacade : SystemApi {
         pango_layout_set_single_paragraph_mode(layout, convertToXBoolean(setting))
     }
 
+    override fun getLayoutPixelExtents(layout: CPointer<PangoLayout>?, logicalRectangle: CPointer<PangoRectangle>?) {
+        pango_layout_get_pixel_extents(layout, null, logicalRectangle)
+    }
+
     override fun getFontMetrics(
         context: CPointer<PangoContext>?,
         font: CPointer<PangoFontDescription>?,

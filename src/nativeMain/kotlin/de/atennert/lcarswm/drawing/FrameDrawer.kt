@@ -81,7 +81,7 @@ class FrameDrawer(
         fontApi.setLayoutEllipsizeMode(layout, PangoEllipsizeMode.PANGO_ELLIPSIZE_END)
         fontApi.setLayoutSingleParagraphMode(layout, true)
 
-        pango_layout_get_pixel_extents(layout, null, rect.ptr)
+        fontApi.getLayoutPixelExtents(layout, rect.ptr)
         val textX = screenMeasurements[2] - rect.width
 
         drawApi.xftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  screenMeasurements[2].convert(), textH.convert())
