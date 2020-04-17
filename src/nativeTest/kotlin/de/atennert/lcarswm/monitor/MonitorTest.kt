@@ -108,7 +108,7 @@ class MonitorTest {
 
         val defaultMeasurements = monitor.getWindowMeasurements()
 
-        assertEquals(listOf(208, 242, 552, 292, 358), defaultMeasurements)
+        assertEquals(WindowMeasurements(208, 242, 552, 292, 358), defaultMeasurements)
     }
 
     @Test
@@ -121,7 +121,7 @@ class MonitorTest {
 
         val defaultMeasurements = monitor.getWindowMeasurements()
 
-        assertEquals(listOf(40, 48, 720, 504, 552), defaultMeasurements)
+        assertEquals(WindowMeasurements(40, 48, 720, 504, 552), defaultMeasurements)
     }
 
     @Test
@@ -134,6 +134,6 @@ class MonitorTest {
 
         val defaultMeasurements = monitor.getWindowMeasurements()
 
-        assertEquals(listOf(0, 0, 800, 600, 600), defaultMeasurements)
+        assertEquals(WindowMeasurements(0, 0, 800, 600, 600), defaultMeasurements)
     }
 }

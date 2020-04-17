@@ -70,10 +70,10 @@ class WindowHandler(
         val measurements = windowCoordinator.addWindowToMonitor(window)
 
         window.frame = system.createSimpleWindow(screen.root,
-            listOf(measurements[0], measurements[1], measurements[2], measurements[4]))
+            listOf(measurements.x, measurements.y, measurements.width, measurements.frameHeight))
 
         window.titleBar = system.createSimpleWindow(window.frame,
-            listOf(0, measurements[4] - BAR_HEIGHT_WITH_OFFSET, measurements[2], BAR_HEIGHT_WITH_OFFSET))
+            listOf(0, measurements.frameHeight - BAR_HEIGHT_WITH_OFFSET, measurements.width, BAR_HEIGHT_WITH_OFFSET))
 
         logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}")
 
@@ -85,7 +85,7 @@ class WindowHandler(
 
         system.reparentWindow(windowId, window.frame, 0, 0)
 
-        system.resizeWindow(window.id, measurements[2].convert(), measurements[3].convert())
+        system.resizeWindow(window.id, measurements.width.convert(), measurements.height.convert())
 
         system.ungrabServer()
 

@@ -60,7 +60,7 @@ class FrameDrawer(
     }
 
     override fun drawFrame(window: FramedWindow, monitor: Monitor) {
-        val screenMeasurements = monitor.getWindowMeasurements()
+        val windowMeasurements = monitor.getWindowMeasurements()
         val textW = monitor.width - 390 // a little wider the normal layout lower corner
         val textH = BAR_HEIGHT_WITH_OFFSET
         val rect = nativeHeap.alloc<PangoRectangle>()
@@ -69,7 +69,7 @@ class FrameDrawer(
                 - (ascent + descent))
                 / 2 + ascent) / PANGO_SCALE
 
-        val pixmap = drawApi.createPixmap(screen.root, screenMeasurements[2].convert(), textH.convert(), screen.root_depth.convert())
+        val pixmap = drawApi.createPixmap(screen.root, windowMeasurements.width.convert(), textH.convert(), screen.root_depth.convert())
         val xftDraw = drawApi.xftDrawCreate(pixmap, screen.root_visual!!, colorMap)
 
         val textColor = if (focusHandler.getFocusedWindow() == window.id) {
@@ -82,9 +82,9 @@ class FrameDrawer(
         fontApi.setLayoutWidth(layout, textW * PANGO_SCALE)
 
         fontApi.getLayoutPixelExtents(layout, rect.ptr)
-        val textX = screenMeasurements[2] - rect.width
+        val textX = windowMeasurements.width - rect.width
 
-        drawApi.xftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  screenMeasurements[2].convert(), textH.convert())
+        drawApi.xftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  windowMeasurements.width.convert(), textH.convert())
 
         val line = fontApi.getLayoutLineReadonly(layout, 0)
         fontApi.xftRenderLayoutLine(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)

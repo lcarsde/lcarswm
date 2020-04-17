@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import xlib.ConfigureNotify
@@ -17,13 +18,13 @@ class SendConfigureNotifyTest {
         val eventMock = XEventMock()
 
         val windowId: Window = 1.convert()
-        val measurements = listOf(1, 2, 3, 4)
+        val measurements = WindowMeasurements(1, 2, 3, 4, 5)
 
         sendConfigureNotify(eventMock, windowId, measurements)
 
         assertEquals(windowId, eventMock.eventWindowId, "Invalid window ID in event call")
         assertEquals(ConfigureNotify, eventMock.eventType, "The event type was not ConfigureNotify")
-        assertEquals(measurements, eventMock.measurements, "The window measurements were wrong")
+        assertEquals(listOf(measurements.x, measurements.y, measurements.width, measurements.height), eventMock.measurements, "The window measurements were wrong")
     }
 
     private class XEventMock : SystemFacadeMock() {

@@ -2,6 +2,7 @@ package de.atennert.lcarswm.windowactions
 
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.monitor.Monitor
+import de.atennert.lcarswm.monitor.WindowMeasurements
 import xlib.Window
 
 /**
@@ -14,7 +15,7 @@ interface WindowCoordinator {
      * Register the window with the monitor
      * @return measurements
      */
-    fun addWindowToMonitor(window: FramedWindow): List<Int>
+    fun addWindowToMonitor(window: FramedWindow): WindowMeasurements
     
     /**
      * Unregister the window with the monitor
@@ -27,7 +28,7 @@ interface WindowCoordinator {
 
     fun getMonitorForWindow(windowId: Window): Monitor
 
-    fun getWindowMeasurements(windowId: Window): List<Int>
+    fun getWindowMeasurements(windowId: Window): WindowMeasurements
 
     fun stackWindowToTheTop(windowId: Window)
 

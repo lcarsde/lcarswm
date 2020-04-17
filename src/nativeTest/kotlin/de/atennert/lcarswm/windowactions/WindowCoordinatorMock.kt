@@ -3,6 +3,7 @@ package de.atennert.lcarswm.windowactions
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
+import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.FunctionCall
 import kotlinx.cinterop.convert
 import xlib.Window
@@ -15,7 +16,7 @@ class WindowCoordinatorMock : WindowCoordinator {
     }
 
     val primaryMonitor = Monitor(MonitorManagerMock(), 21.convert(), "", true)
-    override fun addWindowToMonitor(window: FramedWindow): List<Int> {
+    override fun addWindowToMonitor(window: FramedWindow): WindowMeasurements {
         functionCalls.add(FunctionCall("addWindowToMonitor", window))
         return primaryMonitor.getWindowMeasurements()
     }
@@ -36,7 +37,7 @@ class WindowCoordinatorMock : WindowCoordinator {
         return Monitor(MonitorManagerMock(), 1.convert(), "some monitor", false)
     }
 
-    override fun getWindowMeasurements(windowId: Window): List<Int> {
+    override fun getWindowMeasurements(windowId: Window): WindowMeasurements {
         return primaryMonitor.getWindowMeasurements()
     }
 

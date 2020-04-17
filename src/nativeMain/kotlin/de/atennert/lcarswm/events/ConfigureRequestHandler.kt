@@ -47,10 +47,10 @@ class ConfigureRequestHandler(
         e.xconfigure.display = eventApi.getDisplay()
         e.xconfigure.event = configureEvent.window
         e.xconfigure.window = configureEvent.window
-        e.xconfigure.x = measurements[0]
-        e.xconfigure.y = measurements[1]
-        e.xconfigure.width = measurements[2]
-        e.xconfigure.height = measurements[3]
+        e.xconfigure.x = measurements.x
+        e.xconfigure.y = measurements.y
+        e.xconfigure.width = measurements.width
+        e.xconfigure.height = measurements.height
         e.xconfigure.border_width = configureEvent.border_width
         e.xconfigure.above = None.convert()
         e.xconfigure.override_redirect = X_FALSE

@@ -5,6 +5,7 @@ import de.atennert.lcarswm.adjustWindowPositionAndSize
 import de.atennert.lcarswm.drawing.IFrameDrawer
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
+import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.api.EventApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
@@ -36,7 +37,7 @@ class ActiveWindowCoordinator(
         windowsOnMonitors.putAll(updatedWindows)
     }
 
-    override fun addWindowToMonitor(window: FramedWindow): List<Int> {
+    override fun addWindowToMonitor(window: FramedWindow): WindowMeasurements {
         windowsOnMonitors[window] = monitorManager.getPrimaryMonitor()
         return getMonitorForWindow(window.id).getWindowMeasurements()
     }
@@ -73,7 +74,7 @@ class ActiveWindowCoordinator(
         return windowsOnMonitors.entries.single { (window, _) -> window.id == windowId }.value
     }
 
-    override fun getWindowMeasurements(windowId: Window): List<Int> {
+    override fun getWindowMeasurements(windowId: Window): WindowMeasurements {
         return getMonitorForWindow(windowId).getWindowMeasurements()
     }
 

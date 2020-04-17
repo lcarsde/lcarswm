@@ -5,6 +5,7 @@ import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.drawing.FrameDrawerMock
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
+import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
@@ -194,19 +195,19 @@ class ActiveWindowCoordinatorTest {
         monitorManager.screenMode = ScreenMode.MAXIMIZED
         activeWindowCoordinator.realignWindows()
         var measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
-        assertEquals(listOf(40, 48, 720, 504, 552), measurments, "")
+        assertEquals(WindowMeasurements(40, 48, 720, 504, 552), measurments, "")
         checkMoveWindow(systemApi.functionCalls, window)
 
         monitorManager.screenMode = ScreenMode.FULLSCREEN
         activeWindowCoordinator.realignWindows()
         measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
-        assertEquals(listOf(0, 0, 800, 600, 600), measurments, "")
+        assertEquals(WindowMeasurements(0, 0, 800, 600, 600), measurments, "")
         checkMoveWindow(systemApi.functionCalls, window)
 
         monitorManager.screenMode = ScreenMode.NORMAL
         activeWindowCoordinator.realignWindows()
         measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
-        assertEquals(listOf(208, 242, 552, 292, 358), measurments, "")
+        assertEquals(WindowMeasurements(208, 242, 552, 292, 358), measurments, "")
         checkMoveWindow(systemApi.functionCalls, window)
     }
 }

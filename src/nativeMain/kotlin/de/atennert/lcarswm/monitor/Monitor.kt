@@ -29,23 +29,14 @@ data class Monitor(
     var height = 600
         private set
 
-    private val defaultWindowPosition get() = Pair(x + 208, y + 242)
+    private val normalMeasurements: WindowMeasurements
+        get() = WindowMeasurements.createNormal(x, y, width, height)
 
-    private val defaultWindowSize get() = Pair(width - 248, height - 308)
+    private val maximizedMeasurements: WindowMeasurements
+        get() = WindowMeasurements.createMaximized(x, y, width, height)
 
-    private val defaultFrameHeight get() = height - 242
-
-    private val maximizedWindowPosition get() = Pair(x + 40, y + 48)
-
-    private val maximizedWindowSize get() = Pair(width - 80, height - 96)
-
-    private val maximizedFrameHeight get() = height - 48
-
-    private val fullscreenWindowPosition get() = Pair(x, y)
-
-    private val fullscreenWindowSize get() = Pair(width, height)
-
-    private val fullscreenFrameHeight get() = height
+    private val fullscreenMeasurements: WindowMeasurements
+        get() = WindowMeasurements.createFullscreen(x, y, width, height)
 
     private var isFullyInitialized = false
 
@@ -97,22 +88,10 @@ data class Monitor(
     /**
      * @return the current window measurements in the form [x, y, width, height], depending on the current screenMode
      */
-    fun getWindowMeasurements(): List<Int> = when (getScreenMode()) {
-        ScreenMode.NORMAL -> windowMeasurementsToList(
-            this.defaultWindowPosition,
-            this.defaultWindowSize,
-            this.defaultFrameHeight
-        )
-        ScreenMode.MAXIMIZED -> windowMeasurementsToList(
-            this.maximizedWindowPosition,
-            this.maximizedWindowSize,
-            this.maximizedFrameHeight
-        )
-        ScreenMode.FULLSCREEN -> windowMeasurementsToList(
-            this.fullscreenWindowPosition,
-            this.fullscreenWindowSize,
-            this.fullscreenFrameHeight
-        )
+    fun getWindowMeasurements(): WindowMeasurements = when (getScreenMode()) {
+        ScreenMode.NORMAL -> normalMeasurements
+        ScreenMode.MAXIMIZED -> maximizedMeasurements
+        ScreenMode.FULLSCREEN -> fullscreenMeasurements
     }
 
     /**
