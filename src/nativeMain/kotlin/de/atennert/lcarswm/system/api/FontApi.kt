@@ -29,6 +29,8 @@ interface FontApi {
 
     fun setLayoutWrapMode(layout: CPointer<PangoLayout>?, wrapMode: PangoWrapMode)
 
+    fun setLayoutText(layout: CPointer<PangoLayout>?, text: String)
+
     fun getFontMetrics(context: CPointer<PangoContext>?, font: CPointer<PangoFontDescription>?, language: CPointer<PangoLanguage>?): CPointer<PangoFontMetrics>?
 
     fun getFontAscentDescent(metrics: CPointer<PangoFontMetrics>?): Pair<Int, Int>

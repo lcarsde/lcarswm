@@ -712,6 +712,9 @@ open class SystemFacadeMock : SystemApi {
     ) {
     }
 
+    override fun setLayoutText(layout: CPointer<PangoLayout>?, text: String) {
+    }
+
     override fun getFontMetrics(
         context: CPointer<PangoContext>?,
         font: CPointer<PangoFontDescription>?,

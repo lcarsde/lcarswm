@@ -76,7 +76,7 @@ class FrameDrawer(
             inactiveTextColor
         }
 
-        pango_layout_set_text(layout, window.name, window.name.length)
+        fontApi.setLayoutText(layout, window.name)
         pango_layout_set_width(layout, textW * PANGO_SCALE)
         pango_layout_set_ellipsize(layout, PangoEllipsizeMode.PANGO_ELLIPSIZE_END)
         pango_layout_set_single_paragraph_mode(layout, X_TRUE)
