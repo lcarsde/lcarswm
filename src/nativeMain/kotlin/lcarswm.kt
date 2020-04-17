@@ -133,14 +133,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val focusHandler = WindowFocusHandler()
 
-        focusHandler.registerObserver { activeWindow, _ ->
-            if (activeWindow != null) {
-                system.setInputFocus(activeWindow, RevertToParent, eventTime.lastEventTime)
-            } else {
-                system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
-            }
-        }
-
         val frameDrawer = FrameDrawer(system, system, focusHandler, colorHandler, system.defaultScreenNumber(), screen)
 
         val windowCoordinator = ActiveWindowCoordinator(system, monitorManager, frameDrawer)
@@ -149,12 +141,24 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, screen, frameDrawer)
 
+        focusHandler.registerObserver { activeWindow, _ ->
+            if (activeWindow != null) {
+                system.setInputFocus(activeWindow, RevertToParent, eventTime.lastEventTime)
+            } else {
+                system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
+            }
+        }
+
         focusHandler.registerObserver { activeWindow, oldWindow ->
             listOf(oldWindow, activeWindow).forEach {
                 it?.let { ow -> windowRegistration[ow]?.let { fw ->
                     frameDrawer.drawFrame(fw, windowCoordinator.getMonitorForWindow(ow))
                 } }
             }
+        }
+
+        focusHandler.registerObserver { activeWindow, _ ->
+            activeWindow?.let { windowCoordinator.stackWindowToTheTop(activeWindow) }
         }
 
         val eventManager = createEventManager(

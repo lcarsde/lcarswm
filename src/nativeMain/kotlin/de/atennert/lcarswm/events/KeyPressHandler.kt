@@ -57,9 +57,8 @@ class KeyPressHandler(
 
     private fun toggleFocusedWindow() {
         windowFocusHandler.toggleWindowFocus()
-        val newFocusedWindow = windowFocusHandler.getFocusedWindow() ?: return
+        val newFocusedWindow = windowFocusHandler.getFocusedWindow()
         logger.logDebug("KeyPressHandler::toggleFocusedWindow::new focused window: $newFocusedWindow")
-        windowCoordinator.stackWindowToTheTop(newFocusedWindow)
     }
 
     private fun toggleScreenMode() {

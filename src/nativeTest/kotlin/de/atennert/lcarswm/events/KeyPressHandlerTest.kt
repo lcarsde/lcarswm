@@ -5,7 +5,6 @@ import de.atennert.lcarswm.Modifiers
 import de.atennert.lcarswm.drawing.UIDrawingMock
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
-import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import de.atennert.lcarswm.windowactions.WindowCoordinatorMock
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
@@ -178,24 +177,14 @@ class KeyPressHandlerTest {
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
         assertFalse(shutdownValue, "Handling the up-key shouldn't trigger a shutdown")
-        val coordinatorCalls = windowCoordinator.functionCalls
 
         assertEquals(window2, windowFocusHandler.getFocusedWindow(), "The focused window needs to be updated")
-        checkRestacking(coordinatorCalls.removeAt(0), window2)
 
         keyPressHandler.handleEvent(keyPressEvent)
         assertEquals(window3, windowFocusHandler.getFocusedWindow(), "The focused window needs to be updated")
-        checkRestacking(coordinatorCalls.removeAt(0), window3)
-
 
         keyPressHandler.handleEvent(keyPressEvent)
         assertEquals(window1, windowFocusHandler.getFocusedWindow(), "The focused window needs to be updated")
-        checkRestacking(coordinatorCalls.removeAt(0), window1)
-    }
-
-    private fun checkRestacking(restackCall: FunctionCall, window: Window) {
-        assertEquals("stackWindowToTheTop", restackCall.name, "The window $window needs to be stacked to the top")
-        assertEquals(window, restackCall.parameters[0], "The _window ${window}_ needs to be stacked to the top")
     }
 
     @Test
