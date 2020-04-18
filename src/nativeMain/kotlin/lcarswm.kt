@@ -139,7 +139,9 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val screenChangeHandler = setupRandr(system, randrHandlerFactory, monitorManager, windowCoordinator, uiDrawer, screen.root)
 
-        val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, screen, frameDrawer)
+        val windowNameReader = WindowNameReader(system, atomLibrary)
+
+        val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, screen, windowNameReader)
 
         focusHandler.registerObserver { activeWindow, _ ->
             if (activeWindow != null) {
@@ -173,6 +175,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             atomLibrary,
             screenChangeHandler,
             keyConfiguration,
+            windowNameReader,
+            frameDrawer,
             screen.root
         )
 
@@ -328,6 +332,8 @@ private fun createEventManager(
     atomLibrary: AtomLibrary,
     screenChangeHandler: XEventHandler,
     keyConfiguration: KeyConfiguration,
+    windowNameReader: WindowNameReader,
+    frameDrawer: FrameDrawer,
     rootWindowId: Window
 ): EventDistributor {
 
@@ -343,6 +349,7 @@ private fun createEventManager(
         .addEventHandler(ClientMessageHandler(logger, atomLibrary))
         .addEventHandler(SelectionClearHandler(logger))
         .addEventHandler(MappingNotifyHandler(logger, keyManager, keyConfiguration, rootWindowId))
+        .addEventHandler(PropertyNotifyHandler(atomLibrary, windowRegistration, windowNameReader, frameDrawer, windowCoordinator, rootWindowId))
         .build()
 }
 

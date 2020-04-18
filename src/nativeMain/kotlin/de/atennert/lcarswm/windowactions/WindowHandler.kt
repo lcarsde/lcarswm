@@ -7,7 +7,6 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms.*
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
-import de.atennert.lcarswm.drawing.IFrameDrawer
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -23,7 +22,7 @@ class WindowHandler(
     private val focusHandler: WindowFocusHandler,
     private val atomLibrary: AtomLibrary,
     private val screen: Screen,
-    private val frameDrawer: IFrameDrawer
+    private val windowNameReader: WindowNameReader
 ) : WindowRegistration {
 
     private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or
@@ -63,9 +62,9 @@ class WindowHandler(
         attributeSet.do_not_propagate_mask = clientNoPropagateMask
         system.changeWindowAttributes(windowId, (CWEventMask or CWDontPropagate).convert(), attributeSet.ptr)
 
-        val windowName = getWindowName(windowId)
+        val window = FramedWindow(windowId, windowAttributes.border_width)
 
-        val window = FramedWindow(windowId, windowName, windowAttributes.border_width)
+        window.name = windowNameReader.getWindowName(windowId)
 
         val measurements = windowCoordinator.addWindowToMonitor(window)
 
@@ -136,84 +135,5 @@ class WindowHandler(
 
         windowCoordinator.removeWindow(framedWindow)
         focusHandler.removeWindow(windowId)
-    }
-
-    private fun getWindowName(windowId: Window): String {
-        val textProperty = nativeHeap.alloc<XTextProperty>()
-        var result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[NET_WM_NAME])
-
-        if (result != 0 || textProperty.encoding != atomLibrary[UTF_STRING]) {
-            result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[WM_NAME])
-            if (result == 0) {
-                return "UNKNOWN"
-            }
-        }
-
-        val name = when (textProperty.encoding) {
-            atomLibrary[COMPOUND_TEXT] -> {
-                val localeString = getByteArrayListFromCompound(textProperty).toKString()
-                val readBytes = ULongArray(1).pin()
-                val utfBytes = system.localeToUtf8(localeString, (-1).convert(), readBytes.addressOf(0))
-                    ?: system.localeToUtf8(localeString, readBytes.get()[0].convert(), null)
-                    ?: return "unknown"
-                ByteArray(readBytes.get()[0].convert()) {utfBytes[it]}.toKString()
-            }
-            atomLibrary[UTF_STRING] -> {
-                getByteArray(textProperty).toKString()
-            }
-            atomLibrary[STRING] -> {
-                val latinString = getByteArray(textProperty).takeWhile { c ->
-                    // filter forbidden control characters
-                    c.toInt() == 9 ||
-                            c.toInt() == 10 ||
-                            c.toInt() in 33..126 ||
-                            c.toInt() > 160
-                }.toByteArray()
-                    .toKString()
-                val readBytes = ULongArray(1).pin()
-                val utfBytes = system.convertLatinToUtf8(latinString, (-1).convert(), readBytes.addressOf(0))
-                    ?: system.convertLatinToUtf8(latinString, readBytes.get()[0].convert(), null)
-                    ?: return "unknown"
-                ByteArray(readBytes.get()[0].convert()) {utfBytes[it]}.toKString()
-            }
-            else -> ""
-        }
-        system.free(textProperty.value)
-        nativeHeap.free(textProperty)
-        return if (name.isEmpty()) {
-            "-"
-        } else {
-            name.toUpperCase()
-        }
-    }
-
-    private fun getByteArrayListFromCompound(textProperty: XTextProperty): ByteArray {
-        val resultList = nativeHeap.allocPointerTo<CPointerVar<ByteVar>>()
-        val listCount = IntArray(1).pin()
-        system.xmbTextPropertyToTextList(textProperty.ptr, resultList.ptr, listCount.addressOf(0))
-
-        val byteList = mutableListOf<Byte>()
-        var index = 0
-        var value = resultList.value?.get(0)?.get(0)
-        while (value != null && value.toInt() != 0) {
-            byteList.add(value)
-            index++
-            value = resultList.value?.get(0)?.get(index)
-        }
-        byteList.add(0)
-        nativeHeap.free(resultList)
-        return byteList.toByteArray()
-    }
-
-    private fun getByteArray(textProperty: XTextProperty): ByteArray {
-        return UByteArray(textProperty.nitems.convert()) { textProperty.value?.get(it)!! }
-            .fold(mutableListOf<Byte>()) { list, ub ->
-                list.add(ub.convert())
-                if (ub.convert<Int>() == 0) {
-                    return@fold list
-                }
-                list
-            }
-            .toByteArray()
     }
 }
