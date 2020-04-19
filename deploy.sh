@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TRAVIS_TAG="0.0"
-TIME="$(date '+%a, %d %B %Y %T %z')"
+TIME="$(date '+%a, %d %b %Y %T %z')"
 
 echo "run build for deployment"
 ./gradlew build
@@ -11,18 +11,14 @@ echo "build debian package for lcarswm-${TRAVIS_TAG}"
 # create debian package construction directory
 mkdir -p "build/deb/lcarswm-${TRAVIS_TAG}"
 
-# create software directories
-mkdir -p "build/deb/lcarswm-${TRAVIS_TAG}/usr/bin"
-
 # copy software resources
+cp -r "src/nativeMain/resources/usr" "build/deb/lcarswm-${TRAVIS_TAG}/usr"
 cp "build/bin/native/releaseExecutable/lcarswm.kexe" "build/deb/lcarswm-${TRAVIS_TAG}/usr/bin/"
-cp -r "build/processedResources/native/main/usr/share" "build/deb/lcarswm-${TRAVIS_TAG}/usr/share"
 
 cd "build/deb"
 
 echo "create tarball"
 tar -czvf "lcarswm_${TRAVIS_TAG}.orig.tar.gz" "lcarswm-${TRAVIS_TAG}"
-
 tar -ztvf "lcarswm_${TRAVIS_TAG}.orig.tar.gz"
 
 cd ../..
