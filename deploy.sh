@@ -35,5 +35,8 @@ sed -i "s/%time%/${TIME}/" "debian/changelog"
 
 debuild -us -uc
 
-cd ../../..
-mv "build/deb/lcarswm_${TRAVIS_TAG}.orig.tar.gz" "build/deb/lcarswm-${TRAVIS_TAG}.tar.gz"
+cd ..
+ls -l
+mkdir "deploy"
+mv "lcarswm_${TRAVIS_TAG}.orig.tar.gz" "deploy/lcarswm-${TRAVIS_TAG}.tar.gz"
+mv lcarswm_*.deb deploy/
