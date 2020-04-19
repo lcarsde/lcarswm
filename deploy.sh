@@ -34,7 +34,7 @@ echo "Deploying debian package of lcarswm-${TRAVIS_TAG}"
 
 cd "build/deb/lcarswm-${TRAVIS_TAG}"
 
-sed -i "s/%version%/${TRAVIS_TAG}/" "changelog"
-sed -i "s/%time%/${TIME}/" "changelog"
+sed -i "s/%version%/${TRAVIS_TAG}/" "debian/changelog"
+sed -i "s/%time%/${TIME}/" "debian/changelog"
 
 debuild -us -uc
