@@ -36,6 +36,7 @@ deploy:
     - "build/deb/lcarswm_*.deb"
     - "build/deb/lcarswm-*.tar.gz"
   draft: true
+  skip_cleanup: true
   on:
     branch: master
 #    tags: true
