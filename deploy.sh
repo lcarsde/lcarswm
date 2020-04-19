@@ -40,3 +40,5 @@ ls -l
 mkdir "deploy"
 mv "lcarswm_${TRAVIS_TAG}.orig.tar.gz" "deploy/lcarswm-${TRAVIS_TAG}.tar.gz"
 mv lcarswm_*.deb deploy/
+
+cd ../..
