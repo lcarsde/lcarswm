@@ -2,10 +2,10 @@
 
 TRAVIS_TAG="0.0"
 
-echo "build debian package for lcarswm-${TRAVIS_TAG}"
+echo "run build for deployment"
+./gradlew build
 
-echo "$TRAVIS_BUILD_DIR"
-ls -l "$TRAVIS_BUILD_DIR"
+echo "build debian package for lcarswm-${TRAVIS_TAG}"
 
 # create debian package construction directory
 mkdir -p "build/deb/lcarswm-${TRAVIS_TAG}"
