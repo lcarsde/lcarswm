@@ -3,7 +3,7 @@ Maintainer: Andreas Tennert <mail@andreas-tennert.de>
 Section: x11
 Priority: optional
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9), gradle, openjdk-11-jdk, libx11-dev, libxpm-dev, libxrandr-dev, libglib2.0-dev, libpango1.0-dev
+Build-Depends: debhelper (>= 9), openjdk-8-jdk, libx11-dev, libxpm-dev, libxrandr-dev, libglib2.0-dev, libpango1.0-dev
 
 Package: lcarswm
 Architecture: any
