@@ -4,6 +4,8 @@ TRAVIS_TAG="0.0"
 
 echo "build debian package for lcarswm-${TRAVIS_TAG}"
 
+ls -l
+
 # create debian package construction directory
 mkdir -p "build/deb/lcarswm-${TRAVIS_TAG}"
 
