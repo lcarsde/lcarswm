@@ -33,8 +33,8 @@ deploy:
   api_key:
     secure: cXKfAUxb2hpeKBPZFsc3lOV+fldQ8PhpJiOMnl+XWVjIMcQs71bE/CdoERqknRyekd0Bzb358M7kXwc1HgBfKc8kMhEQtEwrruhA8rTKcBDr+y4Yokl+xbcti1A2ocIG1hFhL9E7E2CAP2RVQy9sYqwiMCldRF31ZJPYEgXw9n4awFXBlNXTzpqhDJq72HJ8c8LK/Zi6Ol0wXArglhEjTw8UbbmJ3GVFxv558q2Viy+vv4uhwhrsXiNQuSaGW4DK7ZCyqETb9fgCnXWWKxoV3XNZ5QFOggnqQxs3zseKdRLQqJKUO0WL3milWF5fQtedxTujDW450n3xEklPPL5y1jYwrhNHRUEbmin9oRUAm3YdFr4NoNPnl5Pou9oHHkN7Ng4O9qzfmLp6rc5T9glCiCzlSsDVHwOvNWAEZNnQHMXD8ApjTw4UJicW0e/Zjlw8HVTqVZd5BvSs8BfyPRf7Pg/fH1A0q0JC3zW+bWLO1jwv+ndLcnXCiXXltRKbKyx8Yss2na5wm/xGB/6B65BHHiOOlaXApJqE6qADp4B6xHmRP8BmB8dJz/wEGOug/aOkv/7jzqolkzhDJP/ag6QT4V5dRMdptvR6GjXav2QIPdIWr28jK+vKWYLWz7RUHD7fO/SevtnAOAzL2RPavtJqd2Z4ZfoXjN/M1DX+l+Dl6pc=
   file:
-    - "build/deb/lcarswm_*.deb"
-    - "build/deb/lcarswm-*.tar.gz"
+    - build/deb/lcarswm_*.deb
+    - build/deb/lcarswm-*.tar.gz
   draft: true
   skip_cleanup: true
   on:
