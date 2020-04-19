@@ -28,5 +28,3 @@ before_install:
 deploy:
   provider: script
   script: deploy.sh
-#  on:
-#    tags: true
