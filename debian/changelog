@@ -1,5 +1,5 @@
-lcarswm (0.0) UNRELEASED; urgency=low
+lcarswm (%version%) UNRELEASED; urgency=low
 
   * Upstream release.
 
- -- Andreas Tennert <mail@andreas-tennert.de> Sun, 19 Apr 2020 16:42:12 + 0000
+ -- Andreas Tennert <mail@andreas-tennert.de> %time%
