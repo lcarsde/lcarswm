@@ -85,6 +85,7 @@ Fullscreen mode
 * Monitors
   * Merge overlaying screens of same size
   * If screens have different sizes, the higher one draws
+* check for XDG-path variables and have a fallback
 
 ## Some definitions
 * Height of top and bottom bar: 40px
