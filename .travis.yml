@@ -28,6 +28,6 @@ before_install:
 deploy:
   provider: script
   script: bash deploy.sh
-  on:
-    branch: master
-    tags: true
+#  on:
+#    branch: master
+#    tags: true
