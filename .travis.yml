@@ -27,7 +27,7 @@ before_install:
 - sudo ln -s /usr/lib/x86_64-linux-gnu/libgthread-2.0.so /usr/lib/libgthread-2.0.so
 
 before_deploy:
-  - ./deploy.sh
+  - bash deploy.sh
 
 deploy:
   provider: releases
