@@ -1,6 +1,5 @@
 #!/bin/bash
 
-TRAVIS_TAG="0.0"
 TIME="$(date '+%a, %d %b %Y %T %z')"
 
 echo "run build for deployment"
