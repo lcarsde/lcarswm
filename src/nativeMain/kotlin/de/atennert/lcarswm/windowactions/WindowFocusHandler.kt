@@ -32,12 +32,10 @@ class WindowFocusHandler {
     fun removeWindow(window: Window) {
         val focusIndex = getIndexOfFocusedWindow()
         windowIdList.remove(window)
-        this.activeWindow = if (windowIdList.isEmpty()) {
-            null
-        } else {
-            getPreviousWindowToFocus(focusIndex)
+        if (window == activeWindow) {
+            this.activeWindow = getPreviousWindowToFocus(focusIndex)
+            this.observers.forEach { it(this.activeWindow, window) }
         }
-        this.observers.forEach { it(this.activeWindow, window) }
     }
 
     fun toggleWindowFocus() {
@@ -59,6 +57,10 @@ class WindowFocusHandler {
     }
 
     private fun getPreviousWindowToFocus(currentFocusIndex: Int): Window? {
+        if (windowIdList.isEmpty()) {
+            return null
+        }
+
         val nextIndex = if (currentFocusIndex > 0) currentFocusIndex - 1 else windowIdList.size - 1
         return windowIdList.elementAt(nextIndex)
     }
