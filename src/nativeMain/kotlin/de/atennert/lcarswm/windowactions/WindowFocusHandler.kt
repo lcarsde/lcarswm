@@ -7,7 +7,7 @@ typealias FocusObserver = (Window?, Window?) -> Unit
 class WindowFocusHandler {
     private var activeWindow: Window? = null
 
-    private val windowIdList = mutableSetOf<Window>()
+    private val windowIdList = mutableListOf<Window>()
 
     private val observers = mutableListOf<FocusObserver>()
 
@@ -30,11 +30,12 @@ class WindowFocusHandler {
     }
 
     fun removeWindow(window: Window) {
+        val focusIndex = getIndexOfFocusedWindow()
         windowIdList.remove(window)
         this.activeWindow = if (windowIdList.isEmpty()) {
             null
         } else {
-            windowIdList.first()
+            getPreviousWindowToFocus(focusIndex)
         }
         this.observers.forEach { it(this.activeWindow, window) }
     }
@@ -54,6 +55,11 @@ class WindowFocusHandler {
 
     private fun getNextWindowToFocus(currentFocusIndex: Int): Window {
         val nextIndex = (currentFocusIndex + 1).rem(windowIdList.size)
+        return windowIdList.elementAt(nextIndex)
+    }
+
+    private fun getPreviousWindowToFocus(currentFocusIndex: Int): Window? {
+        val nextIndex = if (currentFocusIndex > 0) currentFocusIndex - 1 else windowIdList.size - 1
         return windowIdList.elementAt(nextIndex)
     }
 }

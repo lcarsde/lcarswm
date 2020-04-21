@@ -68,6 +68,24 @@ class WindowFocusHandlerTest {
     }
 
     @Test
+    fun `remove third focused window`() {
+        val focusHandler = WindowFocusHandler()
+        val window1: Window = 1.convert()
+        val window2: Window = 2.convert()
+        val window3: Window = 3.convert()
+
+        focusHandler.setFocusedWindow(window1)
+        focusHandler.setFocusedWindow(window2)
+        focusHandler.setFocusedWindow(window3)
+
+        // remove currently focused window
+        focusHandler.removeWindow(window3)
+
+        // the last focused window should be focused
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The fallback should be another focusable window")
+    }
+
+    @Test
     fun `toggle through windows`() {
         val focusHandler = WindowFocusHandler()
         val window1: Window = 1.convert()
