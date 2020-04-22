@@ -56,9 +56,25 @@ class MappingNotifyHandlerTest {
         assertEquals("ungrabKey", system.functionCalls.removeAt(0).name, "ungrab keys")
         assertEquals("freeModifiermap", system.functionCalls.removeAt(0).name, "free the known modifiers")
         assertEquals("free", system.functionCalls.removeAt(0).name, "free the key map")
-        assertEquals("grabKey", system.functionCalls.removeAt(0).name, "grab the modifier key")
-        LCARS_WM_KEY_SYMS.forEach {
-            assertEquals("grabKey", system.functionCalls.removeAt(0).name, "grab the internal key")
+        listOf(20, 21).forEach {keyCode ->
+            val grabKeyCall = system.functionCalls.removeAt(0)
+            assertEquals("grabKey", grabKeyCall.name, "grab the modifier key")
+            assertEquals(
+                keyCode,
+                grabKeyCall.parameters[0],
+                "The modifier key code needs to be $keyCode"
+            )
+        }
+        LCARS_WM_KEY_SYMS
+            .filterNot { system.keySyms[it.first] == 0 } // 0s are not available
+            .forEach {(keySym, _) ->
+            val grabKeyCall = system.functionCalls.removeAt(0)
+            assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")
+            assertEquals(
+                system.keySyms[keySym],
+                grabKeyCall.parameters[0],
+                "The key needs to be ${system.keySyms[keySym]}"
+            )
         }
         configurationProvider.getPropertyNames().forEach {
             assertEquals("grabKey", system.functionCalls.removeAt(0).name, "grab the property key")
