@@ -76,8 +76,8 @@ class KeyManagerTest {
             }
 
         LCARS_WM_KEY_SYMS
-            .filterNot { systemApi.keySyms[it] == 0 } // 0s are not available
-            .onEach { keySym ->
+            .filterNot { systemApi.keySyms[it.first] == 0 } // 0s are not available
+            .onEach { (keySym, modifier) ->
                 val grabKeyCall = inputCalls.removeAt(0)
                 assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")
                 assertEquals(
@@ -86,9 +86,9 @@ class KeyManagerTest {
                     "The key needs to be ${systemApi.keySyms[keySym]}"
                 )
                 assertEquals(
-                    0x40.toUInt(),
+                    if (modifier == Modifiers.ALT) 0x08.toUInt() else 0x40.toUInt(),
                     grabKeyCall.parameters[1],
-                    "The modifier key needs to be SUPER (Win)"
+                    "The modifier key needs to be $modifier"
                 )
                 assertEquals(
                     systemApi.rootWindowId,
@@ -96,7 +96,7 @@ class KeyManagerTest {
                     "The key needs to be grabbed for the root window"
                 )
             }
-            .forEach { keySym ->
+            .forEach { (keySym, _) ->
                 assertEquals(
                     keySym,
                     keyManager.getKeySym(systemApi.keySyms.getValue(keySym).convert())!!.convert()

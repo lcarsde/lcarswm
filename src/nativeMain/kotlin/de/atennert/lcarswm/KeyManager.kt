@@ -154,16 +154,9 @@ class KeyManager(private val inputApi: InputApi) {
             inputApi.grabKey(keyCode, AnyModifier.convert(), rootWindowId, GrabModeAsync)
         }
 
-        grabKeysForKeySyms(LCARS_WM_KEY_SYMS, modMasks.getValue(Modifiers.SUPER), rootWindowId)
-    }
-
-    private fun grabKeysForKeySyms(keySyms: List<Int>, modifierKey: Int, rootWindowId: Window) {
-        keySyms.map { keySym -> Pair(keySym, inputApi.keysymToKeycode(keySym.convert())) }
-            .filterNot { (_, keyCode) -> keyCode.convert<Int>() == 0 }
-            .onEach { (keySym, keyCode) -> grabbedKeys[keyCode] = keySym.convert() }
-            .forEach { (_, keyCode) ->
-                inputApi.grabKey(keyCode.convert(), modifierKey.convert(), rootWindowId, GrabModeAsync)
-            }
+        LCARS_WM_KEY_SYMS.forEach { (keySym, modifier) ->
+            grabKey(keySym.convert(), modMasks.getValue(modifier), rootWindowId)
+        }
     }
 
     /**
