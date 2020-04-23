@@ -1,12 +1,9 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.KeyConfiguration
-import de.atennert.lcarswm.KeyManager
-import de.atennert.lcarswm.Modifiers
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.log.Logger
-import de.atennert.lcarswm.runProgram
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.windowactions.WindowFocusHandler
 import kotlinx.cinterop.*
@@ -33,11 +30,11 @@ class KeyReleaseHandler(
         logger.logDebug("KeyReleaseHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
 
         val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
-        val winKeyMask = keyManager.modMasks.getValue(Modifiers.SUPER)
+        val requiredKeyMask = keyManager.modMasks[LCARS_WM_KEY_SYMS[keySym.convert()]]
 
         when (Pair(keySym.convert<Int>(), keyMask)) {
-            Pair(XK_F4, winKeyMask) -> closeActiveWindow()
-            Pair(XK_Q, winKeyMask) -> return true // shutdown the WM
+            Pair(XK_F4, requiredKeyMask) -> closeActiveWindow()
+            Pair(XK_Q, requiredKeyMask) -> return true // shutdown the WM
             else -> {
                 keyConfiguration.getCommandForKey(keySym, keyMask)?.let { command ->
                     logger.logDebug("KeyReleaseHandler::handleEvent::run command: $command")

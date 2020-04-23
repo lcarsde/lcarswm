@@ -94,7 +94,7 @@ class KeyReleaseHandlerTest {
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
-        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
+        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.ALT))
 
         val keyReleaseHandler = KeyReleaseHandler(LoggerMock(), systemApi, focusHandler, keyManager, keyConfiguration, atomLibrary)
 
@@ -132,7 +132,7 @@ class KeyReleaseHandlerTest {
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
-        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
+        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.ALT))
 
         val keyReleaseHandler = KeyReleaseHandler(LoggerMock(), systemApi, focusHandler, keyManager, keyConfiguration, atomLibrary)
 
@@ -161,7 +161,7 @@ class KeyReleaseHandlerTest {
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
         keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
-        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.SUPER))
+        keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.ALT))
 
         val keyReleaseHandler = KeyReleaseHandler(LoggerMock(), systemApi, focusHandler, keyManager, keyConfiguration, atomLibrary)
 

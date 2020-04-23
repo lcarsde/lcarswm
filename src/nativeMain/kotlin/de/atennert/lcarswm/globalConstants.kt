@@ -13,7 +13,7 @@ const val KEY_CONFIG_FILE = "/$LCARS_WM_DIR/key-config.properties"
 const val X_FALSE = 0
 const val X_TRUE = 1
 
-val LCARS_WM_KEY_SYMS = listOf(
+val LCARS_WM_KEY_SYMS = mapOf(
     Pair(XK_Tab, Modifiers.ALT), // toggle through windows
     Pair(XK_Up, Modifiers.ALT), // move windows up the monitor list
     Pair(XK_Down, Modifiers.ALT), // move windows down the monitor list
