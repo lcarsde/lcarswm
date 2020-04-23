@@ -18,10 +18,10 @@ Thank you very much to the creators of the following resources:
 ## Functionality
 * Window title bar, with window name and different colors for active and inactive windows
 * Windows-key + Q closes the window manager
-* Windows-key + Tab toggles through the windows
-* Windows-key + Up/Down moves the active window to other monitors
 * Windows-key + M toggles the display mode between normal, maximized and fullscreen
-* Windows-key + F4 closes the active window
+* Alt-key + Tab toggles through the windows
+* Alt-key + Up/Down moves the active window to other monitors
+* Alt-key + F4 closes the active window
 * Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
 * Other key combinations can be connected to commands via a key configuration file
   * The key configuration file is expected to be `~/.config/lcarswm/key-config.properties`
