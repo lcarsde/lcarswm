@@ -347,7 +347,7 @@ class SystemFacade : SystemApi {
         window: Window,
         keyboardMode: Int
     ): Int {
-        return XGrabKey(display, keyCode, modifiers, window, X_FALSE, GrabModeAsync, keyboardMode)
+        return XGrabKey(display, keyCode, modifiers, window, X_TRUE, GrabModeAsync, keyboardMode)
     }
 
     override fun ungrabKey(window: Window) {
