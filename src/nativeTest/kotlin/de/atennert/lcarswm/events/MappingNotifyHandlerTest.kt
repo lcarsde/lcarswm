@@ -56,17 +56,9 @@ class MappingNotifyHandlerTest {
         assertEquals("ungrabKey", system.functionCalls.removeAt(0).name, "ungrab keys")
         assertEquals("freeModifiermap", system.functionCalls.removeAt(0).name, "free the known modifiers")
         assertEquals("free", system.functionCalls.removeAt(0).name, "free the key map")
-        listOf(20, 21).forEach {keyCode ->
-            val grabKeyCall = system.functionCalls.removeAt(0)
-            assertEquals("grabKey", grabKeyCall.name, "grab the modifier key")
-            assertEquals(
-                keyCode,
-                grabKeyCall.parameters[0],
-                "The modifier key code needs to be $keyCode"
-            )
-        }
+
         LCARS_WM_KEY_SYMS
-            .filterNot { system.keySyms[it.first] == 0 } // 0s are not available
+            .filterNot { system.keySyms[it.key] == 0 } // 0s are not available
             .forEach {(keySym, _) ->
             val grabKeyCall = system.functionCalls.removeAt(0)
             assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")

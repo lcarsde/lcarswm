@@ -58,7 +58,6 @@ class KeyManager(private val inputApi: InputApi) {
             for (j in 0 until modifierKeymap.max_keypermod) {
                 val keyCode = modifierKeymap.modifiermap!![i * modifierKeymap.max_keypermod + j].convert<Int>()
                 if (keyCode != 0) {
-                    var usedForModifier = false
                     for (k in 0 until keySymsPerKeyCode[0]) {
                         val keySym = keymap!![(keyCode - minKeyCodes) * keySymsPerKeyCode[0] + k]
                         if (keySym.convert<Long>() != NoSymbol) {
@@ -73,7 +72,6 @@ class KeyManager(private val inputApi: InputApi) {
                                 }
 
                                 XK_Super_L -> {
-                                    usedForModifier = true
                                     modifierMasks[Modifiers.SUPER] = if (superLUsed) {
                                         modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
                                     } else {
@@ -82,7 +80,6 @@ class KeyManager(private val inputApi: InputApi) {
                                     }
                                 }
                                 XK_Super_R -> {
-                                    usedForModifier = true
                                     if (!superLUsed) {
                                         modifierMasks[Modifiers.SUPER] = modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
                                     }
@@ -120,9 +117,6 @@ class KeyManager(private val inputApi: InputApi) {
                             }
                         }
                     }
-                    if (usedForModifier) {
-                        modifierKeyCodes.add(keyCode)
-                    }
                 }
             }
         }
@@ -150,10 +144,6 @@ class KeyManager(private val inputApi: InputApi) {
      * Grab the internal keys from the XServer.
      */
     fun grabInternalKeys(rootWindowId: Window) {
-        modifierKeyCodes.forEach { keyCode ->
-            inputApi.grabKey(keyCode, AnyModifier.convert(), rootWindowId, GrabModeAsync)
-        }
-
         LCARS_WM_KEY_SYMS.forEach { (keySym, modifier) ->
             grabKey(keySym.convert(), modMasks.getValue(modifier), rootWindowId)
         }

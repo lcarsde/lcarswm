@@ -54,29 +54,8 @@ class KeyManagerTest {
 
         val inputCalls = systemApi.functionCalls
 
-        listOf(20, 21) // grab modifier key codes
-            .forEach { keyCode ->
-                val grabKeyCall = inputCalls.removeAt(0)
-                assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")
-                assertEquals(
-                    keyCode,
-                    grabKeyCall.parameters[0],
-                    "The modifier key code needs to be $keyCode"
-                )
-                assertEquals(
-                    AnyModifier.toUInt(),
-                    grabKeyCall.parameters[1],
-                    "The modifier mask needs to be Any"
-                )
-                assertEquals(
-                    systemApi.rootWindowId,
-                    grabKeyCall.parameters[2],
-                    "The modifier needs to be grabbed for the root window"
-                )
-            }
-
         LCARS_WM_KEY_SYMS
-            .filterNot { systemApi.keySyms[it.first] == 0 } // 0s are not available
+            .filterNot { systemApi.keySyms[it.key] == 0 } // 0s are not available
             .onEach { (keySym, modifier) ->
                 val grabKeyCall = inputCalls.removeAt(0)
                 assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")
