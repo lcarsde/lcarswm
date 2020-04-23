@@ -1,7 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.KeyManager
-import de.atennert.lcarswm.Modifiers
+import de.atennert.lcarswm.LCARS_WM_KEY_SYMS
 import de.atennert.lcarswm.drawing.UIDrawingMock
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
@@ -47,7 +47,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Up).convert()
-        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.ALT).convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(LCARS_WM_KEY_SYMS.getValue(XK_Up)).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -77,7 +77,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Down).convert()
-        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.ALT).convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(LCARS_WM_KEY_SYMS.getValue(XK_Down)).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -106,7 +106,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Up).convert()
-        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.ALT).convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(LCARS_WM_KEY_SYMS.getValue(XK_Up)).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -132,7 +132,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Down).convert()
-        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.ALT).convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(LCARS_WM_KEY_SYMS.getValue(XK_Down)).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -172,7 +172,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = 42.convert()
-        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.ALT).convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(LCARS_WM_KEY_SYMS.getValue(XK_Tab)).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -209,7 +209,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = 42.convert()
-        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.ALT).convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(LCARS_WM_KEY_SYMS.getValue(XK_Tab)).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
@@ -234,7 +234,7 @@ class KeyPressHandlerTest {
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
         keyPressEvent.xkey.keycode = systemApi.keySyms.getValue(XK_M).convert()
-        keyPressEvent.xkey.state = keyManager.modMasks.getValue(Modifiers.SUPER).convert()
+        keyPressEvent.xkey.state = keyManager.modMasks.getValue(LCARS_WM_KEY_SYMS.getValue(XK_M)).convert()
 
         val shutdownValue = keyPressHandler.handleEvent(keyPressEvent)
 
