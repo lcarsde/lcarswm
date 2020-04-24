@@ -368,6 +368,14 @@ class SystemFacade : SystemApi {
         return XGrabButton(display, button, modifiers, window, convertToXBoolean(ownerEvents), mask, pointerMode, keyboardMode, windowToConfineTo, cursor)
     }
 
+    override fun grabKeyboard(window: Window, time: Time): Boolean {
+        return XGrabKeyboard(display, window, X_FALSE, GrabModeAsync, GrabModeAsync, time) == 0
+    }
+
+    override fun ungrabKeyboard(time: Time) {
+        XUngrabKeyboard(display, time)
+    }
+
     override fun getModifierMapping(): CPointer<XModifierKeymap>? {
         return XGetModifierMapping(display)
     }

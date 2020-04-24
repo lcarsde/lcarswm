@@ -207,6 +207,13 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun grabKeyboard(window: Window, time: Time): Boolean {
+        return true
+    }
+
+    override fun ungrabKeyboard(time: Time) {
+    }
+
     val modifiers = UByteArray(16) { (it+8).convert() }
 
     val winModifierPosition = 6
