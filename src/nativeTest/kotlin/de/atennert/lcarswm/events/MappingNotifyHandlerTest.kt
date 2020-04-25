@@ -59,17 +59,21 @@ class MappingNotifyHandlerTest {
 
         LCARS_WM_KEY_SYMS
             .filterNot { system.keySyms[it.key] == 0 } // 0s are not available
-            .forEach {(keySym, _) ->
-            val grabKeyCall = system.functionCalls.removeAt(0)
-            assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")
-            assertEquals(
-                system.keySyms[keySym],
-                grabKeyCall.parameters[0],
-                "The key needs to be ${system.keySyms[keySym]}"
-            )
-        }
-        configurationProvider.getPropertyNames().forEach {
-            assertEquals("grabKey", system.functionCalls.removeAt(0).name, "grab the property key")
+            .forEach { (keySym, _) ->
+                for (i in 0..7) {
+                    val grabKeyCall = system.functionCalls.removeAt(0)
+                    assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")
+                    assertEquals(
+                        system.keySyms[keySym],
+                        grabKeyCall.parameters[0],
+                        "The key needs to be ${system.keySyms[keySym]}"
+                    )
+                }
+            }
+        configurationProvider.getPropertyNames().forEach { _ ->
+            for (i in 0..7) {
+                assertEquals("grabKey", system.functionCalls.removeAt(0).name, "grab the property key")
+            }
         }
         assertTrue(system.functionCalls.isEmpty(), "There should be no more system calls")
     }

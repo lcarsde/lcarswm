@@ -31,6 +31,8 @@ class KeyManager(private val inputApi: InputApi) {
     var modMasks = getAllModifierKeys()
         private set
 
+    private var lockMasks = getLockMasks()
+
     private fun getAllModifierKeys(): Map<Modifiers, Int> {
         modifierKeymapReference = inputApi.getModifierMapping()
         val modifierKeymap = modifierKeymapReference?.pointed ?: return emptyMap()
@@ -124,6 +126,23 @@ class KeyManager(private val inputApi: InputApi) {
         return modifierMasks
     }
 
+    private fun getLockMasks(): List<Int> {
+        val numMask = modMasks[Modifiers.NUM_LOCK] ?: 0
+        val capsMask = modMasks[Modifiers.CAPS_LOCK] ?: 0
+        val scrollMask = modMasks[Modifiers.SCROLL_LOCK] ?: 0
+
+        return listOf(
+            0,
+            numMask,
+            capsMask,
+            scrollMask,
+            numMask or capsMask,
+            numMask or scrollMask,
+            capsMask or scrollMask,
+            numMask or capsMask or scrollMask
+        )
+    }
+
     /**
      * Ungrab all grabbed keys
      */
@@ -138,6 +157,7 @@ class KeyManager(private val inputApi: InputApi) {
     fun reloadConfig() {
         cleanup()
         modMasks = getAllModifierKeys()
+        lockMasks = getLockMasks()
     }
 
     /**
@@ -157,7 +177,9 @@ class KeyManager(private val inputApi: InputApi) {
 
         if (keyCode.convert<Int>() != 0) {
             grabbedKeys[keyCode] = keySym
-            inputApi.grabKey(keyCode.convert(), modifiers.convert(), rootWindowId, GrabModeAsync)
+            lockMasks.forEach { lockMask ->
+                inputApi.grabKey(keyCode.convert(), (modifiers or lockMask).convert(), rootWindowId, GrabModeAsync)
+            }
         }
     }
 
