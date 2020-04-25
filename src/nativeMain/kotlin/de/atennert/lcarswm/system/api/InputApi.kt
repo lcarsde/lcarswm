@@ -32,8 +32,4 @@ interface InputApi {
     fun freeModifiermap(modifierMap: CPointer<XModifierKeymap>?)
 
     fun free(xObject: CPointer<*>?)
-
-    fun grabKeyboard(window: Window, time: Time): Boolean
-
-    fun ungrabKeyboard(time: Time)
 }
