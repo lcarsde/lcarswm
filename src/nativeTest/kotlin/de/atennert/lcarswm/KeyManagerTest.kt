@@ -2,7 +2,6 @@ package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
-import xlib.AnyModifier
 import xlib.ControlMask
 import xlib.LockMask
 import xlib.ShiftMask
@@ -52,35 +51,15 @@ class KeyManagerTest {
 
         keyManager.grabInternalKeys(systemApi.rootWindowId)
 
-        val inputCalls = systemApi.functionCalls
-
         LCARS_WM_KEY_SYMS
-            .filterNot { systemApi.keySyms[it.key] == 0 } // 0s are not available
+            .filterNot { systemApi.keySymKeyCodeMapping[it.key] == 0 } // 0s are not available
             .onEach { (keySym, modifier) ->
-                for (lockMask in systemApi.lockMasks) {
-                    val grabKeyCall = inputCalls.removeAt(0)
-                    assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")
-                    assertEquals(
-                        systemApi.keySyms[keySym],
-                        grabKeyCall.parameters[0],
-                        "The key needs to be ${systemApi.keySyms[keySym]}"
-                    )
-                    assertEquals(
-                        (lockMask or if (modifier == Modifiers.ALT) 0x08 else 0x40).toUInt(),
-                        grabKeyCall.parameters[1],
-                        "The modifier key needs to be $modifier"
-                    )
-                    assertEquals(
-                        systemApi.rootWindowId,
-                        grabKeyCall.parameters[2],
-                        "The key needs to be grabbed for the root window"
-                    )
-                }
+                checkGrabKey(systemApi, systemApi.stringKeys.getValue(keySym), listOf(modifier))
             }
             .forEach { (keySym, _) ->
                 assertEquals(
                     keySym,
-                    keyManager.getKeySym(systemApi.keySyms.getValue(keySym).convert())!!.convert()
+                    keyManager.getKeySym(systemApi.keySymKeyCodeMapping.getValue(keySym).convert())!!.convert()
                 )
             }
     }

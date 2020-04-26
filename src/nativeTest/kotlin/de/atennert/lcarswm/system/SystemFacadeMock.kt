@@ -234,6 +234,8 @@ open class SystemFacadeMock : SystemApi {
         Pair("XF86AudioLowerVolume", XF86XK_AudioLowerVolume)
     )
 
+    val stringKeys = keyStrings.map { (s, i) -> Pair(i, s) }.toMap()
+
     private val numMask = 0
     private val capsMask = LockMask
     private val scrollMask = 1.shl(7)
@@ -249,7 +251,7 @@ open class SystemFacadeMock : SystemApi {
         numMask or capsMask or scrollMask
     )
 
-    val keySyms = keyStrings.values.associateWith { startKeyCode++ }
+    val keySymKeyCodeMapping = keyStrings.values.associateWith { startKeyCode++ }
 
     override fun getModifierMapping(): CPointer<XModifierKeymap>? {
         val keymap = nativeHeap.alloc<XModifierKeymap>()
@@ -290,7 +292,7 @@ open class SystemFacadeMock : SystemApi {
     }
 
     override fun keysymToKeycode(keySym: KeySym): KeyCode {
-        return keySyms[keySym.convert()]?.convert() ?: error("keySym not found")
+        return keySymKeyCodeMapping[keySym.convert()]?.convert() ?: error("keySym not found")
     }
 
     override fun stringToKeysym(s: String): KeySym {

@@ -61,7 +61,7 @@ class KeyReleaseHandlerTest {
 
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
-        keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_Q).convert()
+        keyReleaseEvent.xkey.keycode = systemApi.keySymKeyCodeMapping.getValue(XK_Q).convert()
         keyReleaseEvent.xkey.state = getMask(keyManager, listOf(LCARS_WM_KEY_SYMS.getValue(XK_Q)))
 
         val keyReleaseHandler = KeyReleaseHandler(LoggerMock(), systemApi, focusHandler, keyManager, keyConfiguration, atomLibrary)
@@ -90,7 +90,7 @@ class KeyReleaseHandlerTest {
 
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
-        keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
+        keyReleaseEvent.xkey.keycode = systemApi.keySymKeyCodeMapping.getValue(XK_F4).convert()
         keyReleaseEvent.xkey.state = getMask(keyManager, listOf(LCARS_WM_KEY_SYMS.getValue(XK_F4)))
 
         val keyReleaseHandler = KeyReleaseHandler(LoggerMock(), systemApi, focusHandler, keyManager, keyConfiguration, atomLibrary)
@@ -128,7 +128,7 @@ class KeyReleaseHandlerTest {
 
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
-        keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
+        keyReleaseEvent.xkey.keycode = systemApi.keySymKeyCodeMapping.getValue(XK_F4).convert()
         keyReleaseEvent.xkey.state = getMask(keyManager, listOf(LCARS_WM_KEY_SYMS.getValue(XK_F4)))
 
         val keyReleaseHandler = KeyReleaseHandler(LoggerMock(), systemApi, focusHandler, keyManager, keyConfiguration, atomLibrary)
@@ -157,7 +157,7 @@ class KeyReleaseHandlerTest {
 
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
-        keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
+        keyReleaseEvent.xkey.keycode = systemApi.keySymKeyCodeMapping.getValue(XK_F4).convert()
         keyReleaseEvent.xkey.state = getMask(keyManager, listOf(LCARS_WM_KEY_SYMS.getValue(XK_F4)))
 
         val keyReleaseHandler = KeyReleaseHandler(LoggerMock(), systemApi, focusHandler, keyManager, keyConfiguration, atomLibrary)
@@ -199,7 +199,7 @@ class KeyReleaseHandlerTest {
 
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
-        keyReleaseEvent.xkey.keycode = systemApi.keySyms.getValue(XK_F4).convert()
+        keyReleaseEvent.xkey.keycode = systemApi.keySymKeyCodeMapping.getValue(XK_F4).convert()
         keyReleaseEvent.xkey.state = getMask(keyManager, listOf(Modifiers.CONTROL))
 
         val shutdownValue = keyReleaseHandler.handleEvent(keyReleaseEvent)

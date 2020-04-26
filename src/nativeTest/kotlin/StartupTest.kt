@@ -164,7 +164,7 @@ class StartupTest {
                     super.nextEvent(event)
                     event.pointed.type = KeyRelease
                     event.pointed.xkey.time = 234.convert()
-                    event.pointed.xkey.keycode = keySyms.getValue(XK_Q).convert()
+                    event.pointed.xkey.keycode = keySymKeyCodeMapping.getValue(XK_Q).convert()
                     event.pointed.xkey.state = 0x40.convert()
                 }
             }

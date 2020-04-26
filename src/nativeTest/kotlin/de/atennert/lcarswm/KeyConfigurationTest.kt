@@ -54,7 +54,7 @@ class KeyConfigurationTest {
         )
 
         configurationProvider.getPropertyNames()
-            .forEach { key -> checkGrabKey(systemApi, keyManager, key, emptyList()) }
+            .forEach { key -> checkGrabKey(systemApi, key, emptyList()) }
     }
 
     @Test
@@ -100,7 +100,13 @@ class KeyConfigurationTest {
 
         configurationProvider.getPropertyNames()
             .zip(listOf(emptyList(), listOf(Modifiers.CONTROL), listOf(Modifiers.ALT)))
-            .forEach { (key, modifiers) -> checkGrabKey(systemApi, keyManager, key, modifiers) }
+            .forEach { (key, modifiers) ->
+                checkGrabKey(
+                    systemApi,
+                    key,
+                    modifiers
+                )
+            }
     }
 
     @Test
@@ -130,7 +136,6 @@ class KeyConfigurationTest {
             keyConfiguration.getCommandForKey(
                 XK_A.convert(),
                 getMask(
-                    keyManager,
                     listOf(Modifiers.CONTROL, Modifiers.ALT)
                 )
             ),
@@ -140,7 +145,7 @@ class KeyConfigurationTest {
             "commandB",
             keyConfiguration.getCommandForKey(
                 XK_B.convert(),
-                getMask(keyManager, listOf(Modifiers.SUPER, Modifiers.SHIFT, Modifiers.META))
+                getMask(listOf(Modifiers.SUPER, Modifiers.SHIFT, Modifiers.META))
             ),
             "The config should load the second key binding"
         )
@@ -148,7 +153,7 @@ class KeyConfigurationTest {
             "commandX",
             keyConfiguration.getCommandForKey(
                 XK_X.convert(),
-                getMask(keyManager, listOf(Modifiers.SUPER, Modifiers.HYPER))
+                getMask(listOf(Modifiers.SUPER, Modifiers.HYPER))
             ),
             "The config should load the third key binding"
         )
@@ -158,52 +163,13 @@ class KeyConfigurationTest {
                 listOf(Modifiers.CONTROL, Modifiers.ALT),
                 listOf(Modifiers.SUPER, Modifiers.SHIFT, Modifiers.META),
                 listOf(Modifiers.HYPER, Modifiers.SUPER)))
-            .forEach { (key, modifiers) -> checkGrabKey(systemApi, keyManager, key, modifiers) }
-    }
-
-    private fun getMask(keyManager: KeyManager, l: List<Modifiers>): Int {
-        val mask = l.fold(0) { acc, m ->
-            acc or keyManager.modMasks.getValue(m)
-        }
-        return if (mask == 0) {
-            AnyModifier
-        } else {
-            mask
-        }
-    }
-
-    private fun checkGrabKey(
-        systemApi: SystemFacadeMock,
-        keyManager: KeyManager,
-        key: String,
-        modifiers: List<Modifiers>
-    ) {
-        val keyPart = key.split('+').last()
-
-        for (mask in systemApi.lockMasks) {
-            val grabKeyCall1 = systemApi.functionCalls.removeAt(0)
-
-            assertEquals("grabKey", grabKeyCall1.name, "Grab key needs to be called to grab $key with ...")
-            assertEquals(
-                systemApi.keySyms[systemApi.keyStrings[keyPart]],
-                grabKeyCall1.parameters[0],
-                "Grab key needs to be called with the keyCode for $key (modifier ...)"
-            )
-            assertEquals(
-                (getMask(keyManager, modifiers) or mask).toUInt(),
-                grabKeyCall1.parameters[1],
-                "The modifier for $key should be ...")
-            assertEquals(
-                systemApi.rootWindowId,
-                grabKeyCall1.parameters[2],
-                "The key should be grabbed for the root window"
-            )
-            assertEquals(
-                GrabModeAsync,
-                grabKeyCall1.parameters[3],
-                "The mode for the grabbed key should be GrabModeAsync"
-            )
-        }
+            .forEach { (key, modifiers) ->
+                checkGrabKey(
+                    systemApi,
+                    key,
+                    modifiers
+                )
+            }
     }
 
     @Test

@@ -1,9 +1,6 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.KeyConfiguration
-import de.atennert.lcarswm.KeyManager
-import de.atennert.lcarswm.LCARS_WM_KEY_SYMS
-import de.atennert.lcarswm.Properties
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
@@ -58,22 +55,13 @@ class MappingNotifyHandlerTest {
         assertEquals("free", system.functionCalls.removeAt(0).name, "free the key map")
 
         LCARS_WM_KEY_SYMS
-            .filterNot { system.keySyms[it.key] == 0 } // 0s are not available
-            .forEach { (keySym, _) ->
-                for (mask in system.lockMasks) {
-                    val grabKeyCall = system.functionCalls.removeAt(0)
-                    assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")
-                    assertEquals(
-                        system.keySyms[keySym],
-                        grabKeyCall.parameters[0],
-                        "The key needs to be ${system.keySyms[keySym]}"
-                    )
-                }
+            .filterNot { system.keySymKeyCodeMapping[it.key] == 0 } // 0s are not available
+            .forEach { (keySym, modifier) ->
+                checkGrabKey(system, system.stringKeys.getValue(keySym), listOf(modifier))
             }
-        configurationProvider.getPropertyNames().forEach { _ ->
-            for (i in 0..7) {
-                assertEquals("grabKey", system.functionCalls.removeAt(0).name, "grab the property key")
-            }
+
+        configurationProvider.getPropertyNames().forEach { propertyName ->
+            checkGrabKey(system, propertyName, listOf(Modifiers.CONTROL))
         }
         assertTrue(system.functionCalls.isEmpty(), "There should be no more system calls")
     }
