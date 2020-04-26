@@ -88,14 +88,6 @@ Fullscreen mode
 * check for XDG-path variables and have a fallback
 * toggle window list by latest used application
 
-## Some definitions
-* Height of top and bottom bar: 40px
-* Width of top, middle and bottom bar ends: 32px
-* Width of bar gaps: 8px
-* Corner pieces have an inner corner with radius: 16px
-* Random data area height: 100px
-* Width of normal mode side bar: 184px
-
 ## Logo
 The logo is a xpm file. It needs to be located in /usr/share/pixmaps and must be named lcarswm.xpm. It can be exchanged. The only restriction is that the logo height needs to be 40px. The bars will adjust to the width.
 

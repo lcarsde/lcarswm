@@ -25,7 +25,12 @@ val LCARS_WM_KEY_SYMS = mapOf(
 // layout values
 
 const val BAR_HEIGHT = 40
-const val TITLE_BAR_OFFSET = 1
+const val BAR_END_WIDTH = 32
+const val BAR_GAP_SIZE = 8
+const val INNER_CORNER_RADIUS = 16
+const val DATA_AREA_HEIGHT = 100
+const val SIDE_BAR_WIDTH = 184
+const val TITLE_BAR_OFFSET = 1 // extra pixel for overflowing fonts
 const val BAR_HEIGHT_WITH_OFFSET = BAR_HEIGHT + TITLE_BAR_OFFSET // accommodate the font layout with a required extra pixel
 
 const val WINDOW_TITLE_FONT_SIZE = BAR_HEIGHT
