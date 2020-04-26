@@ -60,7 +60,7 @@ class MappingNotifyHandlerTest {
         LCARS_WM_KEY_SYMS
             .filterNot { system.keySyms[it.key] == 0 } // 0s are not available
             .forEach { (keySym, _) ->
-                for (i in 0..7) {
+                for (mask in system.lockMasks) {
                     val grabKeyCall = system.functionCalls.removeAt(0)
                     assertEquals("grabKey", grabKeyCall.name, "The modifier key needs to be grabbed")
                     assertEquals(

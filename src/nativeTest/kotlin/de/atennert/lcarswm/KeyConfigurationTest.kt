@@ -180,7 +180,7 @@ class KeyConfigurationTest {
     ) {
         val keyPart = key.split('+').last()
 
-        for (i in 0..7) {
+        for (mask in systemApi.lockMasks) {
             val grabKeyCall1 = systemApi.functionCalls.removeAt(0)
 
             assertEquals("grabKey", grabKeyCall1.name, "Grab key needs to be called to grab $key with ...")
@@ -189,7 +189,10 @@ class KeyConfigurationTest {
                 grabKeyCall1.parameters[0],
                 "Grab key needs to be called with the keyCode for $key (modifier ...)"
             )
-//        assertEquals(getMask(keyManager, modifiers).toUInt(), grabKeyCall1.parameters[1], "The modifier for $key should be ...")
+            assertEquals(
+                (getMask(keyManager, modifiers) or mask).toUInt(),
+                grabKeyCall1.parameters[1],
+                "The modifier for $key should be ...")
             assertEquals(
                 systemApi.rootWindowId,
                 grabKeyCall1.parameters[2],

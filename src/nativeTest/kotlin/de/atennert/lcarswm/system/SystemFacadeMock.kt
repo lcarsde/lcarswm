@@ -234,6 +234,21 @@ open class SystemFacadeMock : SystemApi {
         Pair("XF86AudioLowerVolume", XF86XK_AudioLowerVolume)
     )
 
+    private val numMask = 0
+    private val capsMask = LockMask
+    private val scrollMask = 1.shl(7)
+
+    val lockMasks = listOf(
+        0,
+        numMask,
+        capsMask,
+        scrollMask,
+        numMask or capsMask,
+        numMask or scrollMask,
+        capsMask or scrollMask,
+        numMask or capsMask or scrollMask
+    )
+
     val keySyms = keyStrings.values.associateWith { startKeyCode++ }
 
     override fun getModifierMapping(): CPointer<XModifierKeymap>? {
