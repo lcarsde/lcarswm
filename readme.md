@@ -3,7 +3,7 @@ It's a window manager written in Kotlin that is designed to look like an LCARS i
 
 lcarswm has two kinds of monitors, one primary monitor (which maps to the X primary monitor) and "other" monitors. Only the primary screen has the upper (currently empty) information area in normal mode. The other screens normal mode looks just like the maximized mode. If there's no primary screen defined in the X server, then lcarswm will use the first monitor it finds as primary.
 
-lcarswm displays one window at a time per screen although that might change in the future (maybe I'll make it tiling). Windows always open on the primary monitor and can be moved to other monitors with keyboard short cuts. At some point, I'd love to have that managable via touch though, because what would an LCARS interface be without touchscreen usability.
+lcarswm is a stacking window manager and displays one window at a time per screen. Windows always open on the primary monitor and can be moved to other monitors with keyboard short cuts. At some point, I'd love to have that managable via touch (mouse input), because what would an LCARS interface be without touchscreen usability.
 
 ## Acknowledgements
 Thank you very much to the creators of the following resources:
