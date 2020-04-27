@@ -1,5 +1,8 @@
 package de.atennert.lcarswm.monitor
 
+import de.atennert.lcarswm.BAR_END_WIDTH
+import de.atennert.lcarswm.BAR_GAP_SIZE
+import de.atennert.lcarswm.SIDE_BAR_WIDTH
 import de.atennert.lcarswm.ScreenMode
 import kotlinx.cinterop.convert
 import kotlin.test.*
@@ -108,7 +111,9 @@ class MonitorTest {
 
         val defaultMeasurements = monitor.getWindowMeasurements()
 
-        assertEquals(WindowMeasurements(208, 240, 552, 296, 360), defaultMeasurements)
+        val x = SIDE_BAR_WIDTH + BAR_GAP_SIZE + BAR_END_WIDTH + BAR_GAP_SIZE
+        val width = monitor.width - x - BAR_GAP_SIZE - BAR_END_WIDTH
+        assertEquals(WindowMeasurements(x, 240, width, 296, 360), defaultMeasurements)
     }
 
     @Test

@@ -90,7 +90,7 @@ class FrameDrawer(
         fontApi.xftRenderLayoutLine(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
 
         if (monitor.getScreenMode() == ScreenMode.NORMAL) {
-            val primBarWidth = 104
+            val primBarWidth = 80
             val secBarWidth = textX - primBarWidth - 14 // 8 + 8 - 1 because of first letter offset
             drawApi.xftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  primBarWidth.convert(), BAR_HEIGHT.convert())
             drawApi.xftDrawRect(xftDraw, secondaryBarColor.ptr, primBarWidth + 8, TITLE_BAR_OFFSET,  secBarWidth.convert(), BAR_HEIGHT.convert())
