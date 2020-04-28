@@ -163,9 +163,9 @@ class RootWindowDrawer(
         rects[2].y = (monitor.y + monitor.height - 40).convert()
 
         val bigBars = nativeHeap.allocArray<XRectangle>(2)
-        bigBars[0].x = (monitor.x + 270).convert()
+        bigBars[0].x = (monitor.x + 290).convert()
         bigBars[0].y = monitor.y.convert()
-        bigBars[0].width = (monitor.width - 318 - logoImage.pointed.width).convert()
+        bigBars[0].width = (monitor.width - 298 - logoImage.pointed.width).convert()
         bigBars[0].height = 40.convert()
 
         // bottom bar
@@ -178,9 +178,9 @@ class RootWindowDrawer(
         val middleSegmentWidth = (monitor.width - 280) / 8
 
         // upper middle bars
-        middleBars[0].x = (monitor.x + 232).convert()
+        middleBars[0].x = (monitor.x + 232 + 32).convert()
         middleBars[0].y = (monitor.y + 176).convert()
-        middleBars[0].width = (middleSegmentWidth * 6).convert()
+        middleBars[0].width = (middleSegmentWidth * 6 - 32).convert()
         middleBars[0].height = 16.convert()
 
         middleBars[1].x = (monitor.x + 240 + middleSegmentWidth * 6).convert()
@@ -189,9 +189,9 @@ class RootWindowDrawer(
         middleBars[1].height = 16.convert()
 
         // lower middle bars
-        middleBars[2].x = (monitor.x + 232).convert()
+        middleBars[2].x = (monitor.x + 232 + 32).convert()
         middleBars[2].y = (monitor.y + 200).convert()
-        middleBars[2].width = (middleSegmentWidth * 3).convert()
+        middleBars[2].width = (middleSegmentWidth * 3 - 32).convert()
         middleBars[2].height = 16.convert()
 
         middleBars[3].x = (monitor.x + 240 + middleSegmentWidth * 3).convert()
@@ -252,13 +252,13 @@ class RootWindowDrawer(
             cornerRects[i].height = BAR_HEIGHT.convert()
         }
         cornerRects[4].y = monitor.y.convert()
-        cornerRects[4].width = 222.convert()
+        cornerRects[4].width = 242.convert()
         cornerRects[5].y = (monitor.y + monitor.height - BAR_HEIGHT).convert()
         cornerRects[5].width = 272.convert()
 
         for (i in 6 until 8) {
             cornerRects[i].x = (monitor.x + OUTER_CORNER_RADIUS_SMALL).convert()
-            cornerRects[i].width = 208.convert()
+            cornerRects[i].width = 240.convert()
             cornerRects[i].height = BAR_HEIGHT_SMALL.convert()
         }
         cornerRects[6].y = (monitor.y + 176).convert()
