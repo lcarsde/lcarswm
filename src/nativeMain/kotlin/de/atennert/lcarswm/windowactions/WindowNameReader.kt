@@ -36,10 +36,11 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
                     // filter forbidden control characters
                     c.toInt() == 9 ||
                             c.toInt() == 10 ||
-                            c.toInt() in 33..126 ||
+                            c.toInt() in 32..126 ||
                             c.toInt() > 160
                 }.toByteArray()
                     .toKString()
+                    .trim()
                 val readBytes = ULongArray(1).pin()
                 val utfBytes = system.convertLatinToUtf8(latinString, (-1).convert(), readBytes.addressOf(0))
                     ?: system.convertLatinToUtf8(latinString, readBytes.get()[0].convert(), null)
