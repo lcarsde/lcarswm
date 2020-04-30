@@ -6,3 +6,4 @@ build
 gradle.properties
 gradlew.bat
 .idea
+**/*.iml
