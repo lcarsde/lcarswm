@@ -4,7 +4,7 @@ import de.atennert.lcarswm.BAR_HEIGHT_WITH_OFFSET
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.atom.AtomLibrary
-import de.atennert.lcarswm.atom.Atoms.*
+import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.log.Logger
@@ -74,7 +74,9 @@ class WindowHandler(
         window.titleBar = system.createSimpleWindow(window.frame,
             listOf(0, measurements.frameHeight - BAR_HEIGHT_WITH_OFFSET, measurements.width, BAR_HEIGHT_WITH_OFFSET))
 
-        logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}")
+        val isAppSelector = isAppSelector(windowId)
+
+        logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}; isAppSelector: $isAppSelector")
 
         system.selectInput(window.frame, frameEventMask)
 
@@ -94,7 +96,7 @@ class WindowHandler(
 
         system.mapWindow(window.id)
 
-        system.changeProperty(window.id, atomLibrary[WM_STATE], atomLibrary[WM_STATE], wmStateData, 32)
+        system.changeProperty(window.id, atomLibrary[Atoms.WM_STATE], atomLibrary[Atoms.WM_STATE], wmStateData, 32)
 
         registeredWindows[windowId] = window
 
@@ -135,5 +137,13 @@ class WindowHandler(
 
         windowCoordinator.removeWindow(framedWindow)
         focusHandler.removeWindow(windowId)
+    }
+
+    private fun isAppSelector(windowId: Window): Boolean {
+        val textProperty = nativeHeap.alloc<XTextProperty>()
+        val result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.LCARSWM_APP_SELECTOR])
+        system.free(textProperty.value)
+        nativeHeap.free(textProperty)
+        return result != 0
     }
 }
