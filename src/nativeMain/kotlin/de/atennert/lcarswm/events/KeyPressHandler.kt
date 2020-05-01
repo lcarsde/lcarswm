@@ -5,8 +5,8 @@ import de.atennert.lcarswm.LCARS_WM_KEY_SYMS
 import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
-import de.atennert.lcarswm.windowactions.WindowCoordinator
-import de.atennert.lcarswm.windowactions.WindowFocusHandler
+import de.atennert.lcarswm.window.WindowCoordinator
+import de.atennert.lcarswm.window.WindowFocusHandler
 import kotlinx.cinterop.convert
 import xlib.*
 

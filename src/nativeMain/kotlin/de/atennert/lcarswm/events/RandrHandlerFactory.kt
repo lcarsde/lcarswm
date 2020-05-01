@@ -4,7 +4,7 @@ import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.SystemApi
-import de.atennert.lcarswm.windowactions.WindowCoordinator
+import de.atennert.lcarswm.window.WindowCoordinator
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.pin
 import xlib.RRScreenChangeNotify

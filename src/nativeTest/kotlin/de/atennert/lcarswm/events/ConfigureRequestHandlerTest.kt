@@ -3,8 +3,8 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
-import de.atennert.lcarswm.windowactions.WindowCoordinatorMock
-import de.atennert.lcarswm.windowactions.WindowRegistrationMock
+import de.atennert.lcarswm.window.WindowCoordinatorMock
+import de.atennert.lcarswm.window.WindowRegistrationMock
 import kotlinx.cinterop.*
 import xlib.*
 import kotlin.test.Test

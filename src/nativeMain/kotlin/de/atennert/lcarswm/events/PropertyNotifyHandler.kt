@@ -3,9 +3,9 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.drawing.FrameDrawer
-import de.atennert.lcarswm.windowactions.WindowCoordinator
-import de.atennert.lcarswm.windowactions.WindowNameReader
-import de.atennert.lcarswm.windowactions.WindowRegistration
+import de.atennert.lcarswm.window.WindowCoordinator
+import de.atennert.lcarswm.window.WindowNameReader
+import de.atennert.lcarswm.window.WindowRegistration
 import xlib.PropertyNotify
 import xlib.Window
 import xlib.XEvent

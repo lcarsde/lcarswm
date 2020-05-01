@@ -3,8 +3,8 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.EventApi
-import de.atennert.lcarswm.windowactions.WindowCoordinator
-import de.atennert.lcarswm.windowactions.WindowRegistration
+import de.atennert.lcarswm.window.WindowCoordinator
+import de.atennert.lcarswm.window.WindowRegistration
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap

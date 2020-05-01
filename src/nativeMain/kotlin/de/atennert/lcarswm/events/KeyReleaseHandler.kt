@@ -5,7 +5,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
-import de.atennert.lcarswm.windowactions.WindowFocusHandler
+import de.atennert.lcarswm.window.WindowFocusHandler
 import kotlinx.cinterop.*
 import xlib.*
 

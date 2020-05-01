@@ -2,7 +2,7 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.drawing.UIDrawingMock
 import de.atennert.lcarswm.log.LoggerMock
-import de.atennert.lcarswm.windowactions.WindowRegistrationMock
+import de.atennert.lcarswm.window.WindowRegistrationMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
