@@ -61,7 +61,11 @@ class FrameDrawer(
 
     override fun drawFrame(window: FramedWindow, monitor: Monitor) {
         val windowMeasurements = monitor.getWindowMeasurements()
-        val textW = monitor.width - 390 // a little wider the normal layout lower corner
+        val textW = if (monitor.getScreenMode() == ScreenMode.NORMAL) {
+            monitor.width - LOWER_CORNER_WIDTH - BAR_GAP_SIZE - WINDOW_TITLE_OFFSET - BAR_GAP_SIZE /* <text> */ - BAR_GAP_SIZE - BAR_END_WIDTH
+        } else {
+            windowMeasurements.width - WINDOW_TITLE_OFFSET - BAR_GAP_SIZE
+        }
         val textH = BAR_HEIGHT_WITH_OFFSET
         val rect = nativeHeap.alloc<PangoRectangle>()
 
@@ -90,12 +94,12 @@ class FrameDrawer(
         fontApi.xftRenderLayoutLine(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
 
         if (monitor.getScreenMode() == ScreenMode.NORMAL) {
-            val primBarWidth = 80
-            val secBarWidth = textX - primBarWidth - 14 // 8 + 8 - 1 because of first letter offset
+            val primBarWidth = LOWER_CORNER_WIDTH - NORMAL_WINDOW_LEFT_OFFSET
+            val secBarWidth = textX - primBarWidth - 2 * BAR_GAP_SIZE + FIRST_LETTER_OFFSET
             drawApi.xftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  primBarWidth.convert(), BAR_HEIGHT.convert())
-            drawApi.xftDrawRect(xftDraw, secondaryBarColor.ptr, primBarWidth + 8, TITLE_BAR_OFFSET,  secBarWidth.convert(), BAR_HEIGHT.convert())
+            drawApi.xftDrawRect(xftDraw, secondaryBarColor.ptr, primBarWidth + BAR_GAP_SIZE, TITLE_BAR_OFFSET,  secBarWidth.convert(), BAR_HEIGHT.convert())
         } else {
-            val barWidth = textX - 7 // 8 - 1 because of first letter offset
+            val barWidth = textX - BAR_GAP_SIZE + FIRST_LETTER_OFFSET
             drawApi.xftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  barWidth.convert(), BAR_HEIGHT.convert())
         }
 
@@ -115,5 +119,9 @@ class FrameDrawer(
         nativeHeap.free(primaryBarColor.rawPtr)
         nativeHeap.free(secondaryBarColor.rawPtr)
         nativeHeap.free(backgroundColor.rawPtr)
+    }
+
+    companion object {
+        private const val FIRST_LETTER_OFFSET = 2
     }
 }

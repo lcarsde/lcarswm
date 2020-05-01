@@ -36,4 +36,10 @@ const val SIDE_BAR_WIDTH = 184
 const val TITLE_BAR_OFFSET = 1 // extra pixel for overflowing fonts
 const val BAR_HEIGHT_WITH_OFFSET = BAR_HEIGHT + TITLE_BAR_OFFSET // accommodate the font layout with a required extra pixel
 
+const val NORMAL_WINDOW_LEFT_OFFSET = SIDE_BAR_WIDTH + BAR_GAP_SIZE + BAR_END_WIDTH + BAR_GAP_SIZE
+const val NORMAL_WINDOW_UPPER_OFFSET = 2 * BAR_HEIGHT + 3 * INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_AREA_HEIGHT
+
+const val LOWER_CORNER_WIDTH = OUTER_CORNER_RADIUS_BIG + 272
+
 const val WINDOW_TITLE_FONT_SIZE = BAR_HEIGHT
+const val WINDOW_TITLE_OFFSET = 30

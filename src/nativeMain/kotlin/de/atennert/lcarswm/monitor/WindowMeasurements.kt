@@ -8,9 +8,6 @@ import de.atennert.lcarswm.*
 data class WindowMeasurements(val x: Int, val y: Int, val width: Int, val height: Int, val frameHeight: Int) {
 
     companion object {
-        private const val NORMAL_WINDOW_LEFT_OFFSET = SIDE_BAR_WIDTH + BAR_GAP_SIZE + BAR_END_WIDTH + BAR_GAP_SIZE
-        private const val NORMAL_WINDOW_UPPER_OFFSET = 2 * BAR_HEIGHT + 3 * INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_AREA_HEIGHT
-
         /** Create window measurements for normal mode windows (primary screen exclusive mode) */
         fun createNormal(monitorX: Int, monitorY: Int, monitorWidth: Int, monitorHeight: Int): WindowMeasurements {
             return WindowMeasurements(
