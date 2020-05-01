@@ -12,9 +12,9 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
         val textProperty = nativeHeap.alloc<XTextProperty>()
         var result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.NET_WM_NAME])
 
-        if (result != 0 || textProperty.encoding != atomLibrary[Atoms.UTF_STRING]) {
+        if (result == 0 || textProperty.nitems.toInt() == 0 || !hasCorrectEncoding(textProperty)) {
             result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.WM_NAME])
-            if (result == 0) {
+            if (result == 0 || textProperty.nitems.toInt() == 0 || !hasCorrectEncoding(textProperty)) {
                 return "UNKNOWN"
             }
         }
@@ -56,6 +56,12 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
         } else {
             name.toUpperCase()
         }
+    }
+
+    private fun hasCorrectEncoding(textProperty: XTextProperty): Boolean {
+        return textProperty.encoding == atomLibrary[Atoms.STRING] ||
+                textProperty.encoding == atomLibrary[Atoms.UTF_STRING] ||
+                textProperty.encoding == atomLibrary[Atoms.COMPOUND_TEXT]
     }
 
     private fun getByteArrayListFromCompound(textProperty: XTextProperty): ByteArray {
