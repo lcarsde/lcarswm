@@ -42,7 +42,7 @@ class FrameDrawer(
 
     private fun initializeFontObjects(): Pair<Int, Int> {
         val lang = fontApi.getDefaultLanguage()
-        fontApi.setFontDescriptionFamily(font, "Ubuntu Condensed")
+        fontApi.setFontDescriptionFamily(font, WM_FONT)
         fontApi.setFontDescriptionWeight(font, PANGO_WEIGHT_BOLD)
         fontApi.setFontDescriptionStyle(font, PangoStyle.PANGO_STYLE_NORMAL)
         fontApi.setFontDescriptionSize(font, WINDOW_TITLE_FONT_SIZE * PANGO_SCALE)
