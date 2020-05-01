@@ -1,4 +1,4 @@
-package de.atennert.lcarswm.windowactions
+package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms

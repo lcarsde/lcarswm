@@ -1,4 +1,4 @@
-package de.atennert.lcarswm.windowactions
+package de.atennert.lcarswm.window
 
 import kotlinx.cinterop.convert
 import xlib.Window

@@ -15,7 +15,7 @@ import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.PosixApi
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.system.api.WindowUtilApi
-import de.atennert.lcarswm.windowactions.*
+import de.atennert.lcarswm.window.*
 import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.*
 import platform.posix.WNOHANG
