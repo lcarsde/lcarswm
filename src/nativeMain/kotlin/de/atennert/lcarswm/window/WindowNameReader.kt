@@ -15,7 +15,7 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
         if (result == 0 || textProperty.nitems.toInt() == 0 || !hasCorrectEncoding(textProperty)) {
             result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.WM_NAME])
             if (result == 0 || textProperty.nitems.toInt() == 0 || !hasCorrectEncoding(textProperty)) {
-                return "UNKNOWN"
+                return "-"
             }
         }
 
@@ -25,7 +25,7 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
                 val readBytes = ULongArray(1).pin()
                 val utfBytes = system.localeToUtf8(localeString, (-1).convert(), readBytes.addressOf(0))
                     ?: system.localeToUtf8(localeString, readBytes.get()[0].convert(), null)
-                    ?: return "unknown"
+                    ?: return "-"
                 ByteArray(readBytes.get()[0].convert()) { utfBytes[it] }.toKString()
             }
             atomLibrary[Atoms.UTF_STRING] -> {
@@ -44,7 +44,7 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
                 val readBytes = ULongArray(1).pin()
                 val utfBytes = system.convertLatinToUtf8(latinString, (-1).convert(), readBytes.addressOf(0))
                     ?: system.convertLatinToUtf8(latinString, readBytes.get()[0].convert(), null)
-                    ?: return "unknown"
+                    ?: return "-"
                 ByteArray(readBytes.get()[0].convert()) { utfBytes[it] }.toKString()
             }
             else -> ""
