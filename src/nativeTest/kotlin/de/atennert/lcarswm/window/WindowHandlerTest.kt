@@ -96,9 +96,9 @@ class WindowHandlerTest {
 
         assertEquals("grabServer", setupCalls.removeAt(0).name, "grab the server to block interrupting updates")
         assertEquals("changeWindowAttributes", setupCalls.removeAt(0).name, "register for client events")
+        assertEquals("free", setupCalls.removeAt(0).name, "free resources for checking for app selector")
         assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "frame window should be created")
         assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "title bar window should be created")
-        assertEquals("free", setupCalls.removeAt(0).name, "free resources for checking for app selector")
         assertEquals("selectInput", setupCalls.removeAt(0).name, "select the input on the window frame")
         assertEquals("addToSaveSet", setupCalls.removeAt(0).name, "add the windows frame to the save set")
         assertEquals("setWindowBorderWidth", setupCalls.removeAt(0).name, "Set the border width of the window to 0")

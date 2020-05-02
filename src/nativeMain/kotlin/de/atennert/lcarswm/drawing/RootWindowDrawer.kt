@@ -165,7 +165,7 @@ class RootWindowDrawer(
         val bigBars = nativeHeap.allocArray<XRectangle>(2)
         bigBars[0].x = (monitor.x + 290).convert()
         bigBars[0].y = monitor.y.convert()
-        bigBars[0].width = (monitor.width - 298 - logoImage.pointed.width).convert()
+        bigBars[0].width = (monitor.width - 290 - logoImage.pointed.width).convert()
         bigBars[0].height = 40.convert()
 
         // bottom bar
@@ -202,12 +202,12 @@ class RootWindowDrawer(
         val sideBars = nativeHeap.allocArray<XRectangle>(2)
         sideBars[0].x = monitor.x.convert()
         sideBars[0].y = (monitor.y + 64).convert()
-        sideBars[0].width = 184.convert()
-        sideBars[0].height = 88.convert()
+        sideBars[0].width = SIDE_BAR_WIDTH.convert()
+        sideBars[0].height = DATA_AREA_HEIGHT.convert()
 
         sideBars[1].x = monitor.x.convert()
         sideBars[1].y = (monitor.y + 240).convert()
-        sideBars[1].width = 184.convert()
+        sideBars[1].width = SIDE_BAR_WIDTH.convert()
         sideBars[1].height = (monitor.height - 304).convert()
 
         // TODO create corners as pixmaps
