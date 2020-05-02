@@ -22,7 +22,8 @@ class WindowHandler(
     private val focusHandler: WindowFocusHandler,
     private val atomLibrary: AtomLibrary,
     private val screen: Screen,
-    private val windowNameReader: WindowNameReader
+    private val windowNameReader: WindowNameReader,
+    private val appMenuHandler: AppMenuHandler
 ) : WindowRegistration {
 
     private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or
@@ -62,6 +63,8 @@ class WindowHandler(
         attributeSet.do_not_propagate_mask = clientNoPropagateMask
         system.changeWindowAttributes(windowId, (CWEventMask or CWDontPropagate).convert(), attributeSet.ptr)
 
+        val isAppSelector = appMenuHandler.isAppSelector(windowId)
+
         val window = FramedWindow(windowId, windowAttributes.border_width)
 
         window.name = windowNameReader.getWindowName(windowId)
@@ -73,8 +76,6 @@ class WindowHandler(
 
         window.titleBar = system.createSimpleWindow(window.frame,
             listOf(0, measurements.frameHeight - BAR_HEIGHT_WITH_OFFSET, measurements.width, BAR_HEIGHT_WITH_OFFSET))
-
-        val isAppSelector = isAppSelector(windowId)
 
         logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}; isAppSelector: $isAppSelector")
 
@@ -137,13 +138,5 @@ class WindowHandler(
 
         windowCoordinator.removeWindow(framedWindow)
         focusHandler.removeWindow(windowId)
-    }
-
-    private fun isAppSelector(windowId: Window): Boolean {
-        val textProperty = nativeHeap.alloc<XTextProperty>()
-        val result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.LCARSWM_APP_SELECTOR])
-        system.free(textProperty.value)
-        nativeHeap.free(textProperty)
-        return result != 0
     }
 }

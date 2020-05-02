@@ -4,6 +4,7 @@ import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.log.LoggerMock
+import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import xlib.*
@@ -33,7 +34,8 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary)
+            WindowNameReader(systemApi, atomLibrary),
+            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock())
         )
 
         windowRegistration.addWindow(windowId, false)
@@ -68,7 +70,8 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary)
+            WindowNameReader(systemApi, atomLibrary),
+            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock())
         )
 
         windowRegistration.addWindow(windowId, true)
@@ -160,7 +163,8 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary)
+            WindowNameReader(systemApi, atomLibrary),
+            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock())
         )
 
         windowRegistration.addWindow(windowId, true)
@@ -196,7 +200,8 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary)
+            WindowNameReader(systemApi, atomLibrary),
+            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock())
         )
 
         windowRegistration.addWindow(windowId, false)
@@ -233,7 +238,8 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary)
+            WindowNameReader(systemApi, atomLibrary),
+            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock())
         )
 
         assertFalse(windowRegistration.isWindowManaged(windowId), "An unknown window should not be reported managed")
@@ -266,7 +272,8 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary)
+            WindowNameReader(systemApi, atomLibrary),
+            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock())
         )
         windowRegistration.addWindow(windowId, false)
 
@@ -339,7 +346,8 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary)
+            WindowNameReader(systemApi, atomLibrary),
+            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock())
         )
         windowRegistration.addWindow(windowId, false)
 

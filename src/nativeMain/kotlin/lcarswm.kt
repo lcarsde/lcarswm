@@ -141,7 +141,18 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val windowNameReader = WindowNameReader(system, atomLibrary)
 
-        val windowRegistration = WindowHandler(system, logger, windowCoordinator, focusHandler, atomLibrary, screen, windowNameReader)
+        val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager)
+
+        val windowRegistration = WindowHandler(
+            system,
+            logger,
+            windowCoordinator,
+            focusHandler,
+            atomLibrary,
+            screen,
+            windowNameReader,
+            appMenuHandler
+        )
 
         focusHandler.registerObserver { activeWindow, _ ->
             if (activeWindow != null) {
