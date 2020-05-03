@@ -4,7 +4,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import GdkX11, Gtk
 
 
-class AppSelector(Gtk.Window):
+class LcarswmAppSelector(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Hello World")
 
@@ -23,7 +23,7 @@ class AppSelector(Gtk.Window):
 
 
 if __name__ == '__main__':
-    win = AppSelector()
+    win = LcarswmAppSelector()
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
     Gtk.main()
