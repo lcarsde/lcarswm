@@ -135,8 +135,8 @@ class MonitorManagerImplTest {
 
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        val eventListener = TestEventListener()
-        monitorManager.addEventListener(eventListener)
+        val eventListener = TestObserver()
+        monitorManager.registerObserver(eventListener)
 
         listOf(ScreenMode.MAXIMIZED, ScreenMode.FULLSCREEN, ScreenMode.NORMAL)
             .forEach { screenMode ->
@@ -146,7 +146,7 @@ class MonitorManagerImplTest {
             }
     }
 
-    private class TestEventListener : MonitorEventListener {
+    private class TestObserver : MonitorObserver {
         var screenMode: ScreenMode? = null
 
         override fun toggleScreenMode(newScreenMode: ScreenMode) {

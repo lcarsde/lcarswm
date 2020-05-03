@@ -174,6 +174,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             activeWindow?.let { windowCoordinator.stackWindowToTheTop(it) }
         }
 
+        monitorManager.registerObserver(appMenuHandler)
+
         val eventManager = createEventManager(
             system,
             logger,
