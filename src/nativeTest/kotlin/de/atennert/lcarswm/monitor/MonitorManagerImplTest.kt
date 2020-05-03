@@ -135,13 +135,22 @@ class MonitorManagerImplTest {
 
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        monitorManager.toggleScreenMode()
-        assertEquals(ScreenMode.MAXIMIZED, monitorManager.getScreenMode(), "The second mode should be maximized")
+        val eventListener = TestEventListener()
+        monitorManager.addEventListener(eventListener)
 
-        monitorManager.toggleScreenMode()
-        assertEquals(ScreenMode.FULLSCREEN, monitorManager.getScreenMode(), "The third mode should be fullscreen")
+        listOf(ScreenMode.MAXIMIZED, ScreenMode.FULLSCREEN, ScreenMode.NORMAL)
+            .forEach { screenMode ->
+                monitorManager.toggleScreenMode()
+                assertEquals(screenMode, monitorManager.getScreenMode(), "Finally it should wrap around back to $screenMode")
+                assertEquals(screenMode, eventListener.screenMode, "The listener should be notified about $screenMode")
+            }
+    }
 
-        monitorManager.toggleScreenMode()
-        assertEquals(ScreenMode.NORMAL, monitorManager.getScreenMode(), "Finally it should wrap around back to normal")
+    private class TestEventListener : MonitorEventListener {
+        var screenMode: ScreenMode? = null
+
+        override fun toggleScreenMode(newScreenMode: ScreenMode) {
+            screenMode = newScreenMode
+        }
     }
 }

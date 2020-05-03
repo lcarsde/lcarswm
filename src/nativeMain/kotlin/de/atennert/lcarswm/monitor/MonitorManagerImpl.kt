@@ -14,6 +14,12 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
 
     private var screenMode = ScreenMode.NORMAL
 
+    private val eventListeners = mutableListOf<MonitorEventListener>()
+
+    fun addEventListener(eventListener: MonitorEventListener) {
+        eventListeners.add(eventListener)
+    }
+
     override fun updateMonitorList() {
         val monitorData = getMonitorData()
         val monitorIds = getMonitorIds(monitorData)
@@ -97,5 +103,6 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
             ScreenMode.MAXIMIZED -> ScreenMode.FULLSCREEN
             ScreenMode.FULLSCREEN -> ScreenMode.NORMAL
         }
+        eventListeners.forEach { it.toggleScreenMode(screenMode) }
     }
 }
