@@ -165,7 +165,7 @@ class RootWindowDrawer(
         val bigBars = nativeHeap.allocArray<XRectangle>(2)
         bigBars[0].x = (monitor.x + 290).convert()
         bigBars[0].y = monitor.y.convert()
-        bigBars[0].width = (monitor.width - 290 - logoImage.pointed.width).convert()
+        bigBars[0].width = (monitor.width - 338 - logoImage.pointed.width).convert()
         bigBars[0].height = 40.convert()
 
         // bottom bar
