@@ -4,4 +4,6 @@ import de.atennert.lcarswm.ScreenMode
 
 interface MonitorObserver {
     fun toggleScreenMode(newScreenMode: ScreenMode)
+
+    fun updateMonitors()
 }

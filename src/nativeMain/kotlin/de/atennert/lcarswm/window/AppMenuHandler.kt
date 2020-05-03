@@ -28,15 +28,8 @@ class AppMenuHandler (
     fun manageWindow(windowId: Window) {
         this.windowId = windowId
 
-        val monitor = monitorManager.getPrimaryMonitor()
+        moveResizeWindow(windowId)
 
-        systemApi.moveResizeWindow(
-            windowId,
-            monitor.x,
-            monitor.y + NORMAL_WINDOW_UPPER_OFFSET,
-            SIDE_BAR_WIDTH.convert(),
-            (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert()
-        )
         systemApi.ungrabServer()
         systemApi.mapWindow(windowId)
         systemApi.changeProperty(windowId, atomLibrary[Atoms.WM_STATE], atomLibrary[Atoms.WM_STATE], wmStateData, 32)
@@ -66,5 +59,23 @@ class AppMenuHandler (
 
     private fun hideAppMenu(windowId: Window) {
         systemApi.mapWindow(windowId)
+    }
+
+    override fun updateMonitors() {
+        windowId?.let { windowId ->
+            moveResizeWindow(windowId)
+        }
+    }
+
+    private fun moveResizeWindow(windowId: Window) {
+        val monitor = monitorManager.getPrimaryMonitor()
+
+        systemApi.moveResizeWindow(
+            windowId,
+            monitor.x,
+            monitor.y + NORMAL_WINDOW_UPPER_OFFSET,
+            SIDE_BAR_WIDTH.convert(),
+            (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert()
+        )
     }
 }

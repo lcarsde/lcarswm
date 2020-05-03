@@ -17,7 +17,10 @@ class MonitorManagerImplTest {
     @Test
     fun `update monitor list`() {
         val systemApi = SystemFacadeMock()
-        val monitorManager: MonitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+        val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+
+        val eventObserver = TestObserver()
+        monitorManager.registerObserver(eventObserver)
 
         monitorManager.updateMonitorList()
 
@@ -28,6 +31,8 @@ class MonitorManagerImplTest {
 
         assertTrue(monitorList.contains(primaryMonitor), "The primary monitor should be part of the monitor list")
         assertEquals(systemApi.primaryOutput, primaryMonitor.id, "The ID of the primary monitor should match")
+
+        assertEquals(1, eventObserver.monitorUpdates, "The event observer should have gotten an update for the monitors")
     }
 
     @Test
@@ -151,6 +156,12 @@ class MonitorManagerImplTest {
 
         override fun toggleScreenMode(newScreenMode: ScreenMode) {
             screenMode = newScreenMode
+        }
+
+        var monitorUpdates = 0
+
+        override fun updateMonitors() {
+            monitorUpdates++
         }
     }
 }

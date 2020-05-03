@@ -38,6 +38,8 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
             .map { (id, name) -> Monitor(this, id, name, id == primary) }
             .zip(activeMonitorInfos.map { it.second })
             .map { (monitor, outputInfo) -> addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData) }
+
+        observers.forEach { it.updateMonitors() }
     }
 
     private fun getMonitorData(): CPointer<XRRScreenResources> {
