@@ -23,7 +23,11 @@ class AppMenuHandler (
         .map { it.toUByteArray() }
         .combine()
 
+    private var windowId: Window? = null
+
     fun manageWindow(windowId: Window) {
+        this.windowId = windowId
+
         val monitor = monitorManager.getPrimaryMonitor()
 
         systemApi.moveResizeWindow(
@@ -47,6 +51,20 @@ class AppMenuHandler (
     }
 
     override fun toggleScreenMode(newScreenMode: ScreenMode) {
+        windowId?.let { windowId ->
+            if (newScreenMode == ScreenMode.NORMAL) {
+                showAppMenu(windowId)
+            } else {
+                hideAppMenu(windowId)
+            }
+        }
+    }
 
+    private fun showAppMenu(windowId: Window) {
+        systemApi.unmapWindow(windowId)
+    }
+
+    private fun hideAppMenu(windowId: Window) {
+        systemApi.mapWindow(windowId)
     }
 }
