@@ -22,7 +22,7 @@ class RootWindowDrawer(
 
     init {
         val imageArray = nativeHeap.allocArrayOfPointersTo(nativeHeap.alloc<XImage>())
-        drawApi.readXpmFileToImage("/usr/share/pixmaps/lcarswm.xpm", imageArray)
+        drawApi.readXpmFileToImage(WM_LOGO, imageArray)
         logoImage = imageArray[0]!!
     }
 
