@@ -58,12 +58,16 @@ class WindowHandler(
             return
         }
 
+        if (appMenuHandler.isAppSelector(windowId)) {
+            appMenuHandler.manageWindow(windowId)
+            nativeHeap.free(windowAttributes)
+            return
+        }
+
         val attributeSet = nativeHeap.alloc<XSetWindowAttributes>()
         attributeSet.event_mask = clientEventMask
         attributeSet.do_not_propagate_mask = clientNoPropagateMask
         system.changeWindowAttributes(windowId, (CWEventMask or CWDontPropagate).convert(), attributeSet.ptr)
-
-        val isAppSelector = appMenuHandler.isAppSelector(windowId)
 
         val window = FramedWindow(windowId, windowAttributes.border_width)
 
@@ -77,7 +81,7 @@ class WindowHandler(
         window.titleBar = system.createSimpleWindow(window.frame,
             listOf(0, measurements.frameHeight - BAR_HEIGHT_WITH_OFFSET, measurements.width, BAR_HEIGHT_WITH_OFFSET))
 
-        logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}; isAppSelector: $isAppSelector")
+        logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}")
 
         system.selectInput(window.frame, frameEventMask)
 
