@@ -3,6 +3,7 @@ package de.atennert.lcarswm.window
 import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
@@ -356,5 +357,78 @@ class WindowHandlerTest {
         assertFalse(windowRegistration.isWindowParentedBy(rootWindowId, rootWindowId), "Return false for unmanaged windows")
 
         nativeHeap.free(screen)
+    }
+
+    @Test
+    fun `check app menu window initialization`() {
+        var windowId: Window? = null
+        val systemApi = object : SystemFacadeMock() {
+            override fun getTextProperty(
+                window: Window,
+                textProperty: CPointer<XTextProperty>,
+                propertyAtom: Atom
+            ): Int {
+                if (window == windowId && propertyAtom == this.atomMap[Atoms.LCARSWM_APP_SELECTOR.atomName]) {
+                    return 1
+                }
+                return super.getTextProperty(window, textProperty, propertyAtom)
+            }
+        }
+        windowId = systemApi.getNewWindowId()
+
+        val windowCoordinator = WindowCoordinatorMock()
+        val atomLibrary = AtomLibrary(systemApi)
+        val focusHandler = WindowFocusHandler()
+
+        systemApi.functionCalls.clear() // remove AtomLibrary setup
+
+        val screen = nativeHeap.alloc<Screen>()
+
+        val windowRegistration = WindowHandler(
+            systemApi,
+            LoggerMock(),
+            windowCoordinator,
+            focusHandler,
+            atomLibrary,
+            screen,
+            WindowNameReader(systemApi, atomLibrary),
+            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock())
+        )
+
+        windowRegistration.addWindow(windowId, false)
+
+        checkAppMenuWindowAddProcedure(systemApi, windowId, windowCoordinator, focusHandler, windowRegistration)
+
+        nativeHeap.free(screen)
+    }
+
+    private fun checkAppMenuWindowAddProcedure(
+        systemApi: SystemFacadeMock,
+        windowId: Window,
+        windowCoordinator: WindowCoordinatorMock,
+        focusHandler: WindowFocusHandler,
+        windowRegistration: WindowRegistration
+    ) {
+        assertTrue(windowCoordinator.functionCalls.isEmpty(), "the app selector window should not be registered to the window coordinator")
+        assertNull(focusHandler.getFocusedWindow(), "the app selector window should not be registered to the focus handler")
+
+        val setupCalls = systemApi.functionCalls
+
+        assertEquals("grabServer", setupCalls.removeAt(0).name, "grab the server to block interrupting updates")
+        assertEquals("free", setupCalls.removeAt(0).name, "free resources for checking for app selector")
+        assertEquals("moveResizeWindow", setupCalls.removeAt(0).name, "move and resize app selector window to monitor required dimensions")
+        assertEquals("ungrabServer", setupCalls.removeAt(0).name, "ungrab the server to allow updates again")
+        assertEquals("mapWindow", setupCalls.removeAt(0).name, "app selector window should be mapped")
+
+        val changePropertyCall = setupCalls.removeAt(0)
+        assertEquals("changeProperty", changePropertyCall.name, "normal state needs to be _set_ in windows state atom")
+        assertEquals(windowId, changePropertyCall.parameters[0], "normal state needs to be set in _windows_ state atom")
+        assertEquals(
+            NormalState,
+            (changePropertyCall.parameters[3] as UByteArray)[0].convert(),
+            "_normal state_ needs to be set in windows state atom"
+        )
+
+        assertNull(windowRegistration[windowId], "The window registration not know the app selector window")
     }
 }
