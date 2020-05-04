@@ -54,11 +54,11 @@ class AppMenuHandler (
     }
 
     private fun showAppMenu(windowId: Window) {
-        systemApi.unmapWindow(windowId)
+        systemApi.mapWindow(windowId)
     }
 
     private fun hideAppMenu(windowId: Window) {
-        systemApi.mapWindow(windowId)
+        systemApi.unmapWindow(windowId)
     }
 
     override fun updateMonitors() {
