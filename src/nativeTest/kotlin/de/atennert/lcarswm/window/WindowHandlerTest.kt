@@ -95,8 +95,8 @@ class WindowHandlerTest {
         val setupCalls = systemApi.functionCalls
 
         assertEquals("grabServer", setupCalls.removeAt(0).name, "grab the server to block interrupting updates")
-        assertEquals("changeWindowAttributes", setupCalls.removeAt(0).name, "register for client events")
         assertEquals("free", setupCalls.removeAt(0).name, "free resources for checking for app selector")
+        assertEquals("changeWindowAttributes", setupCalls.removeAt(0).name, "register for client events")
         assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "frame window should be created")
         assertEquals("createSimpleWindow", setupCalls.removeAt(0).name, "title bar window should be created")
         assertEquals("selectInput", setupCalls.removeAt(0).name, "select the input on the window frame")
