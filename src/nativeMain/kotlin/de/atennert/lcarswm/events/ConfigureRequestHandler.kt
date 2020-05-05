@@ -2,7 +2,9 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.api.EventApi
+import de.atennert.lcarswm.window.AppMenuHandler
 import de.atennert.lcarswm.window.WindowCoordinator
 import de.atennert.lcarswm.window.WindowRegistration
 import kotlinx.cinterop.alloc
@@ -19,7 +21,8 @@ class ConfigureRequestHandler(
     private val eventApi: EventApi,
     private val logger: Logger,
     private val windowRegistration: WindowRegistration,
-    private val windowCoordinator: WindowCoordinator
+    private val windowCoordinator: WindowCoordinator,
+    private val appMenuHandler: AppMenuHandler
 ) : XEventHandler {
     override val xEventType = ConfigureRequest
 
@@ -31,16 +34,20 @@ class ConfigureRequestHandler(
         logger.logDebug("ConfigureRequestHandler::handleEvent::configure request for window ${configureEvent.window}, stack mode: ${configureEvent.detail}, sibling: ${configureEvent.above}, parent: ${configureEvent.parent}, is known: $isWindowKnown")
 
         if (isWindowKnown) {
-            adjustWindowToScreen(configureEvent)
-        } else {
+            val measurements = windowCoordinator.getWindowMeasurements(configureEvent.window)
+            adjustWindowToScreen(configureEvent, measurements)
+        }
+        else if (appMenuHandler.isKnownAppMenu(configureEvent.window)) {
+            adjustWindowToScreen(configureEvent, appMenuHandler.getWindowMeasurements())
+        }
+        else {
             forwardConfigureRequest(configureEvent)
         }
 
         return false
     }
 
-    private fun adjustWindowToScreen(configureEvent: XConfigureRequestEvent) {
-        val measurements = windowCoordinator.getWindowMeasurements(configureEvent.window)
+    private fun adjustWindowToScreen(configureEvent: XConfigureRequestEvent, measurements: WindowMeasurements) {
 
         val e = nativeHeap.alloc<XEvent>()
         e.type = ConfigureNotify

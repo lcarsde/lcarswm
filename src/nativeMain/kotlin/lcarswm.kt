@@ -141,7 +141,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val windowNameReader = WindowNameReader(system, atomLibrary)
 
-        val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager)
+        val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager, screen.root)
 
         val windowRegistration = WindowHandler(
             system,
@@ -189,6 +189,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             screenChangeHandler,
             keyConfiguration,
             windowNameReader,
+            appMenuHandler,
             frameDrawer,
             screen.root
         )
@@ -346,12 +347,13 @@ private fun createEventManager(
     screenChangeHandler: XEventHandler,
     keyConfiguration: KeyConfiguration,
     windowNameReader: WindowNameReader,
+    appMenuHandler: AppMenuHandler,
     frameDrawer: FrameDrawer,
     rootWindowId: Window
 ): EventDistributor {
 
     return EventDistributor.Builder(logger)
-        .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator))
+        .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration))
         .addEventHandler(KeyPressHandler(logger, keyManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
         .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, atomLibrary))

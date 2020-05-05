@@ -58,18 +58,18 @@ class WindowHandler(
             return
         }
 
-        if (appMenuHandler.isAppSelector(windowId)) {
-            appMenuHandler.manageWindow(windowId)
-            nativeHeap.free(windowAttributes)
-            return
-        }
-
         val attributeSet = nativeHeap.alloc<XSetWindowAttributes>()
         attributeSet.event_mask = clientEventMask
         attributeSet.do_not_propagate_mask = clientNoPropagateMask
         system.changeWindowAttributes(windowId, (CWEventMask or CWDontPropagate).convert(), attributeSet.ptr)
 
         val window = FramedWindow(windowId, windowAttributes.border_width)
+
+        if (appMenuHandler.isAppSelector(windowId)) {
+            appMenuHandler.manageWindow(window)
+            nativeHeap.free(windowAttributes)
+            return
+        }
 
         window.name = windowNameReader.getWindowName(windowId)
 
