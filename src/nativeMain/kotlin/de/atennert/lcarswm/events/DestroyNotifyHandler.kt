@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.window.AppMenuHandler
 import de.atennert.lcarswm.window.WindowRegistration
 import xlib.DestroyNotify
 import xlib.XEvent
@@ -11,7 +12,8 @@ import xlib.XEvent
  */
 class DestroyNotifyHandler(
     private val logger: Logger,
-    private val windowRegistration: WindowRegistration
+    private val windowRegistration: WindowRegistration,
+    private val appMenuHandler: AppMenuHandler
 ) : XEventHandler {
     override val xEventType = DestroyNotify
 
@@ -21,6 +23,8 @@ class DestroyNotifyHandler(
         
         if (windowRegistration.isWindowManaged(destroyedWindow)) {
             windowRegistration.removeWindow(destroyedWindow)
+        } else if (appMenuHandler.isKnownAppMenu(destroyedWindow)) {
+            appMenuHandler.removeWindow()
         }
         return false
     }

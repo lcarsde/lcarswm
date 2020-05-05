@@ -2,6 +2,7 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.window.AppMenuHandler
 import de.atennert.lcarswm.window.WindowRegistration
 import xlib.UnmapNotify
 import xlib.XEvent
@@ -12,7 +13,8 @@ import xlib.XEvent
 class UnmapNotifyHandler(
     private val logger: Logger,
     private val windowRegistration: WindowRegistration,
-    private val rootWindowDrawer: UIDrawing
+    private val rootWindowDrawer: UIDrawing,
+    private val appMenuHandler: AppMenuHandler
 ) : XEventHandler {
     override val xEventType = UnmapNotify
 
@@ -24,6 +26,8 @@ class UnmapNotifyHandler(
 
         if (isWindowKnown) {
             windowRegistration.removeWindow(window)
+        } else if (appMenuHandler.isKnownAppMenu(window)) {
+            appMenuHandler.removeWindow()
         }
 
         rootWindowDrawer.drawWindowManagerFrame()

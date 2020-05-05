@@ -1,7 +1,11 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.drawing.UIDrawingMock
 import de.atennert.lcarswm.log.LoggerMock
+import de.atennert.lcarswm.monitor.MonitorManagerMock
+import de.atennert.lcarswm.system.SystemFacadeMock
+import de.atennert.lcarswm.window.AppMenuHandler
 import de.atennert.lcarswm.window.WindowRegistrationMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
@@ -20,8 +24,10 @@ import kotlin.test.assertTrue
 class UnmapNotifyHandlerTest {
     @Test
     fun `return correct message type`() {
+        val systemApi = SystemFacadeMock()
+        val appMenuHandler = AppMenuHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
         val unmapNotifyHandler = UnmapNotifyHandler(LoggerMock(), WindowRegistrationMock(),
-            UIDrawingMock()
+            UIDrawingMock(), appMenuHandler
         )
 
         assertEquals(UnmapNotify, unmapNotifyHandler.xEventType, "UnmapNotifyHandler should have type UnmapNotify")
@@ -32,8 +38,10 @@ class UnmapNotifyHandlerTest {
         val unmapWindowId: Window = 42.convert()
         val uiDrawingMock = UIDrawingMock()
         val windowRegistration = WindowRegistrationMock()
+        val systemApi = SystemFacadeMock()
+        val appMenuHandler = AppMenuHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
 
-        val unmapNotifyHandler = UnmapNotifyHandler(LoggerMock(), windowRegistration, uiDrawingMock)
+        val unmapNotifyHandler = UnmapNotifyHandler(LoggerMock(), windowRegistration, uiDrawingMock, appMenuHandler)
 
         val unmapEvent = nativeHeap.alloc<XEvent>()
         unmapEvent.type = UnmapNotify
@@ -62,8 +70,10 @@ class UnmapNotifyHandlerTest {
         val unmapWindowId: Window = 42.convert()
         val uiDrawingMock = UIDrawingMock()
         val windowRegistration = WindowRegistrationMock()
+        val systemApi = SystemFacadeMock()
+        val appMenuHandler = AppMenuHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
 
-        val unmapNotifyHandler = UnmapNotifyHandler(LoggerMock(), windowRegistration, uiDrawingMock)
+        val unmapNotifyHandler = UnmapNotifyHandler(LoggerMock(), windowRegistration, uiDrawingMock, appMenuHandler)
 
         val unmapEvent = nativeHeap.alloc<XEvent>()
         unmapEvent.type = UnmapNotify

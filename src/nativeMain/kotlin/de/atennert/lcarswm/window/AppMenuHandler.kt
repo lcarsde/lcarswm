@@ -41,8 +41,9 @@ class AppMenuHandler(
         systemApi.resizeWindow(window.id, measurements.width.convert(), measurements.height.convert())
 
         systemApi.ungrabServer()
-        systemApi.mapWindow(window.frame)
-        systemApi.mapWindow(window.id)
+        if (monitorManager.getScreenMode() == ScreenMode.NORMAL) {
+            showAppMenu(window)
+        }
         systemApi.changeProperty(window.id, atomLibrary[Atoms.WM_STATE], atomLibrary[Atoms.WM_STATE], wmStateData, 32)
     }
 
@@ -114,5 +115,18 @@ class AppMenuHandler(
             (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert(),
             (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert()
         )
+    }
+
+    fun removeWindow() {
+        window?.let { window ->
+            systemApi.unmapWindow(window.frame)
+            systemApi.flush()
+
+            systemApi.setWindowBorderWidth(window.id, window.borderWidth.convert())
+
+            systemApi.reparentWindow(window.id, rootWindowId, 0, 0)
+            systemApi.destroyWindow(window.frame)
+        }
+        window = null
     }
 }

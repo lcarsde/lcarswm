@@ -354,11 +354,11 @@ private fun createEventManager(
 
     return EventDistributor.Builder(logger)
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler))
-        .addEventHandler(DestroyNotifyHandler(logger, windowRegistration))
+        .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler))
         .addEventHandler(KeyPressHandler(logger, keyManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
         .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, atomLibrary))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
-        .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
+        .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer, appMenuHandler))
         .addEventHandler(screenChangeHandler)
         .addEventHandler(ReparentNotifyHandler(logger, windowRegistration))
         .addEventHandler(ClientMessageHandler(logger, atomLibrary))
