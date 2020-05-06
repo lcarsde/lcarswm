@@ -23,7 +23,8 @@ class WindowHandler(
     private val atomLibrary: AtomLibrary,
     private val screen: Screen,
     private val windowNameReader: WindowNameReader,
-    private val appMenuHandler: AppMenuHandler
+    private val appMenuHandler: AppMenuHandler,
+    private val windowList: WindowList
 ) : WindowRegistration {
 
     private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or
@@ -37,8 +38,6 @@ class WindowHandler(
     private val wmStateData = listOf<ULong>(NormalState.convert(), None.convert())
         .map { it.toUByteArray() }
         .combine()
-
-    private val registeredWindows = mutableMapOf<Window, FramedWindow>()
 
     override fun addWindow(windowId: Window, isSetup: Boolean) {
         system.grabServer()
@@ -103,19 +102,19 @@ class WindowHandler(
 
         system.changeProperty(window.id, atomLibrary[Atoms.WM_STATE], atomLibrary[Atoms.WM_STATE], wmStateData, 32)
 
-        registeredWindows[windowId] = window
+        windowList.add(window)
 
         focusHandler.setFocusedWindow(windowId)
 
         nativeHeap.free(windowAttributes)
     }
 
-    override fun isWindowManaged(windowId: Window): Boolean = registeredWindows.containsKey(windowId)
+    override fun isWindowManaged(windowId: Window): Boolean = windowList.isManaged(windowId)
 
-    override operator fun get(windowId: Window): FramedWindow? = registeredWindows[windowId]
+    override operator fun get(windowId: Window): FramedWindow? = windowList.get(windowId)
 
     override fun isWindowParentedBy(windowId: Window, parentId: Window): Boolean {
-        val framedWindow = registeredWindows[windowId] ?: return false
+        val framedWindow = windowList.get(windowId) ?: return false
         return framedWindow.frame == parentId
     }
 
@@ -125,7 +124,7 @@ class WindowHandler(
         if (!isWindowKnown) {
             return
         }
-        val framedWindow = registeredWindows.remove(windowId)!!
+        val framedWindow = windowList.remove(windowId)!!
 
         system.selectInput(windowId, NoEventMask)
 

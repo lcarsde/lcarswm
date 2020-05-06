@@ -143,6 +143,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager, screen.root)
 
+        val windowList = WindowList()
+
         val windowRegistration = WindowHandler(
             system,
             logger,
@@ -151,7 +153,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             atomLibrary,
             screen,
             windowNameReader,
-            appMenuHandler
+            appMenuHandler,
+            windowList
         )
 
         focusHandler.registerObserver { activeWindow, _ ->
