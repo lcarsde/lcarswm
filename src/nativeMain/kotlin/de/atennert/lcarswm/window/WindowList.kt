@@ -14,15 +14,17 @@ class WindowList {
 
     fun add(window: FramedWindow) {
         windows.add(window)
+        notifyObservers()
     }
 
     fun remove(window: FramedWindow) {
         windows.remove(window)
+        notifyObservers()
     }
 
     fun remove(windowId: Window): FramedWindow? {
-        val window = get(windowId)
-        windows.remove(window)
+        val window = get(windowId) ?: return null
+        remove(window)
         return window
     }
 
