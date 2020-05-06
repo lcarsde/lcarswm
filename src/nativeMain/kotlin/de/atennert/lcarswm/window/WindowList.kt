@@ -20,8 +20,10 @@ class WindowList {
         windows.remove(window)
     }
 
-    fun remove(windowId: Window) {
-        windows.removeAll { it.id == windowId }
+    fun remove(windowId: Window): FramedWindow? {
+        val window = get(windowId)
+        windows.remove(window)
+        return window
     }
 
     fun get(windowId: Window): FramedWindow? {
