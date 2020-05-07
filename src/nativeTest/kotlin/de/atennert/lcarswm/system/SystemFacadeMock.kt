@@ -4,8 +4,12 @@ import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
+import platform.linux.mq_attr
+import platform.linux.mqd_t
+import platform.posix.*
 import platform.posix.FILE
 import platform.posix.__pid_t
+import platform.posix.mode_t
 import platform.posix.sigaction
 import platform.posix.sigset_t
 import xlib.*
@@ -690,6 +694,26 @@ open class SystemFacadeMock : SystemApi {
 
     override fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?) {
         functionCalls.add(FunctionCall("sigProcMask", how, newSigset, oldSigset))
+    }
+
+    override fun mqOpen(name: String, oFlag: Int, mode: mode_t, attributes: CPointer<mq_attr>): mqd_t {
+        functionCalls.add(FunctionCall("mqOpen", name, oFlag, mode, attributes))
+        return 0
+    }
+
+    override fun mqClose(mq: mqd_t): Int {
+        functionCalls.add(FunctionCall("mqClose", mq))
+        return 0
+    }
+
+    override fun mqSend(mq: mqd_t, msg: String, msgPrio: UInt): Int {
+        functionCalls.add(FunctionCall("mqSend", mq, msg, msgPrio))
+        return 0
+    }
+
+    override fun mqUnlink(name: String): Int {
+        functionCalls.add(FunctionCall("mqUnlink", name))
+        return 0
     }
 
     override fun xftGetContext(screen: Int): CPointer<PangoContext>? {

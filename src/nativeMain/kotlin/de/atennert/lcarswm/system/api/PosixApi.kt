@@ -3,10 +3,9 @@ package de.atennert.lcarswm.system.api
 import de.atennert.lcarswm.signal.Signal
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
-import platform.posix.FILE
-import platform.posix.__pid_t
-import platform.posix.sigaction
-import platform.posix.sigset_t
+import platform.linux.mq_attr
+import platform.linux.mqd_t
+import platform.posix.*
 
 /**
  * Interface for accessing POSIX functions
@@ -54,4 +53,12 @@ interface PosixApi {
     fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>, oldSigAction: CPointer<sigaction>?)
 
     fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?)
+
+    fun mqOpen(name: String, oFlag: Int, mode: mode_t, attributes: CPointer<mq_attr>): mqd_t
+
+    fun mqClose(mq: mqd_t): Int
+
+    fun mqSend(mq: mqd_t, msg: String, msgPrio: UInt): Int
+
+    fun mqUnlink(name: String): Int
 }

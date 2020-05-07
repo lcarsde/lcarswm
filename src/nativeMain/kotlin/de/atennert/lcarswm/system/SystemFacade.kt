@@ -5,12 +5,15 @@ import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
-import platform.posix.sigfillset
-import platform.posix.sigemptyset
-import platform.posix.sigprocmask
+import platform.linux.*
+import platform.posix.*
 import platform.posix.FILE
 import platform.posix.__pid_t
+import platform.posix.mode_t
 import platform.posix.sigaction
+import platform.posix.sigemptyset
+import platform.posix.sigfillset
+import platform.posix.sigprocmask
 import platform.posix.sigset_t
 import platform.posix.timeval
 import xlib.*
@@ -331,6 +334,22 @@ class SystemFacade : SystemApi {
 
     override fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?) {
         sigprocmask(how, newSigset, oldSigset)
+    }
+
+    override fun mqOpen(name: String, oFlag: Int, mode: mode_t, attributes: CPointer<mq_attr>): mqd_t  {
+        return mq_open(name, oFlag, mode, attributes)
+    }
+
+    override fun mqClose(mq: mqd_t): Int {
+        return mq_close(mq)
+    }
+
+    override fun mqSend(mq: mqd_t, msg: String, msgPrio: UInt): Int {
+        return mq_send(mq, msg, msg.length.convert(), msgPrio)
+    }
+
+    override fun mqUnlink(name: String): Int {
+        return mq_unlink(name)
     }
 
     override fun selectInput(window: Window, mask: Long): Int {
