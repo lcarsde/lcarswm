@@ -14,12 +14,12 @@ class WindowList {
 
     fun add(window: FramedWindow) {
         windows.add(window)
-        notifyObservers()
+        observers.forEach { observer -> observer.windowAdded(window) }
     }
 
     fun remove(window: FramedWindow) {
         windows.remove(window)
-        notifyObservers()
+        observers.forEach { observer -> observer.windowRemoved(window) }
     }
 
     fun remove(windowId: Window): FramedWindow? {
@@ -38,17 +38,18 @@ class WindowList {
 
     fun update(window: FramedWindow) {
         windows.add(window)
+        observers.forEach { observer -> observer.windowUpdated(window) }
     }
 
     fun isManaged(windowId: Window): Boolean {
         return windows.any { it.id == windowId }
     }
 
-    private fun notifyObservers() {
-        observers.forEach { observer -> observer.listChanged() }
-    }
-
     interface Observer {
-        fun listChanged()
+        fun windowAdded(window: FramedWindow)
+
+        fun windowRemoved(window: FramedWindow)
+
+        fun windowUpdated(window: FramedWindow)
     }
 }

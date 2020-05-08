@@ -129,4 +129,18 @@ class AppMenuHandler(
         }
         window = null
     }
+
+    /*###########################################*
+     * Communicating window list updates
+     *###########################################*/
+    val windowListObserver = object : WindowList.Observer {
+        override fun windowAdded(window: FramedWindow) {
+        }
+
+        override fun windowRemoved(window: FramedWindow) {
+        }
+
+        override fun windowUpdated(window: FramedWindow) {
+        }
+    }
 }

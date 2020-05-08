@@ -179,6 +179,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         monitorManager.registerObserver(appMenuHandler)
 
+        windowList.registerObserver(appMenuHandler.windowListObserver)
+
         val eventManager = createEventManager(
             system,
             logger,
