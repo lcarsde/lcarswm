@@ -82,7 +82,7 @@ class FrameDrawer(
             inactiveTextColor
         }
 
-        fontApi.setLayoutText(layout, window.name)
+        fontApi.setLayoutText(layout, window.title)
         fontApi.setLayoutWidth(layout, textW * PANGO_SCALE)
 
         fontApi.getLayoutPixelExtents(layout, rect.ptr)

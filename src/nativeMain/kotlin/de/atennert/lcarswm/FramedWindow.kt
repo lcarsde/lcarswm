@@ -9,5 +9,5 @@ import xlib.Window
 data class FramedWindow(val id: Window, val borderWidth: Int) {
     var frame: Window = 0.convert()
     var titleBar: Window = 0.convert()
-    var name: String = "-"
+    var title: String = "-"
 }

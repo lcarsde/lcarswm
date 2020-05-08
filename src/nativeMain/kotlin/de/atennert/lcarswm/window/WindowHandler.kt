@@ -70,7 +70,7 @@ class WindowHandler(
             return
         }
 
-        window.name = windowNameReader.getWindowName(windowId)
+        window.title = windowNameReader.getWindowName(windowId)
 
         val measurements = windowCoordinator.addWindowToMonitor(window)
 
@@ -80,7 +80,7 @@ class WindowHandler(
         window.titleBar = system.createSimpleWindow(window.frame,
             listOf(0, measurements.frameHeight - BAR_HEIGHT_WITH_OFFSET, measurements.width, BAR_HEIGHT_WITH_OFFSET))
 
-        logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.name}) to ${window.frame}")
+        logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.title}) to ${window.frame}")
 
         system.selectInput(window.frame, frameEventMask)
 

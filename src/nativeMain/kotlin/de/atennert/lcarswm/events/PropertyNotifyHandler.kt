@@ -40,7 +40,7 @@ class PropertyNotifyHandler(
 
     private fun reloadWindowTitle(window: Window) {
         val framedWindow = windowRegistration[window]!! // this is checked above
-        framedWindow.name = windowNameReader.getWindowName(window)
+        framedWindow.title = windowNameReader.getWindowName(window)
         frameDrawer.drawFrame(framedWindow, windowCoordinator.getMonitorForWindow(window))
     }
 }
