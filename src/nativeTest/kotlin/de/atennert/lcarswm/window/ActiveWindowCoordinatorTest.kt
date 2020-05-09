@@ -1,6 +1,5 @@
 package de.atennert.lcarswm.window
 
-import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.drawing.FrameDrawerMock
 import de.atennert.lcarswm.monitor.Monitor
@@ -42,7 +41,7 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `remove window from coordinator`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(),  0)
+        val window = FramedWindow(systemApi.getNewWindowId(), 0)
         val monitorManager = MonitorManagerMock()
 
         val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
@@ -57,7 +56,7 @@ class ActiveWindowCoordinatorTest {
     @Test
     fun `get measurements for window`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(),  0)
+        val window = FramedWindow(systemApi.getNewWindowId(), 0)
         val monitorManager = MonitorManagerMock()
 
         val activeWindowCoordinator = ActiveWindowCoordinator(systemApi, monitorManager, FrameDrawerMock())
@@ -96,7 +95,7 @@ class ActiveWindowCoordinatorTest {
     @Test
     private fun `restack a window to the top`() {
         val systemApi = SystemFacadeMock()
-        val window = FramedWindow(systemApi.getNewWindowId(),  0)
+        val window = FramedWindow(systemApi.getNewWindowId(), 0)
         window.frame = systemApi.getNewWindowId()
         val monitorManager = MonitorManagerMock()
 

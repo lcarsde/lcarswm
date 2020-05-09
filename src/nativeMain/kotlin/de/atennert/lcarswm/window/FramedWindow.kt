@@ -1,4 +1,4 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.window.TextAtomReader
 import kotlinx.cinterop.convert

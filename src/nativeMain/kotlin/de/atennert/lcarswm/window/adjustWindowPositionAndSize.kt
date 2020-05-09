@@ -1,5 +1,6 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.window
 
+import de.atennert.lcarswm.BAR_HEIGHT_WITH_OFFSET
 import de.atennert.lcarswm.events.sendConfigureNotify
 import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.api.EventApi

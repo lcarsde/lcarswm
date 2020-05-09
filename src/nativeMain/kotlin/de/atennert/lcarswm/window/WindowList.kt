@@ -1,6 +1,5 @@
 package de.atennert.lcarswm.window
 
-import de.atennert.lcarswm.FramedWindow
 import xlib.Window
 
 class WindowList {

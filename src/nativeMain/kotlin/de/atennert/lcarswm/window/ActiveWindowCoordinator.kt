@@ -1,7 +1,5 @@
 package de.atennert.lcarswm.window
 
-import de.atennert.lcarswm.FramedWindow
-import de.atennert.lcarswm.adjustWindowPositionAndSize
 import de.atennert.lcarswm.drawing.IFrameDrawer
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
@@ -31,7 +29,11 @@ class ActiveWindowCoordinator(
             .filterNot { (_, monitor) -> monitors.contains(monitor) }
             .map { (window, _) -> Pair(window, primaryMonitor) }
             .onEach { (window, monitor) ->
-                adjustWindowPositionAndSize(eventApi, monitor.getWindowMeasurements(), window)
+                adjustWindowPositionAndSize(
+                    eventApi,
+                    monitor.getWindowMeasurements(),
+                    window
+                )
                 frameDrawer.drawFrame(window, monitor)
             }
         windowsOnMonitors.putAll(updatedWindows)
@@ -54,7 +56,11 @@ class ActiveWindowCoordinator(
         val nextMonitorIndex = (currentMonitorIndex + 1).rem(monitors.size)
         val nextMonitor = monitors[nextMonitorIndex]
         windowsOnMonitors[window] = nextMonitor
-        adjustWindowPositionAndSize(eventApi, nextMonitor.getWindowMeasurements(), window)
+        adjustWindowPositionAndSize(
+            eventApi,
+            nextMonitor.getWindowMeasurements(),
+            window
+        )
         frameDrawer.drawFrame(window, nextMonitor)
     }
 
@@ -66,7 +72,11 @@ class ActiveWindowCoordinator(
         val nextMonitorIndex = if (currentMonitorIndex == 0) monitors.size - 1 else currentMonitorIndex - 1
         val nextMonitor = monitors[nextMonitorIndex]
         windowsOnMonitors[window] = nextMonitor
-        adjustWindowPositionAndSize(eventApi, nextMonitor.getWindowMeasurements(), window)
+        adjustWindowPositionAndSize(
+            eventApi,
+            nextMonitor.getWindowMeasurements(),
+            window
+        )
         frameDrawer.drawFrame(window, nextMonitor)
     }
 

@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.drawing
 
-import de.atennert.lcarswm.FramedWindow
+import de.atennert.lcarswm.window.FramedWindow
 import de.atennert.lcarswm.monitor.Monitor
 import kotlinx.cinterop.convert
 import xlib.Colormap

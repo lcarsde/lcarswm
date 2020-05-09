@@ -1,6 +1,5 @@
 package de.atennert.lcarswm.window
 
-import de.atennert.lcarswm.FramedWindow
 import de.atennert.lcarswm.system.FunctionCall
 import xlib.Window
 

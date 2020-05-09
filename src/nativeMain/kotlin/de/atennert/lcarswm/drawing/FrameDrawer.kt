@@ -4,6 +4,7 @@ import de.atennert.lcarswm.*
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.api.DrawApi
 import de.atennert.lcarswm.system.api.FontApi
+import de.atennert.lcarswm.window.FramedWindow
 import de.atennert.lcarswm.window.WindowFocusHandler
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
