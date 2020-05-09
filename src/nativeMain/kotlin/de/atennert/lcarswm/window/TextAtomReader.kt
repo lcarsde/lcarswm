@@ -8,7 +8,7 @@ import xlib.Window
 import xlib.XTextProperty
 
 class TextAtomReader(private val system: SystemApi, private val atomLibrary: AtomLibrary) {
-    fun getWindowName(windowId: Window, atom: Atoms): String {
+    fun readTextProperty(windowId: Window, atom: Atoms): String {
         val textProperty = nativeHeap.alloc<XTextProperty>()
         val result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[atom])
 

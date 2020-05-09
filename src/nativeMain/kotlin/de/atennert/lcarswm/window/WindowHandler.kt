@@ -70,9 +70,11 @@ class WindowHandler(
             return
         }
 
-        window.title = textAtomReader.getWindowName(windowId, Atoms.NET_WM_NAME)
+        window.wmClass = textAtomReader.readTextProperty(windowId, Atoms.WM_CLASS)
+
+        window.title = textAtomReader.readTextProperty(windowId, Atoms.NET_WM_NAME)
         if (window.title == TextAtomReader.NO_NAME) {
-            window.title = textAtomReader.getWindowName(windowId, Atoms.WM_NAME)
+            window.title = textAtomReader.readTextProperty(windowId, Atoms.WM_NAME)
         }
 
         val measurements = windowCoordinator.addWindowToMonitor(window)

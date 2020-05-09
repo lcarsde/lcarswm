@@ -40,9 +40,9 @@ class PropertyNotifyHandler(
 
     private fun reloadWindowTitle(windowId: Window) {
         val window = windowRegistration[windowId]!! // this is checked above
-        window.title = textAtomReader.getWindowName(windowId, Atoms.NET_WM_NAME)
+        window.title = textAtomReader.readTextProperty(windowId, Atoms.NET_WM_NAME)
         if (window.title == TextAtomReader.NO_NAME) {
-            window.title = textAtomReader.getWindowName(windowId, Atoms.WM_NAME)
+            window.title = textAtomReader.readTextProperty(windowId, Atoms.WM_NAME)
         }
         frameDrawer.drawFrame(window, windowCoordinator.getMonitorForWindow(windowId))
     }
