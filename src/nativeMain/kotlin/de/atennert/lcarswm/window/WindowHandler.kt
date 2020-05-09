@@ -4,6 +4,7 @@ import de.atennert.lcarswm.BAR_HEIGHT_WITH_OFFSET
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
+import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.log.Logger

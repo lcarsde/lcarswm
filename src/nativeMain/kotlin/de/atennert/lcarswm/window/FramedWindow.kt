@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.window
 
-import de.atennert.lcarswm.window.TextAtomReader
+import de.atennert.lcarswm.atom.TextAtomReader
 import kotlinx.cinterop.convert
 import xlib.Window
 

@@ -1,7 +1,5 @@
-package de.atennert.lcarswm.window
+package de.atennert.lcarswm.atom
 
-import de.atennert.lcarswm.atom.AtomLibrary
-import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.Window

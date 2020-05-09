@@ -1,5 +1,6 @@
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.drawing.Colors
 import de.atennert.lcarswm.drawing.FrameDrawer
 import de.atennert.lcarswm.drawing.RootWindowDrawer

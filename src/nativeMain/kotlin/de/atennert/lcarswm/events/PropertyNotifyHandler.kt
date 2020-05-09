@@ -4,7 +4,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.drawing.FrameDrawer
 import de.atennert.lcarswm.window.WindowCoordinator
-import de.atennert.lcarswm.window.TextAtomReader
+import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.window.WindowRegistration
 import xlib.PropertyNotify
 import xlib.Window
