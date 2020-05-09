@@ -4,7 +4,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.drawing.FrameDrawer
 import de.atennert.lcarswm.window.WindowCoordinator
-import de.atennert.lcarswm.window.WindowNameReader
+import de.atennert.lcarswm.window.TextAtomReader
 import de.atennert.lcarswm.window.WindowRegistration
 import xlib.PropertyNotify
 import xlib.Window
@@ -14,7 +14,7 @@ import xlib.XPropertyEvent
 class PropertyNotifyHandler(
     private val atomLibrary: AtomLibrary,
     private val windowRegistration: WindowRegistration,
-    private val windowNameReader: WindowNameReader,
+    private val textAtomReader: TextAtomReader,
     private val frameDrawer: FrameDrawer,
     private val windowCoordinator: WindowCoordinator,
     private val rootWindowId: Window
@@ -22,10 +22,10 @@ class PropertyNotifyHandler(
     override val xEventType = PropertyNotify
 
     override fun handleEvent(event: XEvent): Boolean {
-        val window = event.xany.window
+        val windowId = event.xany.window
         when {
-            windowRegistration.isWindowManaged(window) -> handleClientMessage(event.xproperty)
-            window == rootWindowId -> { /* nothing to do yet */ }
+            windowRegistration.isWindowManaged(windowId) -> handleClientMessage(event.xproperty)
+            windowId == rootWindowId -> { /* nothing to do yet */ }
             else -> { /* nothing to do */ }
         }
         return false
@@ -38,9 +38,12 @@ class PropertyNotifyHandler(
         }
     }
 
-    private fun reloadWindowTitle(window: Window) {
-        val framedWindow = windowRegistration[window]!! // this is checked above
-        framedWindow.title = windowNameReader.getWindowName(window)
-        frameDrawer.drawFrame(framedWindow, windowCoordinator.getMonitorForWindow(window))
+    private fun reloadWindowTitle(windowId: Window) {
+        val window = windowRegistration[windowId]!! // this is checked above
+        window.title = textAtomReader.getWindowName(windowId, Atoms.NET_WM_NAME)
+        if (window.title == TextAtomReader.NO_NAME) {
+            window.title = textAtomReader.getWindowName(windowId, Atoms.WM_NAME)
+        }
+        frameDrawer.drawFrame(window, windowCoordinator.getMonitorForWindow(windowId))
     }
 }

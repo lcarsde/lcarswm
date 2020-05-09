@@ -22,7 +22,7 @@ class WindowHandler(
     private val focusHandler: WindowFocusHandler,
     private val atomLibrary: AtomLibrary,
     private val screen: Screen,
-    private val windowNameReader: WindowNameReader,
+    private val textAtomReader: TextAtomReader,
     private val appMenuHandler: AppMenuHandler,
     private val windowList: WindowList
 ) : WindowRegistration {
@@ -70,7 +70,10 @@ class WindowHandler(
             return
         }
 
-        window.title = windowNameReader.getWindowName(windowId)
+        window.title = textAtomReader.getWindowName(windowId, Atoms.NET_WM_NAME)
+        if (window.title == TextAtomReader.NO_NAME) {
+            window.title = textAtomReader.getWindowName(windowId, Atoms.WM_NAME)
+        }
 
         val measurements = windowCoordinator.addWindowToMonitor(window)
 

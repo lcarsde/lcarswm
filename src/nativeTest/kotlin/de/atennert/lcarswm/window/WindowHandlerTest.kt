@@ -36,7 +36,7 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary),
+            TextAtomReader(systemApi, atomLibrary),
             AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
             windowList
         )
@@ -74,7 +74,7 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary),
+            TextAtomReader(systemApi, atomLibrary),
             AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
             windowList
         )
@@ -169,7 +169,7 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary),
+            TextAtomReader(systemApi, atomLibrary),
             AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
             windowList
         )
@@ -208,7 +208,7 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary),
+            TextAtomReader(systemApi, atomLibrary),
             AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
             windowList
         )
@@ -248,7 +248,7 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary),
+            TextAtomReader(systemApi, atomLibrary),
             AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
             windowList
         )
@@ -284,7 +284,7 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary),
+            TextAtomReader(systemApi, atomLibrary),
             AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
             windowList
         )
@@ -360,7 +360,7 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary),
+            TextAtomReader(systemApi, atomLibrary),
             AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
             windowList
         )
@@ -406,7 +406,7 @@ class WindowHandlerTest {
             focusHandler,
             atomLibrary,
             screen,
-            WindowNameReader(systemApi, atomLibrary),
+            TextAtomReader(systemApi, atomLibrary),
             AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
             windowList
         )

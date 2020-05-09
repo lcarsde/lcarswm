@@ -7,16 +7,13 @@ import kotlinx.cinterop.*
 import xlib.Window
 import xlib.XTextProperty
 
-class WindowNameReader(private val system: SystemApi, private val atomLibrary: AtomLibrary) {
-    fun getWindowName(windowId: Window): String {
+class TextAtomReader(private val system: SystemApi, private val atomLibrary: AtomLibrary) {
+    fun getWindowName(windowId: Window, atom: Atoms): String {
         val textProperty = nativeHeap.alloc<XTextProperty>()
-        var result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.NET_WM_NAME])
+        val result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[atom])
 
         if (result == 0 || textProperty.nitems.toInt() == 0 || !hasCorrectEncoding(textProperty)) {
-            result = system.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.WM_NAME])
-            if (result == 0 || textProperty.nitems.toInt() == 0 || !hasCorrectEncoding(textProperty)) {
-                return "-"
-            }
+            return NO_NAME
         }
 
         val name = when (textProperty.encoding) {
@@ -25,7 +22,7 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
                 val readBytes = ULongArray(1).pin()
                 val utfBytes = system.localeToUtf8(localeString, (-1).convert(), readBytes.addressOf(0))
                     ?: system.localeToUtf8(localeString, readBytes.get()[0].convert(), null)
-                    ?: return "-"
+                    ?: return NO_NAME
                 ByteArray(readBytes.get()[0].convert()) { utfBytes[it] }.toKString()
             }
             atomLibrary[Atoms.UTF_STRING] -> {
@@ -44,7 +41,7 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
                 val readBytes = ULongArray(1).pin()
                 val utfBytes = system.convertLatinToUtf8(latinString, (-1).convert(), readBytes.addressOf(0))
                     ?: system.convertLatinToUtf8(latinString, readBytes.get()[0].convert(), null)
-                    ?: return "-"
+                    ?: return NO_NAME
                 ByteArray(readBytes.get()[0].convert()) { utfBytes[it] }.toKString()
             }
             else -> ""
@@ -52,7 +49,7 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
         system.free(textProperty.value)
         nativeHeap.free(textProperty)
         return if (name.isEmpty()) {
-            "-"
+            NO_NAME
         } else {
             name.toUpperCase()
         }
@@ -92,5 +89,9 @@ class WindowNameReader(private val system: SystemApi, private val atomLibrary: A
                 list
             }
             .toByteArray()
+    }
+
+    companion object {
+        const val NO_NAME = "-"
     }
 }

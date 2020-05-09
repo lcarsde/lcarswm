@@ -139,7 +139,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val screenChangeHandler = setupRandr(system, randrHandlerFactory, monitorManager, windowCoordinator, uiDrawer, screen.root)
 
-        val windowNameReader = WindowNameReader(system, atomLibrary)
+        val windowNameReader = TextAtomReader(system, atomLibrary)
 
         val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager, screen.root)
 
@@ -351,7 +351,7 @@ private fun createEventManager(
     atomLibrary: AtomLibrary,
     screenChangeHandler: XEventHandler,
     keyConfiguration: KeyConfiguration,
-    windowNameReader: WindowNameReader,
+    textAtomReader: TextAtomReader,
     appMenuHandler: AppMenuHandler,
     frameDrawer: FrameDrawer,
     rootWindowId: Window
@@ -369,7 +369,7 @@ private fun createEventManager(
         .addEventHandler(ClientMessageHandler(logger, atomLibrary))
         .addEventHandler(SelectionClearHandler(logger))
         .addEventHandler(MappingNotifyHandler(logger, keyManager, keyConfiguration, rootWindowId))
-        .addEventHandler(PropertyNotifyHandler(atomLibrary, windowRegistration, windowNameReader, frameDrawer, windowCoordinator, rootWindowId))
+        .addEventHandler(PropertyNotifyHandler(atomLibrary, windowRegistration, textAtomReader, frameDrawer, windowCoordinator, rootWindowId))
         .build()
 }
 
