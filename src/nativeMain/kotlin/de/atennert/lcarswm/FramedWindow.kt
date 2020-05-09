@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.window.TextAtomReader
 import kotlinx.cinterop.convert
 import xlib.Window
 
@@ -9,5 +10,6 @@ import xlib.Window
 data class FramedWindow(val id: Window, val borderWidth: Int) {
     var frame: Window = 0.convert()
     var titleBar: Window = 0.convert()
-    var title: String = "-"
+    var title: String = TextAtomReader.NO_NAME
+    var wmClass: String = TextAtomReader.NO_NAME
 }
