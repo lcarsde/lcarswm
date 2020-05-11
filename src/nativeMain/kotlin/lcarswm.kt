@@ -206,7 +206,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         system.sync(false)
 
-        shutdown(system, uiDrawer, colorHandler, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler, frameDrawer)
+        shutdown(system, uiDrawer, colorHandler, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler, frameDrawer, appMenuHandler)
     }
 }
 
@@ -240,8 +240,10 @@ private fun shutdown(
     rootWindowPropertyHandler: RootWindowPropertyHandler,
     keyManager: KeyManager,
     signalHandler: SignalHandler,
-    frameDrawer: FrameDrawer
+    frameDrawer: FrameDrawer,
+    appMenuHandler: AppMenuHandler
 ) {
+    appMenuHandler.close()
     rootWindowDrawer.cleanupGraphicsContexts()
     frameDrawer.close()
     colors.cleanupColorMap()

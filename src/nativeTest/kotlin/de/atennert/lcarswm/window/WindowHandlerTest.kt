@@ -24,6 +24,7 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
         val windowList = WindowList()
+        val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -37,7 +38,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
-            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
+            appMenuHandler,
             windowList
         )
 
@@ -62,6 +63,7 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
         val windowList = WindowList()
+        val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -75,7 +77,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
-            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
+            appMenuHandler,
             windowList
         )
 
@@ -157,6 +159,7 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
         val windowList = WindowList()
+        val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -170,7 +173,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
-            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
+            appMenuHandler,
             windowList
         )
 
@@ -196,6 +199,7 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
         val windowList = WindowList()
+        val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -209,7 +213,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
-            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
+            appMenuHandler,
             windowList
         )
 
@@ -238,6 +242,7 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
         val windowList = WindowList()
+        val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
 
         val screen = nativeHeap.alloc<Screen>()
 
@@ -249,7 +254,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
-            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
+            appMenuHandler,
             windowList
         )
 
@@ -273,6 +278,7 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
         val windowList = WindowList()
+        val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
 
         val screen = nativeHeap.alloc<Screen>()
         screen.root = rootWindowId
@@ -285,7 +291,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
-            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
+            appMenuHandler,
             windowList
         )
         windowRegistration.addWindow(windowId, false)
@@ -349,6 +355,7 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
         val windowList = WindowList()
+        val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
 
         val screen = nativeHeap.alloc<Screen>()
         screen.root = rootWindowId
@@ -361,7 +368,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
-            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
+            appMenuHandler,
             windowList
         )
         windowRegistration.addWindow(windowId, false)
@@ -394,6 +401,7 @@ class WindowHandlerTest {
         val atomLibrary = AtomLibrary(systemApi)
         val focusHandler = WindowFocusHandler()
         val windowList = WindowList()
+        val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -407,7 +415,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
-            AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId),
+            appMenuHandler,
             windowList
         )
 

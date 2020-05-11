@@ -9,6 +9,7 @@ import de.atennert.lcarswm.events.sendConfigureNotify
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorObserver
 import de.atennert.lcarswm.monitor.WindowMeasurements
+import de.atennert.lcarswm.system.MessageQueue
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.None
@@ -27,6 +28,8 @@ class AppMenuHandler(
         .combine()
 
     private var window: FramedWindow? = null
+
+    private val messageQueue = MessageQueue(systemApi, "active-window-list")
 
     fun manageWindow(window: FramedWindow) {
         this.window = window
@@ -142,5 +145,9 @@ class AppMenuHandler(
 
         override fun windowUpdated(window: FramedWindow) {
         }
+    }
+
+    fun close() {
+        messageQueue.close()
     }
 }

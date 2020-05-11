@@ -258,6 +258,7 @@ class ShutdownTest {
 
         checkThatTheLoggerIsClosed(logger)
         checkFinalizingSync(functionCalls)
+        checkClosingOfAppMenuMessageQueue(functionCalls)
         checkFreeingOfGraphicsContexts(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
@@ -322,6 +323,7 @@ class ShutdownTest {
 
         checkThatTheLoggerIsClosed(logger)
         checkFinalizingSync(functionCalls)
+        checkClosingOfAppMenuMessageQueue(functionCalls)
         checkFreeingOfGraphicsContexts(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
@@ -406,6 +408,11 @@ class ShutdownTest {
             functionCalls.removeAt(0).name,
             "startup should sync after select input to get notified for other WMs"
         )
+    }
+
+    private fun checkClosingOfAppMenuMessageQueue(functionCalls: MutableList<FunctionCall>) {
+        assertEquals("mqClose", functionCalls.removeAt(0).name, "the app menu message queue needs to be closed on shutdown")
+        assertEquals("mqUnlink", functionCalls.removeAt(0).name, "the app menu message queue needs to be unlinked on shutdown")
     }
 
     private fun checkFreeingOfColors(functionCalls: MutableList<FunctionCall>) {
