@@ -14,7 +14,7 @@ data class WindowMeasurements(val x: Int, val y: Int, val width: Int, val height
                 monitorX + NORMAL_WINDOW_LEFT_OFFSET,
                 monitorY + NORMAL_WINDOW_UPPER_OFFSET,
                 monitorWidth - NORMAL_WINDOW_LEFT_OFFSET - BAR_GAP_SIZE - BAR_END_WIDTH,
-                monitorHeight - NORMAL_WINDOW_UPPER_OFFSET - BAR_GAP_SIZE - INNER_CORNER_RADIUS - BAR_HEIGHT,
+                monitorHeight - NORMAL_WINDOW_UPPER_OFFSET - BAR_GAP_SIZE - BAR_HEIGHT,
                 monitorHeight - NORMAL_WINDOW_UPPER_OFFSET
             )
         }
