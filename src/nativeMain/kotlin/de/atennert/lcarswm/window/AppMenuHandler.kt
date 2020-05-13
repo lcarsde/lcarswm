@@ -48,6 +48,8 @@ class AppMenuHandler(
             showAppMenu(window)
         }
         systemApi.changeProperty(window.id, atomLibrary[Atoms.WM_STATE], atomLibrary[Atoms.WM_STATE], wmStateData, 32)
+
+        sendWindowListUpdate()
     }
 
     fun isAppSelector(windowId: Window): Boolean {
@@ -136,14 +138,34 @@ class AppMenuHandler(
     /*###########################################*
      * Communicating window list updates
      *###########################################*/
+    private val windowNameList = mutableMapOf<Window, String>()
+
     val windowListObserver = object : WindowList.Observer {
         override fun windowAdded(window: FramedWindow) {
+            windowNameList[window.id] = window.wmClass
+            sendWindowListUpdate()
         }
 
         override fun windowRemoved(window: FramedWindow) {
+            windowNameList.remove(window.id)
+            sendWindowListUpdate()
         }
 
         override fun windowUpdated(window: FramedWindow) {
+            windowNameList[window.id] = window.wmClass
+            sendWindowListUpdate()
+        }
+    }
+
+    private fun getWindowListString(): String {
+        return windowNameList.asSequence()
+            .fold("") { acc, (window, wmClass) -> "$acc\n$window\t$wmClass" }
+            .trimStart()
+    }
+
+    private fun sendWindowListUpdate() {
+        if (window != null) {
+            messageQueue.sendMessage(getWindowListString())
         }
     }
 

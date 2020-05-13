@@ -32,6 +32,7 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String) {
     }
 
     fun sendMessage(message: String) {
+        // TODO split to long messages
         posixApi.mqSend(mqDes, message, 0.convert())
     }
 
