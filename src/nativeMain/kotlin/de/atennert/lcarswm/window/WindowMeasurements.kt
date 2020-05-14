@@ -1,4 +1,4 @@
-package de.atennert.lcarswm.monitor
+package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.*
 
@@ -35,7 +35,13 @@ data class WindowMeasurements(val x: Int, val y: Int, val width: Int, val height
 
         /** Create window measurements for fullscreen windows */
         fun createFullscreen(monitorX: Int, monitorY: Int, monitorWidth: Int, monitorHeight: Int): WindowMeasurements {
-            return WindowMeasurements(monitorX, monitorY, monitorWidth, monitorHeight, monitorHeight)
+            return WindowMeasurements(
+                monitorX,
+                monitorY,
+                monitorWidth,
+                monitorHeight,
+                monitorHeight
+            )
         }
     }
 }

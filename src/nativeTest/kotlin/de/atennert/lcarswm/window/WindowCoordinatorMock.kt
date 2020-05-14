@@ -2,7 +2,6 @@ package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
-import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.FunctionCall
 import kotlinx.cinterop.convert
 import xlib.Window

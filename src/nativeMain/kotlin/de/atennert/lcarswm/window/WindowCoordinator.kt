@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.monitor.Monitor
-import de.atennert.lcarswm.monitor.WindowMeasurements
 import xlib.Window
 
 /**

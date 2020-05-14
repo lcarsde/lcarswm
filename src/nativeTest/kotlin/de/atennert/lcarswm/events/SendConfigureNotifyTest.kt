@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.monitor.WindowMeasurements
+import de.atennert.lcarswm.window.WindowMeasurements
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import xlib.ConfigureNotify

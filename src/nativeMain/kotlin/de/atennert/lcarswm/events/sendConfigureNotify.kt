@@ -1,7 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.X_FALSE
-import de.atennert.lcarswm.monitor.WindowMeasurements
+import de.atennert.lcarswm.window.WindowMeasurements
 import de.atennert.lcarswm.system.api.EventApi
 import kotlinx.cinterop.*
 import xlib.*

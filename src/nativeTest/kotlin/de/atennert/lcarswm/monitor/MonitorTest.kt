@@ -4,6 +4,7 @@ import de.atennert.lcarswm.BAR_END_WIDTH
 import de.atennert.lcarswm.BAR_GAP_SIZE
 import de.atennert.lcarswm.SIDE_BAR_WIDTH
 import de.atennert.lcarswm.ScreenMode
+import de.atennert.lcarswm.window.WindowMeasurements
 import kotlinx.cinterop.convert
 import kotlin.test.*
 

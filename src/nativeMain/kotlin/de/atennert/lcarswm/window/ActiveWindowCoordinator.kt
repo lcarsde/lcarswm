@@ -3,7 +3,6 @@ package de.atennert.lcarswm.window
 import de.atennert.lcarswm.drawing.IFrameDrawer
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
-import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.api.EventApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert

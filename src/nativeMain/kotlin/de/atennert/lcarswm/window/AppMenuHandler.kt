@@ -8,7 +8,6 @@ import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.events.sendConfigureNotify
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorObserver
-import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.MessageQueue
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*

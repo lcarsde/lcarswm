@@ -4,7 +4,6 @@ import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.drawing.FrameDrawerMock
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManagerMock
-import de.atennert.lcarswm.monitor.WindowMeasurements
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert

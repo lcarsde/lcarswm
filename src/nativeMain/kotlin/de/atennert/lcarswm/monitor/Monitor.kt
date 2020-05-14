@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.monitor
 
 import de.atennert.lcarswm.ScreenMode
+import de.atennert.lcarswm.window.WindowMeasurements
 import kotlinx.cinterop.convert
 import xlib.RROutput
 
