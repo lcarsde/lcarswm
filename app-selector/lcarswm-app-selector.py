@@ -1,7 +1,9 @@
 import gi
+from threading import Thread
+from posix_ipc import MessageQueue, BusyError
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import GdkX11, Gtk
+from gi.repository import GdkX11, Gtk, GObject
 
 
 class LcarswmAppSelector(Gtk.Window):
@@ -12,18 +14,54 @@ class LcarswmAppSelector(Gtk.Window):
         self.button.connect("clicked", self.on_button_clicked)
         self.add(self.button)
         self.set_decorated(False)
+
+        GObject.signal_new("list-update-signal", self, GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,))
+        self.connect("list-update-signal", self.on_list_update)
+
+        self.stop_threads = False
+        self.thread = Thread(target=self.read_window_list_from_queue, args=(lambda: self.stop_threads, self))
+
         self.connect("realize", self.on_create)
+        self.connect("delete-event", self.on_delete)
 
     def on_create(self, window):
         self.get_property("window").set_utf8_property("LCARSWM_APP_SELECTOR", "LCARSWM_APP_SELECTOR")
         print("realized", self.get_property("window").get_xid())
+        self.thread.start()
 
-    def on_button_clicked(self, widget):
+    def on_delete(self, window):
+        print("stopping threads")
+        self.stop_threads = True
+        self.thread.join()
+        print("done")
+
+    @staticmethod
+    def read_window_list_from_queue(stop, window):
+        mq = MessageQueue("/lcarswm-active-window-list")
+        while True:
+            try:
+                s, _ = mq.receive(.4)
+                window.emit("list-update-signal", s)
+            except BusyError:
+                pass
+
+            if stop():
+                break
+
+        mq.close()
+
+    @staticmethod
+    def on_list_update(self, list_string):
+        print("Received:", list_string)
+
+    @staticmethod
+    def on_button_clicked(widget):
         print("hello world")
 
 
 if __name__ == '__main__':
     win = LcarswmAppSelector()
     win.connect("destroy", Gtk.main_quit)
+    win.connect("delete-event", Gtk.main_quit)
     win.show_all()
     Gtk.main()
