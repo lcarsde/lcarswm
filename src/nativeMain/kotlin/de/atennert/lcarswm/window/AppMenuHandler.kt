@@ -114,7 +114,7 @@ class AppMenuHandler(
 
         return WindowMeasurements(
             monitor.x,
-            monitor.y + NORMAL_WINDOW_UPPER_OFFSET + INNER_CORNER_RADIUS * 2,
+            monitor.y + NORMAL_WINDOW_UPPER_OFFSET + INNER_CORNER_RADIUS,
             SIDE_BAR_WIDTH.convert(),
             (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert(),
             (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert()
