@@ -115,7 +115,7 @@ class AppMenuHandler(
         return WindowMeasurements(
             monitor.x,
             monitor.y + NORMAL_WINDOW_UPPER_OFFSET + INNER_CORNER_RADIUS,
-            SIDE_BAR_WIDTH.convert(),
+            (SIDE_BAR_WIDTH + BAR_GAP_SIZE + BAR_END_WIDTH).convert(), // "bar end" is used as window close button
             (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert(),
             (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert()
         )
