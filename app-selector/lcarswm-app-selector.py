@@ -20,20 +20,19 @@ class LcarswmAppSelector(Gtk.Window):
 
         self.stop_threads = False
         self.thread = Thread(target=self.read_window_list_from_queue, args=(lambda: self.stop_threads, self))
+        self.thread.daemon = True
 
         self.connect("realize", self.on_create)
-        self.connect("delete-event", self.on_delete)
+        self.connect("destroy", self.on_destroy)
 
     def on_create(self, window):
         self.get_property("window").set_utf8_property("LCARSWM_APP_SELECTOR", "LCARSWM_APP_SELECTOR")
         print("realized", self.get_property("window").get_xid())
         self.thread.start()
 
-    def on_delete(self, window):
-        print("stopping threads")
+    def on_destroy(self, window):
         self.stop_threads = True
         self.thread.join()
-        print("done")
 
     @staticmethod
     def read_window_list_from_queue(stop, window):
@@ -62,6 +61,5 @@ class LcarswmAppSelector(Gtk.Window):
 if __name__ == '__main__':
     win = LcarswmAppSelector()
     win.connect("destroy", Gtk.main_quit)
-    win.connect("delete-event", Gtk.main_quit)
     win.show_all()
     Gtk.main()
