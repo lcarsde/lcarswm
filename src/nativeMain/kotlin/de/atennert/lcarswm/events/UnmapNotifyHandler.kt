@@ -13,8 +13,7 @@ import xlib.XEvent
 class UnmapNotifyHandler(
     private val logger: Logger,
     private val windowRegistration: WindowRegistration,
-    private val rootWindowDrawer: UIDrawing,
-    private val appMenuHandler: AppMenuHandler
+    private val rootWindowDrawer: UIDrawing
 ) : XEventHandler {
     override val xEventType = UnmapNotify
 
@@ -26,8 +25,6 @@ class UnmapNotifyHandler(
 
         if (isWindowKnown) {
             windowRegistration.removeWindow(window)
-        } else if (appMenuHandler.isKnownAppMenu(window)) {
-            appMenuHandler.removeWindow()
         }
 
         rootWindowDrawer.drawWindowManagerFrame()
