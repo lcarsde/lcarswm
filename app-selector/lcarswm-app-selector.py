@@ -40,7 +40,7 @@ class LcarswmAppSelector(Gtk.Window):
         while True:
             try:
                 s, _ = mq.receive(.4)
-                window.emit("list-update-signal", s)
+                window.emit("list-update-signal", s.decode('utf-8'))
             except BusyError:
                 pass
 
