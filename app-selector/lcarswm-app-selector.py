@@ -63,7 +63,7 @@ class WindowEntry(Gtk.Box):
 
 class LcarswmAppSelector(Gtk.Window):
     def __init__(self):
-        Gtk.Window.__init__(self, title="Hello World")
+        Gtk.Window.__init__(self, title="lcarswm app menu")
 
         self.css_provider = Gtk.CssProvider()
         self.css_provider.load_from_data(css)
@@ -139,10 +139,6 @@ class LcarswmAppSelector(Gtk.Window):
         entry = WindowEntry(window_id, class_name, self.css_provider)
         self.box.pack_start(entry, False, False, 0)
         self.entries[window_id] = entry
-
-    @staticmethod
-    def on_button_clicked(widget):
-        print("hello world")
 
 
 if __name__ == '__main__':
