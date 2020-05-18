@@ -6,8 +6,30 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import GdkX11, Gdk, Gtk, GLib
 
 
+css = b'''
+.select_button {
+    font-family: 'Ubuntu Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: #000;
+    background-color: #99F;
+    outline-style: none;
+    border-radius: 0;
+    padding: 2px 3px;
+    margin: 0;
+}
+.close_button {
+    background-color: #C66;
+    outline-style: none;
+    border-radius: 0 20px 20px 0;
+    padding: 0;
+    margin: 0;
+}
+'''
+
+
 class WindowEntry(Gtk.Box):
-    def __init__(self, window_id, class_name):
+    def __init__(self, window_id, class_name, css_provider):
         super().__init__(spacing=8)
 
         self.window_id = window_id
@@ -15,13 +37,16 @@ class WindowEntry(Gtk.Box):
 
         self.select_button = Gtk.Button(label=class_name)
         self.select_button.set_size_request(184, 40)
-        self.select_button.set_border_width(0)
+        self.select_button.set_alignment(1, 1)
+        self.select_button.get_style_context().add_class('select_button')
+        self.select_button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.select_button.connect("clicked", self.on_select_clicked)
         self.pack_start(self.select_button, False, False, 0)
 
         close_button = Gtk.Button(label="")
         close_button.set_size_request(32, 40)
-        close_button.set_border_width(0)
+        close_button.get_style_context().add_class('close_button')
+        close_button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         close_button.connect("clicked", self.on_close_clicked)
         self.pack_start(close_button, False, False, 0)
 
@@ -39,6 +64,9 @@ class WindowEntry(Gtk.Box):
 class LcarswmAppSelector(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Hello World")
+
+        self.css_provider = Gtk.CssProvider()
+        self.css_provider.load_from_data(css)
 
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         self.add(self.box)
@@ -108,7 +136,7 @@ class LcarswmAppSelector(Gtk.Window):
         entry.update_label(class_name)
 
     def add_window(self, window_id, class_name):
-        entry = WindowEntry(window_id, class_name)
+        entry = WindowEntry(window_id, class_name, self.css_provider)
         self.box.pack_start(entry, False, False, 0)
         self.entries[window_id] = entry
 
