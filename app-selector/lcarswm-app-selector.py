@@ -54,25 +54,34 @@ class LcarswmAppSelector(Gtk.Window):
                                        (window_element.split("\t") for window_element in list_string.split("\n")))
 
         known_windows = list(self.buttons.keys())
-        # cleanup entries that don't exist anymore
+        self.cleanup_windows(known_windows, updated_window_elements)
+
+        self.handle_current_windows(known_windows, updated_window_elements)
+        self.show_all()
+
+    def cleanup_windows(self, known_windows, updated_window_elements):
         for known_window_id in known_windows:
             if known_window_id not in updated_window_elements.keys():
                 button = self.buttons[known_window_id]
                 self.box.remove(button)
                 del self.buttons[known_window_id]
 
+    def handle_current_windows(self, known_windows, updated_window_elements):
         for (window_id, class_name) in updated_window_elements.items():
             if window_id in known_windows:
-                # update entries
-                button = self.buttons[window_id]
-                button.set_label(class_name)
+                self.update_window(window_id, class_name)
             else:
-                # add new entries
-                button = Gtk.Button(label=class_name)
-                button.connect("clicked", self.on_button_clicked)
-                self.box.pack_start(button, False, False, 0)
-                self.buttons[window_id] = button
-        self.show_all()
+                self.add_window(window_id, class_name)
+
+    def update_window(self, window_id, class_name):
+        button = self.buttons[window_id]
+        button.set_label(class_name)
+
+    def add_window(self, window_id, class_name):
+        button = Gtk.Button(label=class_name)
+        button.connect("clicked", self.on_button_clicked)
+        self.box.pack_start(button, False, False, 0)
+        self.buttons[window_id] = button
 
     @staticmethod
     def on_button_clicked(widget):
