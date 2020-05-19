@@ -25,6 +25,16 @@ css = b'''
     padding: 0;
     margin: 0;
 }
+.spacer {
+    background-color: #99C;
+    outline-style: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0 40px 0 0;
+}
+.window {
+    background-color: #000;
+}
 '''
 
 
@@ -68,12 +78,19 @@ class LcarswmAppSelector(Gtk.Window):
         self.css_provider = Gtk.CssProvider()
         self.css_provider.load_from_data(css)
 
-        self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        self.add(self.box)
+        self.app_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+
+        spacer = Gtk.Label("")
+        spacer.get_style_context().add_class('spacer')
+        spacer.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        self.app_container.pack_end(spacer, True, True, 0)
+
+        self.add(self.app_container)
         self.entries = {}
 
         self.set_decorated(False)
-        self.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(0, 0, 0, 1))
+        self.get_style_context().add_class('window')
+        self.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.stop_threads = False
         self.thread = Thread(target=self.read_window_list_from_queue, args=(lambda: self.stop_threads, self))
@@ -121,7 +138,7 @@ class LcarswmAppSelector(Gtk.Window):
         for known_window_id in known_windows:
             if known_window_id not in updated_window_elements.keys():
                 entry = self.entries[known_window_id]
-                self.box.remove(entry)
+                self.app_container.remove(entry)
                 del self.entries[known_window_id]
 
     def handle_current_windows(self, known_windows, updated_window_elements):
@@ -137,7 +154,7 @@ class LcarswmAppSelector(Gtk.Window):
 
     def add_window(self, window_id, class_name):
         entry = WindowEntry(window_id, class_name, self.css_provider)
-        self.box.pack_start(entry, False, False, 0)
+        self.app_container.pack_start(entry, False, False, 0)
         self.entries[window_id] = entry
 
 
