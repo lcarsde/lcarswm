@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import gi
 from threading import Thread
 from posix_ipc import MessageQueue, BusyError
