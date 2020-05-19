@@ -158,8 +158,7 @@ class AppMenuHandler(
 
     private fun getWindowListString(): String {
         return windowNameList.asSequence()
-            .fold("") { acc, (window, wmClass) -> "$acc\n$window\t$wmClass" }
-            .trimStart()
+            .fold("list") { acc, (window, wmClass) -> "$acc\n$window\t$wmClass" }
     }
 
     private fun sendWindowListUpdate() {

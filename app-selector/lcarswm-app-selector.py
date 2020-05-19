@@ -80,7 +80,7 @@ class LcarswmAppSelector(Gtk.Window):
 
         self.app_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
 
-        spacer = Gtk.Label("")
+        spacer = Gtk.Label(label="")
         spacer.get_style_context().add_class('spacer')
         spacer.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.app_container.pack_end(spacer, True, True, 0)
@@ -125,8 +125,12 @@ class LcarswmAppSelector(Gtk.Window):
 
     @staticmethod
     def on_list_update(self, list_string):
+        data_list = list_string.splitlines()
+        if not data_list[1] == "list":
+            return
+
         updated_window_elements = dict((window_id, class_name) for window_id, class_name in
-                                       (window_element.split("\t") for window_element in list_string.split("\n")))
+                                       (window_element.split("\t") for window_element in data_list[1:]))
 
         known_windows = list(self.entries.keys())
         self.cleanup_windows(known_windows, updated_window_elements)
