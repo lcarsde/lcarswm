@@ -127,7 +127,7 @@ class LcarswmAppSelector(Gtk.Window):
     @staticmethod
     def on_list_update(self, list_string):
         data_list = list_string.splitlines()
-        if not data_list[0] == "list":
+        if data_list[0] != "list":
             return
 
         updated_window_elements = dict((window_id, class_name) for window_id, class_name in
