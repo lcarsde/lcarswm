@@ -3,6 +3,7 @@ package de.atennert.lcarswm.system.api
 import de.atennert.lcarswm.signal.Signal
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.UIntVar
 import platform.linux.mq_attr
 import platform.linux.mqd_t
 import platform.posix.*
@@ -59,6 +60,8 @@ interface PosixApi {
     fun mqClose(mq: mqd_t): Int
 
     fun mqSend(mq: mqd_t, msg: String, msgPrio: UInt): Int
+
+    fun mqReceive(mq: mqd_t, msgPtr: CPointer<ByteVar>, msgSize: size_t, msgPrio: CPointer<UIntVar>?): ssize_t
 
     fun mqUnlink(name: String): Int
 }

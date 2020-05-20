@@ -12,6 +12,7 @@ import platform.posix.__pid_t
 import platform.posix.mode_t
 import platform.posix.sigaction
 import platform.posix.sigset_t
+import platform.posix.ssize_t
 import xlib.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -708,6 +709,15 @@ open class SystemFacadeMock : SystemApi {
 
     override fun mqSend(mq: mqd_t, msg: String, msgPrio: UInt): Int {
         functionCalls.add(FunctionCall("mqSend", mq, msg, msgPrio))
+        return 0
+    }
+
+    override fun mqReceive(
+        mq: mqd_t,
+        msgPtr: CPointer<ByteVar>,
+        msgSize: size_t,
+        msgPrio: CPointer<UIntVar>?
+    ): ssize_t {
         return 0
     }
 

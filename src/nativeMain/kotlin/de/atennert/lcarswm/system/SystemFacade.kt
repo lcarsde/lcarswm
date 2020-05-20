@@ -15,6 +15,7 @@ import platform.posix.sigemptyset
 import platform.posix.sigfillset
 import platform.posix.sigprocmask
 import platform.posix.sigset_t
+import platform.posix.ssize_t
 import platform.posix.timeval
 import xlib.*
 
@@ -346,6 +347,10 @@ class SystemFacade : SystemApi {
 
     override fun mqSend(mq: mqd_t, msg: String, msgPrio: UInt): Int {
         return mq_send(mq, msg, msg.length.convert(), msgPrio)
+    }
+
+    override fun mqReceive(mq: mqd_t, msgPtr: CPointer<ByteVar>, msgSize: size_t, msgPrio: CPointer<UIntVar>?): ssize_t {
+        return mq_receive(mq, msgPtr, msgSize, msgPrio)
     }
 
     override fun mqUnlink(name: String): Int {
