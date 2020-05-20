@@ -28,7 +28,7 @@ class AppMenuHandler(
 
     private var window: FramedWindow? = null
 
-    private val messageQueue = MessageQueue(systemApi, "/lcarswm-active-window-list")
+    private val messageQueue = MessageQueue(systemApi, "/lcarswm-active-window-list", MessageQueue.Mode.WRITE)
 
     fun manageWindow(window: FramedWindow) {
         this.window = window

@@ -7,13 +7,17 @@ import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
 import platform.linux.mq_attr
 import platform.linux.mqd_t
-import platform.posix.O_CREAT
-import platform.posix.O_NONBLOCK
-import platform.posix.O_WRONLY
+import platform.posix.*
 
-class MessageQueue(private val posixApi: PosixApi, private val name: String) {
+class MessageQueue(private val posixApi: PosixApi, private val name: String, mode: Mode) {
 
-    private val oFlags = O_WRONLY or O_NONBLOCK or O_CREAT
+    enum class Mode (val flag: Int) {
+        READ(O_RDONLY),
+        WRITE(O_WRONLY),
+        READ_WRITE(O_RDWR)
+    }
+
+    private val oFlags = mode.flag or O_NONBLOCK or O_CREAT
     private val queuePermissions = 432 // 0660
 
     private val maxMessageCount = 10
