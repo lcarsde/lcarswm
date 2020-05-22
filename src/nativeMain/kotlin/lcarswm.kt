@@ -12,6 +12,7 @@ import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.signal.SignalHandler
+import de.atennert.lcarswm.system.MessageQueue
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.PosixApi
 import de.atennert.lcarswm.system.api.SystemApi
@@ -144,6 +145,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager, screen.root)
 
+        val appMenuMessageQueue = MessageQueue(system, "/lcarswm-app-menu-messages", MessageQueue.Mode.READ)
+
         val windowList = WindowList()
 
         val windowRegistration = WindowHandler(
@@ -202,7 +205,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
 
-        eventLoop(system, eventManager, eventTime, eventBuffer)
+        eventLoop(system, eventManager, eventTime, eventBuffer, appMenuMessageQueue)
 
         system.sync(false)
 
@@ -380,7 +383,8 @@ private fun eventLoop(
     posixApi: PosixApi,
     eventDistributor: EventDistributor,
     eventTime: EventTime,
-    eventBuffer: EventBuffer
+    eventBuffer: EventBuffer,
+    appMenuMessageQueue: MessageQueue
 ) {
     while (exitState.value == null) {
         val xEvent = eventBuffer.getNextEvent(false)?.pointed
@@ -395,6 +399,11 @@ private fun eventLoop(
         if (eventDistributor.handleEvent(xEvent)) {
             exitState.value = 0
         }
+
+        appMenuMessageQueue.receiveMessage()?.let {
+            // TODO handle the message
+        }
+
         eventTime.unsetEventTime()
 
         nativeHeap.free(xEvent)
