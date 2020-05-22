@@ -2,7 +2,6 @@ package de.atennert.lcarswm.system
 
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.*
-import kotlinx.coroutines.*
 import platform.linux.mq_attr
 import platform.linux.mqd_t
 import platform.posix.*
@@ -23,8 +22,6 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
 
     private val mqDes: mqd_t
 
-    private var receiveJob: Job? = null
-
     init {
         val mqAttributes = nativeHeap.alloc<mq_attr>()
         mqAttributes.mq_flags = O_NONBLOCK.convert()
@@ -40,30 +37,18 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
         posixApi.mqSend(mqDes, message, 0.convert())
     }
 
-    fun receiveMessage(receiver: (String) -> Unit) {
+    fun receiveMessage(): String? {
         assert(mode == Mode.READ || mode == Mode.READ_WRITE)
 
-        receiveJob = GlobalScope.launch {
-            while (true) {
-                val msgBuffer = ByteArray(maxMessageSize).pin()
-                val msgSize = posixApi.mqReceive(mqDes, msgBuffer.addressOf(0), maxMessageSize.convert(), null)
-                // TODO read message
-                delay(400)
-            }
+        val msgBuffer = ByteArray(maxMessageSize)
+        val msgSize = posixApi.mqReceive(mqDes, msgBuffer.pin().addressOf(0), maxMessageSize.convert(), null)
+        if (msgSize > 0) {
+            return msgBuffer.toKString(0, msgSize.convert())
         }
-    }
-
-    private fun stopReceiving() {
-        receiveJob?.let { job ->
-            runBlocking(GlobalScope.coroutineContext) {
-                job.cancelAndJoin()
-            }
-        }
+        return null
     }
 
     fun close() {
-        stopReceiving()
-
         if (posixApi.mqClose(mqDes) == -1 ) {
             return
         }
