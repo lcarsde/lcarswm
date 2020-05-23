@@ -258,7 +258,7 @@ class ShutdownTest {
 
         checkThatTheLoggerIsClosed(logger)
         checkFinalizingSync(functionCalls)
-        checkClosingOfAppMenuMessageQueue(functionCalls)
+        checkClosingOfAppMenuMessageQueues(functionCalls)
         checkFreeingOfGraphicsContexts(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
@@ -323,7 +323,7 @@ class ShutdownTest {
 
         checkThatTheLoggerIsClosed(logger)
         checkFinalizingSync(functionCalls)
-        checkClosingOfAppMenuMessageQueue(functionCalls)
+        checkClosingOfAppMenuMessageQueues(functionCalls)
         checkFreeingOfGraphicsContexts(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
@@ -410,7 +410,12 @@ class ShutdownTest {
         )
     }
 
-    private fun checkClosingOfAppMenuMessageQueue(functionCalls: MutableList<FunctionCall>) {
+    private fun checkClosingOfAppMenuMessageQueues(functionCalls: MutableList<FunctionCall>) {
+        // send info queue
+        assertEquals("mqClose", functionCalls.removeAt(0).name, "the app menu message queue needs to be closed on shutdown")
+        assertEquals("mqUnlink", functionCalls.removeAt(0).name, "the app menu message queue needs to be unlinked on shutdown")
+
+        // receive info queue
         assertEquals("mqClose", functionCalls.removeAt(0).name, "the app menu message queue needs to be closed on shutdown")
         assertEquals("mqUnlink", functionCalls.removeAt(0).name, "the app menu message queue needs to be unlinked on shutdown")
     }
