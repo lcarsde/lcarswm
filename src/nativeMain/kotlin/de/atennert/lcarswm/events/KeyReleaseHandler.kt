@@ -2,10 +2,10 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
-import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.WindowFocusHandler
+import de.atennert.lcarswm.window.closeWindow
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -47,36 +47,8 @@ class KeyReleaseHandler(
     }
 
     private fun closeActiveWindow() {
-        val focusedWindow = focusHandler.getFocusedWindow() ?: return
+        val focusedWindowId = focusHandler.getFocusedWindow() ?: return
 
-        logger.logInfo("KeyReleaseHandler::closeActiveWindow::focused window: $focusedWindow")
-
-        val supportedProtocols = nativeHeap.allocPointerTo<AtomVar>()
-        val numSupportedProtocols = IntArray(1).pin()
-
-        val protocolsResult =
-            systemApi.getWMProtocols(focusedWindow, supportedProtocols.ptr, numSupportedProtocols.addressOf(0))
-
-        if (protocolsResult == 0) {
-            logger.logDebug("KeyReleaseHandler::closeActiveWindow::kill window due to erroneous protocols")
-            systemApi.killClient(focusedWindow)
-            return
-        }
-
-        val protocols = ULongArray(numSupportedProtocols.get()[0]) { supportedProtocols.value!![it] }
-
-        if (!protocols.contains(atomLibrary[Atoms.WM_DELETE_WINDOW])) {
-            logger.logDebug("KeyReleaseHandler::closeActiveWindow::kill window due to missing WM_DELETE_WINDOW")
-            systemApi.killClient(focusedWindow)
-        } else {
-            logger.logDebug("KeyReleaseHandler::closeActiveWindow::gracefully send WM_DELETE_WINDOW request")
-            val msg = nativeHeap.alloc<XEvent>()
-            msg.xclient.type = ClientMessage
-            msg.xclient.message_type = atomLibrary[Atoms.WM_PROTOCOLS]
-            msg.xclient.window = focusedWindow
-            msg.xclient.format = 32
-            msg.xclient.data.l[0] = atomLibrary[Atoms.WM_DELETE_WINDOW].convert()
-            systemApi.sendEvent(focusedWindow, false, 0, msg.ptr)
-        }
+        closeWindow(logger, systemApi, atomLibrary, focusedWindowId)
     }
 }
