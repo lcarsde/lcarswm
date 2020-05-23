@@ -40,11 +40,12 @@ css = b'''
 
 
 class WindowEntry(Gtk.Box):
-    def __init__(self, window_id, class_name, css_provider):
+    def __init__(self, window_id, class_name, css_provider, sendQueue):
         super().__init__(spacing=8)
 
         self.window_id = window_id
         self.class_name = class_name
+        self.sendQueue = sendQueue
 
         self.select_button = Gtk.Button(label=class_name)
         self.select_button.set_size_request(184, 40)
@@ -63,9 +64,11 @@ class WindowEntry(Gtk.Box):
 
     def on_select_clicked(self, widget):
         print("selecting", self.class_name)
+        self.sendQueue.send(f"select\n{self.window_id}".encode())
 
     def on_close_clicked(self, widget):
         print("closing", self.class_name)
+        self.sendQueue.send(f"close\n{self.window_id}".encode())
 
     def update_label(self, class_name):
         self.class_name = class_name
@@ -93,6 +96,8 @@ class LcarswmAppSelector(Gtk.Window):
         self.get_style_context().add_class('window')
         self.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
+        self.sendQueue = MessageQueue("/lcarswm-active-window-list")
+
         self.stop_threads = False
         self.thread = Thread(target=self.read_window_list_from_queue, args=(lambda: self.stop_threads, self))
         self.thread.daemon = True
@@ -107,6 +112,7 @@ class LcarswmAppSelector(Gtk.Window):
 
     def on_destroy(self, window):
         self.stop_threads = True
+        self.sendQueue.close()
         self.thread.join()
 
     @staticmethod
@@ -158,7 +164,7 @@ class LcarswmAppSelector(Gtk.Window):
         entry.update_label(class_name)
 
     def add_window(self, window_id, class_name):
-        entry = WindowEntry(window_id, class_name, self.css_provider)
+        entry = WindowEntry(window_id, class_name, self.css_provider, self.sendQueue)
         self.app_container.pack_start(entry, False, False, 0)
         self.entries[window_id] = entry
 
