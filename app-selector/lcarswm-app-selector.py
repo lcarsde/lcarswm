@@ -50,14 +50,14 @@ class WindowEntry(Gtk.Box):
         self.select_button = Gtk.Button(label=class_name)
         self.select_button.set_size_request(184, 40)
         self.select_button.set_alignment(1, 1)
-        self.select_button.get_style_context().add_class('select_button')
+        self.select_button.get_style_context().add_class("select_button")
         self.select_button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.select_button.connect("clicked", self.on_select_clicked)
         self.pack_start(self.select_button, False, False, 0)
 
         close_button = Gtk.Button(label="")
         close_button.set_size_request(32, 40)
-        close_button.get_style_context().add_class('close_button')
+        close_button.get_style_context().add_class("close_button")
         close_button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         close_button.connect("clicked", self.on_close_clicked)
         self.pack_start(close_button, False, False, 0)
@@ -85,7 +85,7 @@ class LcarswmAppSelector(Gtk.Window):
         self.app_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
 
         spacer = Gtk.Label(label="")
-        spacer.get_style_context().add_class('spacer')
+        spacer.get_style_context().add_class("spacer")
         spacer.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.app_container.pack_end(spacer, True, True, 0)
 
@@ -93,10 +93,10 @@ class LcarswmAppSelector(Gtk.Window):
         self.entries = {}
 
         self.set_decorated(False)
-        self.get_style_context().add_class('window')
+        self.get_style_context().add_class("window")
         self.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        self.sendQueue = MessageQueue("/lcarswm-active-window-list")
+        self.sendQueue = MessageQueue("/lcarswm-app-menu-messages")
 
         self.stop_threads = False
         self.thread = Thread(target=self.read_window_list_from_queue, args=(lambda: self.stop_threads, self))
@@ -121,7 +121,7 @@ class LcarswmAppSelector(Gtk.Window):
         while True:
             try:
                 s, _ = mq.receive(.4)
-                GLib.idle_add(window.on_list_update, window, s.decode('utf-8'))
+                GLib.idle_add(window.on_list_update, window, s.decode("utf-8"))
             except BusyError:
                 pass
 
@@ -169,7 +169,7 @@ class LcarswmAppSelector(Gtk.Window):
         self.entries[window_id] = entry
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     win = LcarswmAppSelector()
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
