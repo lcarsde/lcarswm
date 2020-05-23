@@ -149,6 +149,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val windowList = WindowList()
 
+        val appMenuMessageHandler = AppMenuMessageHandler(logger, system, atomLibrary, windowList, focusHandler)
+
         val windowRegistration = WindowHandler(
             system,
             logger,
@@ -205,11 +207,11 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
 
-        eventLoop(system, eventManager, eventTime, eventBuffer, appMenuMessageQueue)
+        eventLoop(system, eventManager, eventTime, eventBuffer, appMenuMessageHandler, appMenuMessageQueue)
 
         system.sync(false)
 
-        shutdown(system, uiDrawer, colorHandler, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler, frameDrawer, appMenuHandler)
+        shutdown(system, uiDrawer, colorHandler, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler, frameDrawer, appMenuHandler, appMenuMessageQueue)
     }
 }
 
@@ -244,9 +246,11 @@ private fun shutdown(
     keyManager: KeyManager,
     signalHandler: SignalHandler,
     frameDrawer: FrameDrawer,
-    appMenuHandler: AppMenuHandler
+    appMenuHandler: AppMenuHandler,
+    appMenuMessageQueue: MessageQueue
 ) {
     appMenuHandler.close()
+    appMenuMessageQueue.close()
     rootWindowDrawer.cleanupGraphicsContexts()
     frameDrawer.close()
     colors.cleanupColorMap()
@@ -384,9 +388,14 @@ private fun eventLoop(
     eventDistributor: EventDistributor,
     eventTime: EventTime,
     eventBuffer: EventBuffer,
+    appMenuMessageHandler: AppMenuMessageHandler,
     appMenuMessageQueue: MessageQueue
 ) {
     while (exitState.value == null) {
+        appMenuMessageQueue.receiveMessage()?.let {
+            appMenuMessageHandler.handleMessage(it)
+        }
+
         val xEvent = eventBuffer.getNextEvent(false)?.pointed
 
         if (xEvent == null) {
@@ -398,10 +407,6 @@ private fun eventLoop(
 
         if (eventDistributor.handleEvent(xEvent)) {
             exitState.value = 0
-        }
-
-        appMenuMessageQueue.receiveMessage()?.let {
-            // TODO handle the message
         }
 
         eventTime.unsetEventTime()
