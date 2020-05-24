@@ -33,6 +33,8 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
     }
 
     fun sendMessage(message: String) {
+        assert(mode == Mode.WRITE || mode == Mode.READ_WRITE)
+
         // TODO split to long messages
         posixApi.mqSend(mqDes, message, 0.convert())
     }
@@ -41,7 +43,7 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
         assert(mode == Mode.READ || mode == Mode.READ_WRITE)
 
         val msgBuffer = ByteArray(maxMessageSize)
-        var msgSize: ssize_t = -1
+        var msgSize: Long = -1
         msgBuffer.usePinned {
             msgSize = posixApi.mqReceive(mqDes, it.addressOf(0), maxMessageSize.convert(), null)
         }
