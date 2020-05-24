@@ -17,11 +17,13 @@ class TextAtomReader(private val system: SystemApi, private val atomLibrary: Ato
         val name = when (textProperty.encoding) {
             atomLibrary[Atoms.COMPOUND_TEXT] -> {
                 val localeString = getByteArrayListFromCompound(textProperty).toKString()
-                val readBytes = ULongArray(1).pin()
-                val utfBytes = system.localeToUtf8(localeString, (-1).convert(), readBytes.addressOf(0))
-                    ?: system.localeToUtf8(localeString, readBytes.get()[0].convert(), null)
-                    ?: return NO_NAME
-                ByteArray(readBytes.get()[0].convert()) { utfBytes[it] }.toKString()
+                val readBytes = ULongArray(1)
+                val utfBytes = readBytes.usePinned { readBytesPinned ->
+                    system.localeToUtf8(localeString, (-1).convert(), readBytesPinned.addressOf(0))
+                        ?: system.localeToUtf8(localeString, readBytesPinned.get()[0].convert(), null)
+                        ?: return NO_NAME
+                }
+                ByteArray(readBytes[0].convert()) { utfBytes[it] }.toKString()
             }
             atomLibrary[Atoms.UTF_STRING] -> {
                 getByteArray(textProperty).toKString()
@@ -36,11 +38,13 @@ class TextAtomReader(private val system: SystemApi, private val atomLibrary: Ato
                 }.toByteArray()
                     .toKString()
                     .trim()
-                val readBytes = ULongArray(1).pin()
-                val utfBytes = system.convertLatinToUtf8(latinString, (-1).convert(), readBytes.addressOf(0))
-                    ?: system.convertLatinToUtf8(latinString, readBytes.get()[0].convert(), null)
-                    ?: return NO_NAME
-                ByteArray(readBytes.get()[0].convert()) { utfBytes[it] }.toKString()
+                val readBytes = ULongArray(1)
+                val utfBytes = readBytes.usePinned { readBytesPinned ->
+                    system.convertLatinToUtf8(latinString, (-1).convert(), readBytesPinned.addressOf(0))
+                        ?: system.convertLatinToUtf8(latinString, readBytesPinned.get()[0].convert(), null)
+                        ?: return NO_NAME
+                }
+                ByteArray(readBytes[0].convert()) { utfBytes[it] }.toKString()
             }
             else -> ""
         }
@@ -61,8 +65,10 @@ class TextAtomReader(private val system: SystemApi, private val atomLibrary: Ato
 
     private fun getByteArrayListFromCompound(textProperty: XTextProperty): ByteArray {
         val resultList = nativeHeap.allocPointerTo<CPointerVar<ByteVar>>()
-        val listCount = IntArray(1).pin()
-        system.xmbTextPropertyToTextList(textProperty.ptr, resultList.ptr, listCount.addressOf(0))
+        val listCount = IntArray(1)
+        listCount.usePinned { listCountPinned ->
+            system.xmbTextPropertyToTextList(textProperty.ptr, resultList.ptr, listCountPinned.addressOf(0))
+        }
 
         val byteList = mutableListOf<Byte>()
         var index = 0

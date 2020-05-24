@@ -7,6 +7,7 @@ import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.WindowCoordinator
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.pin
+import kotlinx.cinterop.usePinned
 import xlib.RRScreenChangeNotify
 import xlib.XEvent
 
@@ -15,13 +16,17 @@ class RandrHandlerFactory(systemApi: SystemApi, private val logger: Logger) {
     private val randrErrorBase: Int
 
     init {
-        val eventBase = IntArray(1).pin()
-        val errorBase = IntArray(1).pin()
+        val eventBase = IntArray(1)
+        val errorBase = IntArray(1)
 
-        systemApi.rQueryExtension(eventBase.addressOf(0), errorBase.addressOf(0))
+        eventBase.usePinned { eventBasePinned ->
+            errorBase.usePinned { errorBasePinned ->
+                systemApi.rQueryExtension(eventBasePinned.addressOf(0), errorBasePinned.addressOf(0))
+            }
+        }
 
-        randrEventBase = eventBase.get()[0]
-        randrErrorBase = errorBase.get()[0]
+        randrEventBase = eventBase[0]
+        randrErrorBase = errorBase[0]
 
         logger.logDebug("RandrHandlerFactory::init::event base: $randrEventBase, error base: $randrErrorBase")
     }

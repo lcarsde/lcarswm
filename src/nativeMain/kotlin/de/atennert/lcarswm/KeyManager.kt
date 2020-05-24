@@ -39,10 +39,12 @@ class KeyManager(private val inputApi: InputApi) {
         val (minKeyCodes, maxKeyCodes) = inputApi.getDisplayKeyCodeMinMaxCounts()
 
         val keySymsPerKeyCode = IntArray(1)
-        keymap = inputApi.getKeyboardMapping(
-            minKeyCodes.convert(),
-            (maxKeyCodes - minKeyCodes + 1).convert(),
-            keySymsPerKeyCode.pin().addressOf(0))!!
+        keySymsPerKeyCode.usePinned { keySymsPerKeyCodePinned ->
+            keymap = inputApi.getKeyboardMapping(
+                minKeyCodes.convert(),
+                (maxKeyCodes - minKeyCodes + 1).convert(),
+                keySymsPerKeyCodePinned.addressOf(0))!!
+        }
 
         var superLUsed = false
         var hyperLUsed = false

@@ -14,18 +14,21 @@ fun closeWindow(logger:Logger, systemApi: SystemApi, atomLibrary: AtomLibrary, w
     logger.logInfo("::closeActiveWindow::focused window: $windowId")
 
     val supportedProtocols = nativeHeap.allocPointerTo<AtomVar>()
-    val numSupportedProtocols = IntArray(1).pin()
+    val numSupportedProtocols = IntArray(1)
 
-    val protocolsResult =
-        systemApi.getWMProtocols(windowId, supportedProtocols.ptr, numSupportedProtocols.addressOf(0))
+    val protocolsResult = numSupportedProtocols.usePinned { numSupportedProtocolsPinned ->
+        systemApi.getWMProtocols(windowId, supportedProtocols.ptr, numSupportedProtocolsPinned.addressOf(0))
+    }
 
     if (protocolsResult == 0) {
         logger.logDebug("::closeActiveWindow::kill window due to erroneous protocols")
         systemApi.killClient(windowId)
+        nativeHeap.free(supportedProtocols)
         return
     }
 
-    val protocols = ULongArray(numSupportedProtocols.get()[0]) { supportedProtocols.value!![it] }
+    val protocols = ULongArray(numSupportedProtocols[0]) { supportedProtocols.value!![it] }
+    nativeHeap.free(supportedProtocols)
 
     if (!protocols.contains(atomLibrary[Atoms.WM_DELETE_WINDOW])) {
         logger.logDebug("::closeActiveWindow::kill window due to missing WM_DELETE_WINDOW")
