@@ -13,6 +13,7 @@ mkdir -p "build/deb/lcarswm-${TRAVIS_TAG}"
 # copy software resources
 cp -r "src/nativeMain/resources/usr" "build/deb/lcarswm-${TRAVIS_TAG}/usr"
 cp "build/bin/native/releaseExecutable/lcarswm.kexe" "build/deb/lcarswm-${TRAVIS_TAG}/usr/bin/"
+cp "app-selector/lcarswm-app-selector.py" "build/deb/lcarswm-${TRAVIS_TAG}/usr/bin/"
 
 cd "build/deb"
 
