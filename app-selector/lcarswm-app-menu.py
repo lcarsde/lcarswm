@@ -75,7 +75,7 @@ class WindowEntry(Gtk.Box):
         self.select_button.set_label(class_name)
 
 
-class LcarswmAppSelector(Gtk.Window):
+class LcarswmAppMenu(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="lcarswm app menu")
 
@@ -107,7 +107,7 @@ class LcarswmAppSelector(Gtk.Window):
 
     def on_create(self, window):
         # mark myself as the app menu
-        self.get_property("window").set_utf8_property("LCARSWM_APP_SELECTOR", "LCARSWM_APP_SELECTOR")
+        self.get_property("window").set_utf8_property("LCARSWM_APP_MENU", "LCARSWM_APP_MENU")
         self.thread.start()
 
     def on_destroy(self, window):
@@ -170,7 +170,7 @@ class LcarswmAppSelector(Gtk.Window):
 
 
 if __name__ == "__main__":
-    win = LcarswmAppSelector()
+    win = LcarswmAppMenu()
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
     Gtk.main()
