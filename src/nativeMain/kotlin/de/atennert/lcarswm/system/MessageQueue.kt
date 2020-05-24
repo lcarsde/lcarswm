@@ -41,9 +41,12 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
         assert(mode == Mode.READ || mode == Mode.READ_WRITE)
 
         val msgBuffer = ByteArray(maxMessageSize)
-        val msgSize = posixApi.mqReceive(mqDes, msgBuffer.pin().addressOf(0), maxMessageSize.convert(), null)
+        var msgSize: ssize_t = -1
+        msgBuffer.usePinned {
+            msgSize = posixApi.mqReceive(mqDes, it.addressOf(0), maxMessageSize.convert(), null)
+        }
         if (msgSize > 0) {
-            return msgBuffer.toKString(0, msgSize.convert())
+            return msgBuffer.decodeToString(0, msgSize.convert())
         }
         return null
     }
