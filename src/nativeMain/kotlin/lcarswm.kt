@@ -207,6 +207,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
 
+        runProgram(system, "lcarswm-app-menu.py", listOf())
+
         eventLoop(system, eventManager, eventTime, eventBuffer, appMenuMessageHandler, appMenuMessageQueue)
 
         system.sync(false)
