@@ -63,11 +63,9 @@ class WindowEntry(Gtk.Box):
         self.pack_start(close_button, False, False, 0)
 
     def on_select_clicked(self, widget):
-        print("selecting", self.class_name)
         self.sendQueue.send(f"select\n{self.window_id}".encode())
 
     def on_close_clicked(self, widget):
-        print("closing", self.class_name)
         self.sendQueue.send(f"close\n{self.window_id}".encode())
 
     def update_label(self, class_name):
