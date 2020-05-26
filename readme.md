@@ -17,6 +17,7 @@ Thank you very much to the creators of the following resources:
 
 ## Functionality
 * Window title bar, with window name and different colors for active and inactive windows
+* App menu in the normal screen mode on the primary screen that lists all active windows
 * Windows-key + Q closes the window manager
 * Windows-key + M toggles the display mode between normal, maximized and fullscreen
 * Alt-key + Tab toggles through the windows
