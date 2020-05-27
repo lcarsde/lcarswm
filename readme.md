@@ -64,6 +64,7 @@ Fullscreen mode
 ### For using
 * Ubuntu Condensed font: It comes close enough to LCARS letters and is used by lcarswm for writing.
 * Libraries for XLib, randr, xpm, glib and pango. Check the travis yaml for details via the corresponding dev libs.
+* Python 3.8 with Python 3 gi and Python 3 posix-ipc packages for the app menu
 
 ## Known issues
 * If screens lay over one another they are not "merged" but draw over one another
