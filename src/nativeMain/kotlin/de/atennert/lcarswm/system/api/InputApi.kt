@@ -19,6 +19,8 @@ interface InputApi {
     fun grabButton(button: UInt, modifiers: UInt, window: Window, ownerEvents: Boolean,
                    mask: UInt, pointerMode: Int, keyboardMode: Int, windowToConfineTo: Window, cursor: Cursor): Int
 
+    fun ungrabButton(button: UInt, modifiers: UInt, window: Window): Int
+
     fun getModifierMapping(): CPointer<XModifierKeymap>?
 
     fun getDisplayKeyCodeMinMaxCounts(): Pair<Int, Int>

@@ -392,6 +392,10 @@ class SystemFacade : SystemApi {
         return XGrabButton(display, button, modifiers, window, convertToXBoolean(ownerEvents), mask, pointerMode, keyboardMode, windowToConfineTo, cursor)
     }
 
+    override fun ungrabButton(button: UInt, modifiers: UInt, window: Window): Int {
+        return XUngrabButton(display, button, modifiers, window)
+    }
+
     override fun getModifierMapping(): CPointer<XModifierKeymap>? {
         return XGetModifierMapping(display)
     }

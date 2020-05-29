@@ -212,6 +212,11 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun ungrabButton(button: UInt, modifiers: UInt, window: Window): Int {
+        functionCalls.add(FunctionCall("ungrabButton", button, modifiers, window))
+        return 0
+    }
+
     val modifiers = UByteArray(16) { (it+8).convert() }
 
     val winModifierPosition = 6
