@@ -164,7 +164,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         focusHandler.registerObserver { activeWindow, _ ->
             if (activeWindow != null) {
-                system.setInputFocus(activeWindow, RevertToParent, eventTime.lastEventTime)
+                system.setInputFocus(activeWindow, RevertToNone, eventTime.lastEventTime)
             } else {
                 system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
             }
