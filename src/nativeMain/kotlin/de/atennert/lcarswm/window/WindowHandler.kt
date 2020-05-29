@@ -39,6 +39,8 @@ class WindowHandler(
         .map { it.toUByteArray() }
         .combine()
 
+    private val buttonsToGrab = setOf(Button1, Button2, Button3, Button4, Button5)
+
     override fun addWindow(windowId: Window, isSetup: Boolean) {
         system.grabServer()
         val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
@@ -95,6 +97,17 @@ class WindowHandler(
 
         system.reparentWindow(windowId, window.frame, 0, 0)
 
+        buttonsToGrab.forEach {
+            system.grabButton(
+                it.convert(),
+                AnyModifier.convert(),
+                window.frame,
+                true,
+                (ButtonPressMask or ButtonReleaseMask).convert(),
+                GrabModeAsync, GrabModeAsync,
+                None.convert(), None.convert())
+        }
+
         system.resizeWindow(window.id, measurements.width.convert(), measurements.height.convert())
 
         system.ungrabServer()
@@ -132,6 +145,9 @@ class WindowHandler(
         val framedWindow = windowList.remove(windowId)!!
 
         system.selectInput(windowId, NoEventMask)
+        buttonsToGrab.forEach {
+            system.ungrabButton(it.convert(), AnyModifier.convert(), framedWindow.frame)
+        }
 
         system.unmapWindow(framedWindow.titleBar)
         system.unmapWindow(framedWindow.frame)
