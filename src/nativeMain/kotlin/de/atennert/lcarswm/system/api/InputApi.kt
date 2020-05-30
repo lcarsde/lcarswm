@@ -34,4 +34,6 @@ interface InputApi {
     fun freeModifiermap(modifierMap: CPointer<XModifierKeymap>?)
 
     fun free(xObject: CPointer<*>?)
+
+    fun allowEvents(eventMode: Int, time: Time)
 }

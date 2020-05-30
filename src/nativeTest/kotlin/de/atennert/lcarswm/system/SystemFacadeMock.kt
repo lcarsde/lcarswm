@@ -217,6 +217,10 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun allowEvents(eventMode: Int, time: Time) {
+        functionCalls.add(FunctionCall("allowEvents", eventMode, time))
+    }
+
     val modifiers = UByteArray(16) { (it+8).convert() }
 
     val winModifierPosition = 6

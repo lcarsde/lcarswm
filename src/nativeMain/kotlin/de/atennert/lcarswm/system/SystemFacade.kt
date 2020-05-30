@@ -396,6 +396,10 @@ class SystemFacade : SystemApi {
         return XUngrabButton(display, button, modifiers, window)
     }
 
+    override fun allowEvents(eventMode: Int, time: Time) {
+        XAllowEvents(display, eventMode, time)
+    }
+
     override fun getModifierMapping(): CPointer<XModifierKeymap>? {
         return XGetModifierMapping(display)
     }
