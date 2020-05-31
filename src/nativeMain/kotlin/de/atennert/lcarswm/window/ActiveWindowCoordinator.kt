@@ -25,8 +25,9 @@ class ActiveWindowCoordinator(
         val monitors = monitorManager.getMonitors()
         val primaryMonitor = monitorManager.getPrimaryMonitor()
         val updatedWindows = windowsOnMonitors
-            .filterNot { (_, monitor) -> monitors.contains(monitor) }
-            .map { (window, _) -> Pair(window, primaryMonitor) }
+            .map { (window, monitor) ->
+                Pair(window, monitors.getOrElse(monitors.indexOf(monitor)) { primaryMonitor })
+            }
             .onEach { (window, monitor) ->
                 adjustWindowPositionAndSize(
                     eventApi,
@@ -35,6 +36,7 @@ class ActiveWindowCoordinator(
                 )
                 frameDrawer.drawFrame(window, monitor)
             }
+
         windowsOnMonitors.putAll(updatedWindows)
     }
 
