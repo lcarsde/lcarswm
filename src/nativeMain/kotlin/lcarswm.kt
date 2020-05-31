@@ -201,7 +201,6 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
             windowNameReader,
             appMenuHandler,
             frameDrawer,
-            eventTime,
             windowList,
             screen.root
         )
@@ -367,7 +366,6 @@ private fun createEventManager(
     textAtomReader: TextAtomReader,
     appMenuHandler: AppMenuHandler,
     frameDrawer: FrameDrawer,
-    eventTime: EventTime,
     windowList: WindowList,
     rootWindowId: Window
 ): EventDistributor {
@@ -375,7 +373,7 @@ private fun createEventManager(
     return EventDistributor.Builder(logger)
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler))
-        .addEventHandler(ButtonPressHandler(system, eventTime, windowList))
+        .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler))
         .addEventHandler(KeyPressHandler(logger, keyManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
         .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, atomLibrary))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
