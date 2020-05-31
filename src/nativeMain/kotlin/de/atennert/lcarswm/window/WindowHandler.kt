@@ -97,14 +97,14 @@ class WindowHandler(
 
         system.reparentWindow(windowId, window.frame, 0, 0)
 
-        buttonsToGrab.forEach {
+        buttonsToGrab.forEach { button ->
             system.grabButton(
-                it.convert(),
+                button.convert(),
                 AnyModifier.convert(),
                 window.frame,
                 true,
-                (ButtonPressMask or ButtonReleaseMask).convert(),
-                GrabModeAsync, GrabModeAsync,
+                ButtonPressMask.convert(),
+                GrabModeSync, GrabModeAsync,
                 None.convert(), None.convert())
         }
 
