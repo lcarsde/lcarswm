@@ -31,6 +31,10 @@ class WindowList {
         return windows.firstOrNull { it.id == windowId }
     }
 
+    fun getByFrame(windowId: Window): FramedWindow? {
+        return windows.firstOrNull { it.frame == windowId }
+    }
+
     fun getAll(): Set<FramedWindow> {
         return windows
     }
