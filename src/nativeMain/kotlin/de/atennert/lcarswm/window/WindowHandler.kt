@@ -27,9 +27,7 @@ class WindowHandler(
     private val windowList: WindowList
 ) : WindowRegistration {
 
-    private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or
-            EnterWindowMask or LeaveWindowMask or
-            ButtonPressMask or ButtonReleaseMask
+    private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or ButtonPressMask
 
     private val clientEventMask = PropertyChangeMask or StructureNotifyMask or ColormapChangeMask
 
