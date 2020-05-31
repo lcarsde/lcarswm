@@ -21,6 +21,10 @@ class WindowFocusHandler {
     }
 
     fun setFocusedWindow(activeWindow: Window) {
+        if (activeWindow == this.activeWindow) {
+            return
+        }
+
         val oldActiveWindow = this.activeWindow
         this.activeWindow = activeWindow
         this.observers.forEach { it(activeWindow, oldActiveWindow) }
