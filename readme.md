@@ -8,7 +8,7 @@ lcarswm has two kinds of monitors, one primary monitor (which maps to the X prim
 
 If there's no primary screen defined in the X server, then lcarswm will use the first monitor it finds as primary.
 
-lcarswm is a stacking window manager and displays one window at a time per screen. Windows always open on the primary monitor and can be moved to other monitors with keyboard short cuts. At some point, I'd love to have that managable via touch (mouse input), because what would an LCARS interface be without touchscreen usability.
+lcarswm is a stacking window manager and displays one window at a time per screen. Windows always open on the primary monitor and can be moved to other monitors with keyboard short cuts.
 
 ## Acknowledgements
 Thank you very much to the creators of the following resources:
@@ -76,9 +76,7 @@ Fullscreen mode
 
 ## To Do
 * Associate child screens with their parents
-* Activate windows by clicking on them
 * Center popups and adjust the frame to their size
-* Application menu
 * Content for the data bar (empty upper area in normal mode)
   * Configurable plugin framework
   * Time
