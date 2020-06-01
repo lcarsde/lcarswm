@@ -15,6 +15,9 @@ import kotlin.test.*
  *
  */
 class WindowHandlerTest {
+
+    private val usedButtons = listOf(Button1, Button2, Button3, Button4, Button5)
+
     @Test
     fun `check window initialization`() {
         val systemApi = SystemFacadeMock()
@@ -110,6 +113,9 @@ class WindowHandlerTest {
         assertEquals("addToSaveSet", setupCalls.removeAt(0).name, "add the windows frame to the save set")
         assertEquals("setWindowBorderWidth", setupCalls.removeAt(0).name, "Set the border width of the window to 0")
         assertEquals("reparentWindow", setupCalls.removeAt(0).name, "child window should be reparented to frame")
+        usedButtons.forEach {
+            assertEquals("grabButton", setupCalls.removeAt(0).name, "grab the buttons for click focus")
+        }
         assertEquals("resizeWindow", setupCalls.removeAt(0).name, "resize window to monitor required dimensions")
         assertEquals("ungrabServer", setupCalls.removeAt(0).name, "ungrab the server to allow updates again")
         assertEquals("mapWindow", setupCalls.removeAt(0).name, "frame window should be mapped")
@@ -307,6 +313,10 @@ class WindowHandlerTest {
         assertEquals("selectInput", selectInputCall.name, "Unselect the input")
         assertEquals(windowId, selectInputCall.parameters[0], "unselect the input from the unregistered window")
         assertEquals(NoEventMask, selectInputCall.parameters[1], "set no event mask for events from unregistered window")
+
+        usedButtons.forEach {
+            assertEquals("ungrabButton", unregisterSystemCalls.removeAt(0).name, "Ungrab the buttons")
+        }
 
         val unmapTitleBarCall = unregisterSystemCalls.removeAt(0)
         assertEquals("unmapWindow", unmapTitleBarCall.name, "The title bar of the removed window needs to be _unmapped_")
