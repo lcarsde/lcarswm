@@ -37,7 +37,7 @@ class WindowHandler(
         .map { it.toUByteArray() }
         .combine()
 
-    private val buttonsToGrab = setOf(Button1, Button2, Button3, Button4, Button5)
+    private val buttonsToGrab = setOf(Button1, Button2, Button3)
 
     override fun addWindow(windowId: Window, isSetup: Boolean) {
         system.grabServer()
