@@ -16,7 +16,7 @@ import kotlin.test.*
  */
 class WindowHandlerTest {
 
-    private val usedButtons = listOf(Button1, Button2, Button3, Button4, Button5)
+    private val usedButtons = listOf(Button1, Button2, Button3)
 
     @Test
     fun `check window initialization`() {
