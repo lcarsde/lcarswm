@@ -318,12 +318,12 @@ fun setupScreen(
 /**
  * Load the key configuration from the users key configuration file.
  */
-fun loadKeyConfiguration(posixApi: PosixApi): ConfigurationProvider? {
+fun loadKeyConfiguration(posixApi: PosixApi): PropertiesReader? {
     val configPathBytes = posixApi.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return null
     val configPath = configPathBytes.toKString()
     val keyConfiguration = "$configPath$KEY_CONFIG_FILE"
 
-    return ConfigurationProvider(posixApi, keyConfiguration)
+    return PropertiesReader(posixApi, keyConfiguration)
 }
 
 /**

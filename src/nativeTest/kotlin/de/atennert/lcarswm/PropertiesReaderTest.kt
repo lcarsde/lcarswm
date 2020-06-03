@@ -23,7 +23,7 @@ class ConfigurationProviderTest {
             }
         }
 
-        val configurationProvider = ConfigurationProvider(systemApi, "my-config.properties")
+        val propertiesReader = PropertiesReader(systemApi, "my-config.properties")
 
         val posixCalls = systemApi.functionCalls
         val openFileCall = posixCalls.removeAt(0)
@@ -34,10 +34,10 @@ class ConfigurationProviderTest {
         val closeFileCall = posixCalls.removeAt(0)
         assertEquals("fclose", closeFileCall.name, "The opened file needs to be closed")
 
-        assertEquals("longValue1", configurationProvider["property1"], "The configuration provider should provide given properties")
-        assertEquals("value2", configurationProvider["property2"], "The configuration provider should provide given properties")
+        assertEquals("longValue1", propertiesReader["property1"], "The configuration provider should provide given properties")
+        assertEquals("value2", propertiesReader["property2"], "The configuration provider should provide given properties")
 
-        assertNull(configurationProvider["propertyNone"], "The configuration provider should return null on unknown properties")
+        assertNull(propertiesReader["propertyNone"], "The configuration provider should return null on unknown properties")
     }
 
     @Test
@@ -53,11 +53,11 @@ class ConfigurationProviderTest {
             }
         }
 
-        val configurationProvider = ConfigurationProvider(systemApi, "my-config.properties")
+        val propertiesReader = PropertiesReader(systemApi, "my-config.properties")
 
-        assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue1", configurationProvider["property1"], "The configuration provider should read loooooong entries with end of line")
+        assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue1", propertiesReader["property1"], "The configuration provider should read loooooong entries with end of line")
 
-        assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue2", configurationProvider["property2"], "The configuration provider should read loooooong entries with end of file")
+        assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue2", propertiesReader["property2"], "The configuration provider should read loooooong entries with end of file")
     }
 
     @Test
@@ -71,7 +71,7 @@ class ConfigurationProviderTest {
             }
         }
 
-        ConfigurationProvider(systemApi, "my-config.properties")
+        PropertiesReader(systemApi, "my-config.properties")
 
         assertTrue(systemApi.functionCalls.isEmpty(), "There should be no further calls to the system API")
     }
@@ -84,8 +84,8 @@ class ConfigurationProviderTest {
             }
         }
 
-        val configurationProvider = ConfigurationProvider(systemApi, "my-config.properties")
+        val propertiesReader = PropertiesReader(systemApi, "my-config.properties")
 
-        assertEquals(setOf("property1", "property2"), configurationProvider.getPropertyNames(), "The provider should return the names of the available properties")
+        assertEquals(setOf("property1", "property2"), propertiesReader.getPropertyNames(), "The provider should return the names of the available properties")
     }
 }
