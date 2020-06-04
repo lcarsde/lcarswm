@@ -208,7 +208,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         runProgram(system, "lcarswm-app-menu.py", listOf())
 
-        eventLoop(system, eventManager, eventTime, eventBuffer, appMenuMessageHandler, appMenuMessageQueue)
+        eventLoop(system, logger, eventManager, eventTime, eventBuffer, appMenuMessageHandler, appMenuMessageQueue)
 
         system.sync(false)
 
@@ -388,6 +388,7 @@ private fun createEventManager(
 
 private fun eventLoop(
     posixApi: PosixApi,
+    logger: Logger,
     eventDistributor: EventDistributor,
     eventTime: EventTime,
     eventBuffer: EventBuffer,
@@ -395,25 +396,33 @@ private fun eventLoop(
     appMenuMessageQueue: MessageQueue
 ) {
     while (exitState.value == null) {
-        appMenuMessageQueue.receiveMessage()?.let {
-            appMenuMessageHandler.handleMessage(it)
+        try {
+            appMenuMessageQueue.receiveMessage()?.let {
+                appMenuMessageHandler.handleMessage(it)
+            }
+        } catch (e: Throwable) {
+            logger.logError(e.message ?: "::eventLoop::error during app menu handling")
         }
 
-        val xEvent = eventBuffer.getNextEvent(false)?.pointed
+        try {
+            val xEvent = eventBuffer.getNextEvent(false)?.pointed
 
-        if (xEvent == null) {
-            posixApi.usleep(100.convert())
-            continue
+            if (xEvent == null) {
+                posixApi.usleep(100.convert())
+                continue
+            }
+
+            eventTime.setTimeFromEvent(xEvent.ptr)
+
+            if (eventDistributor.handleEvent(xEvent)) {
+                exitState.value = 0
+            }
+
+            eventTime.unsetEventTime()
+
+            nativeHeap.free(xEvent)
+        } catch (e: Throwable) {
+            logger.logError(e.message ?: "::eventLoop::error during X event handling")
         }
-
-        eventTime.setTimeFromEvent(xEvent.ptr)
-
-        if (eventDistributor.handleEvent(xEvent)) {
-            exitState.value = 0
-        }
-
-        eventTime.unsetEventTime()
-
-        nativeHeap.free(xEvent)
     }
 }
