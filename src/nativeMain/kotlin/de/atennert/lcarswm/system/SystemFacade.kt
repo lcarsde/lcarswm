@@ -400,6 +400,18 @@ class SystemFacade : SystemApi {
         XAllowEvents(display, eventMode, time)
     }
 
+    override fun readXmlFile(filePath: String): xmlDocPtr? {
+        return xmlReadFile(filePath, null, 0)
+    }
+
+    override fun getXmlRootElement(xmlDoc: xmlDocPtr): xmlNodePtr? {
+        return xmlDocGetRootElement(xmlDoc)
+    }
+
+    override fun freeXmlDoc(xmlDoc: xmlDocPtr) {
+        xmlFreeDoc(xmlDoc)
+    }
+
     override fun getModifierMapping(): CPointer<XModifierKeymap>? {
         return XGetModifierMapping(display)
     }

@@ -221,6 +221,17 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("allowEvents", eventMode, time))
     }
 
+    override fun readXmlFile(filePath: String): xmlDocPtr? {
+        return null
+    }
+
+    override fun getXmlRootElement(xmlDoc: xmlDocPtr): xmlNodePtr? {
+        return null
+    }
+
+    override fun freeXmlDoc(xmlDoc: xmlDocPtr) {
+    }
+
     val modifiers = UByteArray(16) { (it+8).convert() }
 
     val winModifierPosition = 6

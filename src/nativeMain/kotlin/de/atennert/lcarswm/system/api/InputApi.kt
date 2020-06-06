@@ -36,4 +36,10 @@ interface InputApi {
     fun free(xObject: CPointer<*>?)
 
     fun allowEvents(eventMode: Int, time: Time)
+
+    fun readXmlFile(filePath: String): xmlDocPtr?
+
+    fun getXmlRootElement(xmlDoc: xmlDocPtr): xmlNodePtr?
+
+    fun freeXmlDoc(xmlDoc: xmlDocPtr)
 }
