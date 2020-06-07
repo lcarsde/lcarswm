@@ -16,23 +16,23 @@ class SettingsWriter {
         <!-- Bindings for executing programs -->
         <entry>
             <binding>Lin+T</binding>
-            <command>lxterminal</command>
+            <exec>lxterminal</exec>
         </entry>
         <entry>
             <binding>Lin+B</binding>
-            <command>firefox</command>
+            <exec>firefox</exec>
         </entry>
         <entry>
             <binding>XF86AudioMute</binding>
-            <command>amixer set Master toggle</command>
+            <exec>amixer set Master toggle</exec>
         </entry>
         <entry>
             <binding>XF86AudioRaiseVolume</binding>
-            <command>amixer set Master 3%+</command>
+            <exec>amixer set Master 3%+</exec>
         </entry>
         <entry>
             <binding>XF86AudioLowerVolume</binding>
-            <command>amixer set Master 3%-</command>
+            <exec>amixer set Master 3%-</exec>
         </entry>
 
         <!-- Window manager action bindings -->
