@@ -81,6 +81,7 @@ class SettingsReader(private val logger: Logger, private val systemApi: SystemAp
 
         while (generalNode != null) {
             if (generalNode.type != XML_ELEMENT_NODE) {
+                logger.logDebug("SettingsReader::readGeneralConfig::node type: ${generalNode.type}")
                 generalNode = node.next?.pointed
                 continue
             }
