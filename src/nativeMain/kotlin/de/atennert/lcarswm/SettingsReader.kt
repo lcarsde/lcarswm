@@ -3,7 +3,7 @@ package de.atennert.lcarswm
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
-import xlib.XML_TEXT_NODE
+import xlib.XML_ELEMENT_NODE
 import xlib._xmlNode
 import xlib.xmlCharVar
 import xlib.xmlDoc
@@ -78,7 +78,13 @@ class SettingsReader(private val logger: Logger, private val systemApi: SystemAp
         var nodeName: String
         var textContent: String
         val generalSettingsXml = mutableMapOf<String, String>()
+
         while (generalNode != null) {
+            if (generalNode.type != XML_ELEMENT_NODE) {
+                generalNode = node.next?.pointed
+                continue
+            }
+
             nodeName = readUbyteString(generalNode.name)
             textContent = readUbyteString(generalNode.children?.get(0)?.content)
 
