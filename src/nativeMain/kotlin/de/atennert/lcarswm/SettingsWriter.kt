@@ -13,53 +13,53 @@ class SettingsWriter {
         private const val INITIAL_SETTINGS = """<?xml version="1.0" encoding="UTF-8"?>
 <lcarswm>
     <key-config>
-        <!-- Bindings for executing programs -->
-        <entry>
-            <binding>Lin+T</binding>
+        <!-- keys for executing programs -->
+        <binding>
+            <keys>Lin+T</keys>
             <exec>lxterminal</exec>
-        </entry>
-        <entry>
-            <binding>Lin+B</binding>
+        </binding>
+        <binding>
+            <keys>Lin+B</keys>
             <exec>firefox</exec>
-        </entry>
-        <entry>
-            <binding>XF86AudioMute</binding>
+        </binding>
+        <binding>
+            <keys>XF86AudioMute</keys>
             <exec>amixer set Master toggle</exec>
-        </entry>
-        <entry>
-            <binding>XF86AudioRaiseVolume</binding>
+        </binding>
+        <binding>
+            <keys>XF86AudioRaiseVolume</keys>
             <exec>amixer set Master 3%+</exec>
-        </entry>
-        <entry>
-            <binding>XF86AudioLowerVolume</binding>
+        </binding>
+        <binding>
+            <keys>XF86AudioLowerVolume</keys>
             <exec>amixer set Master 3%-</exec>
-        </entry>
+        </binding>
 
-        <!-- Window manager action bindings -->
-        <entry>
-            <binding>Alt+Tab</binding>
+        <!-- Window manager action keyss -->
+        <binding>
+            <keys>Alt+Tab</keys>
             <action>window-toggle-forward</action>
-        </entry>
-        <entry>
-            <binding>Alt+Up</binding>
+        </binding>
+        <binding>
+            <keys>Alt+Up</keys>
             <action>window-move-up</action>
-        </entry>
-        <entry>
-            <binding>Alt+Down</binding>
+        </binding>
+        <binding>
+            <keys>Alt+Down</keys>
             <action>window-move-down</action>
-        </entry>
-        <entry>
-            <binding>Alt+F4</binding>
+        </binding>
+        <binding>
+            <keys>Alt+F4</keys>
             <action>window-close</action>
-        </entry>
-        <entry>
-            <binding>Lin+M</binding>
+        </binding>
+        <binding>
+            <keys>Lin+M</keys>
             <action>screen-mode-toggle</action>
-        </entry>
-        <entry>
-            <binding>Lin+Q</binding>
+        </binding>
+        <binding>
+            <keys>Lin+Q</keys>
             <action>lcarswm-quit</action>
-        </entry>
+        </binding>
     </key-config>
     <general>
         <title>LCARS</title>
