@@ -55,13 +55,14 @@ class SettingsReader(private val logger: Logger, private val systemApi: SystemAp
         }
 
         var node = rootElement.children?.get(0)
-        var nodeName: String
         while (node != null) {
-            nodeName = readUbyteString(node.name)
-            when (nodeName) {
+            val successful = when (readUbyteString(node.name)) {
                 "key-config" -> readKeyConfig(node)
                 "general" -> readGeneralConfig(node)
-                else -> return false
+                else -> false
+            }
+            if (!successful) {
+                return false
             }
 
             node = node.next?.pointed
@@ -69,8 +70,64 @@ class SettingsReader(private val logger: Logger, private val systemApi: SystemAp
         return true
     }
 
-    private fun readKeyConfig(node: _xmlNode) {
-        TODO("Not yet implemented")
+    private fun readKeyConfig(node: _xmlNode): Boolean {
+        var bindingNode = node.children?.get(0)
+        val keyConfigXml = mutableListOf<KeyBinding>()
+
+        while (bindingNode != null) {
+            if (bindingNode.type != XML_ELEMENT_NODE) {
+                logger.logDebug("SettingsReader::readKeyConfig::node type: ${bindingNode.type}")
+                bindingNode = node.next?.pointed
+                continue
+            }
+
+            val keyBinding = getBinding(bindingNode) ?: return false
+            keyConfigXml.add(keyBinding)
+
+            bindingNode = node.next?.pointed
+        }
+        return true
+    }
+
+    private fun getBinding(bindingNode: _xmlNode): KeyBinding? {
+        val node1 = bindingNode.children?.get(0) ?: return null
+        val node2 = bindingNode.children?.get(1) ?: return null
+
+        val node1Name = readUbyteString(node1.name)
+        val node2Name = readUbyteString(node2.name)
+
+        val keysNode = getNodeForName("keys", node1Name, node1, node2Name, node2) ?: return null
+        val execNode = getNodeForName("exec", node1Name, node1, node2Name, node2)
+
+        val keys = readUbyteString(keysNode.children?.get(0)?.content)
+        if (keys.isEmpty()) return null
+
+        if (execNode != null) {
+            val exec = readUbyteString(execNode.children?.get(0)?.content)
+            if (exec.isEmpty()) return null
+
+            return KeyExecution(keys, exec)
+        } else {
+            val actionNode = getNodeForName("action", node1Name, node1, node2Name, node2) ?: return null
+            val action = readUbyteString(actionNode.children?.get(0)?.content)
+            if (action.isEmpty()) return null
+
+            return KeyAction(keys, action)
+        }
+    }
+
+    private fun getNodeForName(
+        targetName: String,
+        node1Name: String,
+        node1: _xmlNode,
+        node2Name: String,
+        node2: _xmlNode
+    ): _xmlNode? {
+        return when (targetName) {
+            node1Name -> node1
+            node2Name -> node2
+            else -> null
+        }
     }
 
     private fun readGeneralConfig(node: _xmlNode): Boolean {
