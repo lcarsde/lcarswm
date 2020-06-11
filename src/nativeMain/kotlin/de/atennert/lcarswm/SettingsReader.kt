@@ -59,7 +59,7 @@ class SettingsReader(private val logger: Logger, private val systemApi: SystemAp
             val successful = when (readUbyteString(node.name)) {
                 "key-config" -> readKeyConfig(node)
                 "general" -> readGeneralConfig(node)
-                else -> false
+                else -> false           
             }
             if (!successful) {
                 return false

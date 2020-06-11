@@ -117,6 +117,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val keyConfigurationProvider = loadKeyConfiguration(system) ?: return
 
+        SettingsReader(logger, system)
+
         logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: ${screen.root}")
 
         val monitorManager = MonitorManagerImpl(system, screen.root)
