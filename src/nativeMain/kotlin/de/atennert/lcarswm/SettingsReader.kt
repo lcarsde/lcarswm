@@ -3,13 +3,18 @@ package de.atennert.lcarswm
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
+import platform.posix.F_OK
 import xlib.XML_ELEMENT_NODE
 import xlib._xmlNode
 import xlib.xmlCharVar
 import xlib.xmlDoc
 
-class SettingsReader(private val logger: Logger, private val systemApi: SystemApi) {
-    private val settingsFilePath = ""
+class SettingsReader(
+    private val logger: Logger,
+    private val systemApi: SystemApi,
+    configPath: String
+) {
+    private val settingsFilePath = "$configPath/$LCARS_WM_DIR/settings.xml"
 
     private var keyConfiguration: List<KeyBinding>? = null
     private var generalSettings: Map<String, String>? = null
@@ -23,12 +28,11 @@ class SettingsReader(private val logger: Logger, private val systemApi: SystemAp
     }
 
     private fun doUserSettingsExist(): Boolean {
-        val filePointer = systemApi.fopen(settingsFilePath, "r") ?: return false
-        systemApi.fclose(filePointer)
-        return true
+        return systemApi.access(settingsFilePath, F_OK) != -1
     }
 
     private fun addDefaultSettings(): Boolean {
+        logger.logDebug("SettingsReader::addDefaultSettings::write initial settings")
         return SettingsWriter.writeInitialSettings(systemApi, settingsFilePath)
     }
 
