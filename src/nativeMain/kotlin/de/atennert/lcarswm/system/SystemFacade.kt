@@ -357,6 +357,10 @@ class SystemFacade : SystemApi {
         return mq_unlink(name)
     }
 
+    override fun access(fileName: String, mode: Int): Int {
+        return platform.posix.access(fileName, mode)
+    }
+
     override fun selectInput(window: Window, mask: Long): Int {
         return XSelectInput(display, window, mask)
     }
