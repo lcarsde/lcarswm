@@ -4,10 +4,7 @@ import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import platform.posix.F_OK
-import xlib.XML_ELEMENT_NODE
-import xlib._xmlNode
-import xlib.xmlCharVar
-import xlib.xmlDoc
+import xlib.*
 
 class SettingsReader(
     private val logger: Logger,
@@ -41,12 +38,12 @@ class SettingsReader(
         if (document != null) {
             logger.logDebug("SettingsReader::loadSettings::loading settings from XML")
             if (!readSettingsFromDocument(document)) {
-                logger.logDebug("SettingsReader::loadSettings::loading internal default settings")
+                logger.logInfo("SettingsReader::loadSettings::loading internal default settings")
                 loadDefaultSettings()
             }
             systemApi.freeXmlDoc(document)
         } else {
-            logger.logDebug("SettingsReader::loadSettings::loading internal default settings")
+            logger.logInfo("SettingsReader::loadSettings::loading internal default settings")
             loadDefaultSettings()
         }
     }
@@ -55,15 +52,18 @@ class SettingsReader(
         val rootElement = systemApi.getXmlRootElement(document)?.pointed ?: return false
 
         if (readUbyteString(rootElement.name) != "lcarswm") {
+            logger.logWarning("SettingsReader::readSettingsFromDocument::didn't find root tag: ${readUbyteString(rootElement.name)}")
             return false
         }
 
         var node = rootElement.children?.get(0)
         while (node != null) {
+            logger.logDebug("read: ${readUbyteString(node.name)}")
             val successful = when (readUbyteString(node.name)) {
                 "key-config" -> readKeyConfig(node)
                 "general" -> readGeneralConfig(node)
-                else -> false           
+                "text" -> true
+                else -> false
             }
             if (!successful) {
                 return false
@@ -79,13 +79,20 @@ class SettingsReader(
         val keyConfigXml = mutableListOf<KeyBinding>()
 
         while (bindingNode != null) {
+            if (bindingNode.type == XML_TEXT_NODE) {
+                logger.logDebug("SettingsReader::readKeyConfig::node text: ${readUbyteString(bindingNode.content)}")
+                bindingNode = node.next?.pointed
+                continue
+            }
             if (bindingNode.type != XML_ELEMENT_NODE) {
                 logger.logDebug("SettingsReader::readKeyConfig::node type: ${bindingNode.type}")
                 bindingNode = node.next?.pointed
                 continue
             }
 
+            logger.logDebug("read-config: ${readUbyteString(bindingNode.name)}")
             val keyBinding = getBinding(bindingNode) ?: return false
+            logger.logDebug("read-config: ${keyBinding.keys}->${keyBinding.command}")
             keyConfigXml.add(keyBinding)
 
             bindingNode = node.next?.pointed
