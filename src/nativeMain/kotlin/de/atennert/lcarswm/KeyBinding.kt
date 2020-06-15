@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+/** base class for key bindings */
 sealed class KeyBinding {
     abstract val keys: String
     abstract val command: String
