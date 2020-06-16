@@ -14,7 +14,7 @@ class SettingsReader(
 ) {
     private val settingsFilePath = "$configPath/$LCARS_WM_DIR/settings.xml"
 
-    private var keyConfiguration: List<KeyBinding>? = null
+    private var keyConfiguration: Set<KeyBinding>? = null
     private var generalSettings: Map<String, String>? = null
 
     init {
@@ -177,7 +177,7 @@ class SettingsReader(
     }
 
     private fun loadDefaultSettings() {
-        keyConfiguration = listOf(
+        keyConfiguration = setOf(
             KeyExecution("XF86AudioMute", "amixer set Master toggle"),
             KeyExecution("XF86AudioRaiseVolume", "amixer set Master 3%+"),
             KeyExecution("XF86AudioLowerVolume", "amixer set Master 3%-"),
