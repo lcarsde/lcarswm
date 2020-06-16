@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -62,7 +63,7 @@ class SettingsReader(
             val successful = when (readUbyteString(node.name)) {
                 "key-config" -> readKeyConfig(node)
                 "general" -> readGeneralConfig(node)
-                "text" -> true
+                "text" -> true // ignore text
                 else -> false
             }
             if (!successful) {
@@ -79,14 +80,8 @@ class SettingsReader(
         val keyConfigXml = mutableListOf<KeyBinding>()
 
         while (bindingNode != null) {
-            if (bindingNode.type == XML_TEXT_NODE) {
-                logger.logDebug("SettingsReader::readKeyConfig::node text: ${readUbyteString(bindingNode.content)}")
-                bindingNode = node.next?.pointed
-                continue
-            }
             if (bindingNode.type != XML_ELEMENT_NODE) {
-                logger.logDebug("SettingsReader::readKeyConfig::node type: ${bindingNode.type}")
-                bindingNode = node.next?.pointed
+                bindingNode = bindingNode.next?.pointed
                 continue
             }
 
@@ -95,31 +90,26 @@ class SettingsReader(
             logger.logDebug("read-config: ${keyBinding.keys}->${keyBinding.command}")
             keyConfigXml.add(keyBinding)
 
-            bindingNode = node.next?.pointed
+            bindingNode = bindingNode.next?.pointed
         }
         return true
     }
 
     private fun getBinding(bindingNode: _xmlNode): KeyBinding? {
-        val node1 = bindingNode.children?.get(0) ?: return null
-        val node2 = bindingNode.children?.get(1) ?: return null
+        val keysNode = getNodeForName(bindingNode, "keys") ?: return null
 
-        val node1Name = readUbyteString(node1.name)
-        val node2Name = readUbyteString(node2.name)
-
-        val keysNode = getNodeForName("keys", node1Name, node1, node2Name, node2) ?: return null
-        val execNode = getNodeForName("exec", node1Name, node1, node2Name, node2)
+        val execNode = getNodeForName(bindingNode, "exec")
 
         val keys = readUbyteString(keysNode.children?.get(0)?.content)
         if (keys.isEmpty()) return null
 
-        if (execNode != null) {
+        if (execNode != null) { // check if it's a command execution
             val exec = readUbyteString(execNode.children?.get(0)?.content)
             if (exec.isEmpty()) return null
 
             return KeyExecution(keys, exec)
-        } else {
-            val actionNode = getNodeForName("action", node1Name, node1, node2Name, node2) ?: return null
+        } else { // check if it's a window manager action
+            val actionNode = getNodeForName(bindingNode, "action") ?: return null
             val action = readUbyteString(actionNode.children?.get(0)?.content)
             if (action.isEmpty()) return null
 
@@ -127,18 +117,17 @@ class SettingsReader(
         }
     }
 
-    private fun getNodeForName(
-        targetName: String,
-        node1Name: String,
-        node1: _xmlNode,
-        node2Name: String,
-        node2: _xmlNode
-    ): _xmlNode? {
-        return when (targetName) {
-            node1Name -> node1
-            node2Name -> node2
-            else -> null
+    private fun getNodeForName(parentNode: _xmlNode, nodeName: String): _xmlNode? {
+        val nodeNamePtr = nodeName.toUByteArray().toCValues()
+        var targetNode = parentNode.children?.get(0)
+
+        while (targetNode != null) {
+            if (xmlStrcmp(targetNode.name, nodeNamePtr) == 0) {
+                return targetNode
+            }
+            targetNode = targetNode.next?.pointed
         }
+        return null
     }
 
     private fun readGeneralConfig(node: _xmlNode): Boolean {
@@ -149,8 +138,7 @@ class SettingsReader(
 
         while (generalNode != null) {
             if (generalNode.type != XML_ELEMENT_NODE) {
-                logger.logDebug("SettingsReader::readGeneralConfig::node type: ${generalNode.type}")
-                generalNode = node.next?.pointed
+                generalNode = generalNode.next?.pointed
                 continue
             }
 
@@ -163,7 +151,7 @@ class SettingsReader(
                 return false
             }
 
-            generalNode = node.next?.pointed
+            generalNode = generalNode.next?.pointed
         }
         generalSettings = generalSettingsXml
         return true
