@@ -13,24 +13,13 @@ import kotlin.test.assertTrue
 
 class MappingNotifyHandlerTest {
 
-    private val configurationProvider = object : Properties {
-        override fun get(propertyKey: String): String? {
-            return when (propertyKey) {
-                "Ctrl+F4" -> "command arg1 arg2"
-                else -> error("unknown key configuration: $propertyKey")
-            }
-        }
-
-        override fun getPropertyNames(): Set<String> {
-            return setOf("Ctrl+F4")
-        }
-    }
+    private val keySetting = setOf(KeyExecution("Ctrl+F4", "command arg1 arg2"))
 
     @Test
     fun `return the event type MappingNotify`() {
         val system = SystemFacadeMock()
         val keyManager = KeyManager(system)
-        val keyConfiguration = KeyConfiguration(system, configurationProvider, keyManager, system.rootWindowId)
+        val keyConfiguration = KeyConfiguration(system, keySetting, keyManager, system.rootWindowId)
         val mappingNotifyHandler = MappingNotifyHandler(LoggerMock(), keyManager, keyConfiguration, system.rootWindowId)
 
         assertEquals(MappingNotify, mappingNotifyHandler.xEventType, "The MappingNotifyHandler should have the correct type")
@@ -40,7 +29,7 @@ class MappingNotifyHandlerTest {
     fun `reload the key bindings`() {
         val system = SystemFacadeMock()
         val keyManager = KeyManager(system)
-        val keyConfiguration = KeyConfiguration(system, configurationProvider, keyManager, system.rootWindowId)
+        val keyConfiguration = KeyConfiguration(system, keySetting, keyManager, system.rootWindowId)
         val mappingNotifyHandler = MappingNotifyHandler(LoggerMock(), keyManager, keyConfiguration, system.rootWindowId)
 
         system.functionCalls.clear()
@@ -60,8 +49,8 @@ class MappingNotifyHandlerTest {
                 checkGrabKey(system, system.stringKeys.getValue(keySym), listOf(modifier))
             }
 
-        configurationProvider.getPropertyNames().forEach { propertyName ->
-            checkGrabKey(system, propertyName, listOf(Modifiers.CONTROL))
+        keySetting.forEach { setting ->
+            checkGrabKey(system, setting.keys, listOf(Modifiers.CONTROL))
         }
         assertTrue(system.functionCalls.isEmpty(), "There should be no more system calls")
     }

@@ -2,11 +2,13 @@ package de.atennert.lcarswm
 
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
-import xlib.*
+import xlib.XK_A
+import xlib.XK_B
+import xlib.XK_C
+import xlib.XK_X
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import kotlin.test.fail
 
 class KeyConfigurationTest {
     @Test
@@ -16,21 +18,13 @@ class KeyConfigurationTest {
 
         systemApi.functionCalls.clear()
 
-        val configurationProvider = object : Properties {
-            override fun get(propertyKey: String): String? {
-                return when (propertyKey) {
-                    "A" -> "commandA"
-                    "B" -> "commandB"
-                    "X" -> "commandX"
-                    else -> error("unknown key configuration: $propertyKey")
-                }
-            }
+        val keySetting = setOf(
+            KeyExecution("A", "commandA"),
+            KeyExecution("B", "commandB"),
+            KeyExecution("X", "commandX")
+        )
 
-            override fun getPropertyNames(): Set<String> {
-                return setOf("A", "B", "X")
-            }
-        }
-        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, systemApi.rootWindowId)
+        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
 
         assertEquals(
             "commandA",
@@ -53,8 +47,7 @@ class KeyConfigurationTest {
             "The config should not provide an unknown key binding"
         )
 
-        configurationProvider.getPropertyNames()
-            .forEach { key -> checkGrabKey(systemApi, key, emptyList()) }
+        keySetting.forEach { setting -> checkGrabKey(systemApi, setting.keys, emptyList()) }
     }
 
     @Test
@@ -63,21 +56,12 @@ class KeyConfigurationTest {
         val keyManager = KeyManager(systemApi)
         systemApi.functionCalls.clear()
 
-        val configurationProvider = object : Properties {
-            override fun get(propertyKey: String): String? {
-                return when (propertyKey) {
-                    "A" -> "commandA"
-                    "Ctrl+B" -> "commandB"
-                    "Alt+X" -> "commandX"
-                    else -> error("unknown key configuration: $propertyKey")
-                }
-            }
-
-            override fun getPropertyNames(): Set<String> {
-                return setOf("A", "Ctrl+B", "Alt+X")
-            }
-        }
-        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, systemApi.rootWindowId)
+        val keySetting = setOf(
+            KeyExecution("A", "commandA"),
+            KeyExecution("Ctrl+B", "commandB"),
+            KeyExecution("Alt+X", "commandX")
+        )
+        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
 
         assertEquals(
             "commandA",
@@ -98,12 +82,12 @@ class KeyConfigurationTest {
             "The config should load the third key binding"
         )
 
-        configurationProvider.getPropertyNames()
+        keySetting
             .zip(listOf(emptyList(), listOf(Modifiers.CONTROL), listOf(Modifiers.ALT)))
-            .forEach { (key, modifiers) ->
+            .forEach { (setting, modifiers) ->
                 checkGrabKey(
                     systemApi,
-                    key,
+                    setting.keys,
                     modifiers
                 )
             }
@@ -115,21 +99,12 @@ class KeyConfigurationTest {
         val keyManager = KeyManager(systemApi)
         systemApi.functionCalls.clear()
 
-        val configurationProvider = object : Properties {
-            override fun get(propertyKey: String): String? {
-                return when (propertyKey) {
-                    "Ctrl+Alt+A" -> "commandA"
-                    "Win+Shift+Meta+B" -> "commandB"
-                    "Hyper+Super+X" -> "commandX"
-                    else -> error("unknown key configuration: $propertyKey")
-                }
-            }
-
-            override fun getPropertyNames(): Set<String> {
-                return setOf("Ctrl+Alt+A", "Win+Shift+Meta+B", "Hyper+Super+X")
-            }
-        }
-        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, systemApi.rootWindowId)
+        val keySetting = setOf(
+            KeyExecution("Ctrl+Alt+A", "commandA"),
+            KeyExecution("Win+Shift+Meta+B", "commandB"),
+            KeyExecution("Hyper+Super+X", "commandX")
+        )
+        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
 
         assertEquals(
             "commandA",
@@ -158,58 +133,17 @@ class KeyConfigurationTest {
             "The config should load the third key binding"
         )
 
-        configurationProvider.getPropertyNames()
+        keySetting
             .zip(listOf(
                 listOf(Modifiers.CONTROL, Modifiers.ALT),
                 listOf(Modifiers.SUPER, Modifiers.SHIFT, Modifiers.META),
                 listOf(Modifiers.HYPER, Modifiers.SUPER)))
-            .forEach { (key, modifiers) ->
+            .forEach { (setting, modifiers) ->
                 checkGrabKey(
                     systemApi,
-                    key,
+                    setting.keys,
                     modifiers
                 )
             }
-    }
-
-    @Test
-    fun `reload configuration`() {
-        val systemApi = SystemFacadeMock()
-        val keyManager = KeyManager(systemApi)
-
-        systemApi.functionCalls.clear()
-
-        val configurationProvider = object : Properties {
-            val changingEntries = listOf("A", "B")
-            var entryIndex = -1
-
-            override fun get(propertyKey: String): String? {
-                if (propertyKey == changingEntries[entryIndex]) {
-                    return "command${changingEntries[entryIndex]}"
-                } else {
-                    fail("unknown propertyKey $propertyKey")
-                }
-            }
-
-            override fun getPropertyNames(): Set<String> {
-                ++entryIndex
-                return setOf(changingEntries[entryIndex])
-            }
-        }
-        val keyConfiguration = KeyConfiguration(systemApi, configurationProvider, keyManager, systemApi.rootWindowId)
-
-        assertEquals(
-            "commandA",
-            keyConfiguration.getCommandForKey(XK_A.convert(), 0),
-            "The config should load the first key binding"
-        )
-
-        keyConfiguration.reloadConfig()
-
-        assertEquals(
-            "commandB",
-            keyConfiguration.getCommandForKey(XK_B.convert(), 0),
-            "The config should load the second key binding"
-        )
     }
 }
