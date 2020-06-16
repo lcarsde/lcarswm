@@ -10,7 +10,7 @@ import xlib.Window
  */
 class KeyConfiguration(
     private val inputApi: InputApi,
-    private val configurationProvider: Properties,
+    private val keyConfiguration: Set<KeyBinding>,
     private val keyManager: KeyManager,
     private val rootWindowId: Window
 ) {
@@ -31,8 +31,10 @@ class KeyConfiguration(
     }
 
     fun reloadConfig() {
-        for (keyConfig in configurationProvider.getPropertyNames()) {
-            val (modifierStrings, keyString) = separateKeySymAndModifiers(keyConfig)
+        for (keyBinding in keyConfiguration) {
+            if (keyBinding is KeyAction) continue // TODO take key actions from settings
+
+            val (modifierStrings, keyString) = separateKeySymAndModifiers(keyBinding.keys)
 
             val mask = getMask(modifierStrings)
             val grabbedMask = if (mask == 0) AnyModifier else mask
@@ -40,7 +42,7 @@ class KeyConfiguration(
 
             keyManager.grabKey(keySym, grabbedMask, rootWindowId)
 
-            keySymCommands[Pair(keySym, mask)] = configurationProvider[keyConfig]!!
+            keySymCommands[Pair(keySym, mask)] = keyBinding.command
         }
     }
 

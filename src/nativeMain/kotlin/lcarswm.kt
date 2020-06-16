@@ -115,7 +115,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         eventTime.resetEventTime()
 
-        val keyConfigurationProvider = loadKeyConfiguration(logger, system) ?: return
+        val settings = loadSettings(logger, system) ?: return
 
         logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: ${screen.root}")
 
@@ -127,7 +127,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         keyManager.ungrabAllKeys(screen.root)
         keyManager.grabInternalKeys(screen.root)
 
-        val keyConfiguration = KeyConfiguration(system, keyConfigurationProvider, keyManager, screen.root)
+        val keyConfiguration = KeyConfiguration(system, settings.keyConfiguration, keyManager, screen.root)
 
         system.sync(false)
 
@@ -318,14 +318,11 @@ fun setupScreen(
 /**
  * Load the key configuration from the users key configuration file.
  */
-fun loadKeyConfiguration(logger: Logger, systemApi: SystemApi): PropertiesReader? {
+fun loadSettings(logger: Logger, systemApi: SystemApi): SettingsReader? {
     val configPathBytes = systemApi.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return null
     val configPath = configPathBytes.toKString()
-    val keyConfiguration = "$configPath$KEY_CONFIG_FILE"
 
-    SettingsReader(logger, systemApi, configPath)
-
-    return PropertiesReader(systemApi, keyConfiguration)
+    return SettingsReader(logger, systemApi, configPath)
 }
 
 /**
