@@ -14,8 +14,11 @@ class SettingsReader(
 ) {
     private val settingsFilePath = "$configPath/$LCARS_WM_DIR/settings.xml"
 
-    private var keyConfiguration: Set<KeyBinding>? = null
-    private var generalSettings: Map<String, String>? = null
+    var keyConfiguration: Set<KeyBinding> = emptySet()
+    private set
+
+    var generalSettings: Map<String, String> = emptyMap()
+    private set
 
     init {
         if (!doUserSettingsExist()) {
