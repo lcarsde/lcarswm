@@ -25,14 +25,14 @@ Thank you very much to the creators of the following resources:
 * App menu in the normal screen mode on the primary screen that lists all active windows with
   * a window selection button (blue with program name)
   * a close button (red, small without text)
-* Windows-key + Q closes the window manager
-* Windows-key + M toggles the display mode between normal, maximized and fullscreen
-* Alt-key + Tab toggles through the windows
-* Alt-key + Up/Down moves the active window to other monitors
-* Alt-key + F4 closes the active window
-* Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
-* Other key combinations can be connected to commands via a key configuration file
-  * The key configuration file is expected to be `~/.config/lcarswm/key-config.properties`
+* Key handling
+  * Windows-key + Q closes the window manager
+  * Windows-key + M toggles the display mode between normal, maximized and fullscreen
+  * Alt-key + Tab toggles through the windows
+  * Alt-key + Up/Down moves the active window to other monitors
+  * Alt-key + F4 closes the active window
+  * Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
+  * Other key combinations can be connected to commands via a settings file
   * Modifier keys are
     * Shift
     * Ctrl
@@ -40,14 +40,7 @@ Thank you very much to the creators of the following resources:
     * Win / Lin / Super
     * Meta
     * Hyper
-  * An example layout is this:
-  ```properties
-    Alt+T=lxterminal
-    Alt+B=firefox
-    XF86AudioMute=amixer set Master toggle
-    XF86AudioRaiseVolume=amixer set Master 3%+
-    XF86AudioLowerVolume=amixer set Master 3%-
-  ```
+* The settings file is created as `~/.config/lcarswm/settings.xml` if it doesn't exist and can be edited afterwards
 
 ## Pictures
 Here are some pictures from the VirtualBox test environment.
