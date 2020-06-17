@@ -62,7 +62,6 @@ class SettingsReader(
 
         var node = rootElement.children?.get(0)
         while (node != null) {
-            logger.logDebug("read: ${readUbyteString(node.name)}")
             val successful = when (readUbyteString(node.name)) {
                 "key-config" -> readKeyConfig(node)
                 "general" -> readGeneralConfig(node)
@@ -88,7 +87,6 @@ class SettingsReader(
                 continue
             }
 
-            logger.logDebug("read-config: ${readUbyteString(bindingNode.name)}")
             val keyBinding = getBinding(bindingNode) ?: return false
             logger.logDebug("read-config: ${keyBinding.keys}->${keyBinding.command}")
             keyConfigXml.add(keyBinding)
