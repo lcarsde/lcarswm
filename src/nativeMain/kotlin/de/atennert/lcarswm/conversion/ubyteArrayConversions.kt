@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.conversion
 
-import kotlinx.cinterop.convert
+import kotlinx.cinterop.*
 
 /** Convert ULong value to byte array as used in X properties */
 fun ULong.toUByteArray(): UByteArray {
@@ -22,3 +22,21 @@ fun List<UByteArray>.combine(): UByteArray {
     val byteList = this.fold(mutableListOf<UByte>()) { list, bytes -> list.addAll(bytes); list }
     return byteList.toUByteArray()
 }
+
+fun CPointer<UByteVar>.toKString(): String {
+    val byteString = mutableListOf<Byte>()
+    var i = 0
+
+    while (true) {
+        val value = this[i]
+        if (value.convert<Int>() == 0) {
+            break
+        }
+
+        byteString.add(value.convert())
+        i++
+    }
+    return byteString.toByteArray().toKString()
+}
+
+fun CPointer<UByteVar>?.toKString(): String = this?.toKString() ?: ""

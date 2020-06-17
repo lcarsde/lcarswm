@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.conversion.toKString
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
@@ -55,14 +56,14 @@ class SettingsReader(
     private fun readSettingsFromDocument(document: CPointer<xmlDoc>): Boolean {
         val rootElement = systemApi.getXmlRootElement(document)?.pointed ?: return false
 
-        if (readUbyteString(rootElement.name) != "lcarswm") {
-            logger.logWarning("SettingsReader::readSettingsFromDocument::didn't find root tag: ${readUbyteString(rootElement.name)}")
+        if (rootElement.name.toKString() != "lcarswm") {
+            logger.logWarning("SettingsReader::readSettingsFromDocument::didn't find root tag: ${rootElement.name.toKString()}")
             return false
         }
 
         var node = rootElement.children?.get(0)
         while (node != null) {
-            val successful = when (readUbyteString(node.name)) {
+            val successful = when (node.name.toKString()) {
                 "key-config" -> readKeyConfig(node)
                 "general" -> readGeneralConfig(node)
                 "text" -> true // ignore text
@@ -102,17 +103,17 @@ class SettingsReader(
 
         val execNode = getNodeForName(bindingNode, "exec")
 
-        val keys = readUbyteString(keysNode.children?.get(0)?.content)
+        val keys = keysNode.children?.get(0)?.content.toKString()
         if (keys.isEmpty()) return null
 
         if (execNode != null) { // check if it's a command execution
-            val exec = readUbyteString(execNode.children?.get(0)?.content)
+            val exec = execNode.children?.get(0)?.content.toKString()
             if (exec.isEmpty()) return null
 
             return KeyExecution(keys, exec)
         } else { // check if it's a window manager action
             val actionNode = getNodeForName(bindingNode, "action") ?: return null
-            val action = readUbyteString(actionNode.children?.get(0)?.content)
+            val action = actionNode.children?.get(0)?.content.toKString()
             if (action.isEmpty()) return null
 
             return KeyAction(keys, action)
@@ -144,8 +145,8 @@ class SettingsReader(
                 continue
             }
 
-            nodeName = readUbyteString(generalNode.name)
-            textContent = readUbyteString(generalNode.children?.get(0)?.content)
+            nodeName = generalNode.name.toKString()
+            textContent = generalNode.children?.get(0)?.content.toKString()
 
             if (nodeName.isNotEmpty() && textContent.isNotEmpty()) {
                 generalSettingsXml[nodeName] = textContent
@@ -157,25 +158,6 @@ class SettingsReader(
         }
         generalSettings = generalSettingsXml
         return true
-    }
-
-    private fun readUbyteString(ubyteStringPointer: CPointer<xmlCharVar>?): String {
-        if (ubyteStringPointer == null) {
-            return ""
-        }
-
-        val byteString = mutableListOf<Byte>()
-        var i = 0
-        while (true) {
-            val value = ubyteStringPointer[i]
-            if (value.convert<Int>() == 0) {
-                break
-            }
-
-            byteString.add(value.convert())
-            i++
-        }
-        return byteString.toByteArray().toKString()
     }
 
     private fun loadDefaultSettings() {
