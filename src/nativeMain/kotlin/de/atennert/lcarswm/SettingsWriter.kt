@@ -4,13 +4,12 @@ import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.CPointer
 import platform.posix.FILE
 
-class SettingsWriter {
-    companion object {
-        /*
-         * I would prefer to put this into resources so it could be accessed by something
-         * like get resource, but that's not available on Kotlin native.
-         */
-        private const val INITIAL_SETTINGS = """<?xml version="1.0" encoding="UTF-8"?>
+object SettingsWriter {
+    /*
+     * I would prefer to put this into resources so it could be accessed by something
+     * like getResource(...), but that's currently not available on Kotlin native.
+     */
+    private const val INITIAL_SETTINGS = """<?xml version="1.0" encoding="UTF-8"?>
 <lcarswm>
     <key-config>
         <!-- keys for executing programs -->
@@ -35,7 +34,7 @@ class SettingsWriter {
             <exec>amixer set Master 3%-</exec>
         </binding>
 
-        <!-- Window manager action keyss -->
+        <!-- Window manager action keys ... only edit the following when you know what you're doing -->
         <binding>
             <keys>Alt+Tab</keys>
             <action>window-toggle-forward</action>
@@ -62,20 +61,19 @@ class SettingsWriter {
         </binding>
     </key-config>
     <general>
-        <title>LCARS</title>
+        <title>LCARS</title><!-- Will be shown when there's no title image -->
         <!--<title-image>/usr/share/pixmaps/lcarswm.xpm</title-image>-->
         <font>Ubuntu Condensed</font>
     </general>
 </lcarswm>
         """
 
-        fun writeInitialSettings(posixApi: PosixApi, settingsFilePath: String): Boolean {
-            val file: CPointer<FILE> = posixApi.fopen(settingsFilePath, "w") ?: return false
+    fun writeInitialSettings(posixApi: PosixApi, settingsFilePath: String): Boolean {
+        val file: CPointer<FILE> = posixApi.fopen(settingsFilePath, "w") ?: return false
 
-            posixApi.fputs(INITIAL_SETTINGS, file)
+        posixApi.fputs(INITIAL_SETTINGS, file)
 
-            posixApi.fclose(file)
-            return true
-        }
+        posixApi.fclose(file)
+        return true
     }
 }
