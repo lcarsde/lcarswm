@@ -79,7 +79,7 @@ class SettingsReader(
 
     private fun readKeyConfig(node: _xmlNode): Boolean {
         var bindingNode = node.children?.get(0)
-        val keyConfigXml = mutableListOf<KeyBinding>()
+        val keyConfigXml = mutableSetOf<KeyBinding>()
 
         while (bindingNode != null) {
             if (bindingNode.type != XML_ELEMENT_NODE) {
@@ -93,6 +93,7 @@ class SettingsReader(
 
             bindingNode = bindingNode.next?.pointed
         }
+        keyConfiguration = keyConfigXml
         return true
     }
 
