@@ -23,6 +23,7 @@ fun List<UByteArray>.combine(): UByteArray {
     return byteList.toUByteArray()
 }
 
+/** convert this ubyte array pointer to a string */
 fun CPointer<UByteVar>.toKString(): String {
     val byteString = mutableListOf<Byte>()
     var i = 0
@@ -39,4 +40,5 @@ fun CPointer<UByteVar>.toKString(): String {
     return byteString.toByteArray().toKString()
 }
 
+/** convert this ubyte array pointer to a string */
 fun CPointer<UByteVar>?.toKString(): String = this?.toKString() ?: ""
