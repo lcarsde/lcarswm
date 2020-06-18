@@ -13,10 +13,13 @@ css = b'''
     font-weight: 600;
     font-size: 15px;
     color: #000;
+    text-shadow: none;
     background-color: #99F;
     background: #99F; /* for Ubuntu */
     outline-style: none;
     border-radius: 0;
+    border-width: 0;
+    box-shadow: none;
     padding: 2px 3px;
     margin: 0;
 }
@@ -25,6 +28,8 @@ css = b'''
     background: #C66; /* for Ubuntu */
     outline-style: none;
     border-radius: 0 20px 20px 0;
+    border-width: 0;
+    box-shadow: none;
     padding: 0;
     margin: 0;
 }
