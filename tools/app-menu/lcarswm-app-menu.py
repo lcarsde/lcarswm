@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import gi
 from threading import Thread
 from posix_ipc import MessageQueue, BusyError
@@ -14,6 +14,7 @@ css = b'''
     font-size: 15px;
     color: #000;
     background-color: #99F;
+    background: #99F; /* for Ubuntu */
     outline-style: none;
     border-radius: 0;
     padding: 2px 3px;
@@ -21,6 +22,7 @@ css = b'''
 }
 .close_button {
     background-color: #C66;
+    background: #C66; /* for Ubuntu */
     outline-style: none;
     border-radius: 0 20px 20px 0;
     padding: 0;
@@ -63,10 +65,10 @@ class WindowEntry(Gtk.Box):
         self.pack_start(close_button, False, False, 0)
 
     def on_select_clicked(self, widget):
-        self.sendQueue.send(f"select\n{self.window_id}".encode())
+        self.sendQueue.send("select\n{0}".format(self.window_id).encode())
 
     def on_close_clicked(self, widget):
-        self.sendQueue.send(f"close\n{self.window_id}".encode())
+        self.sendQueue.send("close\n{0}".format(self.window_id).encode())
 
     def update_label(self, class_name):
         self.class_name = class_name
