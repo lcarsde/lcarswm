@@ -2,11 +2,13 @@ package de.atennert.lcarswm
 
 import xlib.*
 
-const val LOG_FILE_PATH = "/var/log/lcarswm.log"
-
 const val HOME_CONFIG_DIR_PROPERTY = "XDG_CONFIG_HOME"
 
+const val HOME_CACHE_DIR_PROPERTY = "XDG_CACHE_HOME"
+
 const val LCARS_WM_DIR = "lcarswm"
+
+const val LOG_FILE_PATH = "/$LCARS_WM_DIR/lcarswm.log"
 
 const val KEY_CONFIG_FILE = "/$LCARS_WM_DIR/key-config.properties"
 

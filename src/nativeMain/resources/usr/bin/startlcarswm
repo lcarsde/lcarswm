@@ -4,9 +4,17 @@ if [ -z "$XDG_CONFIG_HOME" ]; then
 	export XDG_CONFIG_HOME="$HOME/.config"
 fi
 
+if [ -z "$XDG_CACHE_HOME" ]; then
+	export XDG_CACHE_HOME="$HOME/.cache"
+fi
+
 if [ -z "$XDG_DATA_HOME" ]; then
 	export XDG_DATA_HOME="$HOME/.local/share"
 fi
+
+# create wm directories if they don't exist yet
+mkdir -p "$XDG_CONFIG_HOME/lcarswm"
+mkdir -p "$XDG_CACHE_HOME/lcarswm"
 
 # Ensure the existance of the user applications folder
 USER_APPS_DIR="$XDG_DATA_HOME/applications"
