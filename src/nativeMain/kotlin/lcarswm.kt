@@ -40,7 +40,8 @@ const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotifyMask or
 // the main method apparently must not be inside of a package so it can be compiled with Kotlin/Native
 fun main() {
     val system = SystemFacade()
-    val logger = FileLogger(system, LOG_FILE_PATH)
+    val cacheDirPath = system.getenv(HOME_CACHE_DIR_PROPERTY)?.toKString() ?: error("::main::cache dir not set")
+    val logger = FileLogger(system, cacheDirPath + LOG_FILE_PATH)
 
     runWindowManager(system, logger)
 
@@ -115,7 +116,12 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         eventTime.resetEventTime()
 
-        val settings = loadSettings(logger, system) ?: return
+        val settings = loadSettings(logger, system)
+        if (settings == null) {
+            logger.logError("::runWindowManager::unable to load settings")
+            cleanup(logger, system, rootWindowPropertyHandler, signalHandler)
+            return
+        }
 
         logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: ${screen.root}")
 
