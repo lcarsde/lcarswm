@@ -13,7 +13,7 @@ class SettingsReader(
     private val systemApi: SystemApi,
     configPath: String
 ) {
-    private val settingsFilePath = "$configPath/$LCARS_WM_DIR/settings.xml"
+    private val settingsFilePath = "$configPath$SETTINGS_FILE"
 
     var keyConfiguration: Set<KeyBinding> = emptySet()
     private set

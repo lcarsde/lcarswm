@@ -10,7 +10,7 @@ const val LCARS_WM_DIR = "lcarswm"
 
 const val LOG_FILE_PATH = "/$LCARS_WM_DIR/lcarswm.log"
 
-const val KEY_CONFIG_FILE = "/$LCARS_WM_DIR/key-config.properties"
+const val SETTINGS_FILE = "/$LCARS_WM_DIR/settings.xml"
 
 const val WM_FONT = "Ubuntu Condensed"
 
