@@ -30,18 +30,29 @@ class KeyReleaseHandler(
         logger.logDebug("KeyReleaseHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
 
         val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
-        val requiredKeyMask = keyManager.modMasks[LCARS_WM_KEY_SYMS[keySym.convert()]]
 
-        when (Pair(keySym.convert<Int>(), keyMask)) {
-            Pair(XK_F4, requiredKeyMask) -> closeActiveWindow()
-            Pair(XK_Q, requiredKeyMask) -> return true // shutdown the WM
-            else -> {
-                keyConfiguration.getCommandForKey(keySym, keyMask)?.let { command ->
-                    logger.logDebug("KeyReleaseHandler::handleEvent::run command: $command")
-                    val commandParts = command.split(' ')
-                    runProgram(systemApi, commandParts[0], commandParts)
+        return keyConfiguration.getBindingForKey(keySym, keyMask)?.let { keyBinding ->
+            logger.logDebug("KeyReleaseHandler::handleEvent::run command: ${keyBinding.command}")
+            when (keyBinding) {
+                is KeyExecution -> {
+                    execute(keyBinding.command)
+                    false
                 }
+                is KeyAction -> act(keyBinding.command)
             }
+        } ?: false
+    }
+
+    private fun execute(execCommand: String) {
+        val commandParts = execCommand.split(' ')
+        runProgram(systemApi, commandParts[0], commandParts)
+    }
+
+    private fun act(actionCommand: String): Boolean {
+        when (actionCommand) {
+            "window-close" -> closeActiveWindow()
+            "lcarswm-quit" -> return true
+            else -> {/* nothing to do, other actions are handled in key press */}
         }
         return false
     }

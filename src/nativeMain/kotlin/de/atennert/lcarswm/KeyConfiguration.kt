@@ -15,7 +15,7 @@ class KeyConfiguration(
     private val rootWindowId: Window
 ) {
 
-    private val keySymCommands = mutableMapOf<Pair<KeySym, Int>, String>()
+    private val keySymCommands = mutableMapOf<Pair<KeySym, Int>, KeyBinding>()
 
     private val modKeyBindings = mapOf(
         Pair(Modifiers.CONTROL, setOf("Ctrl")),
@@ -26,14 +26,21 @@ class KeyConfiguration(
         Pair(Modifiers.HYPER, setOf("Hyper"))
     )
 
+    private val windowManagerActions = setOf(
+        "window-toggle-forward",
+        "window-move-up",
+        "window-move-down",
+        "window-close",
+        "screen-mode-toggle",
+        "lcarswm-quit"
+    )
+
     init {
         reloadConfig()
     }
 
     fun reloadConfig() {
         for (keyBinding in keyConfiguration) {
-            if (keyBinding is KeyAction) continue // TODO take key actions from settings
-
             val (modifierStrings, keyString) = separateKeySymAndModifiers(keyBinding.keys)
 
             val mask = getMask(modifierStrings)
@@ -42,7 +49,7 @@ class KeyConfiguration(
 
             keyManager.grabKey(keySym, grabbedMask, rootWindowId)
 
-            keySymCommands[Pair(keySym, mask)] = keyBinding.command
+            keySymCommands[Pair(keySym, mask)] = keyBinding
         }
     }
 
@@ -67,7 +74,7 @@ class KeyConfiguration(
     /**
      * @return command for a key binding consisting of key sym and key mask. null if there's no command registered for the given key sym+key mask
      */
-    fun getCommandForKey(keySym: KeySym, keyMask: Int): String? {
+    fun getBindingForKey(keySym: KeySym, keyMask: Int): KeyBinding? {
         return keySymCommands[Pair(keySym, keyMask)]
     }
 }
