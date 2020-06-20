@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.*
+import de.atennert.lcarswm.keys.*
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.alloc
@@ -21,7 +21,12 @@ class MappingNotifyHandlerTest {
     fun `return the event type MappingNotify`() {
         val system = SystemFacadeMock()
         val keyManager = KeyManager(system)
-        val keyConfiguration = KeyConfiguration(system, keySetting, keyManager, system.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            system,
+            keySetting,
+            keyManager,
+            system.rootWindowId
+        )
         val mappingNotifyHandler = MappingNotifyHandler(LoggerMock(), keyManager, keyConfiguration, system.rootWindowId)
 
         assertEquals(MappingNotify, mappingNotifyHandler.xEventType, "The MappingNotifyHandler should have the correct type")
@@ -31,7 +36,12 @@ class MappingNotifyHandlerTest {
     fun `reload the key bindings`() {
         val system = SystemFacadeMock()
         val keyManager = KeyManager(system)
-        val keyConfiguration = KeyConfiguration(system, keySetting, keyManager, system.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            system,
+            keySetting,
+            keyManager,
+            system.rootWindowId
+        )
         val mappingNotifyHandler = MappingNotifyHandler(LoggerMock(), keyManager, keyConfiguration, system.rootWindowId)
 
         system.functionCalls.clear()

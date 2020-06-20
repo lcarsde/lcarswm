@@ -1,4 +1,4 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.settings
 
 /**
  * Interfaces for classes that load and provide Java-style properties.

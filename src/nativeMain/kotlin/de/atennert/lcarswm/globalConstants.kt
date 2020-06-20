@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import de.atennert.lcarswm.keys.Modifiers
 import xlib.*
 
 const val HOME_CONFIG_DIR_PROPERTY = "XDG_CONFIG_HOME"

@@ -1,4 +1,4 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.settings
 
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.CPointer

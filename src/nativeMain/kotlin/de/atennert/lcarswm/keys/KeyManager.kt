@@ -1,4 +1,4 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.keys
 
 import de.atennert.lcarswm.system.api.InputApi
 import kotlinx.cinterop.*
@@ -85,7 +85,8 @@ class KeyManager(private val inputApi: InputApi) {
                                 }
                                 XK_Super_R -> {
                                     if (!superLUsed) {
-                                        modifierMasks[Modifiers.SUPER] = modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
+                                        modifierMasks[Modifiers.SUPER] = modifierMasks.getOrElse(
+                                            Modifiers.SUPER, {0}).or(mask)
                                     }
                                 }
 
@@ -96,7 +97,8 @@ class KeyManager(private val inputApi: InputApi) {
                                     mask // overwrite any hyper-r stuff
                                 }
                                 XK_Hyper_R -> if (!hyperLUsed) {
-                                    modifierMasks[Modifiers.HYPER] = modifierMasks.getOrElse(Modifiers.HYPER, {0}).or(mask)
+                                    modifierMasks[Modifiers.HYPER] = modifierMasks.getOrElse(
+                                        Modifiers.HYPER, {0}).or(mask)
                                 }
 
                                 XK_Alt_L -> modifierMasks[Modifiers.ALT] = if (altLUsed) {
@@ -106,7 +108,8 @@ class KeyManager(private val inputApi: InputApi) {
                                     mask // overwrite any alt-r stuff
                                 }
                                 XK_Alt_R -> if (!altLUsed) {
-                                    modifierMasks[Modifiers.ALT] = modifierMasks.getOrElse(Modifiers.ALT, {0}).or(mask)
+                                    modifierMasks[Modifiers.ALT] = modifierMasks.getOrElse(
+                                        Modifiers.ALT, {0}).or(mask)
                                 }
 
                                 XK_Meta_L -> modifierMasks[Modifiers.META] = if (metaLUsed) {
@@ -116,7 +119,8 @@ class KeyManager(private val inputApi: InputApi) {
                                     mask // overwrite any meta-r stuff
                                 }
                                 XK_Meta_R -> if (!metaLUsed) {
-                                    modifierMasks[Modifiers.META] = modifierMasks.getOrElse(Modifiers.META, {0}).or(mask)
+                                    modifierMasks[Modifiers.META] = modifierMasks.getOrElse(
+                                        Modifiers.META, {0}).or(mask)
                                 }
                             }
                         }

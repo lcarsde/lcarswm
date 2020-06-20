@@ -1,7 +1,9 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.*
 import de.atennert.lcarswm.drawing.UIDrawing
+import de.atennert.lcarswm.keys.KeyAction
+import de.atennert.lcarswm.keys.KeyConfiguration
+import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.window.WindowCoordinator

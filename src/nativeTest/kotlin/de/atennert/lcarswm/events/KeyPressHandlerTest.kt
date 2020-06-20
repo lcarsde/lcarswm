@@ -2,6 +2,9 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.drawing.UIDrawingMock
+import de.atennert.lcarswm.keys.KeyAction
+import de.atennert.lcarswm.keys.KeyConfiguration
+import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
@@ -33,7 +36,12 @@ class KeyPressHandlerTest {
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawing = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            systemApi,
+            keySetting,
+            keyManager,
+            systemApi.rootWindowId
+        )
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, monitorManager, windowCoordinator, windowFocusHandler, uiDrawing)
 
@@ -48,7 +56,12 @@ class KeyPressHandlerTest {
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            systemApi,
+            keySetting,
+            keyManager,
+            systemApi.rootWindowId
+        )
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
@@ -78,7 +91,12 @@ class KeyPressHandlerTest {
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            systemApi,
+            keySetting,
+            keyManager,
+            systemApi.rootWindowId
+        )
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
@@ -108,7 +126,12 @@ class KeyPressHandlerTest {
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            systemApi,
+            keySetting,
+            keyManager,
+            systemApi.rootWindowId
+        )
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
@@ -134,7 +157,12 @@ class KeyPressHandlerTest {
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            systemApi,
+            keySetting,
+            keyManager,
+            systemApi.rootWindowId
+        )
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
@@ -170,7 +198,12 @@ class KeyPressHandlerTest {
         val window1 = systemApi.getNewWindowId()
         val window2 = systemApi.getNewWindowId()
         val window3 = systemApi.getNewWindowId()
-        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            systemApi,
+            keySetting,
+            keyManager,
+            systemApi.rootWindowId
+        )
         windowFocusHandler.setFocusedWindow(window1)
         windowFocusHandler.setFocusedWindow(window2)
         windowFocusHandler.setFocusedWindow(window3)
@@ -211,7 +244,12 @@ class KeyPressHandlerTest {
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            systemApi,
+            keySetting,
+            keyManager,
+            systemApi.rootWindowId
+        )
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
 
@@ -235,7 +273,12 @@ class KeyPressHandlerTest {
         val windowFocusHandler = WindowFocusHandler()
         val uiDrawer = UIDrawingMock()
         val monitorManager = MonitorManagerMock()
-        val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
+        val keyConfiguration = KeyConfiguration(
+            systemApi,
+            keySetting,
+            keyManager,
+            systemApi.rootWindowId
+        )
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
         val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)

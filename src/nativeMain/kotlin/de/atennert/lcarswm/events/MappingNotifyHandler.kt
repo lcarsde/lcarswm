@@ -1,7 +1,7 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.KeyConfiguration
-import de.atennert.lcarswm.KeyManager
+import de.atennert.lcarswm.keys.KeyConfiguration
+import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
 import xlib.MappingNotify
 import xlib.Window

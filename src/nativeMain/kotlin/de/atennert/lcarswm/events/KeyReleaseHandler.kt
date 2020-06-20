@@ -2,6 +2,10 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.keys.KeyAction
+import de.atennert.lcarswm.keys.KeyConfiguration
+import de.atennert.lcarswm.keys.KeyExecution
+import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.WindowFocusHandler

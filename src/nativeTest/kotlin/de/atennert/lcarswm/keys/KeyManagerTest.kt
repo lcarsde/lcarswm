@@ -1,5 +1,7 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.keys
 
+import de.atennert.lcarswm.keys.KeyManager
+import de.atennert.lcarswm.keys.Modifiers
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
 import xlib.ControlMask

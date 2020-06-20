@@ -1,4 +1,4 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.keys
 
 import de.atennert.lcarswm.system.api.InputApi
 import xlib.AnyModifier

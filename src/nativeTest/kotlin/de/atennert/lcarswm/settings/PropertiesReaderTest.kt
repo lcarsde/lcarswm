@@ -1,5 +1,6 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.settings
 
+import de.atennert.lcarswm.settings.PropertiesReader
 import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.ByteVar
@@ -23,7 +24,8 @@ class ConfigurationProviderTest {
             }
         }
 
-        val propertiesReader = PropertiesReader(systemApi, "my-config.properties")
+        val propertiesReader =
+            PropertiesReader(systemApi, "my-config.properties")
 
         val posixCalls = systemApi.functionCalls
         val openFileCall = posixCalls.removeAt(0)
@@ -53,7 +55,8 @@ class ConfigurationProviderTest {
             }
         }
 
-        val propertiesReader = PropertiesReader(systemApi, "my-config.properties")
+        val propertiesReader =
+            PropertiesReader(systemApi, "my-config.properties")
 
         assertEquals("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongValue1", propertiesReader["property1"], "The configuration provider should read loooooong entries with end of line")
 
@@ -84,7 +87,8 @@ class ConfigurationProviderTest {
             }
         }
 
-        val propertiesReader = PropertiesReader(systemApi, "my-config.properties")
+        val propertiesReader =
+            PropertiesReader(systemApi, "my-config.properties")
 
         assertEquals(setOf("property1", "property2"), propertiesReader.getPropertyNames(), "The provider should return the names of the available properties")
     }

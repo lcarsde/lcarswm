@@ -1,4 +1,4 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.keys
 
 /** base class for key bindings */
 sealed class KeyBinding {

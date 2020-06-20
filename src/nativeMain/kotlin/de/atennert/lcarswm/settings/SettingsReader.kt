@@ -1,7 +1,11 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.settings
 
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.conversion.toKString
 import de.atennert.lcarswm.conversion.toUByteArray
+import de.atennert.lcarswm.keys.KeyAction
+import de.atennert.lcarswm.keys.KeyBinding
+import de.atennert.lcarswm.keys.KeyExecution
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*

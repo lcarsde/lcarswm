@@ -6,10 +6,13 @@ import de.atennert.lcarswm.drawing.FrameDrawer
 import de.atennert.lcarswm.drawing.RootWindowDrawer
 import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.events.*
+import de.atennert.lcarswm.keys.KeyConfiguration
+import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
+import de.atennert.lcarswm.settings.SettingsReader
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.MessageQueue
@@ -132,7 +135,12 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         keyManager.ungrabAllKeys(screen.root)
 
-        val keyConfiguration = KeyConfiguration(system, settings.keyBindings, keyManager, screen.root)
+        val keyConfiguration = KeyConfiguration(
+            system,
+            settings.keyBindings,
+            keyManager,
+            screen.root
+        )
 
         system.sync(false)
 
