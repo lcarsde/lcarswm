@@ -163,15 +163,6 @@ class KeyManager(private val inputApi: InputApi) {
     }
 
     /**
-     * Grab the internal keys from the XServer.
-     */
-    fun grabInternalKeys(rootWindowId: Window) {
-//        LCARS_WM_KEY_SYMS.forEach { (keySym, modifier) ->
-//            grabKey(keySym.convert(), modMasks.getValue(modifier), rootWindowId)
-//        }
-    }
-
-    /**
      * Grab a key binding consisting of a key sym and a key modifier
      */
     fun grabKey(keySym: KeySym, modifiers: Int, rootWindowId: Window) {

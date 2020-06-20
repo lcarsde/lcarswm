@@ -131,9 +131,8 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
         val uiDrawer = RootWindowDrawer(system, monitorManager, screen, colorHandler)
 
         keyManager.ungrabAllKeys(screen.root)
-        keyManager.grabInternalKeys(screen.root)
 
-        val keyConfiguration = KeyConfiguration(system, settings.keyConfiguration, keyManager, screen.root)
+        val keyConfiguration = KeyConfiguration(system, settings.keyBindings, keyManager, screen.root)
 
         system.sync(false)
 

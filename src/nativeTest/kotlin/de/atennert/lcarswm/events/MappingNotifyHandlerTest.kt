@@ -13,7 +13,9 @@ import kotlin.test.assertTrue
 
 class MappingNotifyHandlerTest {
 
-    private val keySetting = setOf(KeyExecution("Ctrl+F4", "command arg1 arg2"))
+    private val keySetting = setOf(
+        KeyExecution("Ctrl+F4", "command arg1 arg2")
+    )
 
     @Test
     fun `return the event type MappingNotify`() {
@@ -42,12 +44,6 @@ class MappingNotifyHandlerTest {
         assertEquals("ungrabKey", system.functionCalls.removeAt(0).name, "ungrab keys")
         assertEquals("freeModifiermap", system.functionCalls.removeAt(0).name, "free the known modifiers")
         assertEquals("free", system.functionCalls.removeAt(0).name, "free the key map")
-
-        LCARS_WM_KEY_SYMS
-            .filterNot { system.keySymKeyCodeMapping[it.key] == 0 } // 0s are not available
-            .forEach { (keySym, modifier) ->
-                checkGrabKey(system, system.stringKeys.getValue(keySym), listOf(modifier))
-            }
 
         keySetting.forEach { setting ->
             checkGrabKey(system, setting.keys, listOf(Modifiers.CONTROL))

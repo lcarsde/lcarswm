@@ -15,7 +15,7 @@ class SettingsReader(
 ) {
     private val settingsFilePath = "$configPath$SETTINGS_FILE"
 
-    var keyConfiguration: Set<KeyBinding> = emptySet()
+    var keyBindings: Set<KeyBinding> = emptySet()
     private set
 
     var generalSettings: Map<String, String> = emptyMap()
@@ -66,8 +66,7 @@ class SettingsReader(
             val successful = when (node.name.toKString()) {
                 "key-config" -> readKeyConfig(node)
                 "general" -> readGeneralConfig(node)
-                "text" -> true // ignore text
-                else -> false
+                else -> true // ignore everything else
             }
             if (!successful) {
                 return false
@@ -80,7 +79,7 @@ class SettingsReader(
 
     private fun readKeyConfig(node: _xmlNode): Boolean {
         var bindingNode = node.children?.get(0)
-        val keyConfigXml = mutableSetOf<KeyBinding>()
+        val newKeyBindings = mutableSetOf<KeyBinding>()
 
         while (bindingNode != null) {
             if (bindingNode.type != XML_ELEMENT_NODE) {
@@ -90,11 +89,11 @@ class SettingsReader(
 
             val keyBinding = getBinding(bindingNode) ?: return false
             logger.logDebug("read-config: ${keyBinding.keys}->${keyBinding.command}")
-            keyConfigXml.add(keyBinding)
+            newKeyBindings.add(keyBinding)
 
             bindingNode = bindingNode.next?.pointed
         }
-        keyConfiguration = keyConfigXml
+        keyBindings = newKeyBindings
         return true
     }
 
@@ -161,7 +160,7 @@ class SettingsReader(
     }
 
     private fun loadDefaultSettings() {
-        keyConfiguration = setOf(
+        keyBindings = setOf(
             KeyExecution("XF86AudioMute", "amixer set Master toggle"),
             KeyExecution("XF86AudioRaiseVolume", "amixer set Master 3%+"),
             KeyExecution("XF86AudioLowerVolume", "amixer set Master 3%-"),

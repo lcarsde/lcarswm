@@ -19,7 +19,6 @@ class MappingNotifyHandler(
         logger.logDebug("MappingNotifyHandler::handleEvent::reloading keyboard config")
         keyManager.ungrabAllKeys(rootWindowId)
         keyManager.reloadConfig()
-        keyManager.grabInternalKeys(rootWindowId)
         keyConfiguration.reloadConfig()
         return false
     }

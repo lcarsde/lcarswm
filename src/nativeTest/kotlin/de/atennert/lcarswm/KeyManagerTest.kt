@@ -43,28 +43,6 @@ class KeyManagerTest {
     }
 
     @Test
-    fun `grab input controls`() {
-        val systemApi = SystemFacadeMock()
-
-        val keyManager = KeyManager(systemApi)
-        systemApi.functionCalls.clear()
-
-        keyManager.grabInternalKeys(systemApi.rootWindowId)
-
-        LCARS_WM_KEY_SYMS
-            .filterNot { systemApi.keySymKeyCodeMapping[it.key] == 0 } // 0s are not available
-            .onEach { (keySym, modifier) ->
-                checkGrabKey(systemApi, systemApi.stringKeys.getValue(keySym), listOf(modifier))
-            }
-            .forEach { (keySym, _) ->
-                assertEquals(
-                    keySym,
-                    keyManager.getKeySym(systemApi.keySymKeyCodeMapping.getValue(keySym).convert())!!.convert()
-                )
-            }
-    }
-
-    @Test
     fun `return null on unknown key`() {
         val systemApi = SystemFacadeMock()
 

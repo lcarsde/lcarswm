@@ -18,7 +18,11 @@ import kotlin.test.assertTrue
  */
 class KeyReleaseHandlerTest {
 
-    private val keySetting = setOf(KeyExecution("Ctrl+F4", "command arg1 arg2"))
+    private val keySetting = setOf(
+        KeyExecution("Ctrl+F4", "command arg1 arg2"),
+        KeyAction("Alt+F4", "window-close"),
+        KeyAction("Lin+Q", "lcarswm-quit")
+    )
 
     @Test
     fun `return the event type KeyReleaseHandler`() {
@@ -44,7 +48,6 @@ class KeyReleaseHandlerTest {
         val keyManager = KeyManager(systemApi)
         val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
         val atomLibrary = AtomLibrary(systemApi)
-        keyManager.grabInternalKeys(systemApi.rootWindowId)
 
         systemApi.functionCalls.clear()
 
@@ -75,7 +78,6 @@ class KeyReleaseHandlerTest {
         val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
         val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
-        keyManager.grabInternalKeys(systemApi.rootWindowId)
 
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
@@ -113,7 +115,6 @@ class KeyReleaseHandlerTest {
         val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
         val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
-        keyManager.grabInternalKeys(systemApi.rootWindowId)
 
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
@@ -142,7 +143,6 @@ class KeyReleaseHandlerTest {
         val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
         val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
-        keyManager.grabInternalKeys(systemApi.rootWindowId)
 
         val keyReleaseEvent = nativeHeap.alloc<XEvent>()
         keyReleaseEvent.type = KeyRelease
@@ -180,7 +180,6 @@ class KeyReleaseHandlerTest {
         val keyConfiguration = KeyConfiguration(systemApi, keySetting, keyManager, systemApi.rootWindowId)
         val atomLibrary = AtomLibrary(systemApi)
         focusHandler.setFocusedWindow(windowId)
-        keyManager.grabInternalKeys(systemApi.rootWindowId)
 
         val keyReleaseHandler = KeyReleaseHandler(LoggerMock(), systemApi, focusHandler, keyManager, keyConfiguration, atomLibrary)
 
