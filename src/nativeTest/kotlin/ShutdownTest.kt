@@ -452,7 +452,7 @@ class ShutdownTest {
         assertEquals(modifierKeymapRef, modifierMapCall.parameters[0], "The _acquired_ modifier map needs to be freed")
 
         val keyMapCall = functionCalls.removeAt(0)
-        assertEquals("free", keyMapCall.name, "The acquired keymap needs to be freed")
+        assertEquals("xFree", keyMapCall.name, "The acquired keymap needs to be freed")
         assertEquals(keymapRef1, keyMapCall.parameters[0], "The _acquired_ keymap needs to be freed")
     }
 

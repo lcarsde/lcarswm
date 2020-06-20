@@ -53,7 +53,7 @@ class MappingNotifyHandlerTest {
 
         assertEquals("ungrabKey", system.functionCalls.removeAt(0).name, "ungrab keys")
         assertEquals("freeModifiermap", system.functionCalls.removeAt(0).name, "free the known modifiers")
-        assertEquals("free", system.functionCalls.removeAt(0).name, "free the key map")
+        assertEquals("xFree", system.functionCalls.removeAt(0).name, "free the key map")
 
         keySetting.forEach { setting ->
             checkGrabKey(system, setting.keys, listOf(Modifiers.CONTROL))

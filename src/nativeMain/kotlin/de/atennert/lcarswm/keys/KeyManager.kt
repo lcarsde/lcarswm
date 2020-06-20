@@ -197,7 +197,7 @@ class KeyManager(private val inputApi: InputApi) {
         }
 
         if (keymap != null) {
-            inputApi.free(keymap)
+            inputApi.xFree(keymap)
             keymap = null
         }
     }

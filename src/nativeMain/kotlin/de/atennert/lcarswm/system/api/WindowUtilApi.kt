@@ -66,5 +66,5 @@ interface WindowUtilApi {
 
     fun synchronize(sync: Boolean)
 
-    fun free(xObject: CPointer<*>?)
+    fun xFree(xObject: CPointer<*>?)
 }

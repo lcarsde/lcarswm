@@ -181,7 +181,7 @@ class SystemFacade : SystemApi {
         XSynchronize(display, convertToXBoolean(sync))
     }
 
-    override fun free(xObject: CPointer<*>?) {
+    override fun xFree(xObject: CPointer<*>?) {
         XFree(xObject)
     }
 

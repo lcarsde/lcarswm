@@ -54,7 +54,7 @@ class AppMenuHandler(
     fun isAppSelector(windowId: Window): Boolean {
         val textProperty = nativeHeap.alloc<XTextProperty>()
         val result = systemApi.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.LCARSWM_APP_MENU])
-        systemApi.free(textProperty.value)
+        systemApi.xFree(textProperty.value)
         nativeHeap.free(textProperty)
         return result != 0
     }

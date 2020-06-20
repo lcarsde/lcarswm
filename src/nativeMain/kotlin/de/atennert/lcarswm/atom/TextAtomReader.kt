@@ -48,7 +48,7 @@ class TextAtomReader(private val system: SystemApi, private val atomLibrary: Ato
             }
             else -> ""
         }
-        system.free(textProperty.value)
+        system.xFree(textProperty.value)
         nativeHeap.free(textProperty)
         return if (name.isEmpty()) {
             NO_NAME
