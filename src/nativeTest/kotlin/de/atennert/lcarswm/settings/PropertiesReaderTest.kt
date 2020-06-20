@@ -1,6 +1,5 @@
 package de.atennert.lcarswm.settings
 
-import de.atennert.lcarswm.settings.PropertiesReader
 import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.ByteVar
