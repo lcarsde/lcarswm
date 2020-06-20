@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.system
 
+import de.atennert.lcarswm.HOME_CACHE_DIR_PROPERTY
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
@@ -607,6 +608,7 @@ open class SystemFacadeMock : SystemApi {
     override fun getenv(name: String): CPointer<ByteVar>? {
         return when(name) {
             HOME_CONFIG_DIR_PROPERTY -> "/home/me"
+            HOME_CACHE_DIR_PROPERTY -> "/home/me"
             else -> error("getenv with unsimulated key: $name")
         }.encodeToByteArray().pin().addressOf(0)
     }

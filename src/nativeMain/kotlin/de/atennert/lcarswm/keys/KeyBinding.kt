@@ -10,4 +10,7 @@ sealed class KeyBinding {
 data class KeyExecution(override val keys: String, override val command: String) : KeyBinding()
 
 /** The key action defines a key binding for a window manager action */
-data class KeyAction(override val keys: String, override val command: String) : KeyBinding()
+data class KeyAction(override val keys: String, val action: WmAction) : KeyBinding() {
+    override val command: String
+        get() = action.key
+}

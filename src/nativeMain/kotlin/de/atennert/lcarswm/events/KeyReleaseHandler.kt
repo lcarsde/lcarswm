@@ -2,10 +2,7 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
-import de.atennert.lcarswm.keys.KeyAction
-import de.atennert.lcarswm.keys.KeyConfiguration
-import de.atennert.lcarswm.keys.KeyExecution
-import de.atennert.lcarswm.keys.KeyManager
+import de.atennert.lcarswm.keys.*
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.WindowFocusHandler
@@ -42,7 +39,7 @@ class KeyReleaseHandler(
                     execute(keyBinding.command)
                     false
                 }
-                is KeyAction -> act(keyBinding.command)
+                is KeyAction -> act(keyBinding.action)
             }
         } ?: false
     }
@@ -52,10 +49,10 @@ class KeyReleaseHandler(
         runProgram(systemApi, commandParts[0], commandParts)
     }
 
-    private fun act(actionCommand: String): Boolean {
-        when (actionCommand) {
-            "window-close" -> closeActiveWindow()
-            "lcarswm-quit" -> return true
+    private fun act(action: WmAction): Boolean {
+        when (action) {
+            WmAction.WINDOW_CLOSE -> closeActiveWindow()
+            WmAction.WM_QUIT -> return true
             else -> {/* nothing to do, other actions are handled in key press */}
         }
         return false

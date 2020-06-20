@@ -4,6 +4,7 @@ import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.keys.KeyAction
 import de.atennert.lcarswm.keys.KeyConfiguration
 import de.atennert.lcarswm.keys.KeyManager
+import de.atennert.lcarswm.keys.WmAction
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.window.WindowCoordinator
@@ -31,9 +32,8 @@ class KeyPressHandler(
         logger.logDebug("KeyPressHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
 
         keyConfiguration.getBindingForKey(keySym, keyMask)?.let { keyBinding ->
-            logger.logDebug("KeyPressHandler::handleEvent::run command: ${keyBinding.command}")
             when (keyBinding) {
-                is KeyAction -> act(keyBinding.command)
+                is KeyAction -> act(keyBinding.action)
                 else -> {/* so far we only handle key actions here */}
             }
         }
@@ -41,12 +41,12 @@ class KeyPressHandler(
         return false
     }
 
-    private fun act(actionCommand: String): Boolean {
-        when (actionCommand) {
-            "window-move-up" -> moveWindowToNextMonitor()
-            "window-move-down" -> moveWindowToPreviousMonitor()
-            "window-toggle-forward" -> toggleFocusedWindow()
-            "screen-mode-toggle" -> toggleScreenMode()
+    private fun act(action: WmAction): Boolean {
+        when (action) {
+            WmAction.WINDOW_MOVE_UP -> moveWindowToNextMonitor()
+            WmAction.WINDOW_MOVE_DOWN -> moveWindowToPreviousMonitor()
+            WmAction.WINDOW_TOGGLE -> toggleFocusedWindow()
+            WmAction.SCREEN_MODE_TOGGLE -> toggleScreenMode()
             else -> {/* nothing to do, other actions are handled in key release */}
         }
         return false

@@ -5,6 +5,7 @@ import de.atennert.lcarswm.drawing.UIDrawingMock
 import de.atennert.lcarswm.keys.KeyAction
 import de.atennert.lcarswm.keys.KeyConfiguration
 import de.atennert.lcarswm.keys.KeyManager
+import de.atennert.lcarswm.keys.WmAction
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
@@ -22,10 +23,10 @@ import kotlin.test.assertTrue
 class KeyPressHandlerTest {
 
     private val keySetting = setOf(
-        KeyAction("Alt+Up", "window-move-up"),
-        KeyAction("Alt+Down", "window-move-down"),
-        KeyAction("Alt+Tab", "window-toggle-forward"),
-        KeyAction("Lin+M", "screen-mode-toggle")
+        KeyAction("Alt+Up", WmAction.WINDOW_MOVE_UP),
+        KeyAction("Alt+Down", WmAction.WINDOW_MOVE_DOWN),
+        KeyAction("Alt+Tab", WmAction.WINDOW_TOGGLE),
+        KeyAction("Lin+M", WmAction.SCREEN_MODE_TOGGLE)
     )
 
     @Test

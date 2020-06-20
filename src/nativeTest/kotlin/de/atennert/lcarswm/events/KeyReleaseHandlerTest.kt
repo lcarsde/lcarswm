@@ -21,8 +21,8 @@ class KeyReleaseHandlerTest {
 
     private val keySetting = setOf(
         KeyExecution("Ctrl+F4", "command arg1 arg2"),
-        KeyAction("Alt+F4", "window-close"),
-        KeyAction("Lin+Q", "lcarswm-quit")
+        KeyAction("Alt+F4", WmAction.WINDOW_CLOSE),
+        KeyAction("Lin+Q", WmAction.WM_QUIT)
     )
 
     @Test

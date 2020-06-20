@@ -26,15 +26,6 @@ class KeyConfiguration(
         Pair(Modifiers.HYPER, setOf("Hyper"))
     )
 
-    private val windowManagerActions = setOf(
-        "window-toggle-forward",
-        "window-move-up",
-        "window-move-down",
-        "window-close",
-        "screen-mode-toggle",
-        "lcarswm-quit"
-    )
-
     init {
         reloadConfig()
     }

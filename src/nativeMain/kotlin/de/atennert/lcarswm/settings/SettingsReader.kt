@@ -6,6 +6,7 @@ import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.keys.KeyAction
 import de.atennert.lcarswm.keys.KeyBinding
 import de.atennert.lcarswm.keys.KeyExecution
+import de.atennert.lcarswm.keys.WmAction
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -116,8 +117,8 @@ class SettingsReader(
             return KeyExecution(keys, exec)
         } else { // check if it's a window manager action
             val actionNode = getNodeForName(bindingNode, "action") ?: return null
-            val action = actionNode.children?.get(0)?.content.toKString()
-            if (action.isEmpty()) return null
+            val actionKey = actionNode.children?.get(0)?.content.toKString()
+            val action = WmAction.getActionByKey(actionKey) ?: return null
 
             return KeyAction(keys, action)
         }
@@ -168,12 +169,12 @@ class SettingsReader(
             KeyExecution("XF86AudioMute", "amixer set Master toggle"),
             KeyExecution("XF86AudioRaiseVolume", "amixer set Master 3%+"),
             KeyExecution("XF86AudioLowerVolume", "amixer set Master 3%-"),
-            KeyAction("Alt+Tab", "window-toggle-forward"),
-            KeyAction("Alt+Up", "window-move-up"),
-            KeyAction("Alt+Down", "window-move-down"),
-            KeyAction("Alt+F4", "window-close"),
-            KeyAction("Lin+M", "screen-mode-toggle"),
-            KeyAction("Lin+Q", "lcarswm-quit")
+            KeyAction("Alt+Tab", WmAction.WINDOW_TOGGLE),
+            KeyAction("Alt+Up", WmAction.WINDOW_MOVE_UP),
+            KeyAction("Alt+Down", WmAction.WINDOW_MOVE_DOWN),
+            KeyAction("Alt+F4", WmAction.WINDOW_CLOSE),
+            KeyAction("Lin+M", WmAction.SCREEN_MODE_TOGGLE),
+            KeyAction("Lin+Q", WmAction.WM_QUIT)
         )
 
         generalSettings = mapOf(
