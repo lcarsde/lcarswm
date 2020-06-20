@@ -9,16 +9,6 @@ import xlib.XWindowChanges
 import kotlin.test.assertEquals
 
 class WindowFocusTest {
-    // TODO check adding
-
-    // TODO check toggling
-
-    // TODO check removing
-
-    // TODO toggle with one window
-
-    // TODO toggle with no window
-
     private fun checkRestacking(restackCall: FunctionCall, window: Window) {
         assertEquals("configureWindow", restackCall.name, "The window $window needs to be configured")
         assertEquals(window, restackCall.parameters[0], "The _window ${window}_ needs to be configured")

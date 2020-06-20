@@ -195,6 +195,9 @@ class SystemFacade : SystemApi {
         eventMask: Long,
         event: CPointer<XEvent>
     ): Int {
+        event.pointed.xconfigure.display = display
+        event.pointed.xclient.display = display
+
         return XSendEvent(display, window, convertToXBoolean(propagate), eventMask, event)
     }
 
@@ -205,8 +208,6 @@ class SystemFacade : SystemApi {
     override fun getQueuedEvents(mode: Int): Int {
         return XEventsQueued(display, mode)
     }
-
-    override fun getDisplay(): CPointer<Display>? = this.display
 
     override fun configureWindow(
         window: Window,

@@ -29,10 +29,7 @@ class ConfigureRequestHandlerTest {
 
     @Test
     fun `handle known window`() {
-        val systemApi = object : SystemFacadeMock() {
-            val display = nativeHeap.allocPointerTo<Display>().value
-            override fun getDisplay(): CPointer<Display>? = display
-        }
+        val systemApi = SystemFacadeMock()
         val knownWindow = systemApi.getNewWindowId()
         val windowRegistration = object : WindowRegistrationMock() {
             override fun isWindowManaged(windowId: Window): Boolean = windowId == knownWindow
@@ -61,7 +58,6 @@ class ConfigureRequestHandlerTest {
         assertEquals(StructureNotifyMask, valueMask, "The value mask should be StructureNotify")
 
         assertEquals(ConfigureNotify, sentEvent.type, "The event type needs to match ConfigureNotify")
-        assertEquals(systemApi.display, configureEvent.display, "The display should match the facades display")
         assertEquals(knownWindow, configureEvent.event, "The event should be the known window")
         assertEquals(knownWindow, configureEvent.window, "The window should be the known window")
         assertEquals(windowMeasurements.x, configureEvent.x, "The x value should match the corresponding window measurement")

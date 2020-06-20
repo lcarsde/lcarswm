@@ -400,11 +400,6 @@ open class SystemFacadeMock : SystemApi {
 
     private var display: CPointer<Display>? = null
 
-    override fun getDisplay(): CPointer<Display>? {
-        // no function call logging, as this is a not-out-calling utility function
-        return this.display
-    }
-
     override fun flush() {
         functionCalls.add(FunctionCall("flush"))
     }

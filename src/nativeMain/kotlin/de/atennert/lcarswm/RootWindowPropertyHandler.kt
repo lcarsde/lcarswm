@@ -94,7 +94,6 @@ class RootWindowPropertyHandler(
         val event = nativeHeap.alloc<XEvent>()
         event.xclient.type = ClientMessage
         event.xclient.message_type = atomLibrary[MANAGER]
-        event.xclient.display = system.getDisplay()
         event.xclient.window = rootWindow
         event.xclient.format = 32
         event.xclient.data.l[0] = timeStamp.convert()

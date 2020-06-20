@@ -37,8 +37,5 @@ interface EventApi {
 
     fun destroyWindow(window: Window): Int
 
-    // TODO this is not acceptable, as the idea is to not hand out the display. it's supposed to be hidden
-    fun getDisplay(): CPointer<Display>?
-
     fun flush()
 }

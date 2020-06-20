@@ -51,7 +51,6 @@ class ConfigureRequestHandler(
 
         val e = nativeHeap.alloc<XEvent>()
         e.type = ConfigureNotify
-        e.xconfigure.display = eventApi.getDisplay()
         e.xconfigure.event = configureEvent.window
         e.xconfigure.window = configureEvent.window
         e.xconfigure.x = measurements.x
