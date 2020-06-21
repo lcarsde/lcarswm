@@ -3,6 +3,7 @@ package de.atennert.lcarswm.drawing
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
+import de.atennert.lcarswm.settings.GeneralSetting
 import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -14,7 +15,8 @@ class RootWindowDrawer(
     private val drawApi: DrawApi,
     private val monitorManager: MonitorManager,
     private val screen: Screen,
-    colors: Colors
+    colors: Colors,
+    settings: Map<GeneralSetting, String>
 ) : UIDrawing {
     private val graphicsContexts = colors.loadForegroundGraphicContexts(screen.root, colors.colorMap.second)
 
@@ -22,7 +24,8 @@ class RootWindowDrawer(
 
     init {
         val imageArray = nativeHeap.allocArrayOfPointersTo(nativeHeap.alloc<XImage>())
-        drawApi.readXpmFileToImage(WM_LOGO, imageArray)
+        val wmLogoPath = settings.getValue(GeneralSetting.TITLE_IMAGE)
+        drawApi.readXpmFileToImage(wmLogoPath, imageArray)
         logoImage = imageArray[0]!!
     }
 
