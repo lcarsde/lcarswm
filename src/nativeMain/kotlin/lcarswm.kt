@@ -146,7 +146,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val focusHandler = WindowFocusHandler()
 
-        val frameDrawer = FrameDrawer(system, system, focusHandler, colorHandler, system.defaultScreenNumber(), screen)
+        val frameDrawer = FrameDrawer(system, system, focusHandler, colorHandler, settings.generalSettings, system.defaultScreenNumber(), screen)
 
         val windowCoordinator = ActiveWindowCoordinator(system, monitorManager, frameDrawer)
 

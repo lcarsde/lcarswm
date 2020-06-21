@@ -23,8 +23,13 @@ class SettingsReader(
     var keyBindings: Set<KeyBinding> = emptySet()
     private set
 
-    var generalSettings: Map<String, String> = emptyMap()
+    var generalSettings: Map<GeneralSetting, String> = emptyMap()
     private set
+
+    private val generalSettingsDefault = mapOf(
+        Pair(GeneralSetting.TITLE, "LCARS"),
+        Pair(GeneralSetting.FONT, "Ubuntu Condensed")
+    )
 
     init {
         if (!doUserSettingsExist()) {
@@ -79,6 +84,10 @@ class SettingsReader(
 
             node = node.next?.pointed
         }
+
+        if (keyBindings.isEmpty()) return false
+        generalSettings = fillMissingRequiredSettings(generalSettings)
+
         return true
     }
 
@@ -140,8 +149,9 @@ class SettingsReader(
     private fun readGeneralConfig(node: _xmlNode): Boolean {
         var generalNode = node.children?.get(0)
         var nodeName: String
+        var setting: GeneralSetting?
         var textContent: String
-        val generalSettingsXml = mutableMapOf<String, String>()
+        val generalSettingsXml = mutableMapOf<GeneralSetting, String>()
 
         while (generalNode != null) {
             if (generalNode.type != XML_ELEMENT_NODE) {
@@ -150,12 +160,13 @@ class SettingsReader(
             }
 
             nodeName = generalNode.name.toKString()
+            setting = GeneralSetting.getSettingByKey(nodeName)
             textContent = generalNode.children?.get(0)?.content.toKString()
 
-            if (nodeName.isNotEmpty() && textContent.isNotEmpty()) {
-                generalSettingsXml[nodeName] = textContent
+            if (setting != null && textContent.isNotEmpty()) {
+                generalSettingsXml[setting] = textContent
             } else {
-                return false
+                logger.logWarning("SettingsReader::readGeneralConfig::unknown setting $nodeName - $textContent")
             }
 
             generalNode = generalNode.next?.pointed
@@ -177,9 +188,18 @@ class SettingsReader(
             KeyAction("Lin+Q", WmAction.WM_QUIT)
         )
 
-        generalSettings = mapOf(
-            Pair("title", "LCARS"),
-            Pair("font", "Ubuntu Condensed")
-        )
+        generalSettings = generalSettingsDefault
+    }
+
+    private fun fillMissingRequiredSettings(settings: Map<GeneralSetting, String>): Map<GeneralSetting, String> {
+        val resultSettings = settings.toMutableMap()
+
+        generalSettingsDefault.forEach { (key, value) ->
+            if (!resultSettings.containsKey(key)) {
+                resultSettings[key] = value
+            }
+        }
+
+        return resultSettings
     }
 }

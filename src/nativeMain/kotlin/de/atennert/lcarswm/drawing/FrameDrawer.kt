@@ -2,6 +2,7 @@ package de.atennert.lcarswm.drawing
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.monitor.Monitor
+import de.atennert.lcarswm.settings.GeneralSetting
 import de.atennert.lcarswm.system.api.DrawApi
 import de.atennert.lcarswm.system.api.FontApi
 import de.atennert.lcarswm.window.FramedWindow
@@ -17,6 +18,7 @@ class FrameDrawer(
     private val drawApi: DrawApi,
     private val focusHandler: WindowFocusHandler,
     private val colors: Colors,
+    private val generalSettings: Map<GeneralSetting, String>,
     screenId: Int,
     private val screen: Screen
 ) : IFrameDrawer {
@@ -43,7 +45,7 @@ class FrameDrawer(
 
     private fun initializeFontObjects(): Pair<Int, Int> {
         val lang = fontApi.getDefaultLanguage()
-        fontApi.setFontDescriptionFamily(font, WM_FONT)
+        fontApi.setFontDescriptionFamily(font, generalSettings.getValue(GeneralSetting.FONT))
         fontApi.setFontDescriptionWeight(font, PANGO_WEIGHT_BOLD)
         fontApi.setFontDescriptionStyle(font, PangoStyle.PANGO_STYLE_NORMAL)
         fontApi.setFontDescriptionSize(font, WINDOW_TITLE_FONT_SIZE * PANGO_SCALE)

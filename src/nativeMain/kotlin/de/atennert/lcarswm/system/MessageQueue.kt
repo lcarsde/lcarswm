@@ -35,7 +35,6 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
     fun sendMessage(message: String) {
         assert(mode == Mode.WRITE || mode == Mode.READ_WRITE)
 
-        // TODO split to long messages
         posixApi.mqSend(mqDes, message, 0.convert())
     }
 

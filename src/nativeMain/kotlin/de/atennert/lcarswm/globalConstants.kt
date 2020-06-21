@@ -13,8 +13,6 @@ const val LOG_FILE_PATH = "/$LCARS_WM_DIR/lcarswm.log"
 
 const val SETTINGS_FILE = "/$LCARS_WM_DIR/settings.xml"
 
-const val WM_FONT = "Ubuntu Condensed"
-
 const val WM_LOGO = "/usr/share/pixmaps/lcarswm.xpm"
 
 const val X_FALSE = 0
