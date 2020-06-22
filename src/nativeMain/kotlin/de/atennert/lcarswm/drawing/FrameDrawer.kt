@@ -2,7 +2,6 @@ package de.atennert.lcarswm.drawing
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.monitor.Monitor
-import de.atennert.lcarswm.settings.GeneralSetting
 import de.atennert.lcarswm.system.api.DrawApi
 import de.atennert.lcarswm.system.api.FontApi
 import de.atennert.lcarswm.window.FramedWindow
@@ -11,23 +10,19 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
-import xlib.*
+import xlib.Colormap
+import xlib.PANGO_SCALE
+import xlib.PangoRectangle
+import xlib.Screen
 
 class FrameDrawer(
     private val fontApi: FontApi,
     private val drawApi: DrawApi,
     private val focusHandler: WindowFocusHandler,
+    private val fontProvider: FontProvider,
     private val colors: Colors,
-    private val generalSettings: Map<GeneralSetting, String>,
-    screenId: Int,
     private val screen: Screen
 ) : IFrameDrawer {
-    private val pango = fontApi.xftGetContext(screenId)
-    private val layout = fontApi.newLayout(pango)
-    private val font = fontApi.getFontDescription()
-
-    private var ascent: Int
-    private var descent: Int
 
     private val activeTextColor = colors.getXftColor(1)
     private val inactiveTextColor = colors.getXftColor(4)
@@ -36,31 +31,6 @@ class FrameDrawer(
     private val backgroundColor = colors.getXftColor(0)
     override val colorMap: Colormap
             get() = colors.colorMap.first
-
-    init {
-        val ascDesc = initializeFontObjects()
-        ascent = ascDesc.first
-        descent = ascDesc.second
-    }
-
-    private fun initializeFontObjects(): Pair<Int, Int> {
-        val lang = fontApi.getDefaultLanguage()
-        fontApi.setFontDescriptionFamily(font, generalSettings.getValue(GeneralSetting.FONT))
-        fontApi.setFontDescriptionWeight(font, PANGO_WEIGHT_BOLD)
-        fontApi.setFontDescriptionStyle(font, PangoStyle.PANGO_STYLE_NORMAL)
-        fontApi.setFontDescriptionSize(font, WINDOW_TITLE_FONT_SIZE * PANGO_SCALE)
-
-        fontApi.setLayoutFontDescription(layout, font)
-        fontApi.setLayoutWrapMode(layout, PangoWrapMode.PANGO_WRAP_WORD_CHAR)
-        fontApi.setLayoutEllipsizeMode(layout, PangoEllipsizeMode.PANGO_ELLIPSIZE_END)
-        fontApi.setLayoutSingleParagraphMode(layout, true)
-
-        val metrics = fontApi.getFontMetrics(pango, font, lang)
-        val ascDesc = fontApi.getFontAscentDescent(metrics)
-        fontApi.freeFontMetrics(metrics)
-
-        return ascDesc
-    }
 
     override fun drawFrame(window: FramedWindow, monitor: Monitor) {
         val windowMeasurements = monitor.getWindowMeasurements()
@@ -73,8 +43,8 @@ class FrameDrawer(
         val rect = nativeHeap.alloc<PangoRectangle>()
 
         val textY = (((textH * PANGO_SCALE)
-                - (ascent + descent))
-                / 2 + ascent) / PANGO_SCALE
+                - (fontProvider.ascent + fontProvider.descent))
+                / 2 + fontProvider.ascent) / PANGO_SCALE
 
         val pixmap = drawApi.createPixmap(screen.root, windowMeasurements.width.convert(), textH.convert(), screen.root_depth.convert())
         val xftDraw = drawApi.xftDrawCreate(pixmap, screen.root_visual!!, colorMap)
@@ -85,15 +55,15 @@ class FrameDrawer(
             inactiveTextColor
         }
 
-        fontApi.setLayoutText(layout, window.title)
-        fontApi.setLayoutWidth(layout, textW * PANGO_SCALE)
+        fontApi.setLayoutText(fontProvider.layout, window.title)
+        fontApi.setLayoutWidth(fontProvider.layout, textW * PANGO_SCALE)
 
-        fontApi.getLayoutPixelExtents(layout, rect.ptr)
+        fontApi.getLayoutPixelExtents(fontProvider.layout, rect.ptr)
         val textX = windowMeasurements.width - rect.width
 
         drawApi.xftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  windowMeasurements.width.convert(), textH.convert())
 
-        val line = fontApi.getLayoutLineReadonly(layout, 0)
+        val line = fontApi.getLayoutLineReadonly(fontProvider.layout, 0)
         fontApi.xftRenderLayoutLine(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
 
         if (monitor.getScreenMode() == ScreenMode.NORMAL) {
@@ -113,9 +83,9 @@ class FrameDrawer(
     }
 
     fun close() {
-        layout?.let { nativeHeap.free(it.rawValue) }
-        fontApi.freeFontDescription(font)
-        pango?.let { nativeHeap.free(it.rawValue) }
+        fontProvider.layout?.let { nativeHeap.free(it.rawValue) }
+        fontApi.freeFontDescription(fontProvider.font)
+        fontProvider.pango?.let { nativeHeap.free(it.rawValue) }
 
         nativeHeap.free(activeTextColor.rawPtr)
         nativeHeap.free(inactiveTextColor.rawPtr)
