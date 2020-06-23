@@ -3,6 +3,7 @@ package de.atennert.lcarswm.drawing
 import de.atennert.lcarswm.WINDOW_TITLE_FONT_SIZE
 import de.atennert.lcarswm.settings.GeneralSetting
 import de.atennert.lcarswm.system.api.FontApi
+import kotlinx.cinterop.nativeHeap
 import xlib.*
 
 class FontProvider(
@@ -40,5 +41,11 @@ class FontProvider(
         fontApi.freeFontMetrics(metrics)
 
         return ascDesc
+    }
+
+    fun close() {
+        layout?.let { nativeHeap.free(it.rawValue) }
+        fontApi.freeFontDescription(font)
+        pango?.let { nativeHeap.free(it.rawValue) }
     }
 }

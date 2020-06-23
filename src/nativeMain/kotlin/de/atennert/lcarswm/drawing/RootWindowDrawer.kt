@@ -5,6 +5,7 @@ import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.settings.GeneralSetting
 import de.atennert.lcarswm.system.api.DrawApi
+import de.atennert.lcarswm.system.api.FontApi
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -13,20 +14,33 @@ import xlib.*
  */
 class RootWindowDrawer(
     private val drawApi: DrawApi,
+    private val fontApi: FontApi,
     private val monitorManager: MonitorManager,
     private val screen: Screen,
-    colors: Colors,
-    settings: Map<GeneralSetting, String>
+    private val colors: Colors,
+    settings: Map<GeneralSetting, String>,
+    private val fontProvider: FontProvider
 ) : UIDrawing {
     private val graphicsContexts = colors.loadForegroundGraphicContexts(screen.root, colors.colorMap.second)
 
-    private val logoImage: CPointer<XImage>
+    private val logoImage: CPointer<XImage>?
+    private val logoText: String
+
+    private val logoColor = colors.getXftColor(1)
+
+    private val colorMap: Colormap
+        get() = colors.colorMap.first
 
     init {
         val imageArray = nativeHeap.allocArrayOfPointersTo(nativeHeap.alloc<XImage>())
-        val wmLogoPath = settings.getValue(GeneralSetting.TITLE_IMAGE)
-        drawApi.readXpmFileToImage(wmLogoPath, imageArray)
-        logoImage = imageArray[0]!!
+        val wmLogoPath = settings[GeneralSetting.TITLE_IMAGE]
+        logoImage = if (wmLogoPath != null) {
+            drawApi.readXpmFileToImage(wmLogoPath, imageArray)
+            imageArray[0]!!
+        } else {
+            null
+        }
+        logoText = settings[GeneralSetting.TITLE] ?: "LCARS"
     }
 
     override fun drawWindowManagerFrame() {
@@ -44,8 +58,74 @@ class RootWindowDrawer(
         drawApi.freePixmap(pixmap)
     }
 
-    fun cleanupGraphicsContexts() {
+    fun close() {
         graphicsContexts.forEach { drawApi.freeGC(it) }
+        nativeHeap.free(logoColor.rawPtr)
+    }
+
+    private fun drawLogoTextFront(pixmap: Pixmap, x: Int, y: Int, barWidth: Int) {
+        val rect = nativeHeap.alloc<PangoRectangle>()
+        val maxTextWidth = barWidth - 16
+
+        val textY = y + (((BAR_HEIGHT_WITH_OFFSET * PANGO_SCALE)
+                - (fontProvider.ascent + fontProvider.descent))
+                / 2 + fontProvider.ascent) / PANGO_SCALE
+
+        fontApi.setLayoutText(fontProvider.layout, logoText)
+        fontApi.setLayoutWidth(fontProvider.layout, maxTextWidth * PANGO_SCALE)
+        fontApi.getLayoutPixelExtents(fontProvider.layout, rect.ptr)
+
+        drawApi.fillRectangle(pixmap, graphicsContexts[0],
+            x, y,
+            (rect.width + 16 - 1).convert(), BAR_HEIGHT.convert())
+
+        val line = fontApi.getLayoutLineReadonly(fontProvider.layout, 0)
+
+        val xftDraw = drawApi.xftDrawCreate(pixmap, screen.root_visual!!, colorMap)
+        fontApi.xftRenderLayoutLine(xftDraw, logoColor.ptr, line, (x + 8 - 1) * PANGO_SCALE, textY * PANGO_SCALE)
+
+        nativeHeap.free(rect.rawPtr)
+    }
+
+    private fun drawLogoTextBack(pixmap: Pixmap, barX: Int, y: Int, barWidth: Int) {
+        val rect = nativeHeap.alloc<PangoRectangle>()
+        val maxTextWidth = barWidth - 16
+
+        val textY = y + (((BAR_HEIGHT_WITH_OFFSET * PANGO_SCALE)
+                - (fontProvider.ascent + fontProvider.descent))
+                / 2 + fontProvider.ascent) / PANGO_SCALE
+
+        fontApi.setLayoutText(fontProvider.layout, logoText)
+        fontApi.setLayoutWidth(fontProvider.layout, maxTextWidth * PANGO_SCALE)
+        fontApi.getLayoutPixelExtents(fontProvider.layout, rect.ptr)
+        val logoX = barX + barWidth - rect.width - 8
+
+        drawApi.fillRectangle(pixmap, graphicsContexts[0],
+            logoX + 1, y,
+            (rect.width + 16 - 1).convert(), BAR_HEIGHT.convert())
+
+        val line = fontApi.getLayoutLineReadonly(fontProvider.layout, 0)
+
+        val xftDraw = drawApi.xftDrawCreate(pixmap, screen.root_visual!!, colorMap)
+        fontApi.xftRenderLayoutLine(xftDraw, logoColor.ptr, line, (logoX + 8) * PANGO_SCALE, textY * PANGO_SCALE)
+
+        nativeHeap.free(rect.rawPtr)
+    }
+
+    private fun drawLogo(pixmap: Pixmap, x: Int, y: Int) {
+        if (logoImage == null) return
+
+        val gcCopyImage = drawApi.createGC(screen.root, 0.convert(), null)!!
+
+        drawApi.fillRectangle(pixmap, graphicsContexts[0],
+            x, y,
+            (logoImage.pointed.width + 16).convert(), BAR_HEIGHT.convert())
+
+        drawApi.putImage(pixmap, gcCopyImage,
+            logoImage, x + 8, y,
+            logoImage.pointed.width.convert(), BAR_HEIGHT.convert())
+
+        drawApi.freeGC(gcCopyImage)
     }
 
     private fun drawMaximizedFrame(monitor: Monitor, pixmap: Pixmap) {
@@ -53,7 +133,6 @@ class RootWindowDrawer(
 
         val gcPurple2 = graphicsContexts[6]
         val gcOrchid = graphicsContexts[2]
-        val gcCopyImage = drawApi.createGC(screen.root, 0.convert(), null)!!
 
         // TODO create bar ends as pixmaps
         val arcs = nativeHeap.allocArray<XArc>(4)
@@ -98,9 +177,9 @@ class RootWindowDrawer(
 
         val bars = nativeHeap.allocArray<XRectangle>(2)
         // top bar
-        bars[0].x = (monitor.x + 48 + logoImage.pointed.width).convert()
+        bars[0].x = (monitor.x + 40).convert()
         bars[0].y = monitor.y.toShort()
-        bars[0].width = (monitor.width - 88 - logoImage.pointed.width).convert()
+        bars[0].width = (monitor.width - 80).convert()
         bars[0].height = 40.convert()
 
         // bottom bar
@@ -113,14 +192,14 @@ class RootWindowDrawer(
         drawApi.fillRectangles(pixmap, gcPurple2, rects, 4)
         drawApi.fillRectangles(pixmap, gcOrchid, bars, 2)
 
-        drawApi.putImage(pixmap, gcCopyImage,
-            logoImage, monitor.x + 40, monitor.y,
-            logoImage.pointed.width.convert(), logoImage.pointed.height.convert())
+        if (logoImage != null) {
+            drawLogo(pixmap, monitor.x + 32, monitor.y)
+        } else {
+            drawLogoTextFront(pixmap, monitor.x + 32, monitor.y, monitor.width - 80)
+        }
 
         nativeHeap.free(arcs)
         nativeHeap.free(rects)
-
-        drawApi.freeGC(gcCopyImage)
     }
 
     private fun drawNormalFrame(monitor: Monitor, pixmap: Pixmap) {
@@ -131,7 +210,6 @@ class RootWindowDrawer(
         val gcOrchid = graphicsContexts[2]
         val gcPurple1 = graphicsContexts[3]
         val gcBrick = graphicsContexts[4]
-        val gcCopyImage = drawApi.createGC(screen.root, 0.convert(), null)!!
 
         // TODO create bar ends as pixmaps
         val arcs = nativeHeap.allocArray<XArc>(3)
@@ -168,7 +246,7 @@ class RootWindowDrawer(
         val bigBars = nativeHeap.allocArray<XRectangle>(2)
         bigBars[0].x = (monitor.x + 290).convert()
         bigBars[0].y = monitor.y.convert()
-        bigBars[0].width = (monitor.width - 338 - logoImage.pointed.width).convert()
+        bigBars[0].width = (monitor.width - 330).convert()
         bigBars[0].height = 40.convert()
 
         // bottom bar
@@ -304,9 +382,11 @@ class RootWindowDrawer(
         drawApi.fillRectangles(pixmap, gcOrchid, cornerRects, 8)
         drawApi.fillArcs(pixmap, gcBlack, cornerInnerArcs, 4)
 
-        drawApi.putImage(pixmap, gcCopyImage,
-            logoImage, monitor.x + monitor.width - 40 - logoImage.pointed.width, monitor.y,
-            logoImage.pointed.width.convert(), logoImage.pointed.height.convert())
+        if (logoImage != null) {
+            drawLogo(pixmap, monitor.x + monitor.width - 48 - logoImage.pointed.width, monitor.y)
+        } else {
+            drawLogoTextBack(pixmap, monitor.x + 290, monitor.y, monitor.width - 330)
+        }
 
         nativeHeap.free(arcs)
         nativeHeap.free(rects)
@@ -316,8 +396,6 @@ class RootWindowDrawer(
         nativeHeap.free(cornerOuterArcs)
         nativeHeap.free(cornerRects)
         nativeHeap.free(cornerInnerArcs)
-
-        drawApi.freeGC(gcCopyImage)
     }
 
     private fun clearScreen(monitor: Monitor, pixmap: Pixmap) {

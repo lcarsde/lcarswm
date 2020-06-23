@@ -83,10 +83,6 @@ class FrameDrawer(
     }
 
     fun close() {
-        fontProvider.layout?.let { nativeHeap.free(it.rawValue) }
-        fontApi.freeFontDescription(fontProvider.font)
-        fontProvider.pango?.let { nativeHeap.free(it.rawValue) }
-
         nativeHeap.free(activeTextColor.rawPtr)
         nativeHeap.free(inactiveTextColor.rawPtr)
         nativeHeap.free(primaryBarColor.rawPtr)

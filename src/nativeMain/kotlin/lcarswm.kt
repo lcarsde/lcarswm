@@ -129,7 +129,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         val fontProvider = FontProvider(system, settings.generalSettings, system.defaultScreenNumber())
         val colorHandler = Colors(system, screen)
-        val uiDrawer = RootWindowDrawer(system, monitorManager, screen, colorHandler, settings.generalSettings)
+        val uiDrawer = RootWindowDrawer(system, system, monitorManager, screen, colorHandler, settings.generalSettings, fontProvider)
 
         keyManager.ungrabAllKeys(screen.root)
 
@@ -223,7 +223,7 @@ fun runWindowManager(system: SystemApi, logger: Logger) {
 
         system.sync(false)
 
-        shutdown(system, uiDrawer, colorHandler, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler, frameDrawer, appMenuHandler, appMenuMessageQueue)
+        shutdown(system, uiDrawer, colorHandler, screen.root, logger, rootWindowPropertyHandler, keyManager, signalHandler, frameDrawer, fontProvider, appMenuHandler, appMenuMessageQueue)
     }
 }
 
@@ -258,13 +258,15 @@ private fun shutdown(
     keyManager: KeyManager,
     signalHandler: SignalHandler,
     frameDrawer: FrameDrawer,
+    fontProvider: FontProvider,
     appMenuHandler: AppMenuHandler,
     appMenuMessageQueue: MessageQueue
 ) {
     appMenuHandler.close()
     appMenuMessageQueue.close()
-    rootWindowDrawer.cleanupGraphicsContexts()
+    rootWindowDrawer.close()
     frameDrawer.close()
+    fontProvider.close()
     colors.cleanupColorMap()
 
     system.selectInput(rootWindow, NoEventMask)
