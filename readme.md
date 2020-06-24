@@ -10,6 +10,10 @@ If there's no primary screen defined in the X server, then lcarswm will use the 
 
 lcarswm is a stacking window manager and displays one window at a time per screen. Windows always open on the primary monitor and can be moved to other monitors with keyboard short cuts.
 
+So far the window manager interaction is mostly based on key commands, as listed below. However windows can also be switched and closed using mouse actions by either clicking on the window or using the application menu.
+
+The window manager's application menu is displayed in the main bar on the primary monitor in normal mode. The application menu shows all open windows and can be used to select windows or close them with mouse actions.
+
 ## Acknowledgements
 Thank you very much to the creators of the following resources:
 * [Chuan Ji - How X Window Managers Work, And How To Write One](https://jichu4n.com/posts/how-x-window-managers-work-and-how-to-write-one-part-i/)
@@ -25,22 +29,28 @@ Thank you very much to the creators of the following resources:
 * App menu in the normal screen mode on the primary screen that lists all active windows with
   * a window selection button (blue with program name)
   * a close button (red, small without text)
-* Key handling
-  * Windows-key + Q closes the window manager
-  * Windows-key + M toggles the display mode between normal, maximized and fullscreen
-  * Alt-key + Tab toggles through the windows
-  * Alt-key + Up/Down moves the active window to other monitors
-  * Alt-key + F4 closes the active window
-  * Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
-  * Other key combinations can be connected to commands via a settings file
-  * Modifier keys are
-    * Shift
-    * Ctrl
-    * Alt
-    * Win / Lin / Super
-    * Meta
-    * Hyper
-* The settings file is created as `~/.config/lcarswm/settings.xml` if it doesn't exist and can be edited afterwards
+* Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
+* Windows are always opened on the primary monitor
+* If a monitor is removed, it's windows are moved to the primary monitor
+* The settings file contains key handling and general settings per user and is created as `~/.config/lcarswm/settings.xml` if it doesn't exist and can be edited afterwards
+  * Key handling
+    * Windows-key + Q closes the window manager
+    * Windows-key + M toggles the display mode between normal, maximized and fullscreen
+    * Alt-key + Tab toggles through the windows
+    * Alt-key + Up/Down moves the active window to other monitors
+    * Alt-key + F4 closes the active window
+    * Other key combinations can be connected to commands via a settings file
+    * Modifier keys are
+      * Shift
+      * Ctrl
+      * Alt
+      * Win / Lin / Super
+      * Meta
+      * Hyper
+  * General settings
+    * title: title that is displayd in the top bar in normal and maximized mode
+    * title-image: optional, path to image in XPM format, if set, it will be shown instead of the title. Should have a height of 40px and be at least 16px shorter then the normal modes' top bar.
+    * font: the font used for drawing the title and the window titles
 
 ## Pictures
 Here are some pictures from the VirtualBox test environment.
@@ -57,11 +67,11 @@ Fullscreen mode
 ## Required
 ### For compiling
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
-* header files and development libraries for XLib, randr, xpm, glib and pango. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
+* header files and development libraries for XLib, randr, xpm, libxml2, glib and pango. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
 
 ### For using
-* Ubuntu Condensed font: It comes close enough to LCARS letters and is used by lcarswm for writing.
-* Libraries for XLib, randr, xpm, glib and pango. Check the travis yaml for details via the corresponding dev libs.
+* Ubuntu Condensed font: It comes close enough to LCARS letters and is used by lcarswm as default for writing.
+* Libraries for XLib, randr, xpm, libxml2, glib and pango. Check the travis yaml for details via the corresponding dev libs.
 * Python 3.8 with Python 3 gi and Python 3 posix-ipc packages for the app menu
 
 ## Known issues
@@ -70,6 +80,7 @@ Fullscreen mode
 
 ## To Do
 * Associate child screens with their parents
+* Identify and handle popups as popups
 * Center popups and adjust the frame to their size
 * Content for the data bar (empty upper area in normal mode)
   * Configurable plugin framework
@@ -88,25 +99,5 @@ Fullscreen mode
   * If screens have different sizes, the higher one draws
 * check for XDG-path variables and have a fallback
 * toggle window list by latest used application
-
-## Logo
-The logo is a xpm file. It needs to be located in /usr/share/pixmaps and must be named lcarswm.xpm. It can be exchanged. The only restriction is that the logo height needs to be 40px. The bars will adjust to the width.
-
-## Automated testing
-Automated tests are set up using Travis CI. It's working well except for the fact, that the whole environment is downloaded again for every test run. That means downloads of over 500MB, which takes time. However, it's working and that's good enough for me for now.
-
-System tests are created using a mocked system facade, that covers all calls to Xlib, POSIX and other things. The difficulty lies within guessing the behavior of the mocked system though, in cases where calls would be dependent on each other when using the actual libraries.
-
-## Manuel testing / running the wm
-To manually test the functionality, I've set up a virtual Linux machine in VirtualBox with a shared directory to the generated executables. In this virtual environment, I run the window manager like this:
-
-```
-export XDG_CONFIG_HOME="$HOME/.config"
-startx /path/to/executable/lcarswm.kexe
-```
-
-That runs the X window manager with the lcarswm window manager. The .config folder in the home directory should contain an lcarswm folder with a key-config.properties file with the configuration for the key bindings (see the example file in `src/nativeMain/resources/homedir/.config/lcarswm`).
-
-lcarswm creates a log file at the path `/var/log/lcarswm.log`.
-
-Probably one of the most interesting features in using a VM and RANDR is screen resizing. For me this works with using VBoxVGA as graphics controller and `VBoxClient-all` needs to be called after the activation of X to allow for resizing detection and all other things VBoxClient offers. Alternatively, VBoxClient can be called with specific flags.
+* basic configurable window tiling
+* autostart for things
