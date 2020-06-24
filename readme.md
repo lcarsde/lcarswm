@@ -14,6 +14,9 @@ So far the window manager interaction is mostly based on key commands, as listed
 
 The window manager's application menu is displayed in the main bar on the primary monitor in normal mode. The application menu shows all open windows and can be used to select windows or close them with mouse actions.
 
+## Copyright
+Copyright (C) 2019  Andreas Tennert
+
 ## Acknowledgements
 Thank you very much to the creators of the following resources:
 * [Chuan Ji - How X Window Managers Work, And How To Write One](https://jichu4n.com/posts/how-x-window-managers-work-and-how-to-write-one-part-i/)
