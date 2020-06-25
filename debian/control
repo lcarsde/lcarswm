@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 9), openjdk-8-jdk, libx11-dev, libxpm-dev, libxrand
 Package: lcarswm
 Architecture: any
 Depends: libglib2.0-0, libx11-6, libxpm4, libxrandr2, libpango1.0-0, libpangoxft-1.0-0, libxml2, python3, python3-gi, python3-posix-ipc
-Recommends: fonts-ubuntu
+Recommends: fonts-ubuntu, xterm, firefox, alsa-utils
 Suggests: x-display-manager, kdm | gdm
 Provides: x-window-manager
 Description: A simple window manager that looks like the LCARS interface

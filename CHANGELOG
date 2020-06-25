@@ -22,6 +22,8 @@
 * update of pictures
 * forwarding of information via posix message queues to app menu and back
 * removed my logo from resources (not required since title introduction)
+* Change default terminal to xterm and add it to recommendations in debian setup routines
+* Add debian recommendations for firefox and alsa-utils
 
 20.1
 * change LCARSWM to lcarswm

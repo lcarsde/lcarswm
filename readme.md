@@ -76,10 +76,14 @@ Fullscreen mode
 * Ubuntu Condensed font: It comes close enough to LCARS letters and is used by lcarswm as default for writing.
 * Libraries for XLib, randr, xpm, libxml2, glib and pango. Check the travis yaml for details via the corresponding dev libs.
 * Python 3.8 with Python 3 gi and Python 3 posix-ipc packages for the app menu
+* The applications for the default keybindings are recommended in the debian setup and are xterm, firefox and alsa-utils (amixer). The default application key bindings are
+  * Lin+T -> xterm
+  * Lin+B -> firefox (B for browser)
+  * Audio-keys -> amixer ... (mute toggle, louder, quieter)
 
 ## Known issues
 * If screens lay over one another they are not "merged" but draw over one another
-* Using SoftMaker Office sometimes leaves empty windows
+* Using SoftMaker Office sometimes leaves empty windows (noticed with csv import dialog)
 
 ## To Do
 * Associate child screens with their parents

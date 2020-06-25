@@ -15,7 +15,7 @@ object SettingsWriter {
         <!-- keys for executing programs -->
         <binding>
             <keys>Lin+T</keys>
-            <exec>lxterminal</exec>
+            <exec>xterm</exec>
         </binding>
         <binding>
             <keys>Lin+B</keys>
