@@ -55,18 +55,6 @@ Thank you very much to the creators of the following resources:
     * title-image: optional, path to image in XPM format, if set, it will be shown instead of the title. Should have a height of 40px and be at least 16px shorter then the normal modes' top bar.
     * font: the font used for drawing the title and the window titles
 
-## Pictures
-Here are some pictures from the VirtualBox test environment.
-
-Normal mode
-![lcarswm in normal mode](doc/images/screen-normal-mode.png)
-
-Maximized mode
-![lcarswm in normal mode](doc/images/screen-maximized-mode.png)
-
-Fullscreen mode
-![lcarswm in normal mode](doc/images/screen-fullscreen-mode.png)
-
 ## Required
 ### For compiling
 * ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
