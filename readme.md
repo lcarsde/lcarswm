@@ -14,6 +14,8 @@ So far the window manager interaction is mostly based on key commands, as listed
 
 The window manager's application menu is displayed in the main bar on the primary monitor in normal mode. The application menu shows all open windows and can be used to select windows or close them with mouse actions.
 
+Checkout https://www.andreas-tennert.de/#2-0006 for images :-)
+
 ## Copyright
 Copyright (C) 2019  Andreas Tennert
 
