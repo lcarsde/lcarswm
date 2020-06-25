@@ -109,6 +109,5 @@ Fullscreen mode
 * basic configurable window tiling
 * autostart for things
 * debian build script
-  * missing /usr/share/doc/lcarswm/copyrigth
   * missing /usr/share/doc/lcarswm/changelog.Debian.gz
   * missing-dependency-on-libc
