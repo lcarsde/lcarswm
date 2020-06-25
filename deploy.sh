@@ -1,32 +1,37 @@
 #!/bin/bash
 
+export LC_ALL=en_US.UTF-8
 TIME="$(date '+%a, %d %b %Y %T %z')"
 
-echo "run build for deployment"
-./gradlew build
-
-echo "build debian package for lcarswm-${TRAVIS_TAG}"
+echo "preparing debian package build for lcarswm-${TRAVIS_TAG}"
 
 # create debian package construction directory
 mkdir -p "build/deb/lcarswm-${TRAVIS_TAG}"
 
 # copy software resources
-cp -r "src/nativeMain/resources/usr" "build/deb/lcarswm-${TRAVIS_TAG}/usr"
-cp "build/bin/native/releaseExecutable/lcarswm.kexe" "build/deb/lcarswm-${TRAVIS_TAG}/usr/bin/"
-cp "tools/app-menu/lcarswm-app-menu.py" "build/deb/lcarswm-${TRAVIS_TAG}/usr/bin/"
+cp -r doc "build/deb/lcarswm-${TRAVIS_TAG}/doc"
+cp -r gradle "build/deb/lcarswm-${TRAVIS_TAG}/gradle"
+cp -r src "build/deb/lcarswm-${TRAVIS_TAG}/src"
+cp -r tools "build/deb/lcarswm-${TRAVIS_TAG}/tools"
+cp build.gradle "build/deb/lcarswm-${TRAVIS_TAG}/"
+cp CHANGELOG "build/deb/lcarswm-${TRAVIS_TAG}/"
+cp gradlew "build/deb/lcarswm-${TRAVIS_TAG}/"
+cp LICENSE "build/deb/lcarswm-${TRAVIS_TAG}/"
+cp readme.md "build/deb/lcarswm-${TRAVIS_TAG}/"
+cp settings.gradle "build/deb/lcarswm-${TRAVIS_TAG}/"
 
 cd "build/deb"
 
 echo "create tarball"
-tar -czvf "lcarswm_${TRAVIS_TAG}.orig.tar.gz" "lcarswm-${TRAVIS_TAG}"
-tar -ztvf "lcarswm_${TRAVIS_TAG}.orig.tar.gz"
+tar -czf "lcarswm_${TRAVIS_TAG}.orig.tar.gz" "lcarswm-${TRAVIS_TAG}"
+tar -ztf "lcarswm_${TRAVIS_TAG}.orig.tar.gz"
 
 cd ../..
 
 # copy debian packaging files
 cp -r "debian" "build/deb/lcarswm-${TRAVIS_TAG}/debian"
 
-echo "Deploying debian package of lcarswm-${TRAVIS_TAG}"
+echo "building debian package of lcarswm-${TRAVIS_TAG}"
 
 cd "build/deb/lcarswm-${TRAVIS_TAG}"
 
@@ -42,3 +47,5 @@ mv "lcarswm_${TRAVIS_TAG}.orig.tar.gz" "deploy/lcarswm-${TRAVIS_TAG}.tar.gz"
 mv lcarswm_*.deb deploy/
 
 cd ../..
+
+echo "deb and tar.gz files are in build/deb/deploy"
