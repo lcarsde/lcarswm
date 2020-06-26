@@ -4,12 +4,13 @@ import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
+import kotlinx.coroutines.runBlocking
 import xlib.*
 import kotlin.test.*
 
 class StartupTest {
     @Test
-    fun `check startup`() {
+    fun `check startup`() = runBlocking {
         val systemFacade = StartupFacadeMock()
 
         runWindowManager(systemFacade, LoggerMock())
@@ -102,7 +103,7 @@ class StartupTest {
     }
 
     @Test
-    fun `send client message informing that we are the WM`() {
+    fun `send client message informing that we are the WM`() = runBlocking {
         val systemFacade = StartupFacadeMock()
 
         runWindowManager(systemFacade, LoggerMock())
@@ -122,7 +123,7 @@ class StartupTest {
     }
 
     @Test
-    fun `set required properties`() {
+    fun `set required properties`() = runBlocking {
         val systemFacade = StartupFacadeMock()
         val rootWindow: Window = 1.convert() // hard coded in SystemFacadeMock
         val supportWindow: Window = systemFacade.nextWindowId // first created window starts at 2 in SystemFacadeMock
