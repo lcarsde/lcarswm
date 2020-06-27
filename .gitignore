@@ -7,3 +7,4 @@ gradle.properties
 gradlew.bat
 .idea
 **/*.iml
+venv
