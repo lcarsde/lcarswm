@@ -47,12 +47,15 @@ css = b'''
 
 
 class WindowEntry(Gtk.Box):
-    def __init__(self, window_id, class_name, css_provider, sendQueue):
+    """
+        Window entry for selecting or closing the associated window
+    """
+    def __init__(self, window_id, class_name, css_provider, send_queue):
         super().__init__(spacing=8)
 
         self.window_id = window_id
         self.class_name = class_name
-        self.sendQueue = sendQueue
+        self.sendQueue = send_queue
 
         self.select_button = Gtk.Button(label=class_name)
         self.select_button.set_size_request(184, 40)
@@ -81,6 +84,9 @@ class WindowEntry(Gtk.Box):
 
 
 class LcarswmAppMenu(Gtk.Window):
+    """
+        Application menu main window
+    """
     def __init__(self):
         Gtk.Window.__init__(self, title="lcarswm app menu")
 
