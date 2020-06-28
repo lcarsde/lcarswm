@@ -223,7 +223,7 @@ class RootWindowDrawer(
         arcs[0].y = monitor.y.convert()
 
         arcs[1].x = (monitor.x + monitor.width - 40).convert()
-        arcs[1].y = (monitor.y + 176).convert()
+        arcs[1].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
 
         arcs[2].x = (monitor.x + monitor.width - 40).convert()
         arcs[2].y = (monitor.y + monitor.height - 40).convert()
@@ -238,7 +238,7 @@ class RootWindowDrawer(
         rects[0].y = monitor.y.convert()
 
         rects[1].x = (monitor.x + monitor.width - 32).convert()
-        rects[1].y = (monitor.y + 176).convert()
+        rects[1].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
 
         rects[2].x = (monitor.x + monitor.width - 32).convert()
         rects[2].y = (monitor.y + monitor.height - 40).convert()
@@ -260,36 +260,36 @@ class RootWindowDrawer(
 
         // upper middle bars
         middleBars[0].x = (monitor.x + 232 + 32).convert()
-        middleBars[0].y = (monitor.y + 176).convert()
+        middleBars[0].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
         middleBars[0].width = (middleSegmentWidth * 6 - 32).convert()
         middleBars[0].height = 16.convert()
 
         middleBars[1].x = (monitor.x + 240 + middleSegmentWidth * 6).convert()
-        middleBars[1].y = (monitor.y + 176).convert()
+        middleBars[1].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
         middleBars[1].width = (middleSegmentWidth * 2).convert()
         middleBars[1].height = 16.convert()
 
         // lower middle bars
         middleBars[2].x = (monitor.x + 232 + 32).convert()
-        middleBars[2].y = (monitor.y + 200).convert()
+        middleBars[2].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
         middleBars[2].width = (middleSegmentWidth * 3 - 32).convert()
         middleBars[2].height = 16.convert()
 
         middleBars[3].x = (monitor.x + 240 + middleSegmentWidth * 3).convert()
-        middleBars[3].y = (monitor.y + 200).convert()
+        middleBars[3].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
         middleBars[3].width = (middleSegmentWidth * 5).convert()
         middleBars[3].height = 16.convert()
 
         val sideBars = nativeHeap.allocArray<XRectangle>(2)
         sideBars[0].x = monitor.x.convert()
-        sideBars[0].y = (monitor.y + 64).convert()
+        sideBars[0].y = (monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + BAR_GAP_SIZE).convert()
         sideBars[0].width = SIDE_BAR_WIDTH.convert()
-        sideBars[0].height = DATA_AREA_HEIGHT.convert()
+        sideBars[0].height = DATA_BAR_HEIGHT.convert()
 
         sideBars[1].x = monitor.x.convert()
-        sideBars[1].y = (monitor.y + 240).convert()
+        sideBars[1].y = (monitor.y + NORMAL_WINDOW_UPPER_OFFSET + INNER_CORNER_RADIUS).convert()
         sideBars[1].width = SIDE_BAR_WIDTH.convert()
-        sideBars[1].height = (monitor.height - 304).convert()
+        sideBars[1].height = (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert()
 
         // TODO create corners as pixmaps
         val cornerOuterArcs = nativeHeap.allocArray<XArc>(4)
@@ -302,12 +302,12 @@ class RootWindowDrawer(
         cornerOuterArcs[0].height = 80.convert()
         cornerOuterArcs[0].angle1 = 90.shl(6)
 
-        cornerOuterArcs[1].y = (monitor.y + 160).convert()
+        cornerOuterArcs[1].y = (monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
         cornerOuterArcs[1].width = 32.convert()
         cornerOuterArcs[1].height = 32.convert()
         cornerOuterArcs[1].angle1 = 180.shl(6)
 
-        cornerOuterArcs[2].y = (monitor.y + 200).convert()
+        cornerOuterArcs[2].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
         cornerOuterArcs[2].width = 32.convert()
         cornerOuterArcs[2].height = 32.convert()
         cornerOuterArcs[2].angle1 = 90.shl(6)
@@ -323,10 +323,10 @@ class RootWindowDrawer(
             cornerRects[i].width = 200.convert()
             cornerRects[i].height = 16.convert()
         }
-        cornerRects[0].y = (monitor.y + 40).convert()
-        cornerRects[1].y = (monitor.y + 160).convert()
-        cornerRects[2].y = (monitor.y + 216).convert()
-        cornerRects[3].y = (monitor.y + monitor.height - 56).convert()
+        cornerRects[0].y = (monitor.y + BAR_HEIGHT).convert()
+        cornerRects[1].y = (monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        cornerRects[2].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + 2*BAR_HEIGHT_SMALL).convert()
+        cornerRects[3].y = (monitor.y + monitor.height - BAR_HEIGHT - INNER_CORNER_RADIUS).convert()
 
         for (i in 4 until 6) {
             cornerRects[i].x = (monitor.x + OUTER_CORNER_RADIUS_BIG).convert()
@@ -342,8 +342,8 @@ class RootWindowDrawer(
             cornerRects[i].width = 240.convert()
             cornerRects[i].height = BAR_HEIGHT_SMALL.convert()
         }
-        cornerRects[6].y = (monitor.y + 176).convert()
-        cornerRects[7].y = (monitor.y + 200).convert()
+        cornerRects[6].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        cornerRects[7].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
 
         val cornerInnerArcs = nativeHeap.allocArray<XArc>(4)
         for (i in 0 until 4) {
@@ -355,10 +355,10 @@ class RootWindowDrawer(
         cornerInnerArcs[0].y = (monitor.y + 40).convert()
         cornerInnerArcs[0].angle1 = 90.shl(6)
 
-        cornerInnerArcs[1].y = (monitor.y + 144).convert()
+        cornerInnerArcs[1].y = (monitor.y + BAR_HEIGHT + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
         cornerInnerArcs[1].angle1 = 180.shl(6)
 
-        cornerInnerArcs[2].y = (monitor.y + 216).convert()
+        cornerInnerArcs[2].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + 2*BAR_HEIGHT_SMALL).convert()
         cornerInnerArcs[2].angle1 = 90.shl(6)
 
         cornerInnerArcs[3].y = (monitor.y + monitor.height - 72).convert()
