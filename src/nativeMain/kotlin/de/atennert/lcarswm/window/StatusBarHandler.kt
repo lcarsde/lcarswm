@@ -8,7 +8,6 @@ import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.events.sendConfigureNotify
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorObserver
-import de.atennert.lcarswm.system.MessageQueue
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import xlib.None
@@ -16,19 +15,17 @@ import xlib.NormalState
 import xlib.Window
 import xlib.XTextProperty
 
-class AppMenuHandler(
-    private val systemApi: SystemApi,
-    private val atomLibrary: AtomLibrary,
-    private val monitorManager: MonitorManager,
-    private val rootWindowId: Window
+class StatusBarHandler(
+        private val systemApi: SystemApi,
+        private val atomLibrary: AtomLibrary,
+        private val monitorManager: MonitorManager,
+        private val rootWindowId: Window
 ) : MonitorObserver {
     private val wmStateData = listOf<ULong>(NormalState.convert(), None.convert())
         .map { it.toUByteArray() }
         .combine()
 
     private var window: FramedWindow? = null
-
-    private val messageQueue = MessageQueue(systemApi, "/lcarswm-active-window-list", MessageQueue.Mode.WRITE)
 
     fun manageWindow(window: FramedWindow) {
         this.window = window
@@ -44,16 +41,14 @@ class AppMenuHandler(
 
         systemApi.ungrabServer()
         if (monitorManager.getScreenMode() == ScreenMode.NORMAL) {
-            showAppMenu(window)
+            showStatusBar(window)
         }
         systemApi.changeProperty(window.id, atomLibrary[Atoms.WM_STATE], atomLibrary[Atoms.WM_STATE], wmStateData, 32)
-
-        sendWindowListUpdate()
     }
 
-    fun isAppMenu(windowId: Window): Boolean {
+    fun isStatusBar(windowId: Window): Boolean {
         val textProperty = nativeHeap.alloc<XTextProperty>()
-        val result = systemApi.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.LCARSWM_APP_MENU])
+        val result = systemApi.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.LCARSWM_STATUS_BAR])
         systemApi.xFree(textProperty.value)
         nativeHeap.free(textProperty)
         return result != 0
@@ -62,19 +57,19 @@ class AppMenuHandler(
     override fun toggleScreenMode(newScreenMode: ScreenMode) {
         window?.let { window ->
             if (newScreenMode == ScreenMode.NORMAL) {
-                showAppMenu(window)
+                showStatusBar(window)
             } else {
-                hideAppMenu(window)
+                hideStatusBar(window)
             }
         }
     }
 
-    private fun showAppMenu(window: FramedWindow) {
+    private fun showStatusBar(window: FramedWindow) {
         systemApi.mapWindow(window.frame)
         systemApi.mapWindow(window.id)
     }
 
-    private fun hideAppMenu(window: FramedWindow) {
+    private fun hideStatusBar(window: FramedWindow) {
         systemApi.unmapWindow(window.id)
         systemApi.unmapWindow(window.frame)
     }
@@ -105,7 +100,7 @@ class AppMenuHandler(
         sendConfigureNotify(systemApi, window.id, measurements)
     }
 
-    fun isKnownAppMenu(windowId: Window): Boolean {
+    fun isKnownStatusBar(windowId: Window): Boolean {
         return window?.id == windowId
     }
 
@@ -113,11 +108,11 @@ class AppMenuHandler(
         val monitor = monitorManager.getPrimaryMonitor()
 
         return WindowMeasurements(
-            monitor.x,
-            monitor.y + NORMAL_WINDOW_UPPER_OFFSET + INNER_CORNER_RADIUS,
-            (SIDE_BAR_WIDTH + BAR_GAP_SIZE + BAR_END_WIDTH).convert(), // "bar end" is used as window close button
-            (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert(),
-            (monitor.height - NORMAL_WINDOW_NON_APP_HEIGHT).convert()
+            monitor.x + SIDE_BAR_WIDTH + BAR_GAP_SIZE,
+            monitor.y + BAR_HEIGHT + BAR_GAP_SIZE,
+            (monitor.width - SIDE_BAR_WIDTH - 2 * BAR_END_WIDTH - 2 * BAR_GAP_SIZE).convert(),
+            (DATA_AREA_HEIGHT).convert(),
+            (DATA_AREA_HEIGHT).convert()
         )
     }
 
@@ -132,42 +127,5 @@ class AppMenuHandler(
             systemApi.destroyWindow(window.frame)
         }
         window = null
-    }
-
-    /*###########################################*
-     * Communicating window list updates
-     *###########################################*/
-    private val windowNameList = mutableMapOf<Window, String>()
-
-    val windowListObserver = object : WindowList.Observer {
-        override fun windowAdded(window: FramedWindow) {
-            windowNameList[window.id] = window.wmClass
-            sendWindowListUpdate()
-        }
-
-        override fun windowRemoved(window: FramedWindow) {
-            windowNameList.remove(window.id)
-            sendWindowListUpdate()
-        }
-
-        override fun windowUpdated(window: FramedWindow) {
-            windowNameList[window.id] = window.wmClass
-            sendWindowListUpdate()
-        }
-    }
-
-    private fun getWindowListString(): String {
-        return windowNameList.asSequence()
-            .fold("list") { acc, (window, wmClass) -> "$acc\n$window\t$wmClass" }
-    }
-
-    private fun sendWindowListUpdate() {
-        if (window != null) {
-            messageQueue.sendMessage(getWindowListString())
-        }
-    }
-
-    fun close() {
-        messageQueue.close()
     }
 }

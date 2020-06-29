@@ -2,11 +2,8 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.log.Logger
-import de.atennert.lcarswm.window.WindowMeasurements
 import de.atennert.lcarswm.system.api.EventApi
-import de.atennert.lcarswm.window.AppMenuHandler
-import de.atennert.lcarswm.window.WindowCoordinator
-import de.atennert.lcarswm.window.WindowRegistration
+import de.atennert.lcarswm.window.*
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
@@ -22,7 +19,8 @@ class ConfigureRequestHandler(
     private val logger: Logger,
     private val windowRegistration: WindowRegistration,
     private val windowCoordinator: WindowCoordinator,
-    private val appMenuHandler: AppMenuHandler
+    private val appMenuHandler: AppMenuHandler,
+    private val statusBarHandler: StatusBarHandler
 ) : XEventHandler {
     override val xEventType = ConfigureRequest
 
@@ -39,6 +37,9 @@ class ConfigureRequestHandler(
         }
         else if (appMenuHandler.isKnownAppMenu(configureEvent.window)) {
             adjustWindowToScreen(configureEvent, appMenuHandler.getWindowMeasurements())
+        }
+        else if (statusBarHandler.isKnownStatusBar(configureEvent.window)) {
+            adjustWindowToScreen(configureEvent, statusBarHandler.getWindowMeasurements())
         }
         else {
             forwardConfigureRequest(configureEvent)

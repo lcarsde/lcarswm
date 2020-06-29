@@ -154,6 +154,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     val windowNameReader = TextAtomReader(system, atomLibrary)
 
     val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager, screen.root)
+    val statusBarHandler = StatusBarHandler(system, atomLibrary, monitorManager, screen.root)
 
     val appMenuMessageQueue = MessageQueue(system, "/lcarswm-app-menu-messages", MessageQueue.Mode.READ)
 
@@ -170,6 +171,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
         screen,
         windowNameReader,
         appMenuHandler,
+        statusBarHandler,
         windowList
     )
 
@@ -196,6 +198,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     }
 
     monitorManager.registerObserver(appMenuHandler)
+    monitorManager.registerObserver(statusBarHandler)
 
     windowList.registerObserver(appMenuHandler.windowListObserver)
 
@@ -213,6 +216,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
         keyConfiguration,
         windowNameReader,
         appMenuHandler,
+        statusBarHandler,
         frameDrawer,
         windowList,
         screen.root
@@ -392,14 +396,15 @@ private fun createEventManager(
     keyConfiguration: KeyConfiguration,
     textAtomReader: TextAtomReader,
     appMenuHandler: AppMenuHandler,
+    statusBarHandler: StatusBarHandler,
     frameDrawer: FrameDrawer,
     windowList: WindowList,
     rootWindowId: Window
 ): EventDistributor {
 
     return EventDistributor.Builder(logger)
-        .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler))
-        .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler))
+        .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler, statusBarHandler))
+        .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler, statusBarHandler))
         .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler))
         .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, monitorManager, windowCoordinator, focusHandler, uiDrawer))
         .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, atomLibrary))

@@ -6,6 +6,7 @@ import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import de.atennert.lcarswm.window.AppMenuHandler
+import de.atennert.lcarswm.window.StatusBarHandler
 import de.atennert.lcarswm.window.WindowCoordinatorMock
 import de.atennert.lcarswm.window.WindowRegistrationMock
 import kotlinx.cinterop.*
@@ -22,7 +23,8 @@ class ConfigureRequestHandlerTest {
     fun `has ConfigureRequest type`() {
         val systemApi = SystemFacadeMock()
         val appMenuHandler = AppMenuHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
-        val configureRequestHandler = ConfigureRequestHandler(systemApi, LoggerMock(), WindowRegistrationMock(), WindowCoordinatorMock(), appMenuHandler)
+        val statusBarHandler = StatusBarHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
+        val configureRequestHandler = ConfigureRequestHandler(systemApi, LoggerMock(), WindowRegistrationMock(), WindowCoordinatorMock(), appMenuHandler, statusBarHandler)
 
         assertEquals(ConfigureRequest, configureRequestHandler.xEventType, "The ConfigureRequestHandler should have the ConfigureRequest type")
     }
@@ -37,8 +39,9 @@ class ConfigureRequestHandlerTest {
         val monitorCoordinator = WindowCoordinatorMock()
         val windowMeasurements = monitorCoordinator.getWindowMeasurements(knownWindow)
         val appMenuHandler = AppMenuHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
+        val statusBarHandler = StatusBarHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
 
-        val configureRequestHandler = ConfigureRequestHandler(systemApi, LoggerMock(), windowRegistration, monitorCoordinator, appMenuHandler)
+        val configureRequestHandler = ConfigureRequestHandler(systemApi, LoggerMock(), windowRegistration, monitorCoordinator, appMenuHandler, statusBarHandler)
         systemApi.functionCalls.clear()
 
         val configureRequestEvent = createConfigureRequestEvent(knownWindow)
@@ -75,16 +78,20 @@ class ConfigureRequestHandlerTest {
         val windowRegistration = WindowRegistrationMock()
         val monitorCoordinator = WindowCoordinatorMock()
         val appMenuHandler = AppMenuHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
+        val statusBarHandler = StatusBarHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
 
-        val configureRequestHandler = ConfigureRequestHandler(systemApi, LoggerMock(), windowRegistration, monitorCoordinator, appMenuHandler)
+        val configureRequestHandler = ConfigureRequestHandler(systemApi, LoggerMock(), windowRegistration, monitorCoordinator, appMenuHandler, statusBarHandler)
         systemApi.functionCalls.clear()
 
         val configureRequestEvent = createConfigureRequestEvent(systemApi.getNewWindowId())
         val shutdownValue = configureRequestHandler.handleEvent(configureRequestEvent)
 
         val configureWindowCall = systemApi.functionCalls[0] // there should be only one call for unknown windows
+        println(1)
         val configuredWindow = configureWindowCall.parameters[0]
+        println(configureWindowCall.name)
         val valueMask = (configureWindowCall.parameters[1] as UInt).toULong()
+        println(3)
         @Suppress("UNCHECKED_CAST")
         val windowChanges: XWindowChanges = (configureWindowCall.parameters[2] as CPointer<XWindowChanges>).pointed
 

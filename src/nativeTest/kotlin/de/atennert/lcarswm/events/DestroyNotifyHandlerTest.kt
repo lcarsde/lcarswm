@@ -5,6 +5,7 @@ import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import de.atennert.lcarswm.window.AppMenuHandler
+import de.atennert.lcarswm.window.StatusBarHandler
 import de.atennert.lcarswm.window.WindowRegistrationMock
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
@@ -22,7 +23,8 @@ class DestroyNotifyHandlerTest {
     fun `return the event type DestroyNotify`() {
         val systemApi = SystemFacadeMock()
         val appMenuHandler = AppMenuHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
-        val destroyNotifyHandler = DestroyNotifyHandler(LoggerMock(), WindowRegistrationMock(), appMenuHandler)
+        val statusBarHandler = StatusBarHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
+        val destroyNotifyHandler = DestroyNotifyHandler(LoggerMock(), WindowRegistrationMock(), appMenuHandler, statusBarHandler)
 
         assertEquals(DestroyNotify, destroyNotifyHandler.xEventType, "The event type for DestroyEventHandler needs to be DestroyNotify")
     }
@@ -39,8 +41,9 @@ class DestroyNotifyHandlerTest {
         windowRegistration.functionCalls.clear()
         val systemApi = SystemFacadeMock()
         val appMenuHandler = AppMenuHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
+        val statusBarHandler = StatusBarHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
 
-        val destroyNotifyHandler = DestroyNotifyHandler(LoggerMock(), windowRegistration, appMenuHandler)
+        val destroyNotifyHandler = DestroyNotifyHandler(LoggerMock(), windowRegistration, appMenuHandler, statusBarHandler)
         val requestShutdown = destroyNotifyHandler.handleEvent(destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")
@@ -60,8 +63,9 @@ class DestroyNotifyHandlerTest {
         val windowRegistration = WindowRegistrationMock()
         val systemApi = SystemFacadeMock()
         val appMenuHandler = AppMenuHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
+        val statusBarHandler = StatusBarHandler(systemApi, AtomLibrary(systemApi), MonitorManagerMock(), systemApi.rootWindowId)
 
-        val destroyNotifyHandler = DestroyNotifyHandler(LoggerMock(), windowRegistration, appMenuHandler)
+        val destroyNotifyHandler = DestroyNotifyHandler(LoggerMock(), windowRegistration, appMenuHandler, statusBarHandler)
         val requestShutdown = destroyNotifyHandler.handleEvent(destroyNotifyEvent)
 
         assertFalse(requestShutdown, "Destroy handling should not request shutdown of the window manager")

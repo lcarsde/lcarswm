@@ -24,6 +24,7 @@ class WindowHandler(
     private val screen: Screen,
     private val textAtomReader: TextAtomReader,
     private val appMenuHandler: AppMenuHandler,
+    private val statusBarHandler: StatusBarHandler,
     private val windowList: WindowList
 ) : WindowRegistration {
 
@@ -64,8 +65,12 @@ class WindowHandler(
 
         val window = FramedWindow(windowId, windowAttributes.border_width)
 
-        if (appMenuHandler.isAppSelector(windowId)) {
+        if (appMenuHandler.isAppMenu(windowId)) {
             appMenuHandler.manageWindow(window)
+            nativeHeap.free(windowAttributes)
+            return
+        } else if (statusBarHandler.isStatusBar(windowId)) {
+            statusBarHandler.manageWindow(window)
             nativeHeap.free(windowAttributes)
             return
         }
