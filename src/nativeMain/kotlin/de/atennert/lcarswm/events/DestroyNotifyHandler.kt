@@ -6,7 +6,6 @@ import de.atennert.lcarswm.window.StatusBarHandler
 import de.atennert.lcarswm.window.WindowRegistration
 import xlib.DestroyNotify
 import xlib.XEvent
-import xlib.stat
 
 /**
  * The DestroyNotify event is triggered when a window was destroyed. If we (still) know the destroyed window, then we
