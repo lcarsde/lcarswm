@@ -1,3 +1,4 @@
+import de.atennert.lcarswm.closeWith
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.FunctionCall
@@ -12,7 +13,7 @@ import kotlin.test.assertTrue
 class ShutdownTest {
     @Test
     fun `shutdown when there's no display to get`() = runBlocking {
-        val logger = LoggerMock()
+        val logger = LoggerMock().closeWith(LoggerMock::close)
         val testFacade = object : SystemFacadeMock() {
             override fun openDisplay(): Boolean {
                 super.openDisplay()
@@ -35,7 +36,7 @@ class ShutdownTest {
 
     @Test
     fun `shutdown when there's no default screen to get`() = runBlocking {
-        val logger = LoggerMock()
+        val logger = LoggerMock().closeWith(LoggerMock::close)
         val testFacade = object : SystemFacadeMock() {
             override fun defaultScreenOfDisplay(): CPointer<Screen>? {
                 super.defaultScreenOfDisplay()
@@ -58,7 +59,7 @@ class ShutdownTest {
 
     @Test
     fun `shutdown when the old WM doesn't`() = runBlocking {
-        val logger = LoggerMock()
+        val logger = LoggerMock().closeWith(LoggerMock::close)
         val testFacade = object : SystemFacadeMock() {
             override fun defaultScreenNumber(): Int = 23
 
@@ -111,7 +112,7 @@ class ShutdownTest {
 
     @Test
     fun `shutdown when the wm can not become screen owner`() = runBlocking {
-        val logger = LoggerMock()
+        val logger = LoggerMock().closeWith(LoggerMock::close)
         val testFacade = object : SystemFacadeMock() {
             var selectionOwnerCounter = 0
 
@@ -160,7 +161,7 @@ class ShutdownTest {
 
     @Test
     fun `shutdown when there is an error response for select input`() = runBlocking {
-        val logger = LoggerMock()
+        val logger = LoggerMock().closeWith(LoggerMock::close)
         val testFacade = object : SystemFacadeMock() {
             private lateinit var errorHandler: XErrorHandler
 
@@ -209,7 +210,7 @@ class ShutdownTest {
 
     @Test
     fun `shutdown after sending shutdown key combo`() = runBlocking {
-        val logger = LoggerMock()
+        val logger = LoggerMock().closeWith(LoggerMock::close)
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {
@@ -276,7 +277,7 @@ class ShutdownTest {
 
     @Test
     fun `shutdown after sending selection clear event`() = runBlocking {
-        val logger = LoggerMock()
+        val logger = LoggerMock().closeWith(LoggerMock::close)
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {

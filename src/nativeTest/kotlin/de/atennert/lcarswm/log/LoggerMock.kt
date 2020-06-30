@@ -14,7 +14,7 @@ class LoggerMock : Logger {
 
     override fun logError(text: String) {}
 
-    override fun close() {
+    fun close() {
         this.closed = true
     }
 }

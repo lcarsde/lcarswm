@@ -1,11 +1,13 @@
 package de.atennert.lcarswm.log
 
+import de.atennert.lcarswm.closeClosables
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
 import platform.posix.FILE
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,13 +23,18 @@ class FileLoggerTest {
         this.posixApi = PosixApiMock(filePointer)
     }
 
+    @AfterTest
+    fun teardown() {
+        closeClosables()
+    }
+
     @Test
     fun `open and close file logger`() {
-        val fileLogger = FileLogger(this.posixApi, this.filePath)
+        FileLogger(this.posixApi, this.filePath)
         assertEquals(this.filePath, this.posixApi.fopenFileName, "handed in file path not used")
         assertEquals("w", this.posixApi.fopenMode, "not using log file for write only")
 
-        fileLogger.close()
+        closeClosables()
         assertEquals(this.filePointer, this.posixApi.fcloseFile, "closed other file then opened")
     }
 
@@ -92,6 +99,7 @@ class FileLoggerTest {
 
         override fun fclose(file: CPointer<FILE>): Int {
             this.fcloseFile = file
+            nativeHeap.free(file.rawValue)
             return 0
         }
 

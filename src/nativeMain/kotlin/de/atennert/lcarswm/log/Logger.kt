@@ -15,7 +15,4 @@ interface Logger {
 
     /** log information in error mode */
     fun logError(text: String)
-
-    /** close logger and free any used resources */
-    fun close()
 }

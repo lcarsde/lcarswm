@@ -1,3 +1,7 @@
+20.3
+* add status-bar tool application
+* add semi-auto-close mechanism for classes in window manager
+
 20.2
 * change of licensing from MIT to GPL V2
 * removal of properties
