@@ -272,6 +272,7 @@ class SystemFacade : SystemApi {
     }
 
     override fun fclose(file: CPointer<FILE>): Int {
+        platform.posix.fflush(file)
         return platform.posix.fclose(file)
     }
 
