@@ -87,11 +87,8 @@ class ConfigureRequestHandlerTest {
         val shutdownValue = configureRequestHandler.handleEvent(configureRequestEvent)
 
         val configureWindowCall = systemApi.functionCalls[0] // there should be only one call for unknown windows
-        println(1)
         val configuredWindow = configureWindowCall.parameters[0]
-        println(configureWindowCall.name)
         val valueMask = (configureWindowCall.parameters[1] as UInt).toULong()
-        println(3)
         @Suppress("UNCHECKED_CAST")
         val windowChanges: XWindowChanges = (configureWindowCall.parameters[2] as CPointer<XWindowChanges>).pointed
 
