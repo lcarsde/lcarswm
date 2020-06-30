@@ -50,11 +50,10 @@ class TextAtomReader(private val system: SystemApi, private val atomLibrary: Ato
         }
         system.xFree(textProperty.value)
         nativeHeap.free(textProperty)
-        return if (name.isEmpty()) {
-            NO_NAME
-        } else {
-            name.toUpperCase()
-        }
+
+        return name.trim()
+                .ifEmpty { NO_NAME }
+                .toUpperCase()
     }
 
     private fun hasCorrectEncoding(textProperty: XTextProperty): Boolean {
