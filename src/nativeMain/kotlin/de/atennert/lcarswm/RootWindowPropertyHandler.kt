@@ -42,6 +42,8 @@ class RootWindowPropertyHandler(
 
         system.mapWindow(this.ewmhSupportWindow)
         system.lowerWindow(this.ewmhSupportWindow)
+
+        closeWith(RootWindowPropertyHandler::destroySupportWindow)
     }
 
     fun becomeScreenOwner(eventTime: EventTime): Boolean {

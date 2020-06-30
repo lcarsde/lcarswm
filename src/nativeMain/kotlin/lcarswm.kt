@@ -58,10 +58,10 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     wmDetected = false
     if (!system.openDisplay()) {
         logger.logError("::runWindowManager::got no display")
-        signalHandler.cleanup()
         closeClosables()
         return@coroutineScope
     }
+    system.closeWith { system.closeDisplay() }
 
     val randrHandlerFactory = RandrHandlerFactory(system, logger)
 
@@ -77,8 +77,6 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     val screen = system.defaultScreenOfDisplay()?.pointed
     if (screen == null) {
         logger.logError("::runWindowManager::got no screen")
-        system.closeDisplay()
-        signalHandler.cleanup()
         closeClosables()
         return@coroutineScope
     }
@@ -93,7 +91,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
 
     if (!rootWindowPropertyHandler.becomeScreenOwner(eventTime)) {
         logger.logError("::runWindowManager::Detected another active window manager")
-        cleanup(system, rootWindowPropertyHandler, signalHandler)
+        closeClosables()
         return@coroutineScope
     }
 
@@ -105,20 +103,22 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
 
     if (wmDetected) {
         logger.logError("::runWindowManager::Detected another active window manager")
-        cleanup(system, rootWindowPropertyHandler, signalHandler)
+        closeClosables()
         return@coroutineScope
     }
 
     system.setErrorHandler(staticCFunction { _, err -> staticLogger?.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
-    rootWindowPropertyHandler.setSupportWindowProperties()
+    rootWindowPropertyHandler
+        .closeWith(RootWindowPropertyHandler::unsetWindowProperties)
+        .setSupportWindowProperties()
 
     eventTime.resetEventTime()
 
     val settings = loadSettings(logger, system)
     if (settings == null) {
         logger.logError("::runWindowManager::unable to load settings")
-        cleanup(system, rootWindowPropertyHandler, signalHandler)
+        closeClosables()
         return@coroutineScope
     }
 
@@ -235,9 +235,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
         uiDrawer,
         colorHandler,
         screen.root,
-        rootWindowPropertyHandler,
         keyManager,
-        signalHandler,
         frameDrawer,
         fontProvider,
         appMenuHandler,
@@ -271,9 +269,7 @@ private fun shutdown(
     rootWindowDrawer: RootWindowDrawer,
     colors: Colors,
     rootWindow: Window,
-    rootWindowPropertyHandler: RootWindowPropertyHandler,
     keyManager: KeyManager,
-    signalHandler: SignalHandler,
     frameDrawer: FrameDrawer,
     fontProvider: FontProvider,
     appMenuHandler: AppMenuHandler,
@@ -288,23 +284,7 @@ private fun shutdown(
     colors.cleanupColorMap()
 
     system.selectInput(rootWindow, NoEventMask)
-    rootWindowPropertyHandler.unsetWindowProperties()
-
     keyManager.cleanup()
-
-    cleanup(system, rootWindowPropertyHandler, signalHandler)
-}
-
-fun cleanup(
-    windowUtils: WindowUtilApi,
-    rootWindowPropertyHandler: RootWindowPropertyHandler,
-    signalHandler: SignalHandler
-) {
-    rootWindowPropertyHandler.destroySupportWindow()
-
-    windowUtils.closeDisplay()
-
-    signalHandler.cleanup()
 
     closeClosables()
 }

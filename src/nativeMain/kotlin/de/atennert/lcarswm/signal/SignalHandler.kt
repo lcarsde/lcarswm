@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.signal
 
+import de.atennert.lcarswm.closeWith
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.*
 import platform.posix.SA_NOCLDSTOP
@@ -35,6 +36,8 @@ class SignalHandler(private val posixApi: PosixApi) {
                 posixApi.sigAction(it, action.ptr, oldSignal.ptr)
                 oldActions[it] = oldSignal
             }
+
+        closeWith(SignalHandler::cleanup)
     }
 
     fun addSignalCallback(signal: Signal, signalHandler: CPointer<CFunction<(Int) -> Unit>>) {
@@ -48,7 +51,7 @@ class SignalHandler(private val posixApi: PosixApi) {
         oldActions[signal] = oldSignal
     }
 
-    fun cleanup() {
+    private fun cleanup() {
         oldActions.forEach { (signalValue, action) ->
             posixApi.sigAction(signalValue, action.ptr, null)
         }
