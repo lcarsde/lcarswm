@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.drawing
 
+import de.atennert.lcarswm.closeWith
 import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -18,6 +19,10 @@ class Colors(private val drawApi: DrawApi, private val screen: Screen) {
     )
 
     val colorMap = allocateCompleteColorMap()
+
+    init {
+        closeWith(Colors::cleanupColorMap)
+    }
 
     private fun allocateCompleteColorMap(): Pair<Colormap, List<ULong>> {
         val colorMapId = drawApi.createColormap(screen.root, screen.root_visual!!, AllocNone)
@@ -38,7 +43,7 @@ class Colors(private val drawApi: DrawApi, private val screen: Screen) {
         return Pair(colorMapId, colorReplies)
     }
 
-    fun cleanupColorMap() {
+    private fun cleanupColorMap() {
         val colorPixels = ULongArray(colorMap.second.size) { colorMap.second[it] }
         drawApi.freeColors(colorMap.first, colorPixels.toCValues(), colorPixels.size)
         drawApi.freeColormap(colorMap.first)

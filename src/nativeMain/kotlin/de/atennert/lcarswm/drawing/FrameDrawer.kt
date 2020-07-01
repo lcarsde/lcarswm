@@ -32,6 +32,10 @@ class FrameDrawer(
     override val colorMap: Colormap
             get() = colors.colorMap.first
 
+    init {
+        closeWith(FrameDrawer::close)
+    }
+
     override fun drawFrame(window: FramedWindow, monitor: Monitor) {
         val windowMeasurements = monitor.getWindowMeasurements()
         val textW = if (monitor.getScreenMode() == ScreenMode.NORMAL) {
@@ -82,7 +86,7 @@ class FrameDrawer(
         nativeHeap.free(rect.rawPtr)
     }
 
-    fun close() {
+    private fun close() {
         nativeHeap.free(activeTextColor.rawPtr)
         nativeHeap.free(inactiveTextColor.rawPtr)
         nativeHeap.free(primaryBarColor.rawPtr)

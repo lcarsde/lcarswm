@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.system
 
+import de.atennert.lcarswm.closeWith
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.*
 import platform.linux.mq_attr
@@ -30,6 +31,8 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
         mqAttributes.mq_curmsgs = 0
 
         mqDes = posixApi.mqOpen(name, oFlags, queuePermissions.convert(), mqAttributes.ptr)
+
+        closeWith(MessageQueue::close)
     }
 
     fun sendMessage(message: String) {
@@ -52,7 +55,7 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
         return null
     }
 
-    fun close() {
+    private fun close() {
         if (posixApi.mqClose(mqDes) == -1 ) {
             return
         }

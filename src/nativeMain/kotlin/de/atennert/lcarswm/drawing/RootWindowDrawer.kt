@@ -41,6 +41,8 @@ class RootWindowDrawer(
             null
         }
         logoText = settings[GeneralSetting.TITLE] ?: "LCARS"
+
+        closeWith(RootWindowDrawer::close)
     }
 
     override fun drawWindowManagerFrame() {
@@ -58,7 +60,7 @@ class RootWindowDrawer(
         drawApi.freePixmap(pixmap)
     }
 
-    fun close() {
+    private fun close() {
         graphicsContexts.forEach { drawApi.freeGC(it) }
         nativeHeap.free(logoColor.rawPtr)
     }

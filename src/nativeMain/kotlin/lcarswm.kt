@@ -15,7 +15,6 @@ import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.MessageQueue
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.SystemApi
-import de.atennert.lcarswm.system.api.WindowUtilApi
 import de.atennert.lcarswm.window.*
 import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.*
@@ -99,6 +98,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
 
     system.selectInput(screen.root, ROOT_WINDOW_MASK)
+
     system.sync(false)
 
     if (wmDetected) {
@@ -106,6 +106,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
         closeClosables()
         return@coroutineScope
     }
+    system.closeWith { system.selectInput(screen.root, NoEventMask) }
 
     system.setErrorHandler(staticCFunction { _, err -> staticLogger?.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
@@ -230,17 +231,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
 
     system.sync(false)
 
-    shutdown(
-        system,
-        uiDrawer,
-        colorHandler,
-        screen.root,
-        keyManager,
-        frameDrawer,
-        fontProvider,
-        appMenuHandler,
-        appMenuMessageQueue
-    )
+    shutdown()
 }
 
 /**
@@ -264,27 +255,8 @@ private fun handleSignal(signalValue: Int) {
 /**
  * Full shutdown routines.
  */
-private fun shutdown(
-    system: SystemApi,
-    rootWindowDrawer: RootWindowDrawer,
-    colors: Colors,
-    rootWindow: Window,
-    keyManager: KeyManager,
-    frameDrawer: FrameDrawer,
-    fontProvider: FontProvider,
-    appMenuHandler: AppMenuHandler,
-    appMenuMessageQueue: MessageQueue
-) {
+private fun shutdown() {
     staticLogger = null
-    appMenuHandler.close()
-    appMenuMessageQueue.close()
-    rootWindowDrawer.close()
-    frameDrawer.close()
-    fontProvider.close()
-    colors.cleanupColorMap()
-
-    system.selectInput(rootWindow, NoEventMask)
-    keyManager.cleanup()
 
     closeClosables()
 }

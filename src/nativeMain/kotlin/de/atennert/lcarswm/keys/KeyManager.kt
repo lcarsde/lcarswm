@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.keys
 
+import de.atennert.lcarswm.closeWith
 import de.atennert.lcarswm.system.api.InputApi
 import kotlinx.cinterop.*
 import xlib.*
@@ -32,6 +33,10 @@ class KeyManager(private val inputApi: InputApi) {
         private set
 
     private var lockMasks = getLockMasks()
+
+    init {
+        closeWith(KeyManager::cleanup)
+    }
 
     private fun getAllModifierKeys(): Map<Modifiers, Int> {
         modifierKeymapReference = inputApi.getModifierMapping()
@@ -188,7 +193,7 @@ class KeyManager(private val inputApi: InputApi) {
     /**
      * Cleanup acquired X data
      */
-    fun cleanup() {
+    private fun cleanup() {
         modifierKeyCodes.clear()
 
         if (modifierKeymapReference != null) {

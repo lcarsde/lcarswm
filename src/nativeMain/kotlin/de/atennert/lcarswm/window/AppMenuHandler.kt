@@ -166,8 +166,4 @@ class AppMenuHandler(
             messageQueue.sendMessage(getWindowListString())
         }
     }
-
-    fun close() {
-        messageQueue.close()
-    }
 }

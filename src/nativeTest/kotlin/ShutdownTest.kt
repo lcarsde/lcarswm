@@ -37,10 +37,26 @@ class ShutdownTest {
     @Test
     fun `shutdown when there's no default screen to get`() = runBlocking {
         val logger = LoggerMock().closeWith(LoggerMock::close)
+        lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
+        lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {
             override fun defaultScreenOfDisplay(): CPointer<Screen>? {
                 super.defaultScreenOfDisplay()
                 return null
+            }
+
+            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+                modifierKeymapRef = super.getModifierMapping()!!
+                return modifierKeymapRef
+            }
+
+            override fun getKeyboardMapping(
+                firstKeyCode: KeyCode,
+                keyCodeCount: Int,
+                keySymsPerKeyCode: CPointer<IntVar>
+            ): CPointer<KeySymVar>? {
+                keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
+                return keymapRef
             }
         }
         runWindowManager(testFacade, logger)
@@ -51,6 +67,7 @@ class ShutdownTest {
             .toMutableList()
 
         checkThatTheLoggerIsClosed(logger)
+        checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatTheDisplayWasClosed(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
@@ -60,6 +77,8 @@ class ShutdownTest {
     @Test
     fun `shutdown when the old WM doesn't`() = runBlocking {
         val logger = LoggerMock().closeWith(LoggerMock::close)
+        lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
+        lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {
             override fun defaultScreenNumber(): Int = 23
 
@@ -92,6 +111,20 @@ class ShutdownTest {
             }
 
             override fun usleep(time: UInt) {}
+
+            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+                modifierKeymapRef = super.getModifierMapping()!!
+                return modifierKeymapRef
+            }
+
+            override fun getKeyboardMapping(
+                firstKeyCode: KeyCode,
+                keyCodeCount: Int,
+                keySymsPerKeyCode: CPointer<IntVar>
+            ): CPointer<KeySymVar>? {
+                keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
+                return keymapRef
+            }
         }
 
         runWindowManager(testFacade, logger)
@@ -104,6 +137,7 @@ class ShutdownTest {
         checkThatTheLoggerIsClosed(logger)
         checkRequestForCurrentSelectionOwner(functionCalls)
         checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatTheDisplayWasClosed(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
@@ -113,6 +147,8 @@ class ShutdownTest {
     @Test
     fun `shutdown when the wm can not become screen owner`() = runBlocking {
         val logger = LoggerMock().closeWith(LoggerMock::close)
+        lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
+        lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {
             var selectionOwnerCounter = 0
 
@@ -142,6 +178,20 @@ class ShutdownTest {
                 event.pointed.xproperty.time = 123.convert()
                 return Success
             }
+
+            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+                modifierKeymapRef = super.getModifierMapping()!!
+                return modifierKeymapRef
+            }
+
+            override fun getKeyboardMapping(
+                firstKeyCode: KeyCode,
+                keyCodeCount: Int,
+                keySymsPerKeyCode: CPointer<IntVar>
+            ): CPointer<KeySymVar>? {
+                keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
+                return keymapRef
+            }
         }
 
         runWindowManager(testFacade, logger)
@@ -153,6 +203,7 @@ class ShutdownTest {
         checkThatTheLoggerIsClosed(logger)
         checkRequestForCurrentSelectionOwner(functionCalls)
         checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatTheDisplayWasClosed(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
@@ -162,6 +213,8 @@ class ShutdownTest {
     @Test
     fun `shutdown when there is an error response for select input`() = runBlocking {
         val logger = LoggerMock().closeWith(LoggerMock::close)
+        lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
+        lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {
             private lateinit var errorHandler: XErrorHandler
 
@@ -190,6 +243,20 @@ class ShutdownTest {
                 event.pointed.xproperty.time = 123.convert()
                 return Success
             }
+
+            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+                modifierKeymapRef = super.getModifierMapping()!!
+                return modifierKeymapRef
+            }
+
+            override fun getKeyboardMapping(
+                firstKeyCode: KeyCode,
+                keyCodeCount: Int,
+                keySymsPerKeyCode: CPointer<IntVar>
+            ): CPointer<KeySymVar>? {
+                keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
+                return keymapRef
+            }
         }
         runWindowManager(testFacade, logger)
 
@@ -202,6 +269,7 @@ class ShutdownTest {
         checkSelectInputSetting(functionCalls, ROOT_WINDOW_MASK)
         checkSynchronizationRequest(functionCalls)
         checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatTheDisplayWasClosed(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
@@ -265,10 +333,10 @@ class ShutdownTest {
         checkFreeingOfGraphicsContexts(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
-        checkSelectInputSetting(functionCalls, NoEventMask)
-        checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkWindowPropertyRemoval(functionCalls, testFacade.atomMap, "_NET_SUPPORTED")
+        checkSelectInputSetting(functionCalls, NoEventMask)
         checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatTheDisplayWasClosed(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
@@ -330,10 +398,10 @@ class ShutdownTest {
         checkFreeingOfGraphicsContexts(functionCalls)
         checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
-        checkSelectInputSetting(functionCalls, NoEventMask)
-        checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkWindowPropertyRemoval(functionCalls, testFacade.atomMap, "_NET_SUPPORTED")
+        checkSelectInputSetting(functionCalls, NoEventMask)
         checkThatSupportWindowWasDestroyed(functionCalls)
+        checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatTheDisplayWasClosed(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
