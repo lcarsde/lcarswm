@@ -101,3 +101,4 @@ Thank you very much to the creators of the following resources:
 * debian build script
   * missing /usr/share/doc/lcarswm/changelog.Debian.gz
   * missing-dependency-on-libc
+* use default settings in /etc/lcarswm/
