@@ -108,9 +108,9 @@ class StatusBarHandler(
         val monitor = monitorManager.getPrimaryMonitor()
 
         return WindowMeasurements(
-            monitor.x + SIDE_BAR_WIDTH + BAR_GAP_SIZE,
+            monitor.x + NORMAL_WINDOW_LEFT_OFFSET,
             monitor.y + BAR_HEIGHT + BAR_GAP_SIZE,
-            (monitor.width - SIDE_BAR_WIDTH - 2 * BAR_END_WIDTH - 2 * BAR_GAP_SIZE).convert(),
+            (monitor.width - NORMAL_WINDOW_LEFT_OFFSET - BAR_GAP_SIZE - BAR_END_WIDTH).convert(),
             (DATA_AREA_HEIGHT).convert(),
             (DATA_AREA_HEIGHT).convert()
         )
