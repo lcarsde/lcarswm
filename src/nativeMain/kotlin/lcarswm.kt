@@ -60,7 +60,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
         closeClosables()
         return@coroutineScope
     }
-    system.closeWith { system.closeDisplay() }
+    system.closeWith { closeDisplay() }
 
     val randrHandlerFactory = RandrHandlerFactory(system, logger)
 
@@ -106,7 +106,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
         closeClosables()
         return@coroutineScope
     }
-    system.closeWith { system.selectInput(screen.root, NoEventMask) }
+    system.closeWith { selectInput(screen.root, NoEventMask) }
 
     system.setErrorHandler(staticCFunction { _, err -> staticLogger?.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
