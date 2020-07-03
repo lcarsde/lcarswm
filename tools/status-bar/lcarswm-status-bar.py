@@ -9,6 +9,11 @@ class LcarswmStatusBar(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="lcarswm status bar")
 
+        grid = Gtk.Grid()
+        grid.set_column_spacing(8)
+        grid.set_row_spacing(8)
+        self.add(grid)
+
         self.connect("realize", self.on_create)
 
     def on_create(self, window):
