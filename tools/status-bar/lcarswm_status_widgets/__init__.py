@@ -1,1 +1,1 @@
-__all__ = ["LcarswmStatusWidget"]
+__all__ = ["LcarswmStatusWidget", "LcarswmStatusTime"]
