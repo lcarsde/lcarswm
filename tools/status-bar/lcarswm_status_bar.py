@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-import lcarswm_status_widgets
-import gi
+from lcarswm import lcarswm_status_time
 
-gi.require_version("Gtk", "3.0")
-from gi.repository import GdkX11, Gdk, Gtk, GLib
+try:
+    import gi
+
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import GdkX11, Gdk, Gtk, GLib
+except ImportError:
+    pass
 
 css = b'''
 .select_button {
@@ -56,7 +60,7 @@ class LcarswmStatusBar(Gtk.Window):
         grid.set_row_spacing(8)
         self.add(grid)
 
-        grid.add(lcarswm_status_widgets.LcarswmStatusTime(0, 0, self.css_provider))
+        grid.add(lcarswm_status_time.LcarswmStatusTime(0, 0, self.css_provider))
 
         self.connect("realize", self.on_create)
 
