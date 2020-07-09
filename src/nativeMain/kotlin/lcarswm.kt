@@ -225,7 +225,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
 
     setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
 
-    runProgram(system, "lcarswm-app-menu.py", listOf())
+    runProgram(system, "lcarswm_app_menu.py", listOf())
 
     runEventLoops(logger, eventManager, eventTime, eventBuffer, appMenuMessageHandler, appMenuMessageQueue)
 
