@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-from lcarswm import lcarswm_status_time
+from lcarswm import status_time
 
-try:
-    import gi
-
-    gi.require_version("Gtk", "3.0")
-    from gi.repository import GdkX11, Gdk, Gtk, GLib
-except ImportError:
-    pass
+import gi
+gi.require_version("Gtk", "3.0")
+from gi.repository import GdkX11, Gdk, Gtk, GLib
 
 css = b'''
+* {
+    font-family: 'Ubuntu Condensed', psans-serif;
+    font-weight: 600;
+}
 .select_button {
-    font-family: 'Ubuntu Condensed', sans-serif;
+    font-family: 'Ubuntu Condensed', psans-serif;
     font-weight: 600;
     font-size: 15px;
     color: #000;
@@ -60,7 +60,7 @@ class LcarswmStatusBar(Gtk.Window):
         grid.set_row_spacing(8)
         self.add(grid)
 
-        grid.add(lcarswm_status_time.LcarswmStatusTime(0, 0, self.css_provider))
+        grid.add(status_time.LcarswmStatusTime(0, 0, self.css_provider))
 
         self.connect("realize", self.on_create)
 

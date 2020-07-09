@@ -51,7 +51,7 @@ class WindowEntry(Gtk.Box):
         Window entry for selecting or closing the associated window
     """
     def __init__(self, window_id, class_name, css_provider, send_queue):
-        super().__init__(spacing=8)
+        Gtk.Box.__init__(self, spacing=8)
 
         self.window_id = window_id
         self.class_name = class_name

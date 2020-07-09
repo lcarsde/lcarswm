@@ -3,11 +3,13 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import GdkX11, Gdk, Gtk, GLib
 
-class LcarswmStatusWidget(Gtk.Widget):
+
+class LcarswmStatusWidget(Gtk.Bin):
     """
     General widget frame for lcarswm status widgets
     """
     def __init__(self, width, height, css_provider):
+        Gtk.Bin.__init__(self)
         self.width = width
         self.heigth = height
 
