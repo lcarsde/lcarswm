@@ -7,6 +7,15 @@ import platform.linux.mq_attr
 import platform.linux.mqd_t
 import platform.posix.*
 
+/**
+ * Adapter class for Posix message queue. The message queue will be created and destroyed
+ * by this implementation. Other end points must connect later to the queue and disconnect
+ * before it is destroyed.
+ *
+ * @param posixApi The Posix API adapter
+ * @param name The name of the message queue, unique identifier for each queue
+ * @param mode The usage mode for this queue in this app: READ, WRITE or READ_WRITE
+ */
 class MessageQueue(private val posixApi: PosixApi, private val name: String, private val mode: Mode) {
 
     enum class Mode (val flag: Int) {
