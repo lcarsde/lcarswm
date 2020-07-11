@@ -55,6 +55,10 @@ class LcarswmStatusBar(Gtk.Window):
         self.css_provider = Gtk.CssProvider()
         self.css_provider.load_from_data(css)
 
+        self.set_decorated(False)
+        self.get_style_context().add_class("window")
+        self.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
         grid = Gtk.Grid()
         grid.set_column_spacing(8)
         grid.set_row_spacing(8)
