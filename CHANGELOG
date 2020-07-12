@@ -1,6 +1,7 @@
 20.3
 * add status-bar tool application
 * add semi-auto-close mechanism for classes in window manager
+* use coroutines for event loops to decouple them from each other
 
 20.2
 * change of licensing from MIT to GPL V2
