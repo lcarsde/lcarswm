@@ -1,11 +1,12 @@
-import de.atennert.lcarswm.*
+package de.atennert.lcarswm
+
+import XRANDR_MASK
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.drawing.*
 import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.keys.KeyConfiguration
 import de.atennert.lcarswm.keys.KeyManager
-import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
@@ -13,52 +14,20 @@ import de.atennert.lcarswm.settings.SettingsReader
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.MessageQueue
-import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.*
-import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.*
-import kotlinx.coroutines.*
-import platform.posix.WNOHANG
 import platform.posix.waitpid
 import xlib.*
 
-private var wmDetected = false
-
-// this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
-private var staticLogger: Logger? = null
-
-private val exitState = atomic<Int?>(null)
-
-const val ROOT_WINDOW_MASK = SubstructureRedirectMask or StructureNotifyMask or PropertyChangeMask or
-        FocusChangeMask or KeyPressMask or KeyReleaseMask
-
-const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotifyMask or
-        RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
-
-// the main method apparently must not be inside of a package so it can be compiled with Kotlin/Native
-fun main() = runBlocking {
-    val system = SystemFacade()
-    val cacheDirPath = system.getenv(HOME_CACHE_DIR_PROPERTY)?.toKString() ?: error("::main::cache dir not set")
-    val logger = FileLogger(system, cacheDirPath + LOG_FILE_PATH)
-
-    runWindowManager(system, logger)
-
-    system.exit(exitState.value ?: -1)
-}
-
-suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope {
-    logger.logInfo("::runWindowManager::start lcarswm initialization")
-    exitState.value = null
-    staticLogger = logger
-
+fun startup(system: SystemApi, logger: Logger): EventDistributor? {
     val signalHandler = SignalHandler(system)
 
     wmDetected = false
     if (!system.openDisplay()) {
         logger.logError("::runWindowManager::got no display")
         closeClosables()
-        return@coroutineScope
+        return null
     }
     system.closeWith { closeDisplay() }
 
@@ -77,7 +46,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     if (screen == null) {
         logger.logError("::runWindowManager::got no screen")
         closeClosables()
-        return@coroutineScope
+        return null
     }
 
     system.synchronize(false)
@@ -91,7 +60,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     if (!rootWindowPropertyHandler.becomeScreenOwner(eventTime)) {
         logger.logError("::runWindowManager::Detected another active window manager")
         closeClosables()
-        return@coroutineScope
+        return null
     }
 
     system.sync(false)
@@ -104,7 +73,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     if (wmDetected) {
         logger.logError("::runWindowManager::Detected another active window manager")
         closeClosables()
-        return@coroutineScope
+        return null
     }
     system.closeWith { selectInput(screen.root, NoEventMask) }
 
@@ -120,7 +89,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     if (settings == null) {
         logger.logError("::runWindowManager::unable to load settings")
         closeClosables()
-        return@coroutineScope
+        return null
     }
 
     logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: ${screen.root}")
@@ -225,13 +194,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
 
     setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
 
-    runProgram(system, "lcarswm_app_menu.py", listOf())
-
-    runEventLoops(logger, eventManager, eventTime, eventBuffer, appMenuMessageHandler, appMenuMessageQueue)
-
-    system.sync(false)
-
-    shutdown()
+    return eventManager
 }
 
 /**
@@ -245,20 +208,11 @@ private fun handleSignal(signalValue: Int) {
         Signal.USR2 -> staticLogger?.logInfo("Ignoring signal $signal")
         Signal.TTIN -> staticLogger?.logInfo("Ignoring signal $signal")
         Signal.TTOU -> staticLogger?.logInfo("Ignoring signal $signal")
-        Signal.CHLD -> while (waitpid(-1, null, WNOHANG) > 0);
+        Signal.CHLD -> while (waitpid(-1, null, platform.posix.WNOHANG) > 0);
         Signal.TERM -> exitState.value = 0
         Signal.INT -> exitState.value = 0
         else -> exitState.value = 1
     }
-}
-
-/**
- * Full shutdown routines.
- */
-private fun shutdown() {
-    staticLogger = null
-
-    closeClosables()
 }
 
 private fun setDisplayEnvironment(system: SystemApi) {
@@ -365,74 +319,4 @@ private fun createEventManager(
         .addEventHandler(MappingNotifyHandler(logger, keyManager, keyConfiguration, rootWindowId))
         .addEventHandler(PropertyNotifyHandler(atomLibrary, windowRegistration, textAtomReader, frameDrawer, windowCoordinator, rootWindowId))
         .build()
-}
-
-private suspend fun runEventLoops(
-    logger: Logger,
-    eventDistributor: EventDistributor,
-    eventTime: EventTime,
-    eventBuffer: EventBuffer,
-    appMenuMessageHandler: AppMenuMessageHandler,
-    appMenuMessageQueue: MessageQueue
-) = coroutineScope {
-
-    val appMenuJob = runAppMenuLoop(logger, appMenuMessageQueue, appMenuMessageHandler)
-    val xEventJob = runXEventLoop(logger, eventBuffer, eventTime, eventDistributor)
-
-    // When the X event loop goes down, so does everything else
-    xEventJob.invokeOnCompletion {
-        appMenuJob.cancel()
-    }
-
-    appMenuJob.join()
-    logger.logDebug("::eventLoop::finished event loops")
-}
-
-private fun CoroutineScope.runXEventLoop(
-    logger: Logger,
-    eventBuffer: EventBuffer,
-    eventTime: EventTime,
-    eventDistributor: EventDistributor
-): Job {
-    val xEventJob = launch {
-        logger.logDebug("::runXEventLoop::running X event loop")
-        while (exitState.value == null) {
-            val xEvent = eventBuffer.getNextEvent(false)?.pointed
-
-            if (xEvent == null) {
-                delay(50)
-                continue
-            }
-
-            eventTime.setTimeFromEvent(xEvent.ptr)
-
-            if (eventDistributor.handleEvent(xEvent)) {
-                exitState.value = 0
-            }
-
-            eventTime.unsetEventTime()
-
-            nativeHeap.free(xEvent)
-        }
-    }
-    xEventJob.invokeOnCompletion { logger.logDebug("::runXEventLoop::X event job completed") }
-    return xEventJob
-}
-
-private fun CoroutineScope.runAppMenuLoop(
-    logger: Logger,
-    appMenuMessageQueue: MessageQueue,
-    appMenuMessageHandler: AppMenuMessageHandler
-): Job {
-    val appMenuJob = launch {
-        logger.logDebug("::runAppMenuLoop::running app menu job")
-        while (true) {
-            appMenuMessageQueue.receiveMessage()?.let {
-                appMenuMessageHandler.handleMessage(it)
-            }
-            delay(100)
-        }
-    }
-    appMenuJob.invokeOnCompletion { logger.logDebug("::runAppMenuLoop::app menu job completed") }
-    return appMenuJob
 }
