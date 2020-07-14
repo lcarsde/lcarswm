@@ -11,6 +11,9 @@ import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
+import de.atennert.lcarswm.runtime.AppMenuResources
+import de.atennert.lcarswm.runtime.RuntimeResources
+import de.atennert.lcarswm.runtime.XEventResources
 import de.atennert.lcarswm.settings.SettingsReader
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.signal.SignalHandler
@@ -25,7 +28,7 @@ import xlib.*
 
 private var wmDetected = false
 
-fun startup(system: SystemApi, logger: Logger, exitState: AtomicRef<Int?>): EventDistributor? {
+fun startup(system: SystemApi, logger: Logger, exitState: AtomicRef<Int?>): RuntimeResources? {
     val signalHandler = SignalHandler(system)
 
     wmDetected = false
@@ -199,7 +202,10 @@ fun startup(system: SystemApi, logger: Logger, exitState: AtomicRef<Int?>): Even
 
     setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
 
-    return eventManager
+    val xEventResources = XEventResources(eventManager, eventTime, eventBuffer)
+    val appMenuResources = AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
+
+    return RuntimeResources(xEventResources, appMenuResources)
 }
 
 /**
