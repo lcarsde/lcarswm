@@ -1,5 +1,6 @@
 package de.atennert.lcarswm
 
+import ROOT_WINDOW_MASK
 import XRANDR_MASK
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.TextAtomReader
@@ -16,11 +17,15 @@ import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.MessageQueue
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.*
+import kotlinx.atomicfu.AtomicRef
 import kotlinx.cinterop.*
 import platform.posix.waitpid
+import staticLogger
 import xlib.*
 
-fun startup(system: SystemApi, logger: Logger): EventDistributor? {
+private var wmDetected = false
+
+fun startup(system: SystemApi, logger: Logger, exitState: AtomicRef<Int?>): EventDistributor? {
     val signalHandler = SignalHandler(system)
 
     wmDetected = false
@@ -40,7 +45,7 @@ fun startup(system: SystemApi, logger: Logger): EventDistributor? {
     val eventBuffer = EventBuffer(system)
 
     listOf(Signal.USR1, Signal.USR2, Signal.TERM, Signal.INT, Signal.HUP, Signal.PIPE, Signal.CHLD, Signal.TTIN, Signal.TTOU)
-        .forEach { signalHandler.addSignalCallback(it, staticCFunction { signal -> handleSignal(signal) }) }
+        .forEach { signalHandler.addSignalCallback(it, staticCFunction { signal -> handleSignal(signal, exitState) }) }
 
     val screen = system.defaultScreenOfDisplay()?.pointed
     if (screen == null) {
@@ -200,7 +205,7 @@ fun startup(system: SystemApi, logger: Logger): EventDistributor? {
 /**
  * Signal handler for usual stuff.
  */
-private fun handleSignal(signalValue: Int) {
+private fun handleSignal(signalValue: Int, exitState: AtomicRef<Int?>) {
     val signal = Signal.values().single { it.signalValue == signalValue }
     staticLogger?.logDebug("::handleSignal::signal: $signal")
     when (signal) {

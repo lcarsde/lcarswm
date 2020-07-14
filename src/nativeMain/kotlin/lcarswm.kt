@@ -26,9 +26,9 @@ import xlib.*
 private var wmDetected = false
 
 // this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
-private var staticLogger: Logger? = null
+var staticLogger: Logger? = null
 
-private val exitState = atomic<Int?>(null)
+val exitState = atomic<Int?>(null)
 
 const val ROOT_WINDOW_MASK = SubstructureRedirectMask or StructureNotifyMask or PropertyChangeMask or
         FocusChangeMask or KeyPressMask or KeyReleaseMask
