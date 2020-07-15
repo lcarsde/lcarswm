@@ -29,6 +29,7 @@ class ShutdownTest {
             .toMutableList()
 
         checkThatTheLoggerIsClosed(logger)
+        checkSynchronizationRequest(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
 
         checkThatThereIsNoUnexpectedInteraction(functionCalls)
@@ -67,6 +68,7 @@ class ShutdownTest {
             .toMutableList()
 
         checkThatTheLoggerIsClosed(logger)
+        checkSynchronizationRequest(functionCalls)
         checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatTheDisplayWasClosed(functionCalls)
         checkCleanupOfSignals(functionCalls, testFacade.signalActions.keys)
@@ -136,6 +138,7 @@ class ShutdownTest {
 
         checkThatTheLoggerIsClosed(logger)
         checkRequestForCurrentSelectionOwner(functionCalls)
+        checkSynchronizationRequest(functionCalls)
         checkThatSupportWindowWasDestroyed(functionCalls)
         checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatTheDisplayWasClosed(functionCalls)
@@ -202,6 +205,7 @@ class ShutdownTest {
 
         checkThatTheLoggerIsClosed(logger)
         checkRequestForCurrentSelectionOwner(functionCalls)
+        checkSynchronizationRequest(functionCalls)
         checkThatSupportWindowWasDestroyed(functionCalls)
         checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)
         checkThatTheDisplayWasClosed(functionCalls)
@@ -267,6 +271,7 @@ class ShutdownTest {
         checkThatTheLoggerIsClosed(logger)
         checkSettingOfErrorHandler(functionCalls)
         checkSelectInputSetting(functionCalls, ROOT_WINDOW_MASK)
+        checkSynchronizationRequest(functionCalls)
         checkSynchronizationRequest(functionCalls)
         checkThatSupportWindowWasDestroyed(functionCalls)
         checkThatKeyBindingsWereFreed(functionCalls, modifierKeymapRef, keymapRef)

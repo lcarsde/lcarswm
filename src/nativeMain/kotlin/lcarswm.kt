@@ -8,11 +8,11 @@ import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
-import de.atennert.lcarswm.monitor.MonitorManagerImpl
+import de.atennert.lcarswm.runtime.AppMenuResources
+import de.atennert.lcarswm.runtime.RuntimeResources
+import de.atennert.lcarswm.runtime.XEventResources
 import de.atennert.lcarswm.settings.SettingsReader
 import de.atennert.lcarswm.signal.Signal
-import de.atennert.lcarswm.signal.SignalHandler
-import de.atennert.lcarswm.system.MessageQueue
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.*
@@ -52,332 +52,35 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     exitState.value = null
     staticLogger = logger
 
-    val signalHandler = SignalHandler(system)
+    val runtimeResources = startup(system, logger)
 
-    wmDetected = false
-    if (!system.openDisplay()) {
-        logger.logError("::runWindowManager::got no display")
-        closeClosables()
-        return@coroutineScope
-    }
-    system.closeWith { closeDisplay() }
+    runtimeResources?.let {
+        runProgram(system, "lcarswm_app_menu.py", listOf())
 
-    val randrHandlerFactory = RandrHandlerFactory(system, logger)
-
-    val atomLibrary = AtomLibrary(system)
-
-    val keyManager = KeyManager(system)
-
-    val eventBuffer = EventBuffer(system)
-
-    listOf(Signal.USR1, Signal.USR2, Signal.TERM, Signal.INT, Signal.HUP, Signal.PIPE, Signal.CHLD, Signal.TTIN, Signal.TTOU)
-        .forEach { signalHandler.addSignalCallback(it, staticCFunction { signal -> handleSignal(signal) }) }
-
-    val screen = system.defaultScreenOfDisplay()?.pointed
-    if (screen == null) {
-        logger.logError("::runWindowManager::got no screen")
-        closeClosables()
-        return@coroutineScope
+        runEventLoops(logger, it)
     }
 
-    system.synchronize(false)
-
-    setDisplayEnvironment(system)
-
-    val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, screen.root, atomLibrary, eventBuffer)
-
-    val eventTime = EventTime(system, eventBuffer, atomLibrary, rootWindowPropertyHandler)
-
-    if (!rootWindowPropertyHandler.becomeScreenOwner(eventTime)) {
-        logger.logError("::runWindowManager::Detected another active window manager")
-        closeClosables()
-        return@coroutineScope
-    }
-
-    system.sync(false)
-    system.setErrorHandler(staticCFunction { _, _ -> wmDetected = true; 0 })
-
-    system.selectInput(screen.root, ROOT_WINDOW_MASK)
-
-    system.sync(false)
-
-    if (wmDetected) {
-        logger.logError("::runWindowManager::Detected another active window manager")
-        closeClosables()
-        return@coroutineScope
-    }
-    system.closeWith { selectInput(screen.root, NoEventMask) }
-
-    system.setErrorHandler(staticCFunction { _, err -> staticLogger?.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
-
-    rootWindowPropertyHandler
-        .closeWith(RootWindowPropertyHandler::unsetWindowProperties)
-        .setSupportWindowProperties()
-
-    eventTime.resetEventTime()
-
-    val settings = loadSettings(logger, system)
-    if (settings == null) {
-        logger.logError("::runWindowManager::unable to load settings")
-        closeClosables()
-        return@coroutineScope
-    }
-
-    logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: ${screen.root}")
-
-    val monitorManager = MonitorManagerImpl(system, screen.root)
-
-    val fontProvider = FontProvider(system, settings.generalSettings, system.defaultScreenNumber())
-    val colorHandler = Colors(system, screen)
-    val uiDrawer =
-        RootWindowDrawer(system, system, monitorManager, screen, colorHandler, settings.generalSettings, fontProvider)
-
-    keyManager.ungrabAllKeys(screen.root)
-
-    val keyConfiguration = KeyConfiguration(
-        system,
-        settings.keyBindings,
-        keyManager,
-        screen.root
-    )
-
-    system.sync(false)
-
-    val focusHandler = WindowFocusHandler()
-
-    val frameDrawer = FrameDrawer(system, system, focusHandler, fontProvider, colorHandler, screen)
-
-    val windowCoordinator = ActiveWindowCoordinator(system, monitorManager, frameDrawer)
-
-    val screenChangeHandler =
-        setupRandr(system, randrHandlerFactory, monitorManager, windowCoordinator, uiDrawer, screen.root)
-
-    val windowNameReader = TextAtomReader(system, atomLibrary)
-
-    val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager, screen.root)
-    val statusBarHandler = StatusBarHandler(system, atomLibrary, monitorManager, screen.root)
-
-    val appMenuMessageQueue = MessageQueue(system, "/lcarswm-app-menu-messages", MessageQueue.Mode.READ)
-
-    val windowList = WindowList()
-
-    val appMenuMessageHandler = AppMenuMessageHandler(logger, system, atomLibrary, windowList, focusHandler)
-
-    val windowRegistration = WindowHandler(
-        system,
-        logger,
-        windowCoordinator,
-        focusHandler,
-        atomLibrary,
-        screen,
-        windowNameReader,
-        appMenuHandler,
-        statusBarHandler,
-        windowList
-    )
-
-    focusHandler.registerObserver { activeWindow, _ ->
-        if (activeWindow != null) {
-            system.setInputFocus(activeWindow, RevertToNone, eventTime.lastEventTime)
-        } else {
-            system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
-        }
-    }
-
-    focusHandler.registerObserver { activeWindow, oldWindow ->
-        listOf(oldWindow, activeWindow).forEach {
-            it?.let { ow ->
-                windowRegistration[ow]?.let { fw ->
-                    frameDrawer.drawFrame(fw, windowCoordinator.getMonitorForWindow(ow))
-                }
-            }
-        }
-    }
-
-    focusHandler.registerObserver { activeWindow, _ ->
-        activeWindow?.let { windowCoordinator.stackWindowToTheTop(it) }
-    }
-
-    monitorManager.registerObserver(appMenuHandler)
-    monitorManager.registerObserver(statusBarHandler)
-
-    windowList.registerObserver(appMenuHandler.windowListObserver)
-
-    val eventManager = createEventManager(
-        system,
-        logger,
-        monitorManager,
-        windowRegistration,
-        windowCoordinator,
-        focusHandler,
-        keyManager,
-        uiDrawer,
-        atomLibrary,
-        screenChangeHandler,
-        keyConfiguration,
-        windowNameReader,
-        appMenuHandler,
-        statusBarHandler,
-        frameDrawer,
-        windowList,
-        screen.root
-    )
-
-    setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
-
-    runProgram(system, "lcarswm_app_menu.py", listOf())
-
-    runEventLoops(logger, eventManager, eventTime, eventBuffer, appMenuMessageHandler, appMenuMessageQueue)
-
-    system.sync(false)
-
-    shutdown()
-}
-
-/**
- * Signal handler for usual stuff.
- */
-private fun handleSignal(signalValue: Int) {
-    val signal = Signal.values().single { it.signalValue == signalValue }
-    staticLogger?.logDebug("::handleSignal::signal: $signal")
-    when (signal) {
-        Signal.USR1 -> staticLogger?.logInfo("Ignoring signal $signal")
-        Signal.USR2 -> staticLogger?.logInfo("Ignoring signal $signal")
-        Signal.TTIN -> staticLogger?.logInfo("Ignoring signal $signal")
-        Signal.TTOU -> staticLogger?.logInfo("Ignoring signal $signal")
-        Signal.CHLD -> while (waitpid(-1, null, WNOHANG) > 0);
-        Signal.TERM -> exitState.value = 0
-        Signal.INT -> exitState.value = 0
-        else -> exitState.value = 1
-    }
+    shutdown(system)
 }
 
 /**
  * Full shutdown routines.
  */
-private fun shutdown() {
+private fun shutdown(system: SystemApi) {
+    system.sync(false)
+
     staticLogger = null
 
     closeClosables()
 }
 
-private fun setDisplayEnvironment(system: SystemApi) {
-    val displayString = system.getDisplayString()
-    system.setenv("DISPLAY", displayString)
-}
-
-private fun setupScreen(
-    system: SystemApi,
-    rootWindow: Window,
-    rootWindowPropertyHandler: RootWindowPropertyHandler,
-    windowRegistration: WindowHandler
-) {
-    system.grabServer()
-
-    val returnedWindows = ULongArray(1)
-    val returnedParent = ULongArray(1)
-    val topLevelWindows = nativeHeap.allocPointerTo<ULongVarOf<Window>>()
-    val topLevelWindowCount = UIntArray(1)
-
-    system.queryTree(
-        rootWindow, returnedWindows.toCValues(), returnedParent.toCValues(),
-        topLevelWindows.ptr,
-        topLevelWindowCount.toCValues()
-    )
-
-    ULongArray(topLevelWindowCount[0].convert()) { topLevelWindows.value!![it] }
-        .filter { childId -> childId != rootWindow }
-        .filter { childId -> childId != rootWindowPropertyHandler.ewmhSupportWindow }
-        .forEach { childId ->
-            windowRegistration.addWindow(childId, true)
-        }
-
-    nativeHeap.free(topLevelWindows)
-    system.ungrabServer()
-}
-
-/**
- * Load the key configuration from the users key configuration file.
- */
-private fun loadSettings(logger: Logger, systemApi: SystemApi): SettingsReader? {
-    val configPathBytes = systemApi.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return null
-    val configPath = configPathBytes.toKString()
-
-    return SettingsReader(logger, systemApi, configPath)
-}
-
-/**
- * @return RANDR base value
- */
-private fun setupRandr(
-    system: SystemApi,
-    randrHandlerFactory: RandrHandlerFactory,
-    monitorManager: MonitorManager,
-    windowCoordinator: WindowCoordinator,
-    uiDrawer: UIDrawing,
-    rootWindowId: Window
-): XEventHandler {
-    val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler(monitorManager, windowCoordinator, uiDrawer)
-    val fakeEvent = nativeHeap.alloc<XEvent>()
-    screenChangeHandler.handleEvent(fakeEvent)
-    nativeHeap.free(fakeEvent)
-
-    system.rSelectInput(rootWindowId, XRANDR_MASK.convert())
-
-    return screenChangeHandler
-}
-
-/**
- * Create the event handling for the event loop.
- */
-private fun createEventManager(
-    system: SystemApi,
-    logger: Logger,
-    monitorManager: MonitorManager,
-    windowRegistration: WindowRegistration,
-    windowCoordinator: WindowCoordinator,
-    focusHandler: WindowFocusHandler,
-    keyManager: KeyManager,
-    uiDrawer: UIDrawing,
-    atomLibrary: AtomLibrary,
-    screenChangeHandler: XEventHandler,
-    keyConfiguration: KeyConfiguration,
-    textAtomReader: TextAtomReader,
-    appMenuHandler: AppMenuHandler,
-    statusBarHandler: StatusBarHandler,
-    frameDrawer: FrameDrawer,
-    windowList: WindowList,
-    rootWindowId: Window
-): EventDistributor {
-
-    return EventDistributor.Builder(logger)
-        .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler, statusBarHandler))
-        .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler, statusBarHandler))
-        .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler))
-        .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, monitorManager, windowCoordinator, focusHandler, uiDrawer))
-        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, atomLibrary))
-        .addEventHandler(MapRequestHandler(logger, windowRegistration))
-        .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
-        .addEventHandler(screenChangeHandler)
-        .addEventHandler(ReparentNotifyHandler(logger, windowRegistration))
-        .addEventHandler(ClientMessageHandler(logger, atomLibrary))
-        .addEventHandler(SelectionClearHandler(logger))
-        .addEventHandler(MappingNotifyHandler(logger, keyManager, keyConfiguration, rootWindowId))
-        .addEventHandler(PropertyNotifyHandler(atomLibrary, windowRegistration, textAtomReader, frameDrawer, windowCoordinator, rootWindowId))
-        .build()
-}
-
 private suspend fun runEventLoops(
     logger: Logger,
-    eventDistributor: EventDistributor,
-    eventTime: EventTime,
-    eventBuffer: EventBuffer,
-    appMenuMessageHandler: AppMenuMessageHandler,
-    appMenuMessageQueue: MessageQueue
+    runtimeResources: RuntimeResources
 ) = coroutineScope {
 
-    val appMenuJob = runAppMenuLoop(logger, appMenuMessageQueue, appMenuMessageHandler)
-    val xEventJob = runXEventLoop(logger, eventBuffer, eventTime, eventDistributor)
+    val appMenuJob = runAppMenuLoop(logger, runtimeResources.appMenu)
+    val xEventJob = runXEventLoop(logger, runtimeResources.xEvent)
 
     // When the X event loop goes down, so does everything else
     xEventJob.invokeOnCompletion {
@@ -390,10 +93,12 @@ private suspend fun runEventLoops(
 
 private fun CoroutineScope.runXEventLoop(
     logger: Logger,
-    eventBuffer: EventBuffer,
-    eventTime: EventTime,
-    eventDistributor: EventDistributor
+    xEventResources: XEventResources
 ): Job {
+    val eventBuffer = xEventResources.eventBuffer
+    val eventTime = xEventResources.eventTime
+    val eventDistributor = xEventResources.eventHandler
+
     val xEventJob = launch {
         logger.logDebug("::runXEventLoop::running X event loop")
         while (exitState.value == null) {
@@ -421,9 +126,11 @@ private fun CoroutineScope.runXEventLoop(
 
 private fun CoroutineScope.runAppMenuLoop(
     logger: Logger,
-    appMenuMessageQueue: MessageQueue,
-    appMenuMessageHandler: AppMenuMessageHandler
+    appMenuResources: AppMenuResources
 ): Job {
+    val appMenuMessageQueue = appMenuResources.messageQueue
+    val appMenuMessageHandler = appMenuResources.messageHandler
+
     val appMenuJob = launch {
         logger.logDebug("::runAppMenuLoop::running app menu job")
         while (true) {

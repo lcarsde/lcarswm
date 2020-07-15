@@ -35,7 +35,6 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     wmDetected = false
     if (!system.openDisplay()) {
         logger.logError("::runWindowManager::got no display")
-        closeClosables()
         return null
     }
     system.closeWith { closeDisplay() }
@@ -54,7 +53,6 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     val screen = system.defaultScreenOfDisplay()?.pointed
     if (screen == null) {
         logger.logError("::runWindowManager::got no screen")
-        closeClosables()
         return null
     }
 
@@ -68,7 +66,6 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     if (!rootWindowPropertyHandler.becomeScreenOwner(eventTime)) {
         logger.logError("::runWindowManager::Detected another active window manager")
-        closeClosables()
         return null
     }
 
@@ -81,7 +78,6 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     if (wmDetected) {
         logger.logError("::runWindowManager::Detected another active window manager")
-        closeClosables()
         return null
     }
     system.closeWith { selectInput(screen.root, NoEventMask) }
@@ -97,7 +93,6 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     val settings = loadSettings(logger, system)
     if (settings == null) {
         logger.logError("::runWindowManager::unable to load settings")
-        closeClosables()
         return null
     }
 
