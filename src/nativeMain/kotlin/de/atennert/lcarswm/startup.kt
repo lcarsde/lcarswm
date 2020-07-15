@@ -18,6 +18,7 @@ import de.atennert.lcarswm.settings.SettingsReader
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.MessageQueue
+import de.atennert.lcarswm.system.api.PosixApi
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.*
 import exitState
@@ -202,6 +203,10 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     val appMenuResources = AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
 
     return RuntimeResources(xEventResources, appMenuResources)
+}
+
+fun runLcarswmTools(posixApi: PosixApi) {
+    runProgram(posixApi, "lcarswm_app_menu.py", listOf())
 }
 
 /**

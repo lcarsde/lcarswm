@@ -1,29 +1,15 @@
 import de.atennert.lcarswm.*
-import de.atennert.lcarswm.atom.AtomLibrary
-import de.atennert.lcarswm.atom.TextAtomReader
-import de.atennert.lcarswm.drawing.*
-import de.atennert.lcarswm.events.*
-import de.atennert.lcarswm.keys.KeyConfiguration
-import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
-import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.runtime.AppMenuResources
 import de.atennert.lcarswm.runtime.RuntimeResources
 import de.atennert.lcarswm.runtime.XEventResources
-import de.atennert.lcarswm.settings.SettingsReader
-import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.SystemApi
-import de.atennert.lcarswm.window.*
 import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
-import platform.posix.WNOHANG
-import platform.posix.waitpid
 import xlib.*
-
-private var wmDetected = false
 
 // this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
 var staticLogger: Logger? = null
@@ -55,7 +41,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     val runtimeResources = startup(system, logger)
 
     runtimeResources?.let {
-        runProgram(system, "lcarswm_app_menu.py", listOf())
+        runLcarswmTools(system)
 
         runEventLoops(logger, it)
     }
