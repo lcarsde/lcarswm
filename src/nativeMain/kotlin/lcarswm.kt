@@ -49,17 +49,6 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     shutdown(system)
 }
 
-/**
- * Full shutdown routines.
- */
-private fun shutdown(system: SystemApi) {
-    system.sync(false)
-
-    staticLogger = null
-
-    closeClosables()
-}
-
 private suspend fun runEventLoops(
     logger: Logger,
     runtimeResources: RuntimeResources
