@@ -20,6 +20,7 @@ import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.MessageQueue
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.*
+import exitState
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.cinterop.*
 import platform.posix.waitpid
@@ -28,7 +29,7 @@ import xlib.*
 
 private var wmDetected = false
 
-fun startup(system: SystemApi, logger: Logger, exitState: AtomicRef<Int?>): RuntimeResources? {
+fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     val signalHandler = SignalHandler(system)
 
     wmDetected = false
