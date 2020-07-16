@@ -26,7 +26,7 @@ import xlib.*
 
 private var wmDetected = false
 
-private const val ROOT_WINDOW_MASK = SubstructureRedirectMask or StructureNotifyMask or PropertyChangeMask or
+const val ROOT_WINDOW_MASK = SubstructureRedirectMask or StructureNotifyMask or PropertyChangeMask or
         FocusChangeMask or KeyPressMask or KeyReleaseMask
 
 private const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotifyMask or

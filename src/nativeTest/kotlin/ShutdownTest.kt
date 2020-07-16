@@ -1,3 +1,4 @@
+import de.atennert.lcarswm.lifecycle.ROOT_WINDOW_MASK
 import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.signal.Signal
