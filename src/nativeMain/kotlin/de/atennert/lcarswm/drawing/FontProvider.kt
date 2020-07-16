@@ -1,7 +1,7 @@
 package de.atennert.lcarswm.drawing
 
 import de.atennert.lcarswm.WINDOW_TITLE_FONT_SIZE
-import de.atennert.lcarswm.closeWith
+import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.settings.GeneralSetting
 import de.atennert.lcarswm.system.api.FontApi
 import kotlinx.cinterop.nativeHeap

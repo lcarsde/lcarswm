@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.log
 
-import de.atennert.lcarswm.closeWith
+import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.CPointer
 import platform.posix.FILE

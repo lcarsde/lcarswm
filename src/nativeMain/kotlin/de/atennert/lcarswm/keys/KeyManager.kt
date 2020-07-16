@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.keys
 
-import de.atennert.lcarswm.closeWith
+import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.system.api.InputApi
 import kotlinx.cinterop.*
 import xlib.*

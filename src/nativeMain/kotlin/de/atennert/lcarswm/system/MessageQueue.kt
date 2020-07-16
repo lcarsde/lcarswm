@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.system
 
-import de.atennert.lcarswm.closeWith
+import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.*
 import platform.linux.mq_attr

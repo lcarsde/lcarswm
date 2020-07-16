@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.log
 
-import de.atennert.lcarswm.closeClosables
+import de.atennert.lcarswm.lifecycle.closeClosables
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.alloc

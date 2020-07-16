@@ -1,4 +1,4 @@
-import de.atennert.lcarswm.closeWith
+import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.FunctionCall

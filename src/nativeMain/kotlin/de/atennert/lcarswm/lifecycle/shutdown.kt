@@ -1,6 +1,5 @@
 package de.atennert.lcarswm.lifecycle
 
-import de.atennert.lcarswm.closeClosables
 import de.atennert.lcarswm.system.api.SystemApi
 import staticLogger
 
