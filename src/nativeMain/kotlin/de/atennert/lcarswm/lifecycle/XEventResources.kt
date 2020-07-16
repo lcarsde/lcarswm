@@ -1,4 +1,4 @@
-package de.atennert.lcarswm.runtime
+package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.events.EventBuffer
 import de.atennert.lcarswm.events.EventDistributor

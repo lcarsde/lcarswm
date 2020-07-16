@@ -1,7 +1,6 @@
-package de.atennert.lcarswm
+package de.atennert.lcarswm.lifecycle
 
-import ROOT_WINDOW_MASK
-import XRANDR_MASK
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.drawing.*
@@ -11,9 +10,6 @@ import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
-import de.atennert.lcarswm.runtime.AppMenuResources
-import de.atennert.lcarswm.runtime.RuntimeResources
-import de.atennert.lcarswm.runtime.XEventResources
 import de.atennert.lcarswm.settings.SettingsReader
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.signal.SignalHandler
@@ -29,6 +25,12 @@ import staticLogger
 import xlib.*
 
 private var wmDetected = false
+
+private const val ROOT_WINDOW_MASK = SubstructureRedirectMask or StructureNotifyMask or PropertyChangeMask or
+        FocusChangeMask or KeyPressMask or KeyReleaseMask
+
+private const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotifyMask or
+        RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
 
 fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     val signalHandler = SignalHandler(system)
@@ -49,7 +51,12 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     val eventBuffer = EventBuffer(system)
 
     listOf(Signal.USR1, Signal.USR2, Signal.TERM, Signal.INT, Signal.HUP, Signal.PIPE, Signal.CHLD, Signal.TTIN, Signal.TTOU)
-        .forEach { signalHandler.addSignalCallback(it, staticCFunction { signal -> handleSignal(signal, exitState) }) }
+        .forEach { signalHandler.addSignalCallback(it, staticCFunction { signal ->
+            handleSignal(
+                signal,
+                exitState
+            )
+        }) }
 
     val screen = system.defaultScreenOfDisplay()?.pointed
     if (screen == null) {
@@ -61,7 +68,13 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     setDisplayEnvironment(system)
 
-    val rootWindowPropertyHandler = RootWindowPropertyHandler(logger, system, screen.root, atomLibrary, eventBuffer)
+    val rootWindowPropertyHandler = RootWindowPropertyHandler(
+        logger,
+        system,
+        screen.root,
+        atomLibrary,
+        eventBuffer
+    )
 
     val eventTime = EventTime(system, eventBuffer, atomLibrary, rootWindowPropertyHandler)
 
@@ -124,7 +137,14 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     val windowCoordinator = ActiveWindowCoordinator(system, monitorManager, frameDrawer)
 
     val screenChangeHandler =
-        setupRandr(system, randrHandlerFactory, monitorManager, windowCoordinator, uiDrawer, screen.root)
+        setupRandr(
+            system,
+            randrHandlerFactory,
+            monitorManager,
+            windowCoordinator,
+            uiDrawer,
+            screen.root
+        )
 
     val windowNameReader = TextAtomReader(system, atomLibrary)
 
@@ -135,7 +155,13 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     val windowList = WindowList()
 
-    val appMenuMessageHandler = AppMenuMessageHandler(logger, system, atomLibrary, windowList, focusHandler)
+    val appMenuMessageHandler = AppMenuMessageHandler(
+        logger,
+        system,
+        atomLibrary,
+        windowList,
+        focusHandler
+    )
 
     val windowRegistration = WindowHandler(
         system,
@@ -197,10 +223,17 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         screen.root
     )
 
-    setupScreen(system, screen.root, rootWindowPropertyHandler, windowRegistration)
+    setupScreen(
+        system,
+        screen.root,
+        rootWindowPropertyHandler,
+        windowRegistration
+    )
 
-    val xEventResources = XEventResources(eventManager, eventTime, eventBuffer)
-    val appMenuResources = AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
+    val xEventResources =
+        XEventResources(eventManager, eventTime, eventBuffer)
+    val appMenuResources =
+        AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
 
     return RuntimeResources(xEventResources, appMenuResources)
 }

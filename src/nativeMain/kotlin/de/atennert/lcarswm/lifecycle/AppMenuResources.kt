@@ -1,4 +1,4 @@
-package de.atennert.lcarswm.runtime
+package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.AppMenuMessageHandler
 import de.atennert.lcarswm.system.MessageQueue
