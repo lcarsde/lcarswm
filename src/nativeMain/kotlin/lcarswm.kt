@@ -16,6 +16,10 @@ import kotlinx.coroutines.runBlocking
 // this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
 var staticLogger: Logger? = null
 
+/**
+ * Some shitty global state variable that is used in different places to handle exiting the main event loop and hold
+ * the exit value for the application
+ */
 val exitState = atomic<Int?>(null)
 
 // the main method apparently must not be inside of a package so it can be compiled with Kotlin/Native
