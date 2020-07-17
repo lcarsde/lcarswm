@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 from lcarswm import status_time
+from threading import Thread
+from time import sleep
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -59,18 +61,43 @@ class LcarswmStatusBar(Gtk.Window):
         self.get_style_context().add_class("window")
         self.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
+        self.status_widgets = set()
+
         grid = Gtk.Grid()
         grid.set_column_spacing(8)
         grid.set_row_spacing(8)
         self.add(grid)
 
-        grid.add(status_time.LcarswmStatusTime(0, 0, self.css_provider))
+        time_widget = status_time.LcarswmStatusTime(0, 0, self.css_provider)
+        grid.add(time_widget)
+        self.status_widgets.add(time_widget)
+
+        self.stop_threads = False
+        self.update_thread = Thread(target=self.update_widgets, args=(lambda: self.stop_threads, self))
+        self.update_thread.daemon = True
 
         self.connect("realize", self.on_create)
+        self.connect("destroy", self.on_destroy)
 
     def on_create(self, window):
         # mark myself as the app menu
         self.get_property("window").set_utf8_property("LCARSWM_STATUS_BAR", "LCARSWM_STATUS_BAR")
+        self.update_thread.start()
+
+    def on_destroy(self, window):
+        self.stop_threads = True
+        self.update_thread.join()
+
+    @staticmethod
+    def update_widgets(stop, self):
+        while True:
+            for status_widget in self.status_widgets:
+                GLib.idle_add(status_widget.update)
+
+            if stop():
+                break
+
+            sleep(.3)
 
 
 if __name__ == "__main__":
