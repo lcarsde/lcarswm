@@ -14,9 +14,12 @@ class LcarswmStatusTime(LcarswmStatusWidget):
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
-        time_label = Gtk.Label(label="12:34")
-        self.add(time_label)
+        self.time_label = Gtk.Label()
+        self.add(self.time_label)
+
+        self.update()
 
     def update(self):
         # read the updated time
-        pass
+        now = datetime.now()
+        self.time_label.set_label(now.strftime("%H:%M:%S"))
