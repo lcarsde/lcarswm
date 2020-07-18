@@ -14,6 +14,8 @@ class LcarswmStatusTime(LcarswmStatusWidget):
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
+        self.get_style_context().add_class("text_f90_big")
+
         self.time_label = Gtk.Label()
         self.add(self.time_label)
 

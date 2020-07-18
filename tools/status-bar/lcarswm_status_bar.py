@@ -9,43 +9,24 @@ from gi.repository import GdkX11, Gdk, Gtk, GLib
 
 css = b'''
 * {
-    font-family: 'Ubuntu Condensed', psans-serif;
+    font-family: 'Ubuntu Condensed', sans-serif;
     font-weight: 600;
-}
-.select_button {
-    font-family: 'Ubuntu Condensed', psans-serif;
-    font-weight: 600;
-    font-size: 15px;
-    color: #000;
     text-shadow: none;
-    background-color: #99F;
-    background: #99F; /* for Ubuntu */
-    outline-style: none;
-    border-radius: 0;
-    border-width: 0;
-    box-shadow: none;
-    padding: 2px 3px;
-    margin: 0;
-}
-.close_button {
-    background-color: #C66;
-    background: #C66; /* for Ubuntu */
-    outline-style: none;
-    border-radius: 0 20px 20px 0;
+    background-color: #000;
+    background: #000; /* for Ubuntu */
     border-width: 0;
     box-shadow: none;
     padding: 0;
     margin: 0;
-}
-.spacer {
-    background-color: #99C;
     outline-style: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0 40px 0 0;
+}
+.text_f90_big {
+    color: #f90;
+    font-size: 38px;
 }
 .window {
     background-color: #000;
+    background: #000; /* for Ubuntu */
 }
 '''
 
@@ -66,6 +47,7 @@ class LcarswmStatusBar(Gtk.Window):
         grid = Gtk.Grid()
         grid.set_column_spacing(8)
         grid.set_row_spacing(8)
+        grid.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.add(grid)
 
         time_widget = status_time.LcarswmStatusTime(0, 0, self.css_provider)
