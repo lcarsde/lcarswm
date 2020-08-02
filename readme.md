@@ -53,7 +53,7 @@ Thank you very much to the creators of the following resources:
       * Meta
       * Hyper
   * General settings
-    * title: title that is displayd in the top bar in normal and maximized mode
+    * title: title that is displayed in the top bar in normal and maximized mode
     * title-image: optional, path to image in XPM format, if set, it will be shown instead of the title. Should have a height of 40px and be at least 16px shorter then the normal modes' top bar.
     * font: the font used for drawing the title and the window titles
 
