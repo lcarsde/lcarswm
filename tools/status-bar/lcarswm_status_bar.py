@@ -20,10 +20,6 @@ css = b'''
     margin: 0;
     outline-style: none;
 }
-.text_f90_big {
-    color: #f90;
-    font-size: 38px;
-}
 .window {
     background-color: #000;
     background: #000; /* for Ubuntu */
@@ -50,7 +46,7 @@ class LcarswmStatusBar(Gtk.Window):
         grid.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.add(grid)
 
-        time_widget = status_time.LcarswmStatusTime(0, 0, self.css_provider)
+        time_widget = status_time.LcarswmStatusTime(184, 40, self.css_provider)
         grid.add(time_widget)
         self.status_widgets.add(time_widget)
 

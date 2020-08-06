@@ -11,7 +11,8 @@ class LcarswmStatusWidget(Gtk.Bin):
     def __init__(self, width, height, css_provider):
         Gtk.Bin.__init__(self)
         self.width = width
-        self.heigth = height
+        self.height = height
+        self.set_size_request(width, height)
 
         self.get_style_context().add_class("status_bar_widget")
         self.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
