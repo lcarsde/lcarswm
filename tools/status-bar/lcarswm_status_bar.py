@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from lcarswm import status_time
+from lcarswm import internal_widgets
 from threading import Thread
 from time import sleep
 
@@ -46,9 +46,13 @@ class LcarswmStatusBar(Gtk.Window):
         grid.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.add(grid)
 
-        time_widget = status_time.LcarswmStatusTime(184, 40, self.css_provider)
-        grid.add(time_widget)
+        time_widget = internal_widgets.LcarswmStatusTime(184, 40, self.css_provider)
+        grid.attach(time_widget, 0, 0, 4, 1)
         self.status_widgets.add(time_widget)
+
+        temperature_widget = internal_widgets.LcarswmStatusTemperature(136, 136, self.css_provider)
+        grid.attach(temperature_widget, 4, 0, 3, 3)
+        self.status_widgets.add(temperature_widget)
 
         self.stop_threads = False
         self.update_thread = Thread(target=self.update_widgets, args=(lambda: self.stop_threads, self))
