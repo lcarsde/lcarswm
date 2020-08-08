@@ -3,7 +3,7 @@ try:
 except ImportError:
     from .status_widget import LcarswmStatusWidget
 
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import math
 
@@ -30,6 +30,70 @@ class LcarswmStatusTime(LcarswmStatusWidget):
         context.set_source_rgb(1.0, 0.6, 0.0)
         layout = PangoCairo.create_layout(context)
         layout.set_text(now.strftime("%H:%M:%S"), -1)
+        description = Pango.FontDescription('Ubuntu Condensed, 40')
+        layout.set_font_description(description)
+        width, height = layout.get_size()
+        context.move_to(((self.width - (float(width) / 1024.)) / 2), -11)
+        PangoCairo.show_layout(context, layout)
+
+    def update(self):
+        # read the updated time
+        self.drawing_area.queue_draw()
+
+
+class LcarswmStatusStardate(LcarswmStatusWidget):
+    def __init__(self, width, height, css_provider):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider)
+
+        self.drawing_area = Gtk.DrawingArea()
+        self.drawing_area.set_size_request(width, height)
+        self.drawing_area.connect('draw', self.draw_time)
+        self.add(self.drawing_area)
+
+        self.update()
+
+    @staticmethod
+    def days_per_month(days_per_year):
+        return {
+            1: 31,
+            2: 29 if days_per_year == 366 else 28,
+            3: 31,
+            4: 30,
+            5: 31,
+            6: 30,
+            7: 31,
+            8: 31,
+            9: 30,
+            10: 31,
+            11: 30
+        }
+
+    @staticmethod
+    def passed_month_days(current_month, days_per_year):
+        days = 0
+        for (month, month_days) in LcarswmStatusStardate.days_per_month(days_per_year).items():
+            if current_month > month:
+                days += month_days
+        return days
+
+    @staticmethod
+    def calculate_stardate():
+        now = datetime.now(timezone.utc)
+        years = now.year
+        hours = now.hour
+        days_in_year = 366 if years % 4 == 0 and (years % 100 != 0 or years % 400 == 0) else 365
+        day = now.day + LcarswmStatusStardate.passed_month_days(now.month, days_in_year)
+
+        earth_time = years + (day - 1 + hours / 24) / days_in_year
+        star_date = 1000 * (earth_time - 2323)
+        return star_date
+
+    def draw_time(self, widget, context):
+        star_date = self.calculate_stardate()
+
+        context.set_source_rgb(1.0, 0.6, 0.0)
+        layout = PangoCairo.create_layout(context)
+        layout.set_text(f"{star_date:.2f}"[:-1])
         description = Pango.FontDescription('Ubuntu Condensed, 40')
         layout.set_font_description(description)
         width, height = layout.get_size()
