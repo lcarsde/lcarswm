@@ -61,9 +61,31 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         scale = min_dimension / max_scale
 
         self.draw_radar_cross(context, min_dimension, scale)
+        self.draw_data(context, scale)
 
-        angle = 0
+    def draw_radar_cross(self, context, min_dimension, scale):
+        context.set_source_rgb(0.6, 0.6, 0.6)
+
+        context.move_to(0, self.yc)
+        context.line_to(self.width, self.yc)
+        context.move_to(self.xc, 0)
+        context.line_to(self.xc, self.height)
+        v1, v2 = self.polar_to_cartesian(min_dimension, 135)
+        (mi, ma) = (v1, v2) if v1 < v2 else (v2, v1)
+        context.move_to(mi, mi)
+        context.line_to(ma, ma)
+        context.move_to(mi, ma)
+        context.line_to(ma, mi)
+        context.stroke()
+
+        context.arc(self.xc, self.yc, 100 * scale, 0.0, 2.0 * math.pi)
+        context.stroke()
+        context.arc(self.xc, self.yc,  50 * scale, 0.0, 2.0 * math.pi)
+        context.stroke()
+
+    def draw_data(self, context, scale):
         temperatures = LcarswmStatusTemperature.sort_dict(LcarswmStatusTemperature.get_temperatures()).values()
+        angle = 0
         points = []
         max_temp = 0
         for temp in temperatures:
@@ -89,26 +111,6 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
             context.line_to(x, y)
         context.close_path()
         context.fill_preserve()
-        context.stroke()
-
-    def draw_radar_cross(self, context, min_dimension, scale):
-        context.set_source_rgb(0.6, 0.6, 0.6)
-
-        context.move_to(0, self.yc)
-        context.line_to(self.width, self.yc)
-        context.move_to(self.xc, 0)
-        context.line_to(self.xc, self.height)
-        v1, v2 = self.polar_to_cartesian(min_dimension, 135)
-        mi, ma = min(v1, v2), max(v1, v2)
-        context.move_to(mi, mi)
-        context.line_to(ma, ma)
-        context.move_to(mi, ma)
-        context.line_to(ma, mi)
-        context.stroke()
-
-        context.arc(self.xc, self.yc, 100 * scale, 0.0, 2.0 * math.pi)
-        context.stroke()
-        context.arc(self.xc, self.yc,  50 * scale, 0.0, 2.0 * math.pi)
         context.stroke()
 
     def update(self):
