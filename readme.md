@@ -81,13 +81,12 @@ Thank you very much to the creators of the following resources:
 * Center popups and adjust the frame to their size
 * Content for the data bar (empty upper area in normal mode)
   * Configurable plugin framework
-  * Time
   * Master volume
-  * Heat signature
   * Processor usage
   * Memory usage
   * Connection state of network interfaces
   * Data throughput of network interfaces
+  * Battery status
   * ...
 * GTK-Theme (if I can't find one)
 * Configuration for the colors
