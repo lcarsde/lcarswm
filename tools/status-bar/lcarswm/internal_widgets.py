@@ -81,10 +81,11 @@ class LcarswmStatusStardate(LcarswmStatusWidget):
         now = datetime.now(timezone.utc)
         years = now.year
         hours = now.hour
+        minutes = now.minute
         days_in_year = 366 if years % 4 == 0 and (years % 100 != 0 or years % 400 == 0) else 365
         day = now.day + LcarswmStatusStardate.passed_month_days(now.month, days_in_year)
 
-        earth_time = years + (day - 1 + hours / 24) / days_in_year
+        earth_time = years + (day - 1 + hours / 24 + minutes / 1440) / days_in_year
         star_date = 1000 * (earth_time - 2323)
         return star_date
 
