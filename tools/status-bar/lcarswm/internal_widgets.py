@@ -13,72 +13,56 @@ gi.require_version('PangoCairo', '1.0')
 from gi.repository import Gtk, Pango, PangoCairo
 
 
-class LcarswmStatusTime(LcarswmStatusWidget):
+class LcarswmStatusText(LcarswmStatusWidget):
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
         self.drawing_area = Gtk.DrawingArea()
         self.drawing_area.set_size_request(width, height)
-        self.drawing_area.connect('draw', self.draw_time)
+        self.drawing_area.connect('draw', self.draw_text)
         self.add(self.drawing_area)
 
         self.update()
 
-    def draw_time(self, widget, context):
-        now = datetime.now()
-
+    def draw_text(self, widget, context):
         context.set_source_rgb(1.0, 0.6, 0.0)
         layout = PangoCairo.create_layout(context)
-        layout.set_text(now.strftime("%H:%M:%S"), -1)
+        layout.set_text(self.create_text(), -1)
         description = Pango.FontDescription('Ubuntu Condensed, 40')
         layout.set_font_description(description)
         width, height = layout.get_size()
-        context.move_to(((self.width - (float(width) / 1024.)) / 2), -11)
+        context.move_to((self.width - (float(width) / 1024.)), -11)
         PangoCairo.show_layout(context, layout)
 
+    def create_text(self):
+        pass
+
     def update(self):
-        # read the updated time
+        # update the text
         self.drawing_area.queue_draw()
 
 
-class LcarswmStatusDate(LcarswmStatusWidget):
+class LcarswmStatusTime(LcarswmStatusText):
     def __init__(self, width, height, css_provider):
-        LcarswmStatusWidget.__init__(self, width, height, css_provider)
+        LcarswmStatusText.__init__(self, width, height, css_provider)
 
-        self.drawing_area = Gtk.DrawingArea()
-        self.drawing_area.set_size_request(width, height)
-        self.drawing_area.connect('draw', self.draw_time)
-        self.add(self.drawing_area)
-
-        self.update()
-
-    def draw_time(self, widget, context):
+    def create_text(self):
         now = datetime.now()
-
-        context.set_source_rgb(1.0, 0.6, 0.0)
-        layout = PangoCairo.create_layout(context)
-        layout.set_text(now.strftime("%d.%m.%y"), -1)
-        description = Pango.FontDescription('Ubuntu Condensed, 40')
-        layout.set_font_description(description)
-        width, height = layout.get_size()
-        context.move_to(((self.width - (float(width) / 1024.)) / 2), -11)
-        PangoCairo.show_layout(context, layout)
-
-    def update(self):
-        # read the updated time
-        self.drawing_area.queue_draw()
+        return now.strftime("%H:%M:%S")
 
 
-class LcarswmStatusStardate(LcarswmStatusWidget):
+class LcarswmStatusDate(LcarswmStatusText):
     def __init__(self, width, height, css_provider):
-        LcarswmStatusWidget.__init__(self, width, height, css_provider)
+        LcarswmStatusText.__init__(self, width, height, css_provider)
 
-        self.drawing_area = Gtk.DrawingArea()
-        self.drawing_area.set_size_request(width, height)
-        self.drawing_area.connect('draw', self.draw_time)
-        self.add(self.drawing_area)
+    def create_text(self):
+        now = datetime.now()
+        return now.strftime("%d.%m.%y")
 
-        self.update()
+
+class LcarswmStatusStardate(LcarswmStatusText):
+    def __init__(self, width, height, css_provider):
+        LcarswmStatusText.__init__(self, width, height, css_provider)
 
     @staticmethod
     def days_per_month(days_per_year):
@@ -105,7 +89,7 @@ class LcarswmStatusStardate(LcarswmStatusWidget):
         return days
 
     @staticmethod
-    def calculate_stardate():
+    def calculate_star_date():
         now = datetime.now(timezone.utc)
         years = now.year
         hours = now.hour
@@ -117,21 +101,9 @@ class LcarswmStatusStardate(LcarswmStatusWidget):
         star_date = 1000 * (earth_time - 2323)
         return star_date
 
-    def draw_time(self, widget, context):
-        star_date = self.calculate_stardate()
-
-        context.set_source_rgb(1.0, 0.6, 0.0)
-        layout = PangoCairo.create_layout(context)
-        layout.set_text(f"{star_date:.2f}"[:-1])
-        description = Pango.FontDescription('Ubuntu Condensed, 40')
-        layout.set_font_description(description)
-        width, height = layout.get_size()
-        context.move_to(((self.width - (float(width) / 1024.)) / 2), -11)
-        PangoCairo.show_layout(context, layout)
-
-    def update(self):
-        # read the updated time
-        self.drawing_area.queue_draw()
+    def create_text(self):
+        star_date = self.calculate_star_date()
+        return f"{star_date:.2f}"[:-1]
 
 
 class LcarswmStatusTemperature(LcarswmStatusWidget):
