@@ -14,6 +14,12 @@ from gi.repository import Gtk, Pango, PangoCairo
 
 
 class LcarswmStatusText(LcarswmStatusWidget):
+    """
+    LcarswmStatusText is an abstract class that acts as a frame for widgets
+    that display one short line of text.
+
+    To use: extend this class and override the create_text method.
+    """
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
@@ -35,6 +41,9 @@ class LcarswmStatusText(LcarswmStatusWidget):
         PangoCairo.show_layout(context, layout)
 
     def create_text(self):
+        """
+        :return: short line of text that will be displayed in widget
+        """
         pass
 
     def update(self):
