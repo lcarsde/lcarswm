@@ -110,8 +110,11 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
-        self.xc = width / 2
-        self.yc = height / 2
+        self.cx = width / 2
+        self.cy = height / 2
+        self.max_scale = 125
+        self.min_dimension = min(self.cx, self.cy)
+        self.scale = self.min_dimension / self.max_scale
 
         self.drawing_area = Gtk.DrawingArea()
         self.drawing_area.set_size_request(width, height)
@@ -121,21 +124,17 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         self.update()
 
     def draw_graph(self, widget, context):
-        max_scale = 125
-        min_dimension = min(self.xc, self.yc)
-        scale = min_dimension / max_scale
+        self.draw_radar_cross(context)
+        self.draw_data(context)
 
-        self.draw_radar_cross(context, min_dimension, scale)
-        self.draw_data(context, scale)
-
-    def draw_radar_cross(self, context, min_dimension, scale):
+    def draw_radar_cross(self, context):
         context.set_source_rgb(0.6, 0.6, 0.6)
 
-        context.move_to(0, self.yc)
-        context.line_to(self.width, self.yc)
-        context.move_to(self.xc, 0)
-        context.line_to(self.xc, self.height)
-        v1, v2 = self.polar_to_cartesian(min_dimension, 135)
+        context.move_to(0, self.cy)
+        context.line_to(self.width, self.cy)
+        context.move_to(self.cx, 0)
+        context.line_to(self.cx, self.height)
+        v1, v2 = self.polar_to_cartesian(self.min_dimension, 135)
         (mi, ma) = (v1, v2) if v1 < v2 else (v2, v1)
         context.move_to(mi, mi)
         context.line_to(ma, ma)
@@ -143,19 +142,19 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         context.line_to(ma, mi)
         context.stroke()
 
-        context.arc(self.xc, self.yc, 100 * scale, 0.0, 2.0 * math.pi)
+        context.arc(self.cx, self.cy, 100 * self.scale, 0.0, 2.0 * math.pi)
         context.stroke()
-        context.arc(self.xc, self.yc,  50 * scale, 0.0, 2.0 * math.pi)
+        context.arc(self.cx, self.cy, 50 * self.scale, 0.0, 2.0 * math.pi)
         context.stroke()
 
-    def draw_data(self, context, scale):
+    def draw_data(self, context):
         temperatures = LcarswmStatusTemperature.sort_dict(LcarswmStatusTemperature.get_temperatures()).values()
         angle = 0
         points = []
         max_temp = 0
         for temp in temperatures:
-            point = (self.polar_to_cartesian(temp * scale, angle))
-            points .append(point)
+            point = (self.polar_to_cartesian(temp * self.scale, angle))
+            points.append(point)
             if temp > max_temp:
                 max_temp = temp
             angle = angle + 360/len(temperatures)
@@ -209,5 +208,5 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
     def polar_to_cartesian(self, radius, angle):
         x = radius * math.cos(math.radians(angle))
         y = radius * math.sin(math.radians(angle))
-        return self.xc+x, self.yc+y
+        return self.cx + x, self.cy + y
 
