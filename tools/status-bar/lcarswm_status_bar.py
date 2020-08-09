@@ -50,13 +50,13 @@ class LcarswmStatusBar(Gtk.Window):
         grid.attach(time_widget, 0, 0, 4, 1)
         self.status_widgets.add(time_widget)
 
-        stardate_widget = internal_widgets.LcarswmStatusStardate(184, 40, self.css_provider)
-        grid.attach(stardate_widget, 0, 1, 4, 1)
-        self.status_widgets.add(stardate_widget)
+        date = internal_widgets.LcarswmStatusDate(184, 40, self.css_provider)
+        grid.attach(date, 0, 1, 4, 1)
+        self.status_widgets.add(date)
 
-        space = internal_widgets.LcarswmStatusWidget(184, 40, self.css_provider)
-        grid.attach(space, 0, 2, 4, 1)
-        self.status_widgets.add(space)
+        star_date = internal_widgets.LcarswmStatusStardate(184, 40, self.css_provider)
+        grid.attach(star_date, 0, 2, 4, 1)
+        self.status_widgets.add(star_date)
 
         temperature_widget = internal_widgets.LcarswmStatusTemperature(136, 136, self.css_provider)
         grid.attach(temperature_widget, 4, 0, 3, 3)
