@@ -20,6 +20,17 @@ css = b'''
     margin: 0;
     outline-style: none;
 }
+.button--99c {
+    font-family: 'Ubuntu Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 0px;
+    color: #000;
+    background-color: #99c;
+    background: #99c; /* for Ubuntu */
+    border-radius: 20px;
+    padding: 2px 16px;
+}
 .window {
     background-color: #000;
     background: #000; /* for Ubuntu */
@@ -61,6 +72,10 @@ class LcarswmStatusBar(Gtk.Window):
         temperature_widget = internal_widgets.LcarswmStatusTemperature(136, 136, self.css_provider)
         grid.attach(temperature_widget, 4, 0, 3, 3)
         self.status_widgets.add(temperature_widget)
+
+        filler_test = internal_widgets.LcarswmStatusFiller(88, 40, self.css_provider)
+        grid.attach(filler_test, 7, 0, 2, 1)
+        self.status_widgets.add(filler_test)
 
         self.stop_threads = False
         self.update_thread = Thread(target=self.update_widgets, args=(lambda: self.stop_threads, self))

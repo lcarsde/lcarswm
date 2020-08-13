@@ -6,6 +6,7 @@ except ImportError:
 from datetime import datetime, timezone
 import os
 import math
+from random import randint
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -219,3 +220,22 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         y = radius * math.sin(math.radians(angle))
         return self.cx + x, self.cy + y
 
+
+class LcarswmStatusFiller(LcarswmStatusWidget):
+    def __init__(self, width, height, css_provider):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider)
+
+        self.label = Gtk.Label()
+        self.label.set_size_request(width, height)
+        self.label.set_alignment(1, 1)
+        self.add(self.label)
+
+        self.label.get_style_context().add_class("button--99c")
+        self.label.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        self.update()
+
+    def update(self):
+        # TODO change color
+        text = str(randint(0, 9999)).zfill(4)
+        self.label.set_label(text)
