@@ -42,6 +42,18 @@ CELL_SIZE = 40
 GAP_SIZE = 8
 
 
+class WidgetConfiguration:
+    """
+    Container for widget definition
+    """
+    def __init__(self, widget, x, y, width, height):
+        self.widget = widget
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+
 class LcarswmStatusBar(Gtk.Window):
     """
     The status bar window implementation
@@ -58,7 +70,7 @@ class LcarswmStatusBar(Gtk.Window):
 
         self.status_widgets = set()
         self.width = 640
-        self.height = LcarswmStatusBar.get_pixels_for_cells(3)  # remains constant by designs
+        self.height = LcarswmStatusBar.get_pixels_for_cells(3)  # remains constant by design
 
         grid = Gtk.Grid()
         grid.set_column_spacing(GAP_SIZE)
