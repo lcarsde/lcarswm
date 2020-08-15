@@ -50,6 +50,8 @@ class LcarswmStatusBar(Gtk.Window):
         self.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.status_widgets = set()
+        self.width = 640
+        self.height = 136  # remains constant by designs
 
         grid = Gtk.Grid()
         grid.set_column_spacing(8)
@@ -81,6 +83,7 @@ class LcarswmStatusBar(Gtk.Window):
         self.update_thread = Thread(target=self.update_widgets, args=(lambda: self.stop_threads, self))
         self.update_thread.daemon = True
 
+        self.connect("size-allocate", self.on_size_allocate)
         self.connect("realize", self.on_create)
         self.connect("destroy", self.on_destroy)
 
@@ -92,6 +95,16 @@ class LcarswmStatusBar(Gtk.Window):
     def on_destroy(self, window):
         self.stop_threads = True
         self.update_thread.join()
+
+    def on_size_allocate(self, widget, event):
+        new_width = self.get_allocation().width
+        if new_width != self.width:
+            self.width = new_width
+            self.update_layout()
+
+    def update_layout(self):
+        # TODO update layout
+        print(self.width)
 
     @staticmethod
     def update_widgets(stop, self):
