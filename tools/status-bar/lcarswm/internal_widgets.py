@@ -236,6 +236,6 @@ class LcarswmStatusFiller(LcarswmStatusWidget):
         self.update()
 
     def update(self):
-        # TODO change color
-        text = str(randint(0, 9999)).zfill(4)
-        self.label.set_label(text)
+        # text = str(randint(0, 9999)).zfill(4)
+        # self.label.set_label(text)
+        pass
