@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from lcarswm import internal_widgets
 from threading import Thread
 from time import sleep
+import importlib
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -46,12 +46,26 @@ class WidgetConfiguration:
     """
     Container for widget definition
     """
-    def __init__(self, widget, x, y, width, height):
+    def __init__(self, package, module, widget, x, y, width, height):
+        self.package = package
+        self.module = module
         self.widget = widget
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+
+
+def get_widgets():
+    widgets = set()
+
+    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusTime", 0, 0, 4, 1))
+    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusDate", 0, 1, 4, 1))
+    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusStardate", 0, 2, 4, 1))
+    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusTemperature", 4, 0, 3, 3))
+    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusFiller", 7, 0, 2, 1))
+
+    return widgets
 
 
 class LcarswmStatusBar(Gtk.Window):
@@ -78,25 +92,7 @@ class LcarswmStatusBar(Gtk.Window):
         grid.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.add(grid)
 
-        time_widget = internal_widgets.LcarswmStatusTime(184, 40, self.css_provider)
-        grid.attach(time_widget, 0, 0, 4, 1)
-        self.status_widgets.add(time_widget)
-
-        date = internal_widgets.LcarswmStatusDate(184, 40, self.css_provider)
-        grid.attach(date, 0, 1, 4, 1)
-        self.status_widgets.add(date)
-
-        star_date = internal_widgets.LcarswmStatusStardate(184, 40, self.css_provider)
-        grid.attach(star_date, 0, 2, 4, 1)
-        self.status_widgets.add(star_date)
-
-        temperature_widget = internal_widgets.LcarswmStatusTemperature(136, 136, self.css_provider)
-        grid.attach(temperature_widget, 4, 0, 3, 3)
-        self.status_widgets.add(temperature_widget)
-
-        filler_test = internal_widgets.LcarswmStatusFiller(88, 40, self.css_provider)
-        grid.attach(filler_test, 7, 0, 2, 1)
-        self.status_widgets.add(filler_test)
+        self.import_widgets(grid)
 
         self.stop_threads = False
         self.update_thread = Thread(target=self.update_widgets, args=(lambda: self.stop_threads, self))
@@ -120,6 +116,15 @@ class LcarswmStatusBar(Gtk.Window):
         if new_width != self.width:
             self.width = new_width
             self.update_layout()
+
+    def import_widgets(self, grid):
+        for widget_config in get_widgets():
+            widget = getattr(importlib.import_module(widget_config.module, widget_config.package), widget_config.widget)
+            widget_instance = widget(LcarswmStatusBar.get_pixels_for_cells(widget_config.width),
+                                     LcarswmStatusBar.get_pixels_for_cells(widget_config.height),
+                                     self.css_provider)
+            grid.attach(widget_instance, widget_config.x, widget_config.y, widget_config.width, widget_config.height)
+            self.status_widgets.add(widget_instance)
 
     @staticmethod
     def get_pixels_for_cells(cells):
