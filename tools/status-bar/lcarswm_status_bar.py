@@ -38,7 +38,14 @@ css = b'''
 '''
 
 
+CELL_SIZE = 40
+GAP_SIZE = 8
+
+
 class LcarswmStatusBar(Gtk.Window):
+    """
+    The status bar window implementation
+    """
     def __init__(self):
         Gtk.Window.__init__(self, title="lcarswm status bar")
 
@@ -51,11 +58,11 @@ class LcarswmStatusBar(Gtk.Window):
 
         self.status_widgets = set()
         self.width = 640
-        self.height = 136  # remains constant by designs
+        self.height = LcarswmStatusBar.get_pixels_for_cells(3)  # remains constant by designs
 
         grid = Gtk.Grid()
-        grid.set_column_spacing(8)
-        grid.set_row_spacing(8)
+        grid.set_column_spacing(GAP_SIZE)
+        grid.set_row_spacing(GAP_SIZE)
         grid.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.add(grid)
 
@@ -102,9 +109,15 @@ class LcarswmStatusBar(Gtk.Window):
             self.width = new_width
             self.update_layout()
 
+    @staticmethod
+    def get_pixels_for_cells(cells):
+        return CELL_SIZE * cells + GAP_SIZE * (cells - 1)
+
     def update_layout(self):
         # TODO update layout
-        print(self.width)
+        horizontal_cells = int(self.width / CELL_SIZE)
+        left_over_pixels = self.width % CELL_SIZE
+        print(self.width, horizontal_cells, left_over_pixels)
 
     @staticmethod
     def update_widgets(stop, self):
