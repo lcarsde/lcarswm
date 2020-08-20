@@ -74,6 +74,7 @@ Thank you very much to the creators of the following resources:
 ## Known issues
 * If screens lay over one another they are not "merged" but draw over one another
 * Using SoftMaker Office sometimes leaves empty windows (noticed with csv import dialog)
+* Moving windows with Alt-Up/Down collides with the corresponding VS Code key binding
 
 ## To Do
 * Associate child screens with their parents
