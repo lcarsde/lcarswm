@@ -3,7 +3,6 @@
 .vscode
 .gradle
 build
-gradle.properties
 gradlew.bat
 .idea
 **/*.iml
