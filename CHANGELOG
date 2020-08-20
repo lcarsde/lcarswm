@@ -4,7 +4,11 @@
 * use coroutines for event loops to decouple them from each other
 * put lifecycle code (startup, event loop and shutdown) in a lifecycle package
 * add time widget for status bar
-* add temperature widget for status bar
+* add system temperature widget for status bar
+* add date widget for status bar
+* add star date widget for status bar
+* add filler widget for status bar
+* upgrade Kotlin version to 1.4.0 and coroutines to 1.3.9
 
 20.2
 * change of licensing from MIT to GPL V2
