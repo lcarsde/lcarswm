@@ -23,7 +23,7 @@ The application menu needs to know the currently active windows, shall display t
 
 ## Decision Outcome
 
-Chosen option: "Message queues", because this approach is a faster than shared storage approaches and doesn't need to handle locking. Message queues appear somewhat easier to use then sockets. Between pipes and message queues, the message queues are more flexible although it is not sure whether that flexibility will be required.
+Chosen option: "Message queues", because this approach is a faster than shared storage approaches and doesn't need to handle locking. Message queues are asynchronous (the producer doesn't need to wait for the consumer) and messages are queued and not lost.
 
 ### Positive Consequences <!-- optional -->
 
