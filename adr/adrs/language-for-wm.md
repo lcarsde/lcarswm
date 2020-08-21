@@ -1,4 +1,4 @@
-# [Language for window manager]
+# Language for window manager
 
 * Status: accepted <!-- optional -->
 * Deciders: Andreas Tennert <!-- optional -->
