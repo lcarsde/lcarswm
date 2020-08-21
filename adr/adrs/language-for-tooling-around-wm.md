@@ -6,7 +6,7 @@
 
 ## Context and Problem Statement
 
-The window manager needs some additional tool applications. They are separate and can therefore use a different programming language.
+The window manager needs some additional tool applications. They are separate and can therefor use a different programming language.
 
 ## Decision Drivers <!-- optional -->
 
