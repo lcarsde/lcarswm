@@ -103,21 +103,44 @@ class LcarswmStatusBar(Gtk.Window):
         self.connect("destroy", self.on_destroy)
 
     def on_create(self, window):
+        """
+        Called when the window is created.
+        - Set the atom that tells lcarswm that this is the status bar tool window.
+        - Start the widget update threading
+
+        :param window: the window (same as self)
+        """
         # mark myself as the app menu
         self.get_property("window").set_utf8_property("LCARSWM_STATUS_BAR", "LCARSWM_STATUS_BAR")
         self.update_thread.start()
 
     def on_destroy(self, window):
+        """
+        Clean up on shutdown -> stop the update threads.
+
+        :param window: the window (same as self)
+        """
         self.stop_threads = True
         self.update_thread.join()
 
-    def on_size_allocate(self, widget, event):
+    def on_size_allocate(self, window, event):
+        """
+        Trigger an update of the status bar grid layout when the status bar size changes.
+
+        :param window: the window (same as self)
+        :param event: the size allocation event
+        """
         new_width = self.get_allocation().width
         if new_width != self.width:
             self.width = new_width
             self.update_layout()
 
     def import_widgets(self):
+        """
+        Import the configured widgets.
+
+        :return: dictionary of the widget instances and their configurations
+        """
         widget_dict = {}
         for widget_config in get_widgets():
             widget = getattr(importlib.import_module(widget_config.module, widget_config.package), widget_config.widget)
@@ -129,14 +152,26 @@ class LcarswmStatusBar(Gtk.Window):
 
     @staticmethod
     def get_pixels_for_cells(cells):
+        """
+        Convert cells into pixels.
+
+        :param cells: number of cells
+        :return: pixels correspond to the given cell amount
+        """
         return CELL_SIZE * cells + GAP_SIZE * (cells - 1)
 
     def update_layout(self):
+        """
+        Update the status bar grid layout.
+        """
         horizontal_cells, left_over_pixels = self.get_cells_and_overflow()
         self.cleanup_grid()
         self.fill_status_bar(horizontal_cells, left_over_pixels)
 
     def get_cells_and_overflow(self):
+        """
+        :return: the number of currently available horizontal cells and the rest of the pixels that don't fit
+        """
         horizontal_cells = int(self.width / (CELL_SIZE + GAP_SIZE))
         left_over_pixels = self.width % (CELL_SIZE + GAP_SIZE)
         if left_over_pixels >= CELL_SIZE:
@@ -147,10 +182,19 @@ class LcarswmStatusBar(Gtk.Window):
         return horizontal_cells, left_over_pixels
 
     def cleanup_grid(self):
+        """
+        Cleanup the current grid a.k.a. remove all the child widgets from it.
+        """
         for widget in self.grid.get_children():
             self.grid.remove(widget)
 
     def fill_status_bar(self, horizontal_cells, left_over_pixels):
+        """
+        Fill the status bar with the configured widgets and fillers for the empty space.
+
+        :param horizontal_cells: number of available horizontal cells
+        :param left_over_pixels: rest of the pixels that don't fit the cells
+        """
         widget_map = self.fill_configured_widgets(horizontal_cells)
 
         self.fill_empty_space(widget_map, left_over_pixels)
@@ -158,6 +202,12 @@ class LcarswmStatusBar(Gtk.Window):
         self.grid.show_all()
 
     def fill_configured_widgets(self, horizontal_cells):
+        """
+        Fill the configured widgets into the grid.
+        
+        :param horizontal_cells: number of available horizontal cells
+        :return: 2D array (map) that shows where widgets are configured to be in the grid
+        """
         widget_map = np.zeros((3, horizontal_cells), dtype=int)
         for widget, config in self.widget_dict.items():
             x, y = horizontal_cells - config.x - config.width, config.y
@@ -169,6 +219,12 @@ class LcarswmStatusBar(Gtk.Window):
         return widget_map
 
     def fill_empty_space(self, widget_map, left_over_pixels):
+        """
+        Fill unused status bar space.
+
+        :param widget_map: 2D array (map) that shows where widgets are configured to be in the grid
+        :param left_over_pixels: rest of the pixels that don't fit the cells
+        """
         first_non_empty_index = np.min((widget_map != 0).argmax(axis=1))
 
         pixels_to_add = left_over_pixels
@@ -182,6 +238,11 @@ class LcarswmStatusBar(Gtk.Window):
             self.fill_with_filler_widgets(filler_count, pixels_to_add)
 
     def fill_with_empty_space(self, pixels_to_add):
+        """
+        Fill the empty status bar space with an empty widget (necessary if the filler is to big for the empty space)
+
+        :param pixels_to_add: pixels to fill
+        """
         if pixels_to_add <= 0:
             return
 
@@ -191,6 +252,12 @@ class LcarswmStatusBar(Gtk.Window):
                          col_index, 0, 1, 1)
 
     def fill_with_filler_widgets(self, filler_count, pixels_to_add):
+        """
+        Fill the empty status bar space with filler widgets.
+
+        :param filler_count: number of fillers
+        :param pixels_to_add: amount of pixels to distribute over fillers (not fitting into used cells)
+        """
         pixels_per_filler = LcarswmStatusBar.additional_pixels_per_filler(filler_count, pixels_to_add)
 
         for col in range(filler_count):
@@ -200,6 +267,13 @@ class LcarswmStatusBar(Gtk.Window):
 
     @staticmethod
     def additional_pixels_per_filler(filler_count, pixels_to_add):
+        """
+        Calculate the distribution of additional pixels over all fillers.
+
+        :param filler_count: number of filler widgets
+        :param pixels_to_add: amount of pixels to distribute
+        :return: array with pixels per filler
+        """
         pixels_per_filler = np.empty(filler_count, dtype=int)
         if filler_count == 0:
             return []
@@ -214,6 +288,9 @@ class LcarswmStatusBar(Gtk.Window):
 
     @staticmethod
     def update_widgets(stop, self):
+        """
+        Trigger a widget update (called in daemon thread).
+        """
         while True:
             for widget in self.widget_dict:
                 GLib.idle_add(widget.update)
