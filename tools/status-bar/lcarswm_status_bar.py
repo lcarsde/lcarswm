@@ -162,6 +162,8 @@ class LcarswmStatusBar(Gtk.Window):
         for widget, config in self.widget_dict.items():
             x, y = horizontal_cells - config.x - config.width, config.y
             x_end, y_end = horizontal_cells - config.x, config.y + config.height
+            if (config.x + config.width) > horizontal_cells:
+                continue
             widget_map[y:y_end, x:x_end] = 1
             self.grid.attach(widget, x, y, config.width, config.height)
         return widget_map
@@ -174,6 +176,21 @@ class LcarswmStatusBar(Gtk.Window):
             pixels_to_add += CELL_SIZE + GAP_SIZE
 
         filler_count = int(first_non_empty_index / 2)
+        if filler_count == 0:
+            self.fill_with_empty_space(pixels_to_add)
+        else:
+            self.fill_with_filler_widgets(filler_count, pixels_to_add)
+
+    def fill_with_empty_space(self, pixels_to_add):
+        if pixels_to_add <= 0:
+            return
+
+        col_index = -1 if pixels_to_add == GAP_SIZE else 0
+
+        self.grid.attach(iw.LcarswmStatusWidget(pixels_to_add - GAP_SIZE, CELL_SIZE, self.css_provider),
+                         col_index, 0, 1, 1)
+
+    def fill_with_filler_widgets(self, filler_count, pixels_to_add):
         pixels_per_filler = LcarswmStatusBar.additional_pixels_per_filler(filler_count, pixels_to_add)
 
         for col in range(filler_count):
