@@ -82,7 +82,6 @@ class LcarswmStatusBar(Gtk.Window):
         self.get_style_context().add_class("window")
         self.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        self.status_widgets = set()
         self.width = 640
         self.height = LcarswmStatusBar.get_pixels_for_cells(3)  # remains constant by design
 
@@ -92,7 +91,7 @@ class LcarswmStatusBar(Gtk.Window):
         grid.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.add(grid)
 
-        self.import_widgets(grid)
+        self.widget_dict = self.import_widgets(grid)
 
         self.stop_threads = False
         self.update_thread = Thread(target=self.update_widgets, args=(lambda: self.stop_threads, self))
@@ -118,13 +117,16 @@ class LcarswmStatusBar(Gtk.Window):
             self.update_layout()
 
     def import_widgets(self, grid):
+        widget_dict = {}
         for widget_config in get_widgets():
             widget = getattr(importlib.import_module(widget_config.module, widget_config.package), widget_config.widget)
             widget_instance = widget(LcarswmStatusBar.get_pixels_for_cells(widget_config.width),
                                      LcarswmStatusBar.get_pixels_for_cells(widget_config.height),
                                      self.css_provider)
+            widget_dict[widget_instance] = widget_config
+            # TODO remove this
             grid.attach(widget_instance, widget_config.x, widget_config.y, widget_config.width, widget_config.height)
-            self.status_widgets.add(widget_instance)
+        return widget_dict
 
     @staticmethod
     def get_pixels_for_cells(cells):
@@ -139,7 +141,7 @@ class LcarswmStatusBar(Gtk.Window):
     @staticmethod
     def update_widgets(stop, self):
         while True:
-            for status_widget in self.status_widgets:
+            for status_widget in self.widget_dict:
                 GLib.idle_add(status_widget.update)
 
             if stop():
