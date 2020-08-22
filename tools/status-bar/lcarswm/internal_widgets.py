@@ -225,7 +225,8 @@ class LcarswmStatusFiller(LcarswmStatusWidget):
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
-        self.label = Gtk.Label()
+        text = str(randint(0, 9999)).zfill(4)
+        self.label = Gtk.Label(label=text)
         self.label.set_size_request(width, height)
         self.label.set_alignment(1, 1)
         self.add(self.label)
