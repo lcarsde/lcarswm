@@ -133,6 +133,11 @@ class LcarswmStatusBar(Gtk.Window):
         return CELL_SIZE * cells + GAP_SIZE * (cells - 1)
 
     def update_layout(self):
+        horizontal_cells, left_over_pixels = self.get_cells_and_overflow()
+        self.cleanup_grid()
+        self.map_widgets(horizontal_cells, left_over_pixels)
+
+    def get_cells_and_overflow(self):
         horizontal_cells = int(self.width / (CELL_SIZE + GAP_SIZE))
         left_over_pixels = self.width % (CELL_SIZE + GAP_SIZE)
         if left_over_pixels >= CELL_SIZE:
@@ -140,27 +145,35 @@ class LcarswmStatusBar(Gtk.Window):
             left_over_pixels -= CELL_SIZE
         else:
             left_over_pixels += GAP_SIZE
-        self.map_widgets(horizontal_cells, left_over_pixels)
+        return horizontal_cells, left_over_pixels
 
-    def map_widgets(self, horizontal_cells, left_over_pixels):
+    def cleanup_grid(self):
         for widget in self.widget_dict:
             self.grid.remove(widget)
 
+    def fill_status_bar(self, horizontal_cells, left_over_pixels):
+        widget_map = self.fill_configured_widgets(horizontal_cells)
+
+        self.fill_empty_space(widget_map, left_over_pixels)
+
+        self.grid.show_all()
+
+    def fill_configured_widgets(self, horizontal_cells):
         widget_map = np.zeros((3, horizontal_cells), dtype=int)
         for widget, config in self.widget_dict.items():
             x, y = horizontal_cells - config.x - config.width, config.y
             x_end, y_end = horizontal_cells - config.x, config.y + config.height
             widget_map[y:y_end, x:x_end] = 1
             self.grid.attach(widget, x, y, config.width, config.height)
+        return widget_map
 
+    def fill_empty_space(self, widget_map, left_over_pixels):
         first_non_empty_index = np.min((widget_map != 0).argmax(axis=1))
         for n in range(first_non_empty_index):
             width = CELL_SIZE
             if n == 0:
                 width += left_over_pixels
             self.grid.attach(status_widget.LcarswmStatusWidget(width, CELL_SIZE, self.css_provider), n, 0, 1, 1)
-
-        self.grid.show_all()
 
     @staticmethod
     def update_widgets(stop, self):
