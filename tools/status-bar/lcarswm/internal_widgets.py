@@ -17,7 +17,8 @@ from gi.repository import Gtk, Pango, PangoCairo
 class LcarswmStatusText(LcarswmStatusWidget):
     """
     LcarswmStatusText is an abstract class that acts as a frame for widgets
-    that display one short line of text.
+    that display one short line of text. This widget draws text without its
+    font ascent and descent area!
 
     To use: extend this class and override the create_text method.
     """
@@ -53,6 +54,9 @@ class LcarswmStatusText(LcarswmStatusWidget):
 
 
 class LcarswmStatusTime(LcarswmStatusText):
+    """
+    This widget draws the local time in a 24h format.
+    """
     def __init__(self, width, height, css_provider):
         LcarswmStatusText.__init__(self, width, height, css_provider)
 
@@ -62,6 +66,9 @@ class LcarswmStatusTime(LcarswmStatusText):
 
 
 class LcarswmStatusDate(LcarswmStatusText):
+    """
+    This widget draws the current date.
+    """
     def __init__(self, width, height, css_provider):
         LcarswmStatusText.__init__(self, width, height, css_provider)
 
@@ -71,6 +78,12 @@ class LcarswmStatusDate(LcarswmStatusText):
 
 
 class LcarswmStatusStardate(LcarswmStatusText):
+    """
+    This widget draws the current star date.
+
+    Hint: I don't know anymore where I got the formula from ...
+        got something better? Feel free to adjust it.
+    """
     def __init__(self, width, height, css_provider):
         LcarswmStatusText.__init__(self, width, height, css_provider)
 
@@ -117,6 +130,9 @@ class LcarswmStatusStardate(LcarswmStatusText):
 
 
 class LcarswmStatusTemperature(LcarswmStatusWidget):
+    """
+    This widget draws temperatures from thermal zones into a graph.
+    """
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
@@ -125,6 +141,9 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         self.max_scale = 125
         self.min_dimension = min(self.cx, self.cy)
         self.scale = self.min_dimension / self.max_scale
+
+        self.attention_temperature = 60
+        self.warning_temperature = 80
 
         self.drawing_area = Gtk.DrawingArea()
         self.drawing_area.set_size_request(width, height)
@@ -171,10 +190,10 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
 
         context.set_source_rgb(1.0, 0.8, 0.6)
         context.set_source_rgba(1.0, 0.8, 0.6, 0.6)
-        if max_temp > 60:
+        if max_temp > self.attention_temperature:
             context.set_source_rgb(1.0, 0.6, 0.0)
             context.set_source_rgba(1.0, 0.6, 0.0, 0.6)
-        if max_temp > 80:
+        if max_temp > self.warning_temperature:
             context.set_source_rgb(0.8, 0.4, 0.4)
             context.set_source_rgba(0.8, 0.4, 0.4, 0.6)
 
@@ -222,6 +241,9 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
 
 
 class LcarswmStatusFiller(LcarswmStatusWidget):
+    """
+    This widget is used to fill empty space in the status bar.
+    """
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
