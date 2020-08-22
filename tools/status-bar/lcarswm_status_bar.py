@@ -3,7 +3,7 @@ from threading import Thread
 from time import sleep
 import importlib
 import numpy as np
-from lcarswm import status_widget
+from lcarswm import internal_widgets as iw
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -65,7 +65,6 @@ def get_widgets():
     widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusDate", 0, 1, 4, 1))
     widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusStardate", 0, 2, 4, 1))
     widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusTemperature", 4, 0, 3, 3))
-    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusFiller", 7, 0, 2, 1))
 
     return widgets
 
@@ -135,7 +134,7 @@ class LcarswmStatusBar(Gtk.Window):
     def update_layout(self):
         horizontal_cells, left_over_pixels = self.get_cells_and_overflow()
         self.cleanup_grid()
-        self.map_widgets(horizontal_cells, left_over_pixels)
+        self.fill_status_bar(horizontal_cells, left_over_pixels)
 
     def get_cells_and_overflow(self):
         horizontal_cells = int(self.width / (CELL_SIZE + GAP_SIZE))
@@ -148,7 +147,7 @@ class LcarswmStatusBar(Gtk.Window):
         return horizontal_cells, left_over_pixels
 
     def cleanup_grid(self):
-        for widget in self.widget_dict:
+        for widget in self.grid.get_children():
             self.grid.remove(widget)
 
     def fill_status_bar(self, horizontal_cells, left_over_pixels):
@@ -169,11 +168,32 @@ class LcarswmStatusBar(Gtk.Window):
 
     def fill_empty_space(self, widget_map, left_over_pixels):
         first_non_empty_index = np.min((widget_map != 0).argmax(axis=1))
-        for n in range(first_non_empty_index):
-            width = CELL_SIZE
-            if n == 0:
-                width += left_over_pixels
-            self.grid.attach(status_widget.LcarswmStatusWidget(width, CELL_SIZE, self.css_provider), n, 0, 1, 1)
+
+        pixels_to_add = left_over_pixels
+        if first_non_empty_index % 2 != 0:
+            pixels_to_add += CELL_SIZE + GAP_SIZE
+
+        filler_count = int(first_non_empty_index / 2)
+        pixels_per_filler = LcarswmStatusBar.additional_pixels_per_filler(filler_count, pixels_to_add)
+
+        for col in range(filler_count):
+            width = CELL_SIZE * 2 + GAP_SIZE + pixels_per_filler[col]
+            for row in range(3):
+                self.grid.attach(iw.LcarswmStatusFiller(width, CELL_SIZE, self.css_provider), col*2, row, 2, 1)
+
+    @staticmethod
+    def additional_pixels_per_filler(filler_count, pixels_to_add):
+        pixels_per_filler = np.empty(filler_count, dtype=int)
+        if filler_count == 0:
+            return []
+
+        full_pixels = int(np.floor(pixels_to_add / filler_count))
+        rest_pixels = pixels_to_add % filler_count
+
+        pixels_per_filler.fill(full_pixels)
+        pixels_per_filler[0:rest_pixels] = pixels_per_filler[0:rest_pixels] + 1
+
+        return pixels_per_filler
 
     @staticmethod
     def update_widgets(stop, self):
