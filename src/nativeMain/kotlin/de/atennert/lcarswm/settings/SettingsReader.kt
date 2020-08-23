@@ -19,6 +19,7 @@ class SettingsReader(
     configPath: String
 ) {
     private val settingsFilePath = "$configPath$SETTINGS_FILE"
+    private val defaultSettingsFilePath = "/etc/$SETTINGS_FILE"
 
     var keyBindings: Set<KeyBinding> = emptySet()
     private set
@@ -32,34 +33,30 @@ class SettingsReader(
     )
 
     init {
+        var usedSettings = settingsFilePath
         if (!doUserSettingsExist()) {
-            addDefaultSettings()
+            usedSettings = defaultSettingsFilePath
         }
 
-        loadSettings()
+        loadSettings(usedSettings)
     }
 
     private fun doUserSettingsExist(): Boolean {
         return systemApi.access(settingsFilePath, F_OK) != -1
     }
 
-    private fun addDefaultSettings(): Boolean {
-        logger.logDebug("SettingsReader::addDefaultSettings::write initial settings")
-        return SettingsWriter.writeInitialSettings(systemApi, settingsFilePath)
-    }
-
-    private fun loadSettings() {
+    private fun loadSettings(settingsFilePath: String) {
         val document = systemApi.readXmlFile(settingsFilePath)
         if (document != null) {
             logger.logDebug("SettingsReader::loadSettings::loading settings from XML")
             if (!readSettingsFromDocument(document)) {
                 logger.logInfo("SettingsReader::loadSettings::loading internal default settings")
-                loadDefaultSettings()
+                loadInternalDefaultSettings()
             }
             systemApi.freeXmlDoc(document)
         } else {
             logger.logInfo("SettingsReader::loadSettings::loading internal default settings")
-            loadDefaultSettings()
+            loadInternalDefaultSettings()
         }
     }
 
@@ -175,7 +172,7 @@ class SettingsReader(
         return true
     }
 
-    private fun loadDefaultSettings() {
+    private fun loadInternalDefaultSettings() {
         keyBindings = setOf(
             KeyExecution("XF86AudioMute", "amixer set Master toggle"),
             KeyExecution("XF86AudioRaiseVolume", "amixer set Master 3%+"),
