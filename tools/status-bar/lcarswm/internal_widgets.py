@@ -157,7 +157,7 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         self.draw_data(context)
 
     def draw_radar_cross(self, context):
-        context.set_source_rgb(0.6, 0.6, 0.6)
+        context.set_source_rgb(0.6, 0.6, 0.8)
 
         context.move_to(0, self.cy)
         context.line_to(self.width, self.cy)
