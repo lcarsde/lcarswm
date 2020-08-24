@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<status-config>
+    <!--
+    A widget configuration entry consists of a widget tag that has a widget class name and module (mandatory).
+    If necessary you can specify the package of the widget module.
+
+    In the widget entry there has to be one position tag with x, y, width and height of the widget in cells. Each cell
+    is 40px by 40px. If the widget spans over multiple cells then it also spans over 8px gaps between the cells.
+
+    If the widget needs certain properties than they can be set inside the properties tag in separate property tags.
+    Each property needs to have a key and a value. The properties are handed to the widget as dict, so keys need to be
+    unique.
+
+    Example entry below:
+    -->
+
+    <!--<widget package="mypackage" module="my_module" name="MyWidget">
+        <position x="0" y="0" width="2" height="1" />
+        <properties>
+            <property key="key1" value="value1" />
+            <property key="key2" value="value2" />
+        </properties>
+    </widget>-->
+
+    <widget module="lcarswm.internal_widgets" name="LcarswmStatusTime">
+        <position x="0" y="0" width="4" height="1" />
+    </widget>
+    <widget module="lcarswm.internal_widgets" name="LcarswmStatusDate">
+        <position x="0" y="1" width="4" height="1" />
+    </widget>
+    <widget module="lcarswm.internal_widgets" name="LcarswmStatusStardate">
+        <position x="0" y="2" width="4" height="1" />
+    </widget>
+    <widget module="lcarswm.internal_widgets" name="LcarswmStatusTemperature">
+        <position x="4" y="0" width="3" height="3" />
+    </widget>
+</status-config>
