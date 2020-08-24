@@ -178,6 +178,11 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
 
     def draw_data(self, context):
         temperatures = LcarswmStatusTemperature.sort_dict(LcarswmStatusTemperature.get_temperatures()).values()
+
+        if not temperatures:
+            # the system doesn't give us temperature sensors (maybe a virtual machine)
+            return
+
         angle = 0
         points = []
         max_temp = 0
