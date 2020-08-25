@@ -93,6 +93,9 @@ class LcarswmAppMenu(Gtk.Window):
         self.css_provider = Gtk.CssProvider()
         self.css_provider.load_from_data(css)
 
+        scroll_container = Gtk.ScrolledWindow()
+        scroll_container.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+
         self.app_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
 
         spacer = Gtk.Label(label="")
@@ -100,7 +103,8 @@ class LcarswmAppMenu(Gtk.Window):
         spacer.get_style_context().add_provider(self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.app_container.pack_end(spacer, True, True, 0)
 
-        self.add(self.app_container)
+        scroll_container.add(self.app_container)
+        self.add(scroll_container)
         self.entries = {}
 
         self.set_decorated(False)
