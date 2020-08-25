@@ -4,6 +4,7 @@ from time import sleep
 import importlib
 import numpy as np
 from lcarswm import internal_widgets as iw
+import xml.etree.ElementTree as ET
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -56,6 +57,34 @@ class WidgetConfiguration:
         self.y = y
         self.width = width
         self.height = height
+
+
+class ConfigProvider:
+    def __init__(self, path):
+        self.path = path
+
+    def load_widget_configuration(self):
+        root = ET.ElementTree(file=self.path).getroot()
+        widgets = set()
+
+        for configuration in root:
+            package = None if "package" not in configuration.attrib else configuration.attrib["package"]
+            module = configuration.attrib["module"]
+            name = configuration.attrib["name"]
+            x = y = width = height = None
+            properties = {}
+            for elem in configuration:
+                if elem.tag == "position":
+                    x = int(elem.attrib["x"])
+                    y = int(elem.attrib["y"])
+                    width = int(elem.attrib["width"])
+                    height = int(elem.attrib["height"])
+                elif elem.tag == "properties":
+                    for property in elem:
+                        properties[property.attrib["key"]] = property.attrib["value"]
+            widgets.add(WidgetConfiguration(package, module, name, x, y, width, height))
+
+        return widgets
 
 
 def get_widgets():
@@ -141,8 +170,9 @@ class LcarswmStatusBar(Gtk.Window):
 
         :return: dictionary of the widget instances and their configurations
         """
+        provider = ConfigProvider("/etc/lcarswm/status-config.xml")
         widget_dict = {}
-        for widget_config in get_widgets():
+        for widget_config in provider.load_widget_configuration():
             widget = getattr(importlib.import_module(widget_config.module, widget_config.package), widget_config.widget)
             widget_instance = widget(LcarswmStatusBar.get_pixels_for_cells(widget_config.width),
                                      LcarswmStatusBar.get_pixels_for_cells(widget_config.height),
