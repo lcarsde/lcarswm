@@ -18,12 +18,12 @@ class KeyConfiguration(
     private val keySymCommands = mutableMapOf<Pair<KeySym, Int>, KeyBinding>()
 
     private val modKeyBindings = mapOf(
-        Pair(Modifiers.CONTROL, setOf("Ctrl")),
-        Pair(Modifiers.SHIFT, setOf("Shift")),
-        Pair(Modifiers.ALT, setOf("Alt")),
-        Pair(Modifiers.SUPER, setOf("Super", "Win", "Lin")),
-        Pair(Modifiers.META, setOf("Meta")),
-        Pair(Modifiers.HYPER, setOf("Hyper"))
+        Modifiers.CONTROL to setOf("Ctrl"),
+        Modifiers.SHIFT to setOf("Shift"),
+        Modifiers.ALT to setOf("Alt"),
+        Modifiers.SUPER to setOf("Super", "Win", "Lin"),
+        Modifiers.META to setOf("Meta"),
+        Modifiers.HYPER to setOf("Hyper"),
     )
 
     init {

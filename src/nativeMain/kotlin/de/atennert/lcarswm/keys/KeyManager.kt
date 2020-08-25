@@ -57,9 +57,9 @@ class KeyManager(private val inputApi: InputApi) {
         var metaLUsed = false
 
         val modifierMasks = mutableMapOf(
-            Pair(Modifiers.CAPS_LOCK, LockMask),
-            Pair(Modifiers.SHIFT, ShiftMask),
-            Pair(Modifiers.CONTROL, ControlMask)
+            Modifiers.CAPS_LOCK to LockMask,
+            Modifiers.SHIFT to ShiftMask,
+            Modifiers.CONTROL to ControlMask,
         )
 
         for (i in modifierIndexes.indices) {

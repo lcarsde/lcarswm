@@ -31,14 +31,14 @@ class KeyManagerTest {
         val keyManager = KeyManager(systemApi)
 
         val expectedModifiers = mutableMapOf(
-            Pair(Modifiers.CAPS_LOCK, LockMask),
-            Pair(Modifiers.SHIFT, ShiftMask),
-            Pair(Modifiers.CONTROL, ControlMask),
-            Pair(Modifiers.ALT, 0x8),
-            Pair(Modifiers.HYPER, 0x10),
-            Pair(Modifiers.META, 0x20),
-            Pair(Modifiers.SUPER, 0x40),
-            Pair(Modifiers.SCROLL_LOCK, 0x80)
+            Modifiers.CAPS_LOCK to LockMask,
+            Modifiers.SHIFT to ShiftMask,
+            Modifiers.CONTROL to ControlMask,
+            Modifiers.ALT to 0x8,
+            Modifiers.HYPER to 0x10,
+            Modifiers.META to 0x20,
+            Modifiers.SUPER to 0x40,
+            Modifiers.SCROLL_LOCK to 0x80,
         )
 
         assertEquals(expectedModifiers, keyManager.modMasks, "The KeyManager should get the required modifier keys")

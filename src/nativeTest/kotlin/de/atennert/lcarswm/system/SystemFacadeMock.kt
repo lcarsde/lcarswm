@@ -240,24 +240,24 @@ open class SystemFacadeMock : SystemApi {
     private var startKeyCode = 0
 
     val keyStrings = mapOf(
-        Pair("Tab", XK_Tab),
-        Pair("A", XK_A),
-        Pair("B", XK_B),
-        Pair("C", XK_C),
-        Pair("D", XK_D),
-        Pair("E", XK_E),
-        Pair("I", XK_I),
-        Pair("M", XK_M),
-        Pair("Q", XK_Q),
-        Pair("T", XK_T),
-        Pair("X", XK_X),
-        Pair("F4", XK_F4),
-        Pair("Up", XK_Up),
-        Pair("Down", XK_Down),
-        Pair("space", XK_space),
-        Pair("XF86AudioMute", XF86XK_AudioMute),
-        Pair("XF86AudioRaiseVolume", XF86XK_AudioRaiseVolume),
-        Pair("XF86AudioLowerVolume", XF86XK_AudioLowerVolume)
+        "Tab" to XK_Tab,
+        "A" to XK_A,
+        "B" to XK_B,
+        "C" to XK_C,
+        "D" to XK_D,
+        "E" to XK_E,
+        "I" to XK_I,
+        "M" to XK_M,
+        "Q" to XK_Q,
+        "T" to XK_T,
+        "X" to XK_X,
+        "F4" to XK_F4,
+        "Up" to XK_Up,
+        "Down" to XK_Down,
+        "space" to XK_space,
+        "XF86AudioMute" to XF86XK_AudioMute,
+        "XF86AudioRaiseVolume" to XF86XK_AudioRaiseVolume,
+        "XF86AudioLowerVolume" to XF86XK_AudioLowerVolume,
     )
 
     val stringKeys = keyStrings.map { (s, i) -> Pair(i, s) }.toMap()

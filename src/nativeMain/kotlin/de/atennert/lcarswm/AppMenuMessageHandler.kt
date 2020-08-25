@@ -15,8 +15,8 @@ class AppMenuMessageHandler(
     private val focusHandler: WindowFocusHandler
 ) {
     private val messageHandlers = mapOf(
-        Pair("close", this::handleClose),
-        Pair("select", this::handleSelection)
+        "close" to this::handleClose,
+        "select" to this::handleSelection,
     )
 
     fun handleMessage(message: String) {

@@ -17,12 +17,12 @@ const val X_FALSE = 0
 const val X_TRUE = 1
 
 val LCARS_WM_KEY_SYMS = mapOf(
-    Pair(XK_Tab, Modifiers.ALT), // toggle through windows
-    Pair(XK_Up, Modifiers.ALT), // move windows up the monitor list
-    Pair(XK_Down, Modifiers.ALT), // move windows down the monitor list
-    Pair(XK_F4, Modifiers.ALT), // close window
-    Pair(XK_M, Modifiers.SUPER), // toggle screen mode
-    Pair(XK_Q, Modifiers.SUPER) // quit
+    XK_Tab to Modifiers.ALT, // toggle through windows
+    XK_Up to Modifiers.ALT, // move windows up the monitor list
+    XK_Down to Modifiers.ALT, // move windows down the monitor list
+    XK_F4 to Modifiers.ALT, // close window
+    XK_M to Modifiers.SUPER, // toggle screen mode
+    XK_Q to Modifiers.SUPER, // quit
 )
 
 // layout values

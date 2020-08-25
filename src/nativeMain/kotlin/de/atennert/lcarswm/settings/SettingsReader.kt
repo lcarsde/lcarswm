@@ -28,8 +28,8 @@ class SettingsReader(
     private set
 
     private val generalSettingsDefault = mapOf(
-        Pair(GeneralSetting.TITLE, "LCARS"),
-        Pair(GeneralSetting.FONT, "Ubuntu Condensed")
+        GeneralSetting.TITLE to "LCARS",
+        GeneralSetting.FONT to "Ubuntu Condensed",
     )
 
     init {
