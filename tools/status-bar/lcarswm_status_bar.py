@@ -87,17 +87,6 @@ class ConfigProvider:
         return widgets
 
 
-def get_widgets():
-    widgets = set()
-
-    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusTime", 0, 0, 4, 1))
-    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusDate", 0, 1, 4, 1))
-    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusStardate", 0, 2, 4, 1))
-    widgets.add(WidgetConfiguration(None, "lcarswm.internal_widgets", "LcarswmStatusTemperature", 4, 0, 3, 3))
-
-    return widgets
-
-
 class LcarswmStatusBar(Gtk.Window):
     """
     The status bar window implementation
