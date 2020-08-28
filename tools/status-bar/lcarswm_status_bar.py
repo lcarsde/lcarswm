@@ -5,6 +5,7 @@ import importlib
 import numpy as np
 from lcarswm import internal_widgets as iw
 import xml.etree.ElementTree as ET
+import os.path
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -59,32 +60,36 @@ class WidgetConfiguration:
         self.height = height
 
 
-class ConfigProvider:
-    def __init__(self, path):
-        self.path = path
+def get_configuration_path():
+    path = "{0}/.config/lcarswm/status-config.xml".format(os.environ.get('HOME'))
+    if not os.path.isfile(path):
+        print("no local config -> falling back to global config")
+        path = "/etc/lcarswm/status-config.xml"
+    return path
 
-    def load_widget_configuration(self):
-        root = ET.ElementTree(file=self.path).getroot()
-        widgets = set()
 
-        for configuration in root:
-            package = None if "package" not in configuration.attrib else configuration.attrib["package"]
-            module = configuration.attrib["module"]
-            name = configuration.attrib["name"]
-            x = y = width = height = None
-            properties = {}
-            for elem in configuration:
-                if elem.tag == "position":
-                    x = int(elem.attrib["x"])
-                    y = int(elem.attrib["y"])
-                    width = int(elem.attrib["width"])
-                    height = int(elem.attrib["height"])
-                elif elem.tag == "properties":
-                    for property in elem:
-                        properties[property.attrib["key"]] = property.attrib["value"]
-            widgets.add(WidgetConfiguration(package, module, name, x, y, width, height))
+def load_widget_configuration(path):
+    root = ET.ElementTree(file=path).getroot()
+    widgets = set()
 
-        return widgets
+    for configuration in root:
+        package = None if "package" not in configuration.attrib else configuration.attrib["package"]
+        module = configuration.attrib["module"]
+        name = configuration.attrib["name"]
+        x = y = width = height = None
+        properties = {}
+        for elem in configuration:
+            if elem.tag == "position":
+                x = int(elem.attrib["x"])
+                y = int(elem.attrib["y"])
+                width = int(elem.attrib["width"])
+                height = int(elem.attrib["height"])
+            elif elem.tag == "properties":
+                for property in elem:
+                    properties[property.attrib["key"]] = property.attrib["value"]
+        widgets.add(WidgetConfiguration(package, module, name, x, y, width, height))
+
+    return widgets
 
 
 class LcarswmStatusBar(Gtk.Window):
@@ -159,9 +164,9 @@ class LcarswmStatusBar(Gtk.Window):
 
         :return: dictionary of the widget instances and their configurations
         """
-        provider = ConfigProvider("/etc/lcarswm/status-config.xml")
         widget_dict = {}
-        for widget_config in provider.load_widget_configuration():
+        configuration_path = get_configuration_path()
+        for widget_config in load_widget_configuration(configuration_path):
             widget = getattr(importlib.import_module(widget_config.module, widget_config.package), widget_config.widget)
             widget_instance = widget(LcarswmStatusBar.get_pixels_for_cells(widget_config.width),
                                      LcarswmStatusBar.get_pixels_for_cells(widget_config.height),
