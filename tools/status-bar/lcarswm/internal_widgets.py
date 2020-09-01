@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import os
 import math
 from random import randint
+import keyboard
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -252,10 +253,12 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
 
         lower_audio_button = self.create_button("l", css_provider)
         lower_audio_button.get_style_context().add_class("button--left")
+        lower_audio_button.connect("clicked", self.lower_volume)
         box.pack_start(lower_audio_button, False, False, 0)
 
         mute_audio_button = self.create_button("m", css_provider)
         mute_audio_button.get_style_context().add_class("button--middle")
+        mute_audio_button.connect("clicked", self.mute_volume)
         box.pack_start(mute_audio_button, False, False, 0)
 
         drawing_area = Gtk.DrawingArea()
@@ -264,6 +267,7 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
 
         raise_audio_button = self.create_button("r", css_provider)
         raise_audio_button.get_style_context().add_class("button--right")
+        raise_audio_button.connect("clicked", self.raise_volume)
         box.pack_start(raise_audio_button, False, False, 0)
 
         self.add(box)
@@ -275,6 +279,15 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         button.get_style_context().add_class("button--99c")
         button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         return button
+
+    def lower_volume(self, widget):
+        keyboard.send("XF86AudioLowerVolume")
+
+    def raise_volume(self, widget):
+        keyboard.send("XF86AudioRaiseVolume")
+
+    def mute_volume(self, widget):
+        keyboard.send("XF86AudioMute")
 
 
 class LcarswmStatusFiller(LcarswmStatusWidget):
