@@ -32,8 +32,19 @@ css = b'''
     color: #000;
     background-color: #99c;
     background: #99c; /* for Ubuntu */
+}
+.button--long {
     border-radius: 20px;
     padding: 2px 16px;
+}
+.button--left {
+    border-radius: 20px 0 0 20px;
+}
+.button--middle {
+    border-radius: 0;
+}
+.button--right {
+    border-radius: 0 20px 20px 0;
 }
 .window {
     background-color: #000;

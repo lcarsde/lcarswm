@@ -245,6 +245,38 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         return self.cx + x, self.cy + y
 
 
+class LcarswmStatusAudio(LcarswmStatusWidget):
+    def __init__(self, width, height, css_provider):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider)
+        box = Gtk.Box(spacing=8)
+
+        lower_audio_button = self.create_button("l", css_provider)
+        lower_audio_button.get_style_context().add_class("button--left")
+        box.pack_start(lower_audio_button, False, False, 0)
+
+        mute_audio_button = self.create_button("m", css_provider)
+        mute_audio_button.get_style_context().add_class("button--middle")
+        box.pack_start(mute_audio_button, False, False, 0)
+
+        drawing_area = Gtk.DrawingArea()
+        drawing_area.set_size_request(40, 40)
+        box.pack_start(drawing_area, False, False, 0)
+
+        raise_audio_button = self.create_button("r", css_provider)
+        raise_audio_button.get_style_context().add_class("button--right")
+        box.pack_start(raise_audio_button, False, False, 0)
+
+        self.add(box)
+
+    @staticmethod
+    def create_button(label, css_provider):
+        button = Gtk.Button(label=label)
+        button.set_size_request(40, 40)
+        button.get_style_context().add_class("button--99c")
+        button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        return button
+
+
 class LcarswmStatusFiller(LcarswmStatusWidget):
     """
     This widget is used to fill empty space in the status bar.
@@ -259,6 +291,7 @@ class LcarswmStatusFiller(LcarswmStatusWidget):
         self.add(self.label)
 
         self.label.get_style_context().add_class("button--99c")
+        self.label.get_style_context().add_class("button--long")
         self.label.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.update()
