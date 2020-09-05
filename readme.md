@@ -82,7 +82,6 @@ Thank you very much to the creators of the following resources:
 * Center popups and adjust the frame to their size
 * Content for the data bar (empty upper area in normal mode)
   * Configurable plugin framework
-  * Master volume
   * Processor usage
   * Memory usage
   * Connection state of network interfaces
