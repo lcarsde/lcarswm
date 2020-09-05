@@ -147,6 +147,8 @@ class LcarswmStatusBar(Gtk.Window):
         # mark myself as the app menu
         self.get_property("window").set_utf8_property("LCARSWM_STATUS_BAR", "LCARSWM_STATUS_BAR")
         self.update_thread.start()
+        for widget in self.widget_dict.keys():
+            widget.start()
 
     def on_destroy(self, window):
         """
@@ -155,6 +157,8 @@ class LcarswmStatusBar(Gtk.Window):
         :param window: the window (same as self)
         """
         self.stop_threads = True
+        for widget in self.widget_dict.keys():
+            widget.stop()
         self.update_thread.join()
 
     def on_size_allocate(self, window, event):

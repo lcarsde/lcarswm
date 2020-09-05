@@ -19,6 +19,18 @@ class LcarswmStatusWidget(Gtk.Bin):
 
     def update(self):
         """
-        Called for triggering an update of the widget data
+        Called for triggering an update of the widget data.
+        """
+        pass
+
+    def start(self):
+        """
+        Called on creation of status bar. Use to initialize threads and things.
+        """
+        pass
+
+    def stop(self):
+        """
+        Called on shutdown of the status bar. Use to stop threads and cleanup things.
         """
         pass
