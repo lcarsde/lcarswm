@@ -65,7 +65,7 @@ Thank you very much to the creators of the following resources:
 ### For using
 * Ubuntu Condensed font: It comes close enough to LCARS letters and is used by lcarswm as default for writing.
 * Libraries for XLib, randr, xpm, libxml2, glib and pango. Check the travis yaml for details via the corresponding dev libs.
-* Python 3.8 with Python 3 gi and Python 3 posix-ipc packages for the app menu
+* Python 3.8 with Python 3 gi and posix-ipc, numpy and pyalsaaudio packages for the app menu
 * The applications for the default keybindings are recommended in the debian setup and are xterm, firefox and alsa-utils (amixer). The default application key bindings are
   * Lin+T -> xterm
   * Lin+B -> firefox (B for browser)
@@ -102,3 +102,7 @@ Thank you very much to the creators of the following resources:
   * missing /usr/share/doc/lcarswm/changelog.Debian.gz
   * missing-dependency-on-libc
 * use default settings in /etc/lcarswm/
+
+## Credits
+Original author: [Andreas Tennert](https://github.com/atennert)
+Current author: [Andreas Tennert](https://github.com/atennert)
