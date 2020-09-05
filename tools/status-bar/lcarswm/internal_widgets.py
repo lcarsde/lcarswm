@@ -26,8 +26,8 @@ class LcarswmStatusText(LcarswmStatusWidget):
     To use: extend this class and override the create_text method.
     """
 
-    def __init__(self, width, height, css_provider):
-        LcarswmStatusWidget.__init__(self, width, height, css_provider)
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
         self.drawing_area = Gtk.DrawingArea()
         self.drawing_area.set_size_request(width, height)
@@ -62,8 +62,8 @@ class LcarswmStatusTime(LcarswmStatusText):
     This widget draws the local time in a 24h format.
     """
 
-    def __init__(self, width, height, css_provider):
-        LcarswmStatusText.__init__(self, width, height, css_provider)
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusText.__init__(self, width, height, css_provider, properties)
 
     def create_text(self):
         now = datetime.now()
@@ -75,8 +75,8 @@ class LcarswmStatusDate(LcarswmStatusText):
     This widget draws the current date.
     """
 
-    def __init__(self, width, height, css_provider):
-        LcarswmStatusText.__init__(self, width, height, css_provider)
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusText.__init__(self, width, height, css_provider, properties)
 
     def create_text(self):
         now = datetime.now()
@@ -91,8 +91,8 @@ class LcarswmStatusStardate(LcarswmStatusText):
         got something better? Feel free to adjust it.
     """
 
-    def __init__(self, width, height, css_provider):
-        LcarswmStatusText.__init__(self, width, height, css_provider)
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusText.__init__(self, width, height, css_provider, properties)
 
     @staticmethod
     def days_per_month(days_per_year):
@@ -141,8 +141,8 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
     This widget draws temperatures from thermal zones into a graph.
     """
 
-    def __init__(self, width, height, css_provider):
-        LcarswmStatusWidget.__init__(self, width, height, css_provider)
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
         self.cx = width / 2
         self.cy = height / 2
@@ -254,8 +254,8 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
 
 
 class LcarswmStatusAudio(LcarswmStatusWidget):
-    def __init__(self, width, height, css_provider):
-        LcarswmStatusWidget.__init__(self, width, height, css_provider)
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
         self.audio_mixer = audio.AlsaAudioMixer(self.update_mute, self.update_volume)
         self.current_volume = 0
@@ -393,8 +393,8 @@ class LcarswmStatusFiller(LcarswmStatusWidget):
     This widget is used to fill empty space in the status bar.
     """
 
-    def __init__(self, width, height, css_provider):
-        LcarswmStatusWidget.__init__(self, width, height, css_provider)
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
         text = str(randint(0, 9999)).zfill(4)
         self.label = Gtk.Label(label=text)
