@@ -254,8 +254,6 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
 
 
 class LcarswmStatusAudio(LcarswmStatusWidget):
-    name = "LcarswmStatusAlsaAudio"
-
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
@@ -265,11 +263,11 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
 
         box = Gtk.Box(spacing=8)
 
-        lower_audio_button = self.create_button("l", css_provider, {"button--left", "button--f90"})
+        lower_audio_button = self.create_button(css_provider, {"button--left", "button--f90"}, self.draw_lower)
         lower_audio_button.connect("clicked", self.lower_volume)
         box.pack_start(lower_audio_button, False, False, 0)
 
-        self.mute_audio_button = self.create_button("m", css_provider, {"button--middle", "button--99c"})
+        self.mute_audio_button = self.create_button(css_provider, {"button--middle", "button--99c"}, self.draw_mute)
         self.mute_audio_button.connect("clicked", self.toggle_mute)
         box.pack_start(self.mute_audio_button, False, False, 0)
 
@@ -278,7 +276,7 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         self.drawing_area.connect('draw', self.draw_volume)
         box.pack_start(self.drawing_area, False, False, 0)
 
-        raise_audio_button = self.create_button("r", css_provider, {"button--right", "button--f90"})
+        raise_audio_button = self.create_button(css_provider, {"button--right", "button--f90"}, self.draw_raise)
         raise_audio_button.connect("clicked", self.raise_volume)
         box.pack_start(raise_audio_button, False, False, 0)
 
@@ -300,13 +298,54 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         self.audio_mixer.toggle_mute()
 
     @staticmethod
-    def create_button(label, css_provider, style_classes):
-        button = Gtk.Button(label=label)
+    def create_button(css_provider, style_classes, icon_draw_handle):
+        button = Gtk.Button()
         button.set_size_request(40, 40)
         for style_class in style_classes:
             button.get_style_context().add_class(style_class)
         button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        button.set_alignment(.5, .5)
+
+        icon_area = Gtk.DrawingArea()
+        icon_area.connect("draw", icon_draw_handle)
+        button.add(icon_area)
         return button
+
+    def draw_speaker(self, context):
+        context.move_to(28, 10)
+        context.line_to(28, 30)
+        context.line_to(20, 25)
+        context.line_to(12, 25)
+        context.line_to(12, 15)
+        context.line_to(20, 15)
+        context.close_path()
+        context.stroke()
+
+    def draw_mute(self, widget, context):
+        context.set_source_rgb(0.0, 0.0, 0.0)
+        self.draw_speaker(context)
+
+        context.move_to(10, 28)
+        context.line_to(30, 14)
+        context.stroke()
+
+    def draw_raise(self, widget, context):
+        context.set_source_rgb(0.0, 0.0, 0.0)
+        self.draw_speaker(context)
+
+        context.move_to(14, 20)
+        context.line_to(20, 20)
+        context.move_to(17, 17)
+        context.line_to(17, 23)
+        context.stroke()
+
+    def draw_lower(self, widget, context):
+        context.set_source_rgb(0.0, 0.0, 0.0)
+        self.draw_speaker(context)
+
+        context.move_to(14, 20)
+        context.line_to(20, 20)
+        context.stroke()
 
     def update_mute(self, new_mute):
         self.current_mute = new_mute
@@ -329,22 +368,22 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
             context.set_source_rgb(1.0, 0.8, 0.6)
 
         # draw sound triangle border
-        context.move_to(0, 40)
-        context.line_to(40, 40)
-        context.line_to(40, 0)
+        context.move_to(0, 39)
+        context.line_to(39, 39)
+        context.line_to(39, 0)
         context.close_path()
         context.stroke()
 
         # draw volume level
         display_volume = int(self.current_volume * 40 / 100)
-        context.rectangle(0, 0, display_volume, 40)
+        context.rectangle(0, 0, display_volume, 39)
         context.fill()
 
         # clear volume level drawn above triangle
         context.set_source_rgb(0.0, 0.0, 0.0)
         context.move_to(0, 0)
-        context.line_to(39, 0)
-        context.line_to(0, 39)
+        context.line_to(38, 0)
+        context.line_to(0, 38)
         context.close_path()
         context.fill()
 
