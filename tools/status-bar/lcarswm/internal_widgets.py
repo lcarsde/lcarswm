@@ -260,6 +260,8 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
         self.audio_mixer = audio.AlsaAudioMixer(self.update_mute, self.update_volume)
+        self.current_volume = 0
+        self.current_mute = False
 
         box = Gtk.Box(spacing=8)
 
@@ -271,9 +273,10 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         self.mute_audio_button.connect("clicked", self.toggle_mute)
         box.pack_start(self.mute_audio_button, False, False, 0)
 
-        drawing_area = Gtk.DrawingArea()
-        drawing_area.set_size_request(40, 40)
-        box.pack_start(drawing_area, False, False, 0)
+        self.drawing_area = Gtk.DrawingArea()
+        self.drawing_area.set_size_request(40, 40)
+        self.drawing_area.connect('draw', self.draw_volume)
+        box.pack_start(self.drawing_area, False, False, 0)
 
         raise_audio_button = self.create_button("r", css_provider, {"button--right", "button--f90"})
         raise_audio_button.connect("clicked", self.raise_volume)
@@ -306,6 +309,8 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         return button
 
     def update_mute(self, new_mute):
+        self.current_mute = new_mute
+        self.drawing_area.queue_draw()
         if new_mute:
             self.mute_audio_button.get_style_context().add_class("button--c66")
             self.mute_audio_button.get_style_context().remove_class("button--99c")
@@ -314,7 +319,34 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
             self.mute_audio_button.get_style_context().remove_class("button--c66")
 
     def update_volume(self, new_volume):
-        pass
+        self.current_volume = new_volume
+        self.drawing_area.queue_draw()
+
+    def draw_volume(self, widget, context):
+        if self.current_mute or (self.current_volume == 0):
+            context.set_source_rgb(0.6, 0.6, 0.8)
+        else:
+            context.set_source_rgb(1.0, 0.8, 0.6)
+
+        # draw sound triangle border
+        context.move_to(0, 40)
+        context.line_to(40, 40)
+        context.line_to(40, 0)
+        context.close_path()
+        context.stroke()
+
+        # draw volume level
+        display_volume = int(self.current_volume * 40 / 100)
+        context.rectangle(0, 0, display_volume, 40)
+        context.fill()
+
+        # clear volume level drawn above triangle
+        context.set_source_rgb(0.0, 0.0, 0.0)
+        context.move_to(0, 0)
+        context.line_to(39, 0)
+        context.line_to(0, 39)
+        context.close_path()
+        context.fill()
 
 
 class LcarswmStatusFiller(LcarswmStatusWidget):
