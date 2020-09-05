@@ -15,6 +15,7 @@ css = b'''
 * {
     font-family: 'Ubuntu Condensed', sans-serif;
     font-weight: 600;
+    letter-spacing: 0px;
     text-shadow: none;
     background-color: #000;
     background: #000; /* for Ubuntu */
@@ -25,13 +26,22 @@ css = b'''
     outline-style: none;
 }
 .button--99c {
-    font-family: 'Ubuntu Condensed', sans-serif;
-    font-weight: 600;
     font-size: 18px;
-    letter-spacing: 0px;
     color: #000;
     background-color: #99c;
     background: #99c; /* for Ubuntu */
+}
+.button--f96 {
+    font-size: 18px;
+    color: #000;
+    background-color: #f96;
+    background: #f96; /* for Ubuntu */
+}
+.button--c66 {
+    font-size: 18px;
+    color: #000;
+    background-color: #c66;
+    background: #c66; /* for Ubuntu */
 }
 .button--long {
     border-radius: 20px;
