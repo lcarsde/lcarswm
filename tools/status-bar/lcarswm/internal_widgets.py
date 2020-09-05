@@ -3,22 +3,18 @@ try:
 except ImportError:
     from .status_widget import LcarswmStatusWidget
 
+import lcarswm.audio as audio
+
 from datetime import datetime, timezone
 import os
 import math
 from random import randint
-import alsaaudio
-import threading
-import select
-import logging
 
 import gi
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('PangoCairo', '1.0')
 from gi.repository import Gtk, Pango, PangoCairo
-
-logger = logging.getLogger(__name__)
 
 
 class LcarswmStatusText(LcarswmStatusWidget):
@@ -262,15 +258,8 @@ class LcarswmStatusAlsaAudio(LcarswmStatusWidget):
 
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
-        self._observer = None
 
-        # TODO make properties
-        self.control = "Master"
-        self.current_mute = None
-        self.current_volume = None
-        self.max_volume = 100
-        self.min_volume = 0
-        self.audio_step_size = 3
+        self.audio_mixer = audio.AlsaAudioMixer(self.update_mute, self.update_volume)
 
         box = Gtk.Box(spacing=8)
 
@@ -293,18 +282,19 @@ class LcarswmStatusAlsaAudio(LcarswmStatusWidget):
         self.add(box)
 
     def start(self):
-        self._observer = AlsaMixerObserver(
-            control=self.control,
-            callback=self.handle_audio_changes,
-        )
-        self._observer.start()
+        self.audio_mixer.start()
 
     def stop(self):
-        self._observer.stop()
+        self.audio_mixer.stop()
 
-    @property
-    def _mixer(self):
-        return alsaaudio.Mixer(control=self.control)
+    def lower_volume(self, widget):
+        self.audio_mixer.lower_volume()
+
+    def raise_volume(self, widget):
+        self.audio_mixer.raise_volume()
+
+    def toggle_mute(self, widget):
+        self.audio_mixer.toggle_mute()
 
     @staticmethod
     def create_button(label, css_provider, style_classes):
@@ -315,72 +305,7 @@ class LcarswmStatusAlsaAudio(LcarswmStatusWidget):
         button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         return button
 
-    def lower_volume(self, widget):
-        self.change_volume(-self.audio_step_size)
-
-    def raise_volume(self, widget):
-        self.change_volume(self.audio_step_size)
-
-    def toggle_mute(self, widget):
-        self.set_mute(not self.current_mute)
-
-    def get_volume(self):
-        channels = self._mixer.getvolume()
-        if not channels:
-            return None
-        else:
-            # the channels might not have the same volume, use the smallest to avoid accidental loud noise
-            return min(channels)
-
-    def change_volume(self, difference):
-        if self.current_volume is None:
-            return
-
-        new_volume = max(self.min_volume, min(self.current_volume + difference, self.max_volume))
-        if new_volume != self.current_volume:
-            self._mixer.setvolume(new_volume)
-
-    def get_mute(self):
-        """
-        This method is taken from mopidy-alsamixer
-        (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
-        on 5th September 2020. A few adjustments were added.
-
-        The code of this class is licensed under Apache-2.0 License
-        """
-        try:
-            channels_muted = self._mixer.getmute()
-        except alsaaudio.ALSAAudioError as exc:
-            logger.debug("Getting mute state failed: {}".format(exc))
-            return None
-        if all(channels_muted):
-            return True
-        elif not any(channels_muted):
-            return False
-        else:
-            # Not all channels have the same mute state
-            return None
-
-    def set_mute(self, mute):
-        """
-        This method is taken from mopidy-alsamixer
-        (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
-        on 5th September 2020. A few adjustments were added.
-
-        The code of this class is licensed under Apache-2.0 License
-        """
-        try:
-            self._mixer.setmute(int(mute))
-            return True
-        except alsaaudio.ALSAAudioError as exc:
-            logger.debug("Setting mute state failed: {}".format(exc))
-            return False
-
     def update_mute(self, new_mute):
-        if self.current_mute == new_mute:
-            return
-
-        self.current_mute = new_mute
         if new_mute:
             self.mute_audio_button.get_style_context().add_class("button--c66")
             self.mute_audio_button.get_style_context().remove_class("button--99c")
@@ -389,60 +314,7 @@ class LcarswmStatusAlsaAudio(LcarswmStatusWidget):
             self.mute_audio_button.get_style_context().remove_class("button--c66")
 
     def update_volume(self, new_volume):
-        if self.current_volume == new_volume:
-            return
-
-        self.current_volume = new_volume
-
-    def handle_audio_changes(self):
-        self.update_mute(self.get_mute())
-        self.update_volume(self.get_volume())
-
-
-class AlsaMixerObserver(threading.Thread):
-    """
-    Deamon-thread based observer class for the ALSA audio status.
-
-    This class is taken from mopidy-alsamixer
-    (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
-    on 5th September 2020. A few adjustments were added.
-
-    The code of this class is licensed under Apache-2.0 License
-    """
-    daemon = True
-    name = "AlsaMixerObserver"
-
-    def __init__(self, control, callback=None):
-        super().__init__()
-        self.running = True
-
-        # Keep the mixer instance alive for the descriptors to work
-        self.mixer = alsaaudio.Mixer(control=control)
-        descriptors = self.mixer.polldescriptors()
-        assert len(descriptors) == 1
-        self.fd = descriptors[0][0]
-        self.event_mask = descriptors[0][1]
-
-        self.callback = callback
-
-    def stop(self):
-        self.running = False
-
-    def run(self):
-        poller = select.epoll()
-        poller.register(self.fd, self.event_mask | select.EPOLLET)
-        while self.running:
-            try:
-                events = poller.poll(timeout=1)
-                if events and self.callback is not None:
-                    self.callback()
-                    # we need to tell that we handled the events, so we get new ones
-                    self.mixer.handleevents()
-            except OSError as exc:
-                # poller.poll() will raise an IOError because of the
-                # interrupted system call when suspending the machine.
-                logger.debug("Ignored IO error: {}".format(exc))
-        poller.unregister(self.fd)
+        pass
 
 
 class LcarswmStatusFiller(LcarswmStatusWidget):
