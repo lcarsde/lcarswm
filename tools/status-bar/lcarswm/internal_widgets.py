@@ -253,7 +253,7 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         return self.cx + x, self.cy + y
 
 
-class LcarswmStatusAlsaAudio(LcarswmStatusWidget):
+class LcarswmStatusAudio(LcarswmStatusWidget):
     name = "LcarswmStatusAlsaAudio"
 
     def __init__(self, width, height, css_provider):

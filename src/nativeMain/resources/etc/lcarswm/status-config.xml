@@ -34,9 +34,10 @@
     <widget module="lcarswm.internal_widgets" name="LcarswmStatusTemperature">
         <position x="4" y="0" width="3" height="3" />
     </widget>
-    <widget module="lcarswm.internal_widgets" name="LcarswmStatusAlsaAudio">
+    <widget module="lcarswm.internal_widgets" name="LcarswmStatusAudio">
         <position x="7" y="0" width="4" height="1" />
         <properties>
+            <property key="handler" value="lcarswm.audio.AlsaAudioMixer" />
             <property key="control" value="Master"/><!-- might be PCM -->
         </properties>
     </widget>
