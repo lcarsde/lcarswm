@@ -7,12 +7,18 @@ from datetime import datetime, timezone
 import os
 import math
 from random import randint
-import keyboard
+import alsaaudio
+import threading
+import select
+import logging
 
 import gi
+
 gi.require_version("Gtk", "3.0")
 gi.require_version('PangoCairo', '1.0')
 from gi.repository import Gtk, Pango, PangoCairo
+
+logger = logging.getLogger(__name__)
 
 
 class LcarswmStatusText(LcarswmStatusWidget):
@@ -23,6 +29,7 @@ class LcarswmStatusText(LcarswmStatusWidget):
 
     To use: extend this class and override the create_text method.
     """
+
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
@@ -58,6 +65,7 @@ class LcarswmStatusTime(LcarswmStatusText):
     """
     This widget draws the local time in a 24h format.
     """
+
     def __init__(self, width, height, css_provider):
         LcarswmStatusText.__init__(self, width, height, css_provider)
 
@@ -70,6 +78,7 @@ class LcarswmStatusDate(LcarswmStatusText):
     """
     This widget draws the current date.
     """
+
     def __init__(self, width, height, css_provider):
         LcarswmStatusText.__init__(self, width, height, css_provider)
 
@@ -85,6 +94,7 @@ class LcarswmStatusStardate(LcarswmStatusText):
     Hint: I don't know anymore where I got the formula from ...
         got something better? Feel free to adjust it.
     """
+
     def __init__(self, width, height, css_provider):
         LcarswmStatusText.__init__(self, width, height, css_provider)
 
@@ -134,6 +144,7 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
     """
     This widget draws temperatures from thermal zones into a graph.
     """
+
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
@@ -192,7 +203,7 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
             points.append(point)
             if temp > max_temp:
                 max_temp = temp
-            angle = angle + 360/len(temperatures)
+            angle = angle + 360 / len(temperatures)
 
         context.set_source_rgb(1.0, 0.8, 0.6)
         context.set_source_rgba(1.0, 0.8, 0.6, 0.6)
@@ -246,9 +257,17 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         return self.cx + x, self.cy + y
 
 
-class LcarswmStatusAudio(LcarswmStatusWidget):
+class LcarswmStatusAlsaAudio(LcarswmStatusWidget):
+    name = "LcarswmStatusAlsaAudio"
+
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
+        self._observer = None
+        self.control = "Master"
+
+        self.current_mute = None
+        self.current_volume = None
+
         box = Gtk.Box(spacing=8)
 
         lower_audio_button = self.create_button("l", css_provider)
@@ -256,10 +275,10 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         lower_audio_button.connect("clicked", self.lower_volume)
         box.pack_start(lower_audio_button, False, False, 0)
 
-        mute_audio_button = self.create_button("m", css_provider)
-        mute_audio_button.get_style_context().add_class("button--middle")
-        mute_audio_button.connect("clicked", self.mute_volume)
-        box.pack_start(mute_audio_button, False, False, 0)
+        self.mute_audio_button = self.create_button("m", css_provider)
+        self.mute_audio_button.get_style_context().add_class("button--middle")
+        self.mute_audio_button.connect("clicked", self.toggle_mute)
+        box.pack_start(self.mute_audio_button, False, False, 0)
 
         drawing_area = Gtk.DrawingArea()
         drawing_area.set_size_request(40, 40)
@@ -272,6 +291,20 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
 
         self.add(box)
 
+    def start(self):
+        self._observer = AlsaMixerObserver(
+            control=self.control,
+            callback=self.handle_audio_changes,
+        )
+        self._observer.start()
+
+    def stop(self):
+        self._observer.stop()
+
+    @property
+    def _mixer(self):
+        return alsaaudio.Mixer(control=self.control)
+
     @staticmethod
     def create_button(label, css_provider):
         button = Gtk.Button(label=label)
@@ -281,19 +314,152 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         return button
 
     def lower_volume(self, widget):
-        keyboard.send("XF86AudioLowerVolume")
+        pass
 
     def raise_volume(self, widget):
-        keyboard.send("XF86AudioRaiseVolume")
+        pass
 
-    def mute_volume(self, widget):
-        keyboard.send("XF86AudioMute")
+    def toggle_mute(self, widget):
+        self.set_mute(not self.current_mute)
+
+    def get_volume(self):
+        """
+        This method is taken from mopidy-alsamixer
+        (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
+        on 5th September 2020. A few adjustments were added.
+
+        The code of this class is licensed under Apache-2.0 License
+        """
+        channels = self._mixer.getvolume()
+        if not channels:
+            return None
+        elif channels.count(channels[0]) == len(channels):
+            return self.mixer_volume_to_volume(channels[0])
+        else:
+            # Not all channels have the same volume
+            return None
+
+    def set_volume(self, volume):
+        """
+        This method is taken from mopidy-alsamixer
+        (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
+        on 5th September 2020. A few adjustments were added.
+
+        The code of this class is licensed under Apache-2.0 License
+        """
+        self._mixer.setvolume(self.volume_to_mixer_volume(volume))
+        return True
+
+    def get_mute(self):
+        """
+        This method is taken from mopidy-alsamixer
+        (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
+        on 5th September 2020. A few adjustments were added.
+
+        The code of this class is licensed under Apache-2.0 License
+        """
+        try:
+            channels_muted = self._mixer.getmute()
+        except alsaaudio.ALSAAudioError as exc:
+            logger.debug("Getting mute state failed: {}".format(exc))
+            return None
+        if all(channels_muted):
+            return True
+        elif not any(channels_muted):
+            return False
+        else:
+            # Not all channels have the same mute state
+            return None
+
+    def set_mute(self, mute):
+        """
+        This method is taken from mopidy-alsamixer
+        (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
+        on 5th September 2020. A few adjustments were added.
+
+        The code of this class is licensed under Apache-2.0 License
+        """
+        try:
+            self._mixer.setmute(int(mute))
+            return True
+        except alsaaudio.ALSAAudioError as exc:
+            logger.debug("Setting mute state failed: {}".format(exc))
+            return False
+
+    def update_mute(self, new_mute):
+        if self.current_mute == new_mute:
+            return
+
+        self.current_mute = new_mute
+        if new_mute:
+            self.mute_audio_button.get_style_context().add_class("button--c66")
+            self.mute_audio_button.get_style_context().remove_class("button--99c")
+        else:
+            self.mute_audio_button.get_style_context().add_class("button--99c")
+            self.mute_audio_button.get_style_context().remove_class("button--c66")
+
+    def update_volume(self, new_volume):
+        if self.current_volume == new_volume:
+            return
+
+        self.current_volume = new_volume
+
+    def handle_audio_changes(self):
+        self.update_mute(self.get_mute())
+        self.update_volume(self.get_volume())
+
+
+class AlsaMixerObserver(threading.Thread):
+    """
+    Deamon-thread based observer class for the ALSA audio status.
+
+    This class is taken from mopidy-alsamixer
+    (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
+    on 5th September 2020. A few adjustments were added.
+
+    The code of this class is licensed under Apache-2.0 License
+    """
+    daemon = True
+    name = "AlsaMixerObserver"
+
+    def __init__(self, control, callback=None):
+        super().__init__()
+        self.running = True
+
+        # Keep the mixer instance alive for the descriptors to work
+        self.mixer = alsaaudio.Mixer(control=control)
+        descriptors = self.mixer.polldescriptors()
+        assert len(descriptors) == 1
+        self.fd = descriptors[0][0]
+        self.event_mask = descriptors[0][1]
+
+        self.callback = callback
+
+    def stop(self):
+        self.running = False
+
+    def run(self):
+        poller = select.epoll()
+        poller.register(self.fd, self.event_mask | select.EPOLLET)
+        while self.running:
+            try:
+                events = poller.poll(timeout=1)
+                if events and self.callback is not None:
+                    self.callback()
+                    # we need to tell that we handled the events, so we get new ones
+                    self.mixer.handleevents()
+            except OSError as exc:
+                # poller.poll() will raise an IOError because of the
+                # interrupted system call when suspending the machine.
+                logger.debug("Ignored IO error: {}".format(exc))
+        poller.unregister(self.fd)
 
 
 class LcarswmStatusFiller(LcarswmStatusWidget):
     """
     This widget is used to fill empty space in the status bar.
     """
+
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
 
