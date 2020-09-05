@@ -263,20 +263,22 @@ class LcarswmStatusAlsaAudio(LcarswmStatusWidget):
     def __init__(self, width, height, css_provider):
         LcarswmStatusWidget.__init__(self, width, height, css_provider)
         self._observer = None
-        self.control = "Master"
 
+        # TODO make properties
+        self.control = "Master"
         self.current_mute = None
         self.current_volume = None
+        self.max_volume = 100
+        self.min_volume = 0
+        self.audio_step_size = 3
 
         box = Gtk.Box(spacing=8)
 
-        lower_audio_button = self.create_button("l", css_provider)
-        lower_audio_button.get_style_context().add_class("button--left")
+        lower_audio_button = self.create_button("l", css_provider, {"button--left", "button--f90"})
         lower_audio_button.connect("clicked", self.lower_volume)
         box.pack_start(lower_audio_button, False, False, 0)
 
-        self.mute_audio_button = self.create_button("m", css_provider)
-        self.mute_audio_button.get_style_context().add_class("button--middle")
+        self.mute_audio_button = self.create_button("m", css_provider, {"button--middle", "button--99c"})
         self.mute_audio_button.connect("clicked", self.toggle_mute)
         box.pack_start(self.mute_audio_button, False, False, 0)
 
@@ -284,8 +286,7 @@ class LcarswmStatusAlsaAudio(LcarswmStatusWidget):
         drawing_area.set_size_request(40, 40)
         box.pack_start(drawing_area, False, False, 0)
 
-        raise_audio_button = self.create_button("r", css_provider)
-        raise_audio_button.get_style_context().add_class("button--right")
+        raise_audio_button = self.create_button("r", css_provider, {"button--right", "button--f90"})
         raise_audio_button.connect("clicked", self.raise_volume)
         box.pack_start(raise_audio_button, False, False, 0)
 
@@ -306,49 +307,38 @@ class LcarswmStatusAlsaAudio(LcarswmStatusWidget):
         return alsaaudio.Mixer(control=self.control)
 
     @staticmethod
-    def create_button(label, css_provider):
+    def create_button(label, css_provider, style_classes):
         button = Gtk.Button(label=label)
         button.set_size_request(40, 40)
-        button.get_style_context().add_class("button--99c")
+        for style_class in style_classes:
+            button.get_style_context().add_class(style_class)
         button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         return button
 
     def lower_volume(self, widget):
-        pass
+        self.change_volume(-self.audio_step_size)
 
     def raise_volume(self, widget):
-        pass
+        self.change_volume(self.audio_step_size)
 
     def toggle_mute(self, widget):
         self.set_mute(not self.current_mute)
 
     def get_volume(self):
-        """
-        This method is taken from mopidy-alsamixer
-        (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
-        on 5th September 2020. A few adjustments were added.
-
-        The code of this class is licensed under Apache-2.0 License
-        """
         channels = self._mixer.getvolume()
         if not channels:
             return None
-        elif channels.count(channels[0]) == len(channels):
-            return self.mixer_volume_to_volume(channels[0])
         else:
-            # Not all channels have the same volume
-            return None
+            # the channels might not have the same volume, use the smallest to avoid accidental loud noise
+            return min(channels)
 
-    def set_volume(self, volume):
-        """
-        This method is taken from mopidy-alsamixer
-        (https://github.com/mopidy/mopidy-alsamixer/blob/master/mopidy_alsamixer/mixer.py),
-        on 5th September 2020. A few adjustments were added.
+    def change_volume(self, difference):
+        if self.current_volume is None:
+            return
 
-        The code of this class is licensed under Apache-2.0 License
-        """
-        self._mixer.setvolume(self.volume_to_mixer_volume(volume))
-        return True
+        new_volume = max(self.min_volume, min(self.current_volume + difference, self.max_volume))
+        if new_volume != self.current_volume:
+            self._mixer.setvolume(new_volume)
 
     def get_mute(self):
         """

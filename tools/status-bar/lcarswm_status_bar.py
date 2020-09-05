@@ -25,6 +25,12 @@ css = b'''
     margin: 0;
     outline-style: none;
 }
+.button--f90 {
+    font-size: 18px;
+    color: #000;
+    background-color: #f90;
+    background: #f90; /* for Ubuntu */
+}
 .button--99c {
     font-size: 18px;
     color: #000;
