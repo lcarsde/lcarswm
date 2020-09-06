@@ -3,12 +3,11 @@ try:
 except ImportError:
     from .status_widget import LcarswmStatusWidget
 
-import lcarswm.audio as audio
-
 from datetime import datetime, timezone
 import os
 import math
 from random import randint
+import importlib
 
 import gi
 
@@ -257,7 +256,12 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
     def __init__(self, width, height, css_provider, properties):
         LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
-        self.audio_mixer = audio.AlsaAudioMixer(self.update_mute, self.update_volume)
+        audio_handler_name = properties["handler"]
+        audio_handler_module = properties["handlerModule"]
+        audio_handler_package = properties.get("handlerPackage")
+        audio_handler_class = getattr(importlib.import_module(audio_handler_module, audio_handler_package), audio_handler_name)
+
+        self.audio_mixer = audio_handler_class(self.update_mute, self.update_volume)
         self.current_volume = 0
         self.current_mute = False
 

@@ -37,7 +37,12 @@
     <widget module="lcarswm.internal_widgets" name="LcarswmStatusAudio">
         <position x="7" y="0" width="4" height="1" />
         <properties>
-            <property key="handler" value="lcarswm.audio.AlsaAudioMixer" />
+            <!-- Audio widget properties -->
+            <!-- Audio handler needs to be an instance of lcarswm.audio.AudioMixer -->
+            <!--<property key="handlerPackage" value="lcarswm.audio.AlsaAudioMixer" />-->
+            <property key="handlerModule" value="lcarswm.audio" />
+            <property key="handler" value="AlsaAudioMixer" />
+            <!-- Audio handler properties -->
             <property key="control" value="Master"/><!-- might be PCM -->
         </properties>
     </widget>
