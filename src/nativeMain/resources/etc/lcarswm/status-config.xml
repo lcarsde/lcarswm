@@ -44,6 +44,7 @@
             <property key="handler" value="AlsaAudioMixer" />
             <!-- Audio handler properties -->
             <property key="control" value="Master"/><!-- might be PCM -->
+            <property key="stepSize" value="3" />
         </properties>
     </widget>
 </status-config>

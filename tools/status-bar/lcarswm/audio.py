@@ -13,9 +13,10 @@ class AudioMixer:
     of lowering and raising the volume as well as toggling the mute status.
     """
 
-    def __init__(self, mute_change_callback, volume_change_callback):
+    def __init__(self, mute_change_callback, volume_change_callback, properties):
         self.mute_change_callback = mute_change_callback
         self.volume_change_callback = volume_change_callback
+        self.properties = properties
 
     def start(self):
         pass
@@ -39,17 +40,17 @@ class AlsaAudioMixer(AudioMixer):
     """
     name = "AlsaAudioMixer"
 
-    def __init__(self, mute_change_callback, volume_change_callback):
-        AudioMixer.__init__(self, mute_change_callback, volume_change_callback)
+    def __init__(self, mute_change_callback, volume_change_callback, properties):
+        AudioMixer.__init__(self, mute_change_callback, volume_change_callback, properties)
         self._observer = None
+        self.control = self.properties.get("control", "Master")
+        self.audio_step_size = int(self.properties.get("stepSize", 3))
 
-        # TODO make properties
-        self.control = "Master"
-        self.current_mute = None
-        self.current_volume = None
         self.max_volume = 100
         self.min_volume = 0
-        self.audio_step_size = 3
+
+        self.current_mute = None
+        self.current_volume = None
 
     def start(self):
         self._observer = AlsaMixerObserver(

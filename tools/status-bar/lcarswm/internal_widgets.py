@@ -259,9 +259,10 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         audio_handler_name = properties["handler"]
         audio_handler_module = properties["handlerModule"]
         audio_handler_package = properties.get("handlerPackage")
-        audio_handler_class = getattr(importlib.import_module(audio_handler_module, audio_handler_package), audio_handler_name)
+        audio_handler_class = getattr(importlib.import_module(audio_handler_module, audio_handler_package),
+                                      audio_handler_name)
 
-        self.audio_mixer = audio_handler_class(self.update_mute, self.update_volume)
+        self.audio_mixer = audio_handler_class(self.update_mute, self.update_volume, properties)
         self.current_volume = 0
         self.current_mute = False
 
