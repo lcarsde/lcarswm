@@ -104,4 +104,5 @@ Thank you very much to the creators of the following resources:
 
 ## Credits
 Original author: [Andreas Tennert](https://github.com/atennert)
+
 Current author: [Andreas Tennert](https://github.com/atennert)
