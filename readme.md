@@ -42,7 +42,7 @@ Thank you very much to the creators of the following resources:
     * Windows-key + Q closes the window manager
     * Windows-key + M toggles the display mode between normal, maximized and fullscreen
     * Alt-key + Tab toggles through the windows
-    * Alt-key + Up/Down moves the active window to other monitors
+    * Alt-key + Windows-key + Up/Down moves the active window to other monitors
     * Alt-key + F4 closes the active window
     * Other key combinations can be connected to commands via a settings file
     * Modifier keys are
@@ -74,7 +74,6 @@ Thank you very much to the creators of the following resources:
 ## Known issues
 * If screens lay over one another they are not "merged" but draw over one another
 * Using SoftMaker Office sometimes leaves empty windows (noticed with csv import dialog)
-* Moving windows with Alt-Up/Down collides with the corresponding VS Code key binding
 
 ## To Do
 * Associate child screens with their parents
