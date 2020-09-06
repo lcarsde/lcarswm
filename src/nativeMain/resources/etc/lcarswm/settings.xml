@@ -29,11 +29,11 @@
             <action>window-toggle-forward</action>
         </binding>
         <binding>
-            <keys>Alt+Up</keys>
+            <keys>Alt+Lin+Up</keys>
             <action>window-move-up</action>
         </binding>
         <binding>
-            <keys>Alt+Down</keys>
+            <keys>Alt+Lin+Down</keys>
             <action>window-move-down</action>
         </binding>
         <binding>
