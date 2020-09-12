@@ -80,7 +80,6 @@ Thank you very much to the creators of the following resources:
 * Identify and handle popups as popups
 * Center popups and adjust the frame to their size
 * Content for the data bar (empty upper area in normal mode)
-  * Configurable plugin framework
   * Processor usage
   * Memory usage
   * Connection state of network interfaces
@@ -102,6 +101,5 @@ Thank you very much to the creators of the following resources:
 * use default settings in /etc/lcarswm/
 
 ## Credits
-Original author: [Andreas Tennert](https://github.com/atennert)
-
+Original author: [Andreas Tennert](https://github.com/atennert)<br>
 Current author: [Andreas Tennert](https://github.com/atennert)
