@@ -430,16 +430,34 @@ class LcarswmBatteryStatus(LcarswmStatusWidget):
 
         self.update()
 
-        # /sys/class/power_supply/
+    def draw_status(self, widget, context):
+        capacity, status = self.read_battery_status()
+        battery_missing = capacity is None
+
+        self.draw_battery(context, battery_missing)
+        if not battery_missing:
+            self.draw_battery_status(context, capacity, status)
+
+    def read_battery_status(self):
         # status -> Discharging, Charging, Full
         # capacity -> 0 .. 100
 
-    def draw_status(self, widget, context):
-        self.draw_battery(context)
-        self.draw_battery_status(context)
+        path = '/sys/class/power_supply'
+        battery_path = os.path.join(path, self.properties["device"])
 
-    def draw_battery(self, context):
-        context.set_source_rgb(1.0, 0.8, 0.6)
+        if os.path.isdir(battery_path):
+            capacity = int(read_file(os.path.join(battery_path, 'capacity')))
+            status = read_file(os.path.join(battery_path, 'status'))
+            return capacity, status
+        else:
+            return None, None
+
+    def draw_battery(self, context, battery_missing):
+        if battery_missing:
+            context.set_source_rgba(0.8, 0.4, 0.4)
+        else:
+            context.set_source_rgb(1.0, 0.8, 0.6)
+
         context.move_to(15, 6)
         context.line_to(15, 0)
         context.line_to(25, 0)
@@ -451,17 +469,7 @@ class LcarswmBatteryStatus(LcarswmStatusWidget):
         context.line_to(15, 6)
         context.stroke()
 
-    def draw_battery_status(self, context):
-        path = '/sys/class/power_supply'
-
-        battery_path = os.path.join(path, self.properties["device"])
-
-        if os.path.isdir(battery_path):
-            capacity = int(read_file(os.path.join(battery_path, 'capacity')))
-            status = read_file(os.path.join(battery_path, 'status'))
-        else:
-            return
-
+    def draw_battery_status(self, context, capacity, status):
         context.set_source_rgba(1.0, 0.8, 0.6, 0.6)
         if status == "Charging":
             context.set_source_rgba(0.6, 0.6, 1.0, 0.6)
