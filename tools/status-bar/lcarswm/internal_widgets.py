@@ -418,14 +418,7 @@ class LcarswmBatteryStatus(LcarswmStatusWidget):
     def __init__(self, width, height, css_provider, properties):
         LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
-        self.cx = width / 2
-        self.cy = height / 2
-        self.max_scale = 125
-        self.min_dimension = min(self.cx, self.cy)
-        self.scale = self.min_dimension / self.max_scale
-
-        self.attention_temperature = 60
-        self.warning_temperature = 80
+        self.warning_capacity = 10
 
         self.drawing_area = Gtk.DrawingArea()
         self.drawing_area.set_size_request(width, height)
@@ -479,7 +472,7 @@ class LcarswmBatteryStatus(LcarswmStatusWidget):
             context.set_source_rgba(0.6, 0.6, 1.0, 0.6)
         if status == "Discharging":
             context.set_source_rgba(1.0, 0.6, 0.4, 0.6)
-        if status == "Discharging" and capacity <= 10:
+        if status == "Discharging" and capacity <= self.warning_capacity:
             context.set_source_rgba(0.8, 0.4, 0.4, 0.6)
 
         capacity_display = int(capacity * 38 / 100)
