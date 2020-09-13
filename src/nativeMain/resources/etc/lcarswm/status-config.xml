@@ -47,4 +47,10 @@
             <property key="stepSize" value="3" />
         </properties>
     </widget>
+    <widget module="lcarswm.internal_widgets" name="LcarswmBatteryStatus">
+        <position x="7" y="1" width="1" height="1" />
+    </widget>
+    <widget module="lcarswm.internal_widgets" name="LcarswmStatusFiller">
+        <position x="8" y="1" width="3" height="1" />
+    </widget>
 </status-config>

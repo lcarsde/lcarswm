@@ -84,7 +84,6 @@ Thank you very much to the creators of the following resources:
   * Memory usage
   * Connection state of network interfaces
   * Data throughput of network interfaces
-  * Battery status
   * ...
 * GTK-Theme (if I can't find one)
 * Configuration for the colors

@@ -16,6 +16,13 @@ gi.require_version('PangoCairo', '1.0')
 from gi.repository import Gtk, Pango, PangoCairo
 
 
+def read_file(file_path):
+    with open(file_path, 'r') as file:
+        data = file.read().strip()
+
+    return data
+
+
 class LcarswmStatusText(LcarswmStatusWidget):
     """
     LcarswmStatusText is an abstract class that acts as a frame for widgets
@@ -227,15 +234,14 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
         # get every /sys/class/thermal/thermal_zone* directory
         # read type and temp
         # set the data
-        cat = lambda file: open(file, 'r').read().strip()
         path = '/sys/class/thermal'
         files = os.listdir(path)
         temp_dict = {}
         for file in files:
             if file.startswith('thermal_zone'):
                 thermal_path = os.path.join(path, file)
-                name = cat(os.path.join(thermal_path, 'type'))
-                temp = cat(os.path.join(thermal_path, 'temp'))
+                name = read_file(os.path.join(thermal_path, 'type'))
+                temp = read_file(os.path.join(thermal_path, 'temp'))
                 temp_dict[name] = int(temp) / 1000
         return temp_dict
 
@@ -391,6 +397,92 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         context.line_to(0, 38)
         context.close_path()
         context.fill()
+
+
+class LcarswmNetworkStatus(LcarswmStatusWidget):
+    """
+    """
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
+        # /proc/net/wireless -> link
+        # /sys/class/net -> e* / w*
+
+
+class LcarswmBatteryStatus(LcarswmStatusWidget):
+    """
+    """
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
+
+        self.cx = width / 2
+        self.cy = height / 2
+        self.max_scale = 125
+        self.min_dimension = min(self.cx, self.cy)
+        self.scale = self.min_dimension / self.max_scale
+
+        self.attention_temperature = 60
+        self.warning_temperature = 80
+
+        self.drawing_area = Gtk.DrawingArea()
+        self.drawing_area.set_size_request(width, height)
+        self.drawing_area.connect('draw', self.draw_status)
+        self.add(self.drawing_area)
+
+        self.update()
+
+        # /sys/class/power_supply/
+        # status -> Discharging, Charging, Full
+        # capacity -> 0 .. 100
+
+    def draw_status(self, widget, context):
+        self.draw_battery(context)
+        self.draw_battery_status(context)
+
+    def draw_battery(self, context):
+        context.set_source_rgb(1.0, 0.8, 0.6)
+        context.move_to(15, 6)
+        context.line_to(15, 0)
+        context.line_to(25, 0)
+        context.line_to(25, 6)
+        context.line_to(29, 6)
+        context.line_to(29, 40)
+        context.line_to(11, 40)
+        context.line_to(11, 6)
+        context.line_to(15, 6)
+        context.stroke()
+
+    def draw_battery_status(self, context):
+        path = '/sys/class/power_supply'
+        files = os.listdir(path)
+        found_battery = False
+
+        for file in files:
+            if file.startswith('BAT'):
+                battery_path = os.path.join(path, file)
+                capacity = int(read_file(os.path.join(battery_path, 'capacity')))
+                status = read_file(os.path.join(battery_path, 'status'))
+                found_battery = True
+                break
+
+        if not found_battery:
+            return
+
+        context.set_source_rgba(1.0, 0.8, 0.6, 0.6)
+        if status == "Charging":
+            context.set_source_rgba(0.6, 0.6, 1.0, 0.6)
+        if status == "Discharging":
+            context.set_source_rgba(1.0, 0.6, 0.4, 0.6)
+        if status == "Discharging" and capacity <= 10:
+            context.set_source_rgba(0.8, 0.4, 0.4, 0.6)
+
+        capacity_display = int(capacity * 38 / 100)
+        context.rectangle(12, 39, 16, max(-capacity_display, -33))
+        context.rectangle(16, 39, 8, -capacity_display)
+        context.fill()
+
+    def update(self):
+        # read the updated time
+        self.drawing_area.queue_draw()
 
 
 class LcarswmStatusFiller(LcarswmStatusWidget):
