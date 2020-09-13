@@ -418,7 +418,7 @@ class LcarswmBatteryStatus(LcarswmStatusWidget):
     def __init__(self, width, height, css_provider, properties):
         LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
-        self.warning_capacity = 10
+        self.warning_capacity = int(properties.get("warningCapacity", "10"))
 
         self.drawing_area = Gtk.DrawingArea()
         self.drawing_area.set_size_request(width, height)
