@@ -49,6 +49,10 @@
     </widget>
     <widget module="lcarswm.internal_widgets" name="LcarswmBatteryStatus">
         <position x="7" y="1" width="1" height="1" />
+        <properties>
+            <!-- Device should correspond to a folder in /sys/class/power_supply that starts with "BAT" -->
+            <property key="device" value="BAT0" />
+        </properties>
     </widget>
     <widget module="lcarswm.internal_widgets" name="LcarswmStatusFiller">
         <position x="8" y="1" width="3" height="1" />

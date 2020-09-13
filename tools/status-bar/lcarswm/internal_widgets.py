@@ -453,18 +453,13 @@ class LcarswmBatteryStatus(LcarswmStatusWidget):
 
     def draw_battery_status(self, context):
         path = '/sys/class/power_supply'
-        files = os.listdir(path)
-        found_battery = False
 
-        for file in files:
-            if file.startswith('BAT'):
-                battery_path = os.path.join(path, file)
-                capacity = int(read_file(os.path.join(battery_path, 'capacity')))
-                status = read_file(os.path.join(battery_path, 'status'))
-                found_battery = True
-                break
+        battery_path = os.path.join(path, self.properties["device"])
 
-        if not found_battery:
+        if os.path.isdir(battery_path):
+            capacity = int(read_file(os.path.join(battery_path, 'capacity')))
+            status = read_file(os.path.join(battery_path, 'status'))
+        else:
             return
 
         context.set_source_rgba(1.0, 0.8, 0.6, 0.6)
