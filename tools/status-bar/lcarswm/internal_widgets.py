@@ -410,7 +410,11 @@ class LcarswmNetworkStatus(LcarswmStatusWidget):
 
 class LcarswmBatteryStatus(LcarswmStatusWidget):
     """
+    This widget displays the status of the configured battery.
+
+    The battery can be set with key "device" in the status-config.xml.
     """
+
     def __init__(self, width, height, css_provider, properties):
         LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
