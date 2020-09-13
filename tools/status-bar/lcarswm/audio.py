@@ -160,7 +160,7 @@ class AlsaMixerObserver(threading.Thread):
     name = "AlsaMixerObserver"
 
     def __init__(self, control, callback=None):
-        super().__init__()
+        threading.Thread.__init__(self)
         self.running = True
 
         # Keep the mixer instance alive for the descriptors to work
