@@ -531,8 +531,3 @@ class LcarswmStatusFiller(LcarswmStatusWidget):
         self.label.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.update()
-
-    def update(self):
-        # text = str(randint(0, 9999)).zfill(4)
-        # self.label.set_label(text)
-        pass
