@@ -507,6 +507,13 @@ class LcarswmStatusFiller(LcarswmStatusWidget):
     preferred: width 2+, height 1
     """
 
+    COLORS = [
+        "c9c",
+        "99c",
+        "c66",
+        "99f",
+        "f96"]
+
     def __init__(self, width, height, css_provider, properties):
         LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
@@ -516,7 +523,10 @@ class LcarswmStatusFiller(LcarswmStatusWidget):
         self.label.set_alignment(1, 1)
         self.add(self.label)
 
-        self.label.get_style_context().add_class("button--99c")
+        color_index = randint(0, len(self.COLORS) - 1)
+        color = self.COLORS[color_index]
+
+        self.label.get_style_context().add_class("button--{}".format(color))
         self.label.get_style_context().add_class("button--long")
         self.label.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
