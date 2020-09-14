@@ -28,14 +28,11 @@
     <widget module="lcarswm.internal_widgets" name="LcarswmStatusDate">
         <position x="0" y="1" width="4" height="1" />
     </widget>
-    <widget module="lcarswm.internal_widgets" name="LcarswmStatusStardate">
-        <position x="0" y="2" width="4" height="1" />
-    </widget>
     <widget module="lcarswm.internal_widgets" name="LcarswmStatusTemperature">
-        <position x="4" y="0" width="3" height="3" />
+        <position x="5" y="0" width="3" height="3" />
     </widget>
     <widget module="lcarswm.internal_widgets" name="LcarswmStatusAudio">
-        <position x="7" y="0" width="4" height="1" />
+        <position x="0" y="2" width="4" height="1" />
         <properties>
             <!-- Audio widget properties -->
             <!-- Audio handler needs to be an instance of lcarswm.audio.AudioMixer -->
@@ -48,13 +45,10 @@
         </properties>
     </widget>
     <widget module="lcarswm.internal_widgets" name="LcarswmBatteryStatus">
-        <position x="7" y="1" width="1" height="1" />
+        <position x="4" y="0" width="1" height="1" />
         <properties>
             <!-- Device should correspond to a folder in /sys/class/power_supply that starts with "BAT" -->
             <property key="device" value="BAT0" />
         </properties>
-    </widget>
-    <widget module="lcarswm.internal_widgets" name="LcarswmStatusFiller">
-        <position x="8" y="1" width="3" height="1" />
     </widget>
 </status-config>

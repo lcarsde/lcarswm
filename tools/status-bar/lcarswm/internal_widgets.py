@@ -66,6 +66,8 @@ class LcarswmStatusText(LcarswmStatusWidget):
 class LcarswmStatusTime(LcarswmStatusText):
     """
     This widget draws the local time in a 24h format.
+
+    preferred: width 4, height 1
     """
 
     def __init__(self, width, height, css_provider, properties):
@@ -79,6 +81,8 @@ class LcarswmStatusTime(LcarswmStatusText):
 class LcarswmStatusDate(LcarswmStatusText):
     """
     This widget draws the current date.
+
+    preferred: width 4, height 1
     """
 
     def __init__(self, width, height, css_provider, properties):
@@ -95,6 +99,8 @@ class LcarswmStatusStardate(LcarswmStatusText):
 
     Hint: I don't know anymore where I got the formula from ...
         got something better? Feel free to adjust it.
+
+    preferred: width 4, height 1
     """
 
     def __init__(self, width, height, css_provider, properties):
@@ -145,6 +151,8 @@ class LcarswmStatusStardate(LcarswmStatusText):
 class LcarswmStatusTemperature(LcarswmStatusWidget):
     """
     This widget draws temperatures from thermal zones into a graph.
+
+    preferred: width 3, height 3
     """
 
     def __init__(self, width, height, css_provider, properties):
@@ -259,6 +267,11 @@ class LcarswmStatusTemperature(LcarswmStatusWidget):
 
 
 class LcarswmStatusAudio(LcarswmStatusWidget):
+    """
+    This widget has a volume level display and basic audio controls (mute, quieter, louder)
+
+    preferred: width 4, height 1
+    """
     def __init__(self, width, height, css_provider, properties):
         LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
 
@@ -413,6 +426,8 @@ class LcarswmBatteryStatus(LcarswmStatusWidget):
     This widget displays the status of the configured battery.
 
     The battery can be set with key "device" in the status-config.xml.
+
+    preferred: width 1, height 1
     """
 
     def __init__(self, width, height, css_provider, properties):
@@ -488,6 +503,8 @@ class LcarswmBatteryStatus(LcarswmStatusWidget):
 class LcarswmStatusFiller(LcarswmStatusWidget):
     """
     This widget is used to fill empty space in the status bar.
+
+    preferred: width 2+, height 1
     """
 
     def __init__(self, width, height, css_provider, properties):
