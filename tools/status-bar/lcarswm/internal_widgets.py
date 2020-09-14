@@ -529,5 +529,3 @@ class LcarswmStatusFiller(LcarswmStatusWidget):
         self.label.get_style_context().add_class("button--{}".format(color))
         self.label.get_style_context().add_class("button--long")
         self.label.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
-        self.update()
