@@ -51,4 +51,20 @@
             <property key="device" value="BAT0" />
         </properties>
     </widget>
+    <widget module="lcarswm.internal_widgets" name="LcarswmStatusButton">
+        <position x="8" y="0" width="3" height="1" />
+        <properties>
+            <property key="text" value="Programs" />
+            <property key="color" value="f90" />
+            <property key="command" value="lxterminal" />
+        </properties>
+    </widget>
+    <widget module="lcarswm.internal_widgets" name="LcarswmStatusButton">
+        <position x="8" y="2" width="3" height="1" />
+        <properties>
+            <property key="text" value="Close" />
+            <property key="color" value="c66" />
+            <property key="command" value="lxde-logout" />
+        </properties>
+    </widget>
 </status-config>

@@ -26,49 +26,49 @@ css = b'''
     outline-style: none;
 }
 .button--f90 {
-    font-size: 18px;
+    font-size: 16px;
     color: #000;
     background-color: #f90;
     background: #f90; /* for Ubuntu */
 }
 .button--c9c {
-    font-size: 18px;
+    font-size: 16px;
     color: #000;
     background-color: #c9c;
     background: #c9c; /* for Ubuntu */
 }
 .button--99c {
-    font-size: 18px;
+    font-size: 16px;
     color: #000;
     background-color: #99c;
     background: #99c; /* for Ubuntu */
 }
 .button--c66 {
-    font-size: 18px;
+    font-size: 16px;
     color: #000;
     background-color: #c66;
     background: #c66; /* for Ubuntu */
 }
 .button--fc9 {
-    font-size: 18px;
+    font-size: 16px;
     color: #000;
     background-color: #fc9;
     background: #fc9; /* for Ubuntu */
 }
 .button--99f {
-    font-size: 18px;
+    font-size: 16px;
     color: #000;
     background-color: #99f;
     background: #99f; /* for Ubuntu */
 }
 .button--f96 {
-    font-size: 18px;
+    font-size: 16px;
     color: #000;
     background-color: #f96;
     background: #f96; /* for Ubuntu */
 }
 .button--c69 {
-    font-size: 18px;
+    font-size: 16px;
     color: #000;
     background-color: #f96;
     background: #f96; /* for Ubuntu */

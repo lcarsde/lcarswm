@@ -291,7 +291,7 @@ class LcarswmStatusAudio(LcarswmStatusWidget):
         lower_audio_button.connect("clicked", self.lower_volume)
         box.pack_start(lower_audio_button, False, False, 0)
 
-        self.mute_audio_button = self.create_button(css_provider, {"button--middle", "button--99c"}, self.draw_mute)
+        self.mute_audio_button = self.create_button(css_provider, {"button--middle", "button--99f"}, self.draw_mute)
         self.mute_audio_button.connect("clicked", self.toggle_mute)
         box.pack_start(self.mute_audio_button, False, False, 0)
 
@@ -500,6 +500,44 @@ class LcarswmBatteryStatus(LcarswmStatusWidget):
         self.drawing_area.queue_draw()
 
 
+class LcarswmStatusButton(LcarswmStatusWidget):
+    """
+    This widget is used show a button for executing commands.
+
+    preferred: width 2+, height 1
+    """
+
+    COLORS = [
+        "f90",
+        "c9c",
+        "99c",
+        "c66",
+        "99f",
+        "f96",
+        "c69"]
+
+    def __init__(self, width, height, css_provider, properties):
+        LcarswmStatusWidget.__init__(self, width, height, css_provider, properties)
+
+        text = properties["text"].upper()
+        self.button = Gtk.Button(label=text)
+        self.button.set_size_request(width, height)
+        self.button.set_alignment(1, 1)
+        self.button.connect("clicked", self.on_click)
+        self.add(self.button)
+
+        color = properties.get("color", "99f")
+        if color not in self.COLORS:
+            color = "99f"
+
+        self.button.get_style_context().add_class("button--{}".format(color))
+        self.button.get_style_context().add_class("button--long")
+        self.button.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+    def on_click(self, widget):
+        os.system(self.properties["command"])
+
+
 class LcarswmStatusFiller(LcarswmStatusWidget):
     """
     This widget is used to fill empty space in the status bar.
@@ -510,8 +548,6 @@ class LcarswmStatusFiller(LcarswmStatusWidget):
     COLORS = [
         "c9c",
         "99c",
-        "c66",
-        "99f",
         "f96"]
 
     def __init__(self, width, height, css_provider, properties):
