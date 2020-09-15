@@ -33,6 +33,4 @@ Graphs, diagrams and other status and statistical displays should use the colors
 
 Design elements should use the colors #cc99cc, #9999cc and #ff9966. These colors are less "strong" and don't take as much attention.
 
-## Links <!-- optional -->
-
-* [1]: http://mrbsdomain.com/gallery/var/albums/repository/lcars_colors.gif
+[1]: http://mrbsdomain.com/gallery/var/albums/repository/lcars_colors.gif
