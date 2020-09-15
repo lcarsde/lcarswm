@@ -14,14 +14,14 @@ foremost the tool applications.
 Base for decisions on any color distribution is [the color table shown in this linked image][1] with 8 colors.
 
 The following list contains the colors hex-codes.
-* <div style="background-color:#ff9900">#ff9900</div>
-* <div style="background-color:#cc99cc">#cc99cc</div>
-* <div style="background-color:#9999cc">#9999cc</div>
-* <div style="background-color:#cc6666">#cc6666</div>
-* <div style="background-color:#ffcc99">#ffcc99</div>
-* <div style="background-color:#9999ff">#9999ff</div>
-* <div style="background-color:#ff9966">#ff9966</div>
-* <div style="background-color:#cc6699">#cc6699</div>
+* #ff9900
+* #cc99cc
+* #9999cc
+* #cc6666
+* #ffcc99
+* #9999ff
+* #ff9966
+* #cc6699
 
 ## Decision Outcome
 
