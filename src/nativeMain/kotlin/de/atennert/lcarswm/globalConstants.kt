@@ -7,11 +7,11 @@ const val HOME_CONFIG_DIR_PROPERTY = "XDG_CONFIG_HOME"
 
 const val HOME_CACHE_DIR_PROPERTY = "XDG_CACHE_HOME"
 
-const val LCARS_WM_DIR = "lcarswm"
+const val LCARS_DE_DIR = "lcarsde"
 
-const val LOG_FILE_PATH = "/$LCARS_WM_DIR/lcarswm.log"
+const val LOG_FILE_PATH = "/$LCARS_DE_DIR/lcarswm.log"
 
-const val SETTINGS_FILE = "/$LCARS_WM_DIR/settings.xml"
+const val SETTINGS_FILE = "/$LCARS_DE_DIR/settings.xml"
 
 const val X_FALSE = 0
 const val X_TRUE = 1

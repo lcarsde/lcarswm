@@ -33,7 +33,6 @@ install: build
 	cp -r "src/nativeMain/resources/usr" "debian/lcarswm/usr"
 	cp -r "src/nativeMain/resources/etc" "debian/lcarswm/etc"
 	cp "build/bin/native/releaseExecutable/lcarswm.kexe" "debian/lcarswm/usr/bin/"
-	cp "tools/app-menu/lcarswm-app-menu.py" "debian/lcarswm/usr/bin/"
 
 	mkdir -p "debian/lcarswm/usr/share/doc/lcarswm"
 	cp "LICENSE" "debian/lcarswm/usr/share/doc/lcarswm/copyright"

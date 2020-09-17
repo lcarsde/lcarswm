@@ -13,8 +13,8 @@ if [ -z "$XDG_DATA_HOME" ]; then
 fi
 
 # create wm directories if they don't exist yet
-mkdir -p "$XDG_CONFIG_HOME/lcarswm"
-mkdir -p "$XDG_CACHE_HOME/lcarswm"
+mkdir -p "$XDG_CONFIG_HOME/lcarsde"
+mkdir -p "$XDG_CACHE_HOME/lcarsde"
 
 # Ensure the existance of the user applications folder
 USER_APPS_DIR="$XDG_DATA_HOME/applications"

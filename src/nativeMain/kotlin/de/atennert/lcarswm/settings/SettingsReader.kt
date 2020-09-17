@@ -178,8 +178,8 @@ class SettingsReader(
             KeyExecution("XF86AudioRaiseVolume", "amixer set Master 3%+"),
             KeyExecution("XF86AudioLowerVolume", "amixer set Master 3%-"),
             KeyAction("Alt+Tab", WmAction.WINDOW_TOGGLE),
-            KeyAction("Alt+Up", WmAction.WINDOW_MOVE_UP),
-            KeyAction("Alt+Down", WmAction.WINDOW_MOVE_DOWN),
+            KeyAction("Lin+Alt+Up", WmAction.WINDOW_MOVE_UP),
+            KeyAction("Lin+Alt+Down", WmAction.WINDOW_MOVE_DOWN),
             KeyAction("Alt+F4", WmAction.WINDOW_CLOSE),
             KeyAction("Lin+M", WmAction.SCREEN_MODE_TOGGLE),
             KeyAction("Lin+Q", WmAction.WM_QUIT)
