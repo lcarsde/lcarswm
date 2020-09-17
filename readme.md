@@ -1,5 +1,5 @@
 # lcarswm
-It's a window manager written in Kotlin that is designed to look like an LCARS interface.
+lcarswm or LCARS Window Manager is a window manager written in Kotlin that is designed to look like an LCARS interface.
 
 lcarswm has two kinds of monitors, one primary monitor (which maps to the X primary monitor) and "other" monitors. Only the primary screen has the upper (currently empty) information area and the side bar that shows the app menu. The information area and the app menu are only visible in the normal screen mode. There are three screen modes:
 * Normal mode: app menu and information area on the primary screen, upper and lower bars on the other screens
