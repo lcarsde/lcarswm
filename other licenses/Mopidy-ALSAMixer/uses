@@ -1,3 +1,0 @@
-tools/status-bar/lcarswm/internal_widgets.py
--> AlsaMixerObserver class
--> LcarswmStatusAlsaAudio: set_mute, get_mute, set_volume, get_volume
