@@ -414,7 +414,7 @@ class WindowHandlerTest {
                 textProperty: CPointer<XTextProperty>,
                 propertyAtom: Atom
             ): Int {
-                if (window == windowId && propertyAtom == this.atomMap[Atoms.LCARSWM_APP_MENU.atomName]) {
+                if (window == windowId && propertyAtom == this.atomMap[Atoms.LCARSDE_APP_MENU.atomName]) {
                     return 1
                 }
                 return super.getTextProperty(window, textProperty, propertyAtom)

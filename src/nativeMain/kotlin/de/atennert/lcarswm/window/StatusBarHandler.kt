@@ -48,7 +48,7 @@ class StatusBarHandler(
 
     fun isStatusBar(windowId: Window): Boolean {
         val textProperty = nativeHeap.alloc<XTextProperty>()
-        val result = systemApi.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.LCARSWM_STATUS_BAR])
+        val result = systemApi.getTextProperty(windowId, textProperty.ptr, atomLibrary[Atoms.LCARSDE_STATUS_BAR])
         systemApi.xFree(textProperty.value)
         nativeHeap.free(textProperty)
         return result != 0
