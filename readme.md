@@ -75,30 +75,6 @@ Thank you very much to the creators of the following resources:
 * If screens lay over one another they are not "merged" but draw over one another
 * Using SoftMaker Office sometimes leaves empty windows (noticed with csv import dialog)
 
-## To Do
-* Associate child screens with their parents
-* Identify and handle popups as popups
-* Center popups and adjust the frame to their size
-* Content for the data bar (empty upper area in normal mode)
-  * Processor usage
-  * Memory usage
-  * Connection state of network interfaces
-  * Data throughput of network interfaces
-  * ...
-* GTK-Theme (if I can't find one)
-* Configuration for the colors
-* Monitors
-  * Merge overlaying screens of same size
-  * If screens have different sizes, the higher one draws
-* check for XDG-path variables and have a fallback
-* toggle window list by latest used application
-* basic configurable window tiling
-* autostart for things
-* debian build script
-  * missing /usr/share/doc/lcarswm/changelog.Debian.gz
-  * missing-dependency-on-libc
-* use default settings in /etc/lcarswm/
-
 ## Credits
 Original author: [Andreas Tennert](https://github.com/atennert)<br>
 Current author: [Andreas Tennert](https://github.com/atennert)
