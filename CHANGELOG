@@ -11,6 +11,9 @@
   * filler widget
   * audio widget and ALSA mixer implementation
   * battery status widget
+  * wifi widget
+  * ethernet widget
+  * CPU utilization widget
 * update Gradle Version to 6.5.1
 * update Kotlin version to 1.4.0 and Coroutines to 1.3.9
 * other licenses folder to track use of foreign code and their licenses
