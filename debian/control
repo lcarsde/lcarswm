@@ -9,7 +9,7 @@ Package: lcarswm
 Architecture: any
 Depends: libx11-6, libxpm4, libxrandr2, libpango1.0-0, libpangoxft-1.0-0, libxml2
 Recommends: fonts-ubuntu, xterm, firefox, alsa-utils
-Suggests: x-display-manager, kdm | gdm
+Suggests: x-display-manager, kdm | gdm, xscreensaver
 Provides: x-window-manager
 Description: A simple window manager that looks like the LCARS interface
  https://github.com/atennert/lcarswm
