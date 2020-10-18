@@ -31,8 +31,8 @@ class RunAutostartAppsTest {
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertEquals(mapOf(
-            "myapp1" to listOf(),
-            "myapp2" to listOf("--arg1", "-v", "42")
+            "myapp1" to listOf("myapp1"),
+            "myapp2" to listOf("myapp2", "--arg1", "-v", "42")
         ), fakeApi.executions)
     }
 
@@ -55,8 +55,8 @@ class RunAutostartAppsTest {
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertEquals(mapOf(
-            "myapp1" to listOf(),
-            "myapp2" to listOf("--arg1", "-v", "42")
+            "myapp1" to listOf("myapp1"),
+            "myapp2" to listOf("myapp2", "--arg1", "-v", "42")
         ), fakeApi.executions)
     }
 

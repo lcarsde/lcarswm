@@ -35,7 +35,7 @@ private fun getAutostartFile(posixApi: PosixApi): String {
  */
 private fun runCommand(posixApi: PosixApi, command: String) {
     val commandParts = command.split(' ')
-    runProgram(posixApi, commandParts[0], commandParts.drop(1))
+    runProgram(posixApi, commandParts[0], commandParts)
 }
 
 /**
