@@ -26,7 +26,7 @@ class FileReaderTest {
         val readLines = mutableListOf<String>()
         fileReader.readLines { readLines.add(it) }
 
-        assertEquals(systemApi.getLines("myfile"), readLines)
+        assertEquals(listOf("thisIsLine1", "thisIsLine2"), readLines)
     }
 
     @Test
@@ -46,7 +46,9 @@ class FileReaderTest {
         val readLines = mutableListOf<String>()
         fileReader.readLines { readLines.add(it) }
 
-        assertEquals(systemApi.getLines("myfile"), readLines)
+        assertEquals(listOf("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongLine1",
+            "looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongLine2")
+            , readLines)
     }
 
     @Test

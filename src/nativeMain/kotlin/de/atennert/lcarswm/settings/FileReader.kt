@@ -12,7 +12,7 @@ class FileReader(private val posixApi: PosixApi, private val filePath: String) {
     private val readBufferSize = 60
 
     /**
-     * Read a file in lines and provide the lines to a given consumer.
+     * Read a file in lines and provide the lines (without trailing line break) to a given consumer.
      *
      * @param consumer Consumer that will receive the read lines
      */
@@ -28,7 +28,7 @@ class FileReader(private val posixApi: PosixApi, private val filePath: String) {
                     .fold("") {acc, b -> acc + b.toChar()}
 
                 if (bufferString.endsWith('\n') || posixApi.feof(filePointer) != 0) {
-                    consumer(bufferString)
+                    consumer(bufferString.trimEnd('\r', '\n'))
                     bufferString = ""
                 }
             }
