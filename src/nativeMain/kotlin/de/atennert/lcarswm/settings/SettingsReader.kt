@@ -19,7 +19,7 @@ class SettingsReader(
     configPath: String
 ) {
     private val settingsFilePath = "$configPath$SETTINGS_FILE"
-    private val defaultSettingsFilePath = "/etc/$SETTINGS_FILE"
+    private val defaultSettingsFilePath = "/etc$SETTINGS_FILE"
 
     var keyBindings: Set<KeyBinding> = emptySet()
     private set
