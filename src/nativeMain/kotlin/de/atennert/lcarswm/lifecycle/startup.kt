@@ -238,10 +238,6 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     return RuntimeResources(xEventResources, appMenuResources)
 }
 
-fun runLcarswmTools(posixApi: PosixApi) {
-    runProgram(posixApi, "lcarswm_app_menu.py", listOf())
-}
-
 /**
  * Signal handler for usual stuff.
  */

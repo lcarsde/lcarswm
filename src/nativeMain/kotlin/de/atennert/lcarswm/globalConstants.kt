@@ -13,6 +13,8 @@ const val LOG_FILE_PATH = "/$LCARS_DE_DIR/lcarswm.log"
 
 const val SETTINGS_FILE = "/$LCARS_DE_DIR/settings.xml"
 
+const val AUTOSTART_FILE = "/$LCARS_DE_DIR/autostart"
+
 const val X_FALSE = 0
 const val X_TRUE = 1
 

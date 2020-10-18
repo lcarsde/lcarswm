@@ -1,9 +1,6 @@
 import de.atennert.lcarswm.HOME_CACHE_DIR_PROPERTY
 import de.atennert.lcarswm.LOG_FILE_PATH
-import de.atennert.lcarswm.lifecycle.runEventLoops
-import de.atennert.lcarswm.lifecycle.runLcarswmTools
-import de.atennert.lcarswm.lifecycle.shutdown
-import de.atennert.lcarswm.lifecycle.startup
+import de.atennert.lcarswm.lifecycle.*
 import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.SystemFacade
@@ -41,7 +38,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     val runtimeResources = startup(system, logger)
 
     runtimeResources?.let {
-        runLcarswmTools(system)
+        runAutostartApps(system)
 
         runEventLoops(logger, it)
     }
