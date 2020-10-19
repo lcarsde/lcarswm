@@ -156,9 +156,19 @@ class AppMenuHandler(
         }
     }
 
+    private var activeWindow: Window? = null
+
+    val focusObserver: FocusObserver = { newWindow: Window?, _ ->
+        activeWindow = newWindow
+        sendWindowListUpdate()
+    }
+
     private fun getWindowListString(): String {
         return windowNameList.asSequence()
-            .fold("list") { acc, (window, wmClass) -> "$acc\n$window\t$wmClass" }
+            .fold("list") { acc, (window, wmClass) ->
+                val activity = if (window == activeWindow) "active" else ""
+                "$acc\n$window\t$wmClass\t$activity"
+            }
     }
 
     private fun sendWindowListUpdate() {

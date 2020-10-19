@@ -1,6 +1,8 @@
 package de.atennert.lcarswm.lifecycle
 
-import de.atennert.lcarswm.*
+import de.atennert.lcarswm.AppMenuMessageHandler
+import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
+import de.atennert.lcarswm.RootWindowPropertyHandler
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.drawing.*
@@ -14,7 +16,6 @@ import de.atennert.lcarswm.settings.SettingsReader
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.MessageQueue
-import de.atennert.lcarswm.system.api.PosixApi
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.*
 import exitState
@@ -197,6 +198,8 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     focusHandler.registerObserver { activeWindow, _ ->
         activeWindow?.let { windowCoordinator.stackWindowToTheTop(it) }
     }
+
+    focusHandler.registerObserver(appMenuHandler.focusObserver)
 
     monitorManager.registerObserver(appMenuHandler)
     monitorManager.registerObserver(statusBarHandler)

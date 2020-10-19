@@ -19,6 +19,7 @@
 * other licenses folder to track use of foreign code and their licenses
 * add logout application
 * add autostart file and handling, this replaces the static loading of the app menu
+* submit activity status to app menu
 
 20.2
 * change of licensing from MIT to GPL V2
