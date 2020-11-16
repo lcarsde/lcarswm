@@ -9,10 +9,11 @@ headers = X11/Xlib.h \
     pango/pangoxft.h \
     libxml/parser.h
 compilerOpts = -I/usr/include \
+	-I/usr/include/x86_64-linux-gnu \
     -I/usr/include/pango-1.0 \
     -I/usr/include/glib-2.0 \
     -I/usr/lib/glib-2.0/include \
     -I/usr/include/harfbuzz \
     -I/usr/include/freetype2 \
     -I/usr/include/libxml2
-linkerOpts = -L/usr/lib -lX11 -lXpm -lXrandr -lglib-2.0 -lpango-1.0 -lpangoxft-1.0 -lXft -lxml2
+linkerOpts = -L/usr/lib -L/usr/lib/x86_64-linux-gnu -lX11 -lXpm -lXrandr -lglib-2.0 -lpango-1.0 -lpangoxft-1.0 -lXft -lxml2
