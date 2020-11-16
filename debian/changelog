@@ -1,6 +1,0 @@
-lcarswm (%version%) UNRELEASED; urgency=low
-
-  * Upstream release.
-  * Check https://github.com/atennert/lcarswm/blob/master/CHANGELOG
-
--- Andreas Tennert <mail@andreas-tennert.de>  %time%
