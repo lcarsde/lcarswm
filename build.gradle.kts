@@ -3,7 +3,7 @@ plugins {
 }
 
 group "de.atennert"
-version "20.2"
+version "20.3"
 
 repositories {
     mavenCentral()

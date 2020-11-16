@@ -20,6 +20,9 @@
 * add logout application
 * add autostart file and handling, this replaces the static loading of the app menu
 * submit activity status to app menu
+* remove debian deploy scripting
+* moved python stuff in separate repositories
+* add install shell script
 
 20.2
 * change of licensing from MIT to GPL V2
