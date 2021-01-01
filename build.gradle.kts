@@ -10,21 +10,29 @@ repositories {
 }
 
 kotlin {
-    linuxX64("native") {
+    val nativeTarget = when (System.getProperty("os.name")) {
+        "Linux" -> linuxX64("native")
+        else -> throw GradleException("Host OS is not supported.")
+    }
+
+    nativeTarget.apply {
         binaries {
-            executable()
+            executable {
+                entryPoint = "main"
+            }
         }
         compilations.getByName("main") {
             val xlib by cinterops.creating
         }
     }
-
     sourceSets {
         commonMain {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
             }
         }
+        val nativeMain by getting
+        val nativeTest by getting
     }
 }
 
