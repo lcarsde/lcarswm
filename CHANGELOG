@@ -1,3 +1,6 @@
+21.1
+* fix memory leak
+
 20.3
 * add status-bar tool application
 * add semi-auto-close mechanism for classes in window manager

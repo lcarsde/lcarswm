@@ -301,10 +301,13 @@ class SystemFacade : SystemApi {
     }
 
     override fun execvp(fileName: String, args: List<String>): Int {
-        val byteArgs = args.map { it.encodeToByteArray().pin().addressOf(0).pointed }
-        val convertedArgs = nativeHeap.allocArrayOfPointersTo(byteArgs)
+        val byteArgs = args.map { it.encodeToByteArray().pin() }
+        val convertedArgs = nativeHeap.allocArrayOfPointersTo(byteArgs.map { it.addressOf(0).pointed })
 
-        return platform.posix.execvp(fileName, convertedArgs)
+        val result = platform.posix.execvp(fileName, convertedArgs)
+
+        byteArgs.map { it.unpin() }
+        return result
     }
 
     override fun gettimeofday(): Long {
