@@ -71,10 +71,6 @@ Thank you very much to the creators of the following resources:
   * Lin+B -> firefox (B for browser)
   * Audio-keys -> amixer ... (mute toggle, louder, quieter)
 
-## Known issues
-* If screens lay over one another they are not "merged" but draw over one another
-* Using SoftMaker Office sometimes leaves empty windows (noticed with csv import dialog)
-
 ## Credits
 Original author: [Andreas Tennert](https://github.com/atennert)<br>
 Current author: [Andreas Tennert](https://github.com/atennert)
