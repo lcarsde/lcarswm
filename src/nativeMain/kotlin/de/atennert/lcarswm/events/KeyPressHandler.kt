@@ -27,9 +27,9 @@ class KeyPressHandler(
         val keyCode = event.xkey.keycode
         val keyMask = keyManager.filterMask(event.xkey.state)
 
-        val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
-
         logger.logDebug("KeyPressHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
+
+        val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
 
         keyConfiguration.getBindingForKey(keySym, keyMask)?.let { keyBinding ->
             when (keyBinding) {
