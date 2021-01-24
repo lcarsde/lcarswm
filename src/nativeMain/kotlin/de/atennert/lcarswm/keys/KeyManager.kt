@@ -26,9 +26,6 @@ class KeyManager(private val inputApi: InputApi) {
 
     private val grabbedKeys = mutableMapOf<KeyCode, KeySym>()
 
-    /** We need to grab the modifier key codes of the WM modifier key to run our commands */
-    private val modifierKeyCodes = mutableListOf<Int>()
-
     var modMasks = getAllModifierKeys()
         private set
 
@@ -194,8 +191,6 @@ class KeyManager(private val inputApi: InputApi) {
      * Cleanup acquired X data
      */
     private fun cleanup() {
-        modifierKeyCodes.clear()
-
         if (modifierKeymapReference != null) {
             inputApi.freeModifiermap(modifierKeymapReference)
             modifierKeymapReference = null
