@@ -207,7 +207,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     windowList.registerObserver(appMenuHandler.windowListObserver)
 
-    val keySessionManager = KeySessionManager()
+    val keySessionManager = KeySessionManager(logger)
     keySessionManager.addListener(focusHandler.keySessionListener)
 
     val eventManager = createEventManager(

@@ -32,8 +32,8 @@ class WindowFocusHandler {
     }
 
     fun setFocusedWindow(activeWindow: Window) {
-        putActiveWindowToFront()
         setFocusedWindowInternal(activeWindow)
+        putActiveWindowToFront()
     }
 
     private fun setFocusedWindowInternal(activeWindow: Window) {
@@ -70,11 +70,10 @@ class WindowFocusHandler {
      * When starting a new toggle session, the list should be ordered to that the active window is at the front.
      */
     private fun putActiveWindowToFront() {
-        if (windowIdList.isEmpty()) {
-            return
+        activeWindow?.let {
+            windowIdList.remove(it)
+            windowIdList.add(0, it)
         }
-        windowIdList.remove(activeWindow)
-        windowIdList.add(0, activeWindow!!)
     }
 
     private fun getIndexOfFocusedWindow(): Int {

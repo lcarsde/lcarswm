@@ -21,9 +21,6 @@ class KeyPressHandler(
 ) : XEventHandler {
     override val xEventType = KeyPress
 
-    private var lastMask: Int = 0
-    private var lastKeySym: KeySym = 0.convert()
-
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
         val keyMask = keyManager.filterMask(event.xkey.state)

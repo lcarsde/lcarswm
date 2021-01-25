@@ -123,6 +123,29 @@ class WindowFocusHandlerTest {
     }
 
     @Test
+    fun `toggle through windows with reset`() {
+        val focusHandler = WindowFocusHandler()
+        val window1: Window = 1.convert()
+        val window2: Window = 2.convert()
+        val window3: Window = 3.convert()
+
+        focusHandler.setFocusedWindow(window1)
+        focusHandler.setFocusedWindow(window2)
+        focusHandler.setFocusedWindow(window3)
+
+        focusHandler.toggleWindowFocus()
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
+
+        focusHandler.keySessionListener.stopSession()
+        focusHandler.toggleWindowFocus()
+        assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
+
+        focusHandler.keySessionListener.stopSession()
+        focusHandler.toggleWindowFocus()
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle back to window 2")
+    }
+
+    @Test
     fun `don't react on toggle without windows`() {
         val focusHandler = WindowFocusHandler()
 

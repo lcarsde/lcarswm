@@ -1,8 +1,9 @@
 package de.atennert.lcarswm.keys
 
+import de.atennert.lcarswm.log.Logger
 import kotlinx.cinterop.convert
 
-class KeySessionManager {
+class KeySessionManager(private val logger: Logger) {
     private val listeners = mutableListOf<KeySessionListener>()
 
     private var lastMask: Int = 0
@@ -11,6 +12,7 @@ class KeySessionManager {
     fun pressKeys(keyCode: UInt, keyMask: Int) {
         val isSameSession = (keyMask == lastMask) and (keyCode == lastKeyCode)
         if (!isSameSession) {
+            logger.logDebug("KeySessionManager::pressKeys::stop session")
             listeners.forEach { it.stopSession() }
         }
         lastMask = keyMask
