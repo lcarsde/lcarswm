@@ -1,10 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.drawing.UIDrawing
-import de.atennert.lcarswm.keys.KeyAction
-import de.atennert.lcarswm.keys.KeyConfiguration
-import de.atennert.lcarswm.keys.KeyManager
-import de.atennert.lcarswm.keys.WmAction
+import de.atennert.lcarswm.keys.*
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.window.WindowCoordinator
@@ -16,6 +13,7 @@ class KeyPressHandler(
     private val logger: Logger,
     private val keyManager: KeyManager,
     private val keyConfiguration: KeyConfiguration,
+    private val keySessionManager: KeySessionManager,
     private val monitorManager: MonitorManager,
     private val windowCoordinator: WindowCoordinator,
     private val windowFocusHandler: WindowFocusHandler,
@@ -23,11 +21,15 @@ class KeyPressHandler(
 ) : XEventHandler {
     override val xEventType = KeyPress
 
+    private var lastMask: Int = 0
+    private var lastKeySym: KeySym = 0.convert()
+
     override fun handleEvent(event: XEvent): Boolean {
         val keyCode = event.xkey.keycode
         val keyMask = keyManager.filterMask(event.xkey.state)
 
         logger.logDebug("KeyPressHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
+        keySessionManager.pressKeys(keyCode, keyMask)
 
         val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
 

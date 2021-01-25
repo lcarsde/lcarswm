@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.window
 
+import de.atennert.lcarswm.keys.KeySessionManager
 import xlib.Window
 
 typealias FocusObserver = (Window?, Window?) -> Unit
@@ -11,6 +12,16 @@ class WindowFocusHandler {
 
     private val observers = mutableListOf<FocusObserver>()
 
+    val keySessionListener = object : KeySessionManager.KeySessionListener {
+        override fun stopSession() {
+            activeWindow?.let {
+                if (windowIdList[0] != it) {
+                    putActiveWindowToFront()
+                }
+            }
+        }
+    }
+
     fun getFocusedWindow(): Window? {
         return activeWindow
     }
@@ -21,6 +32,11 @@ class WindowFocusHandler {
     }
 
     fun setFocusedWindow(activeWindow: Window) {
+        putActiveWindowToFront()
+        setFocusedWindowInternal(activeWindow)
+    }
+
+    private fun setFocusedWindowInternal(activeWindow: Window) {
         if (activeWindow == this.activeWindow) {
             return
         }
@@ -34,10 +50,9 @@ class WindowFocusHandler {
     }
 
     fun removeWindow(window: Window) {
-        val focusIndex = getIndexOfFocusedWindow()
         windowIdList.remove(window)
         if (window == activeWindow) {
-            this.activeWindow = getPreviousWindowToFocus(focusIndex)
+            this.activeWindow = windowIdList.getOrNull(0)
             this.observers.forEach { it(this.activeWindow, window) }
         }
     }
@@ -48,7 +63,18 @@ class WindowFocusHandler {
         }
         val focusIndex = getIndexOfFocusedWindow()
         val nextWindow = getNextWindowToFocus(focusIndex)
-        setFocusedWindow(nextWindow)
+        setFocusedWindowInternal(nextWindow)
+    }
+
+    /**
+     * When starting a new toggle session, the list should be ordered to that the active window is at the front.
+     */
+    private fun putActiveWindowToFront() {
+        if (windowIdList.isEmpty()) {
+            return
+        }
+        windowIdList.remove(activeWindow)
+        windowIdList.add(0, activeWindow!!)
     }
 
     private fun getIndexOfFocusedWindow(): Int {
@@ -57,15 +83,6 @@ class WindowFocusHandler {
 
     private fun getNextWindowToFocus(currentFocusIndex: Int): Window {
         val nextIndex = (currentFocusIndex + 1).rem(windowIdList.size)
-        return windowIdList.elementAt(nextIndex)
-    }
-
-    private fun getPreviousWindowToFocus(currentFocusIndex: Int): Window? {
-        if (windowIdList.isEmpty()) {
-            return null
-        }
-
-        val nextIndex = if (currentFocusIndex > 0) currentFocusIndex - 1 else windowIdList.size - 1
         return windowIdList.elementAt(nextIndex)
     }
 }

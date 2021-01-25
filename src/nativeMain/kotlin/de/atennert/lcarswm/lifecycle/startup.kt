@@ -9,6 +9,7 @@ import de.atennert.lcarswm.drawing.*
 import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.keys.KeyConfiguration
 import de.atennert.lcarswm.keys.KeyManager
+import de.atennert.lcarswm.keys.KeySessionManager
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
@@ -206,6 +207,9 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     windowList.registerObserver(appMenuHandler.windowListObserver)
 
+    val keySessionManager = KeySessionManager()
+    keySessionManager.addListener(focusHandler.keySessionListener)
+
     val eventManager = createEventManager(
         system,
         logger,
@@ -214,6 +218,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         windowCoordinator,
         focusHandler,
         keyManager,
+        keySessionManager,
         uiDrawer,
         atomLibrary,
         screenChangeHandler,
@@ -336,6 +341,7 @@ private fun createEventManager(
     windowCoordinator: WindowCoordinator,
     focusHandler: WindowFocusHandler,
     keyManager: KeyManager,
+    keySessionManager: KeySessionManager,
     uiDrawer: UIDrawing,
     atomLibrary: AtomLibrary,
     screenChangeHandler: XEventHandler,
@@ -352,7 +358,7 @@ private fun createEventManager(
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler, statusBarHandler))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler, statusBarHandler))
         .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler))
-        .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, monitorManager, windowCoordinator, focusHandler, uiDrawer))
+        .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
         .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, atomLibrary))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
         .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))

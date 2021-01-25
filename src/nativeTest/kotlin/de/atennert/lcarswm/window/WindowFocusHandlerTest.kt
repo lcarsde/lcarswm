@@ -113,10 +113,10 @@ class WindowFocusHandlerTest {
         focusHandler.setFocusedWindow(window3)
 
         focusHandler.toggleWindowFocus()
-        assertEquals(window1, focusHandler.getFocusedWindow(), "The focus should toggle to window 1")
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
 
         focusHandler.toggleWindowFocus()
-        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
+        assertEquals(window1, focusHandler.getFocusedWindow(), "The focus should toggle to window 1")
 
         focusHandler.toggleWindowFocus()
         assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
