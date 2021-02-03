@@ -45,7 +45,8 @@ class KeyManager(private val inputApi: InputApi) {
             keymap = inputApi.getKeyboardMapping(
                 minKeyCodes.convert(),
                 (maxKeyCodes - minKeyCodes + 1).convert(),
-                keySymsPerKeyCodePinned.addressOf(0))!!
+                keySymsPerKeyCodePinned.addressOf(0)
+            )!!
         }
 
         var superLUsed = false
@@ -70,16 +71,16 @@ class KeyManager(private val inputApi: InputApi) {
                             when (keySym.convert<Int>()) {
                                 XK_Num_Lock -> {
                                     modifierMasks[Modifiers.NUM_LOCK] =
-                                        modifierMasks.getOrElse(Modifiers.NUM_LOCK, {0}).or(mask)
+                                        modifierMasks.getOrElse(Modifiers.NUM_LOCK, { 0 }).or(mask)
                                 }
                                 XK_Scroll_Lock -> {
                                     modifierMasks[Modifiers.SCROLL_LOCK] =
-                                        modifierMasks.getOrElse(Modifiers.SCROLL_LOCK, {0}).or(mask)
+                                        modifierMasks.getOrElse(Modifiers.SCROLL_LOCK, { 0 }).or(mask)
                                 }
 
                                 XK_Super_L -> {
                                     modifierMasks[Modifiers.SUPER] = if (superLUsed) {
-                                        modifierMasks.getOrElse(Modifiers.SUPER, {0}).or(mask)
+                                        modifierMasks.getOrElse(Modifiers.SUPER, { 0 }).or(mask)
                                     } else {
                                         superLUsed = true
                                         mask // overwrite any super-r stuff
@@ -88,41 +89,41 @@ class KeyManager(private val inputApi: InputApi) {
                                 XK_Super_R -> {
                                     if (!superLUsed) {
                                         modifierMasks[Modifiers.SUPER] = modifierMasks.getOrElse(
-                                            Modifiers.SUPER, {0}).or(mask)
+                                            Modifiers.SUPER, { 0 }).or(mask)
                                     }
                                 }
 
                                 XK_Hyper_L -> modifierMasks[Modifiers.HYPER] = if (hyperLUsed) {
-                                    modifierMasks.getOrElse(Modifiers.HYPER, {0}).or(mask)
+                                    modifierMasks.getOrElse(Modifiers.HYPER, { 0 }).or(mask)
                                 } else {
                                     hyperLUsed = true
                                     mask // overwrite any hyper-r stuff
                                 }
                                 XK_Hyper_R -> if (!hyperLUsed) {
                                     modifierMasks[Modifiers.HYPER] = modifierMasks.getOrElse(
-                                        Modifiers.HYPER, {0}).or(mask)
+                                        Modifiers.HYPER, { 0 }).or(mask)
                                 }
 
                                 XK_Alt_L -> modifierMasks[Modifiers.ALT] = if (altLUsed) {
-                                    modifierMasks.getOrElse(Modifiers.ALT, {0}).or(mask)
+                                    modifierMasks.getOrElse(Modifiers.ALT, { 0 }).or(mask)
                                 } else {
                                     altLUsed = true
                                     mask // overwrite any alt-r stuff
                                 }
                                 XK_Alt_R -> if (!altLUsed) {
                                     modifierMasks[Modifiers.ALT] = modifierMasks.getOrElse(
-                                        Modifiers.ALT, {0}).or(mask)
+                                        Modifiers.ALT, { 0 }).or(mask)
                                 }
 
                                 XK_Meta_L -> modifierMasks[Modifiers.META] = if (metaLUsed) {
-                                    modifierMasks.getOrElse(Modifiers.META, {0}).or(mask)
+                                    modifierMasks.getOrElse(Modifiers.META, { 0 }).or(mask)
                                 } else {
                                     metaLUsed = true
                                     mask // overwrite any meta-r stuff
                                 }
                                 XK_Meta_R -> if (!metaLUsed) {
                                     modifierMasks[Modifiers.META] = modifierMasks.getOrElse(
-                                        Modifiers.META, {0}).or(mask)
+                                        Modifiers.META, { 0 }).or(mask)
                                 }
                             }
                         }
@@ -166,6 +167,52 @@ class KeyManager(private val inputApi: InputApi) {
         cleanup()
         modMasks = getAllModifierKeys()
         lockMasks = getLockMasks()
+    }
+
+    /**
+     * Grab the detected modifier keys.
+     */
+    private fun grabModifierKeys(rootWindowId: Window) {
+        val grabber = { keySym: Int ->
+            inputApi.grabKey(
+                inputApi.keysymToKeycode(keySym.convert()).convert(),
+                AnyModifier.convert(),
+                rootWindowId,
+                GrabModeAsync
+            )
+        }
+
+        for (modifier in modMasks.keys) {
+            when (modifier) {
+                Modifiers.SHIFT -> {
+                    grabber(XK_Shift_L)
+                    grabber(XK_Shift_R)
+                }
+                Modifiers.CONTROL -> {
+                    grabber(XK_Control_L)
+                    grabber(XK_Control_R)
+                }
+                Modifiers.SUPER -> {
+                    grabber(XK_Super_L)
+                    grabber(XK_Super_R)
+                }
+                Modifiers.HYPER ->{
+                    grabber(XK_Hyper_L)
+                    grabber(XK_Hyper_R)
+                }
+                Modifiers.META -> {
+                    grabber(XK_Meta_L)
+                    grabber(XK_Meta_R)
+                }
+                Modifiers.ALT -> {
+                    grabber(XK_Alt_L)
+                    grabber(XK_Alt_R)
+                }
+                else -> {
+                    // nothing to do
+                }
+            }
+        }
     }
 
     /**
