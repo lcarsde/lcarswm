@@ -30,18 +30,33 @@ class KeyReleaseHandler(
 
         logger.logDebug("KeyReleaseHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
 
-        val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
+        val keySym = keyManager.getKeySym(keyCode.convert())
+        if (keySym == null) {
+            forwardEvent(event)
+            return false
+        }
 
-        return keyConfiguration.getBindingForKey(keySym, keyMask)?.let { keyBinding ->
+        val keyBinding = keyConfiguration.getBindingForKey(keySym, keyMask)
+        if (keyBinding != null) {
             logger.logDebug("KeyReleaseHandler::handleEvent::run command: ${keyBinding.command}")
-            when (keyBinding) {
+            return when (keyBinding) {
                 is KeyExecution -> {
                     execute(keyBinding.command)
                     false
                 }
                 is KeyAction -> act(keyBinding.action)
             }
-        } ?: false
+        } else {
+            forwardEvent(event)
+        }
+        return false
+    }
+
+    private fun forwardEvent(event: XEvent) {
+        focusHandler.getFocusedWindow()?.let { focusedWindow ->
+            event.xkey.window = focusedWindow
+            systemApi.sendEvent(focusedWindow, false, KeyPressMask, event.ptr)
+        }
     }
 
     private fun execute(execCommand: String) {

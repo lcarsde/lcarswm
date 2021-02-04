@@ -4,13 +4,16 @@ import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.keys.*
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
+import de.atennert.lcarswm.system.api.EventApi
 import de.atennert.lcarswm.window.WindowCoordinator
 import de.atennert.lcarswm.window.WindowFocusHandler
 import kotlinx.cinterop.convert
+import kotlinx.cinterop.ptr
 import xlib.*
 
 class KeyPressHandler(
     private val logger: Logger,
+    private val eventApi: EventApi,
     private val keyManager: KeyManager,
     private val keyConfiguration: KeyConfiguration,
     private val keySessionManager: KeySessionManager,
@@ -28,16 +31,30 @@ class KeyPressHandler(
         logger.logDebug("KeyPressHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
         keySessionManager.pressKeys(keyCode, keyMask)
 
-        val keySym = keyManager.getKeySym(keyCode.convert()) ?: return false
+        val keySym = keyManager.getKeySym(keyCode.convert())
+        if (keySym == null) {
+            forwardEvent(event)
+            return false
+        }
 
-        keyConfiguration.getBindingForKey(keySym, keyMask)?.let { keyBinding ->
+        val keyBinding = keyConfiguration.getBindingForKey(keySym, keyMask)
+        if (keyBinding != null) {
             when (keyBinding) {
                 is KeyAction -> act(keyBinding.action)
                 else -> {/* so far we only handle key actions here */}
             }
+        } else {
+            forwardEvent(event)
         }
 
         return false
+    }
+
+    private fun forwardEvent(event: XEvent) {
+        windowFocusHandler.getFocusedWindow()?.let { focusedWindow ->
+            event.xkey.window = focusedWindow
+            eventApi.sendEvent(focusedWindow, false, KeyPressMask, event.ptr)
+        }
     }
 
     private fun act(action: WmAction): Boolean {
