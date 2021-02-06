@@ -31,22 +31,18 @@ class KeyPressHandler(
         logger.logDebug("KeyPressHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
         keySessionManager.pressKeys(keyCode, keyMask)
 
-        val keySym = keyManager.getKeySym(keyCode.convert())
-        if (keySym == null) {
-            forwardEvent(event)
-            return false
-        }
-
-        val keyBinding = keyConfiguration.getBindingForKey(keySym, keyMask)
-        if (keyBinding != null) {
-            when (keyBinding) {
-                is KeyAction -> act(keyBinding.action)
-                else -> {/* so far we only handle key actions here */}
+        keyManager.getKeySym(keyCode.convert())?.let { keySym ->
+            keyConfiguration.getBindingForKey(keySym, keyMask)?.let { keyBinding ->
+                when (keyBinding) {
+                    is KeyAction -> act(keyBinding.action)
+                    else -> {/* so far we only handle key actions here */}
+                }
+                return false
             }
-        } else {
-            forwardEvent(event)
         }
 
+        // no event use in wm ... forward to active client
+        forwardEvent(event)
         return false
     }
 

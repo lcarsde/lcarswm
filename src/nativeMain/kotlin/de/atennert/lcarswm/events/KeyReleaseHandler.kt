@@ -30,25 +30,21 @@ class KeyReleaseHandler(
 
         logger.logDebug("KeyReleaseHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
 
-        val keySym = keyManager.getKeySym(keyCode.convert())
-        if (keySym == null) {
-            forwardEvent(event)
-            return false
+        keyManager.getKeySym(keyCode.convert())?.let { keySym ->
+            keyConfiguration.getBindingForKey(keySym, keyMask)?.let { keyBinding ->
+                logger.logDebug("KeyReleaseHandler::handleEvent::run command: ${keyBinding.command}")
+                return when (keyBinding) {
+                    is KeyExecution -> {
+                        execute(keyBinding.command)
+                        false
+                    }
+                    is KeyAction -> act(keyBinding.action)
+                }
+            }
         }
 
-        val keyBinding = keyConfiguration.getBindingForKey(keySym, keyMask)
-        if (keyBinding != null) {
-            logger.logDebug("KeyReleaseHandler::handleEvent::run command: ${keyBinding.command}")
-            return when (keyBinding) {
-                is KeyExecution -> {
-                    execute(keyBinding.command)
-                    false
-                }
-                is KeyAction -> act(keyBinding.action)
-            }
-        } else {
-            forwardEvent(event)
-        }
+        // no event use in wm ... forward to active client
+        forwardEvent(event)
         return false
     }
 
