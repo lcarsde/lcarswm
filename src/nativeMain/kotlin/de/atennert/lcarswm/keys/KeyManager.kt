@@ -170,52 +170,6 @@ class KeyManager(private val inputApi: InputApi) {
     }
 
     /**
-     * Grab the detected modifier keys.
-     */
-    private fun grabModifierKeys(rootWindowId: Window) {
-        val grabber = { keySym: Int ->
-            inputApi.grabKey(
-                inputApi.keysymToKeycode(keySym.convert()).convert(),
-                AnyModifier.convert(),
-                rootWindowId,
-                GrabModeAsync
-            )
-        }
-
-        for (modifier in modMasks.keys) {
-            when (modifier) {
-                Modifiers.SHIFT -> {
-                    grabber(XK_Shift_L)
-                    grabber(XK_Shift_R)
-                }
-                Modifiers.CONTROL -> {
-                    grabber(XK_Control_L)
-                    grabber(XK_Control_R)
-                }
-                Modifiers.SUPER -> {
-                    grabber(XK_Super_L)
-                    grabber(XK_Super_R)
-                }
-                Modifiers.HYPER ->{
-                    grabber(XK_Hyper_L)
-                    grabber(XK_Hyper_R)
-                }
-                Modifiers.META -> {
-                    grabber(XK_Meta_L)
-                    grabber(XK_Meta_R)
-                }
-                Modifiers.ALT -> {
-                    grabber(XK_Alt_L)
-                    grabber(XK_Alt_R)
-                }
-                else -> {
-                    // nothing to do
-                }
-            }
-        }
-    }
-
-    /**
      * Grab a key binding consisting of a key sym and a key modifier
      */
     fun grabKey(keySym: KeySym, modifiers: Int, rootWindowId: Window) {

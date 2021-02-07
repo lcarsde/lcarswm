@@ -43,16 +43,7 @@ class KeyReleaseHandler(
             }
         }
 
-        // no event use in wm ... forward to active client
-        forwardEvent(event)
         return false
-    }
-
-    private fun forwardEvent(event: XEvent) {
-        focusHandler.getFocusedWindow()?.let { focusedWindow ->
-            event.xkey.window = focusedWindow
-            systemApi.sendEvent(focusedWindow, false, KeyPressMask, event.ptr)
-        }
     }
 
     private fun execute(execCommand: String) {
