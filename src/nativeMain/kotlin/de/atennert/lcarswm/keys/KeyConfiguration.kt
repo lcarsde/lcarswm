@@ -12,6 +12,7 @@ class KeyConfiguration(
     private val inputApi: InputApi,
     private val keyConfiguration: Set<KeyBinding>,
     private val keyManager: KeyManager,
+    private val toggleSessionManager: KeySessionManager,
     private val rootWindowId: Window
 ) {
 
@@ -34,13 +35,17 @@ class KeyConfiguration(
         for (keyBinding in keyConfiguration) {
             val (modifierStrings, keyString) = separateKeySymAndModifiers(keyBinding.keys)
 
-            val mask = getMask(modifierStrings)
+            val (mask, modifiers) = getMask(modifierStrings)
             val grabbedMask = if (mask == 0) AnyModifier else mask
             val keySym = getKeySym(keyString)
 
             keyManager.grabKey(keySym, grabbedMask, rootWindowId)
 
             keySymCommands[Pair(keySym, mask)] = keyBinding
+
+            if (keyBinding is KeyAction && keyBinding.action == WmAction.WINDOW_TOGGLE) {
+                toggleSessionManager.setModifiers(modifiers)
+            }
         }
     }
 
@@ -49,12 +54,15 @@ class KeyConfiguration(
         return Pair(keyStrings.dropLast(1), keyStrings.last())
     }
 
-    private fun getMask(modifierStrings: List<String>): Int {
-        return modifierStrings.fold(0) { acc, modifierString ->
+    private fun getMask(modifierStrings: List<String>): Pair<Int, List<Modifiers>> {
+        return modifierStrings.fold(Pair(0, listOf())) { acc, modifierString ->
             val modifier = modKeyBindings.entries
                 .single { it.value.contains(modifierString) }
                 .key
-            acc or keyManager.modMasks.getValue(modifier)
+            Pair(
+                acc.first or keyManager.modMasks.getValue(modifier),
+                acc.second.plus(modifier)
+            )
         }
     }
 

@@ -3,7 +3,7 @@ package de.atennert.lcarswm.window
 import de.atennert.lcarswm.keys.KeySessionManager
 import xlib.Window
 
-typealias FocusObserver = (Window?, Window?) -> Unit
+typealias FocusObserver = (Window?, Window?, Boolean) -> Unit
 
 class WindowFocusHandler {
     private var activeWindow: Window? = null
@@ -12,13 +12,20 @@ class WindowFocusHandler {
 
     private val observers = mutableListOf<FocusObserver>()
 
+    private var toggleSessionActive = false
+
     val keySessionListener = object : KeySessionManager.KeySessionListener {
         override fun stopSession() {
+            if (!toggleSessionActive) {
+                return
+            }
+            toggleSessionActive = false
             activeWindow?.let {
                 if (windowIdList[0] != it) {
                     putActiveWindowToFront()
                 }
             }
+            observers.forEach { it(activeWindow, null, false) }
         }
     }
 
@@ -28,7 +35,7 @@ class WindowFocusHandler {
 
     fun registerObserver(observer: FocusObserver) {
         this.observers.add(observer)
-        observer(activeWindow, null)
+        observer(activeWindow, null, false)
     }
 
     fun setFocusedWindow(activeWindow: Window) {
@@ -43,7 +50,7 @@ class WindowFocusHandler {
 
         val oldActiveWindow = this.activeWindow
         this.activeWindow = activeWindow
-        this.observers.forEach { it(activeWindow, oldActiveWindow) }
+        this.observers.forEach { it(activeWindow, oldActiveWindow, toggleSessionActive) }
         if (!windowIdList.contains(activeWindow)) {
             windowIdList.add(activeWindow)
         }
@@ -53,7 +60,7 @@ class WindowFocusHandler {
         windowIdList.remove(window)
         if (window == activeWindow) {
             this.activeWindow = windowIdList.getOrNull(0)
-            this.observers.forEach { it(this.activeWindow, window) }
+            this.observers.forEach { it(this.activeWindow, window, false) }
         }
     }
 
@@ -61,6 +68,7 @@ class WindowFocusHandler {
         if (activeWindow == null) {
             return
         }
+        toggleSessionActive = true
         val focusIndex = getIndexOfFocusedWindow()
         val nextWindow = getNextWindowToFocus(focusIndex)
         setFocusedWindowInternal(nextWindow)

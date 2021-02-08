@@ -258,6 +258,18 @@ open class SystemFacadeMock : SystemApi {
         "XF86AudioMute" to XF86XK_AudioMute,
         "XF86AudioRaiseVolume" to XF86XK_AudioRaiseVolume,
         "XF86AudioLowerVolume" to XF86XK_AudioLowerVolume,
+        "Shift-L" to XK_Shift_L,
+        "Shift-R" to XK_Shift_R,
+        "Control-L" to XK_Control_L,
+        "Control-R" to XK_Control_R,
+        "Super-L" to XK_Super_L,
+        "Super-R" to XK_Super_R,
+        "Hyper-L" to XK_Hyper_L,
+        "Hyper-R" to XK_Hyper_R,
+        "Meta-L" to XK_Meta_L,
+        "Meta-R" to XK_Meta_R,
+        "Alt-L" to XK_Alt_L,
+        "Alt-R" to XK_Alt_R,
     )
 
     val stringKeys = keyStrings.map { (s, i) -> Pair(i, s) }.toMap()

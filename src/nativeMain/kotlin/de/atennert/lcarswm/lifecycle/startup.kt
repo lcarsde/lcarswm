@@ -123,10 +123,13 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     keyManager.ungrabAllKeys(screen.root)
 
+    val toggleSessionManager = KeySessionManager(logger, system)
+
     val keyConfiguration = KeyConfiguration(
         system,
         settings.keyBindings,
         keyManager,
+        toggleSessionManager,
         screen.root
     )
 
@@ -178,15 +181,17 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         windowList
     )
 
-    focusHandler.registerObserver { activeWindow, _ ->
-        if (activeWindow != null) {
+    focusHandler.registerObserver { activeWindow, _, toggleSessionActive ->
+        if (activeWindow != null && !toggleSessionActive) {
+            logger.logDebug("::startup::set input focus to $activeWindow")
             system.setInputFocus(activeWindow, RevertToNone, eventTime.lastEventTime)
         } else {
+            logger.logDebug("::startup::set input focus to root")
             system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
         }
     }
 
-    focusHandler.registerObserver { activeWindow, oldWindow ->
+    focusHandler.registerObserver { activeWindow, oldWindow, _ ->
         listOf(oldWindow, activeWindow).forEach {
             it?.let { ow ->
                 windowRegistration[ow]?.let { fw ->
@@ -196,7 +201,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         }
     }
 
-    focusHandler.registerObserver { activeWindow, _ ->
+    focusHandler.registerObserver { activeWindow, _, _ ->
         activeWindow?.let { windowCoordinator.stackWindowToTheTop(it) }
     }
 
@@ -207,8 +212,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     windowList.registerObserver(appMenuHandler.windowListObserver)
 
-    val keySessionManager = KeySessionManager(logger)
-    keySessionManager.addListener(focusHandler.keySessionListener)
+    toggleSessionManager.addListener(focusHandler.keySessionListener)
 
     val eventManager = createEventManager(
         system,
@@ -218,7 +222,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         windowCoordinator,
         focusHandler,
         keyManager,
-        keySessionManager,
+        toggleSessionManager,
         uiDrawer,
         atomLibrary,
         screenChangeHandler,
@@ -341,7 +345,7 @@ private fun createEventManager(
     windowCoordinator: WindowCoordinator,
     focusHandler: WindowFocusHandler,
     keyManager: KeyManager,
-    keySessionManager: KeySessionManager,
+    toggleSessionManager: KeySessionManager,
     uiDrawer: UIDrawing,
     atomLibrary: AtomLibrary,
     screenChangeHandler: XEventHandler,
@@ -358,8 +362,8 @@ private fun createEventManager(
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler, statusBarHandler))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler, statusBarHandler))
         .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler))
-        .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
-        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, atomLibrary))
+        .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, toggleSessionManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
+        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, toggleSessionManager, atomLibrary))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
         .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
         .addEventHandler(screenChangeHandler)

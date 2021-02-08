@@ -15,7 +15,7 @@ class WindowFocusHandlerTest {
 
         var activeWindow: Window? = 42.convert()
         var oldWindow: Window? = 64.convert()
-        windowFocusHandler.registerObserver { n, o -> activeWindow = n; oldWindow = o}
+        windowFocusHandler.registerObserver { n, o, _ -> activeWindow = n; oldWindow = o}
         assertNull(activeWindow, "The observer should get null window")
         assertNull(oldWindow, "The observer should get no old window")
     }
@@ -28,7 +28,7 @@ class WindowFocusHandlerTest {
         var newWindow: Window? = 42.convert()
         var oldWindow: Window? = 64.convert()
 
-        windowFocusHandler.registerObserver { n, o -> newWindow = n; oldWindow = o}
+        windowFocusHandler.registerObserver { n, o, _ -> newWindow = n; oldWindow = o}
 
         windowFocusHandler.setFocusedWindow(testWindow1)
         assertEquals(testWindow1, windowFocusHandler.getFocusedWindow(), "The focused window should be updated (1)")

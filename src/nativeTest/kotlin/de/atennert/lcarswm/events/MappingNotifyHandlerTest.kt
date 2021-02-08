@@ -21,10 +21,12 @@ class MappingNotifyHandlerTest {
     fun `return the event type MappingNotify`() {
         val system = SystemFacadeMock()
         val keyManager = KeyManager(system)
+        val keySessionManager = KeySessionManager(LoggerMock(), system)
         val keyConfiguration = KeyConfiguration(
             system,
             keySetting,
             keyManager,
+            keySessionManager,
             system.rootWindowId
         )
         val mappingNotifyHandler = MappingNotifyHandler(LoggerMock(), keyManager, keyConfiguration, system.rootWindowId)
@@ -36,10 +38,12 @@ class MappingNotifyHandlerTest {
     fun `reload the key bindings`() {
         val system = SystemFacadeMock()
         val keyManager = KeyManager(system)
+        val keySessionManager = KeySessionManager(LoggerMock(), system)
         val keyConfiguration = KeyConfiguration(
             system,
             keySetting,
             keyManager,
+            keySessionManager,
             system.rootWindowId
         )
         val mappingNotifyHandler = MappingNotifyHandler(LoggerMock(), keyManager, keyConfiguration, system.rootWindowId)

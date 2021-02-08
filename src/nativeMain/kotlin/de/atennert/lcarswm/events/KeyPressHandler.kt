@@ -13,7 +13,7 @@ class KeyPressHandler(
     private val logger: Logger,
     private val keyManager: KeyManager,
     private val keyConfiguration: KeyConfiguration,
-    private val keySessionManager: KeySessionManager,
+    private val toggleSessionManager: KeySessionManager,
     private val monitorManager: MonitorManager,
     private val windowCoordinator: WindowCoordinator,
     private val windowFocusHandler: WindowFocusHandler,
@@ -26,7 +26,7 @@ class KeyPressHandler(
         val keyMask = keyManager.filterMask(event.xkey.state)
 
         logger.logDebug("KeyPressHandler::handleEvent::key code: $keyCode, key mask: $keyMask")
-        keySessionManager.pressKeys(keyCode, keyMask)
+        toggleSessionManager.pressKeys(keyCode, keyMask)
 
         keyManager.getKeySym(keyCode.convert())?.let { keySym ->
             keyConfiguration.getBindingForKey(keySym, keyMask)?.let { keyBinding ->

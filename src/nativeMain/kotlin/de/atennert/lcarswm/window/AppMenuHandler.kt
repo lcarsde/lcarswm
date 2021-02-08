@@ -158,7 +158,7 @@ class AppMenuHandler(
 
     private var activeWindow: Window? = null
 
-    val focusObserver: FocusObserver = { newWindow: Window?, _ ->
+    val focusObserver: FocusObserver = { newWindow: Window?, _, _ ->
         activeWindow = newWindow
         sendWindowListUpdate()
     }
