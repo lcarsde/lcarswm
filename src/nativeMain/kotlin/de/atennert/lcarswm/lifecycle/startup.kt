@@ -181,11 +181,33 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         windowList
     )
 
+    val keyboardGrabber = object : FocusObserver {
+        var active = false
+        var lastTime: Time = CurrentTime.convert()
+
+        override fun invoke(activeWindow: Window?, oldWindow: Window?, toggleSessionActive: Boolean) {
+            if (toggleSessionActive != active) {
+                active = toggleSessionActive
+                logger.logDebug("::keyboardGrabber::toggling session: $active")
+                if (toggleSessionActive) {
+                    lastTime = eventTime.lastEventTime
+                    system.grabKeyboard(rootWindowPropertyHandler.ewmhSupportWindow, lastTime)
+                } else {
+                    system.ungrabKeyboard(
+                        if (eventTime.lastEventTime > lastTime) eventTime.lastEventTime else CurrentTime.convert()
+                    )
+                }
+            }
+        }
+    }
+
+    focusHandler.registerObserver(keyboardGrabber)
+
     focusHandler.registerObserver { activeWindow, _, toggleSessionActive ->
         if (activeWindow != null && !toggleSessionActive) {
             logger.logDebug("::startup::set input focus to $activeWindow")
             system.setInputFocus(activeWindow, RevertToNone, eventTime.lastEventTime)
-        } else {
+        } else if (!toggleSessionActive) {
             logger.logDebug("::startup::set input focus to root")
             system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
         }

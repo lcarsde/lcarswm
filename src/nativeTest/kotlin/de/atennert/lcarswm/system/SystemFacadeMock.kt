@@ -198,6 +198,14 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("ungrabKey", window))
     }
 
+    override fun grabKeyboard(window: Window, time: Time) {
+        // TODO implement
+    }
+
+    override fun ungrabKeyboard(time: Time) {
+        // TODO implement
+    }
+
     override fun grabButton(
         button: UInt,
         modifiers: UInt,
