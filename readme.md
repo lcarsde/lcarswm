@@ -59,7 +59,7 @@ Thank you very much to the creators of the following resources:
 
 ## Required
 ### For compiling
-* ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler, which is part of this package.
+* ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler that is used by this package.
 * header files and development libraries for XLib, randr, xpm, libxml2, glib and pango. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
 
 ### For using
