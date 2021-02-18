@@ -112,13 +112,13 @@ class WindowFocusHandlerTest {
         focusHandler.setFocusedWindow(window2)
         focusHandler.setFocusedWindow(window3)
 
-        focusHandler.toggleWindowFocus()
+        focusHandler.toggleWindowFocusForward()
         assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
 
-        focusHandler.toggleWindowFocus()
+        focusHandler.toggleWindowFocusForward()
         assertEquals(window1, focusHandler.getFocusedWindow(), "The focus should toggle to window 1")
 
-        focusHandler.toggleWindowFocus()
+        focusHandler.toggleWindowFocusForward()
         assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
     }
 
@@ -133,23 +133,133 @@ class WindowFocusHandlerTest {
         focusHandler.setFocusedWindow(window2)
         focusHandler.setFocusedWindow(window3)
 
-        focusHandler.toggleWindowFocus()
+        focusHandler.toggleWindowFocusForward()
         assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
 
         focusHandler.keySessionListener.stopSession()
-        focusHandler.toggleWindowFocus()
+        focusHandler.toggleWindowFocusForward()
         assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
 
         focusHandler.keySessionListener.stopSession()
-        focusHandler.toggleWindowFocus()
+        focusHandler.toggleWindowFocusForward()
         assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle back to window 2")
+    }
+
+    @Test
+    fun `toggle through windows reversed`() {
+        val focusHandler = WindowFocusHandler()
+        val window1: Window = 1.convert()
+        val window2: Window = 2.convert()
+        val window3: Window = 3.convert()
+
+        focusHandler.setFocusedWindow(window1)
+        focusHandler.setFocusedWindow(window2)
+        focusHandler.setFocusedWindow(window3)
+
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window1, focusHandler.getFocusedWindow(), "The focus should toggle to window 1")
+
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
+
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
+    }
+
+    @Test
+    fun `toggle through windows reversed with reset`() {
+        val focusHandler = WindowFocusHandler()
+        val window1: Window = 1.convert()
+        val window2: Window = 2.convert()
+        val window3: Window = 3.convert()
+
+        focusHandler.setFocusedWindow(window1)
+        focusHandler.setFocusedWindow(window2)
+        focusHandler.setFocusedWindow(window3)
+
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window1, focusHandler.getFocusedWindow(), "The focus should toggle to window 1")
+
+        focusHandler.keySessionListener.stopSession()
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
+
+        focusHandler.keySessionListener.stopSession()
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle back to window 3")
+    }
+
+    @Test
+    fun `toggle through windows mixed`() {
+        val focusHandler = WindowFocusHandler()
+        val window1: Window = 1.convert()
+        val window2: Window = 2.convert()
+        val window3: Window = 3.convert()
+        val window4: Window = 4.convert()
+
+        focusHandler.setFocusedWindow(window1)
+        focusHandler.setFocusedWindow(window2)
+        focusHandler.setFocusedWindow(window3)
+        focusHandler.setFocusedWindow(window4)
+
+        focusHandler.toggleWindowFocusForward()
+        assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
+
+        focusHandler.toggleWindowFocusForward()
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
+
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
+
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window4, focusHandler.getFocusedWindow(), "The focus should toggle to window 4")
+
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window1, focusHandler.getFocusedWindow(), "The focus should toggle to window 1")
+
+        focusHandler.toggleWindowFocusForward()
+        assertEquals(window4, focusHandler.getFocusedWindow(), "The focus should toggle to window 4")
+    }
+
+    @Test
+    fun `toggle through windows mixed with reset`() {
+        val focusHandler = WindowFocusHandler()
+        val window1: Window = 1.convert()
+        val window2: Window = 2.convert()
+        val window3: Window = 3.convert()
+        val window4: Window = 4.convert()
+
+        focusHandler.setFocusedWindow(window1)
+        focusHandler.setFocusedWindow(window2)
+        focusHandler.setFocusedWindow(window3)
+        focusHandler.setFocusedWindow(window4)
+
+        focusHandler.toggleWindowFocusForward()
+        assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle to window 3")
+
+        focusHandler.toggleWindowFocusForward()
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
+
+        focusHandler.keySessionListener.stopSession()
+        focusHandler.toggleWindowFocusForward()
+        assertEquals(window4, focusHandler.getFocusedWindow(), "The focus should toggle to window 2")
+
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window2, focusHandler.getFocusedWindow(), "The focus should toggle to window 1")
+
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window1, focusHandler.getFocusedWindow(), "The focus should toggle to window 1")
+
+        focusHandler.keySessionListener.stopSession()
+        focusHandler.toggleWindowFocusBackward()
+        assertEquals(window3, focusHandler.getFocusedWindow(), "The focus should toggle back to window 3")
     }
 
     @Test
     fun `don't react on toggle without windows`() {
         val focusHandler = WindowFocusHandler()
 
-        focusHandler.toggleWindowFocus()
+        focusHandler.toggleWindowFocusForward()
 
         assertNull(focusHandler.getFocusedWindow(), "There is no focusable window")
     }

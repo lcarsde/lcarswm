@@ -182,19 +182,22 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     )
 
     val keyboardGrabber = object : FocusObserver {
-        var active = false
-        var lastTime: Time = CurrentTime.convert()
+        private var grabActive = false
+        private var grabTime: Time = CurrentTime.convert()
 
         override fun invoke(activeWindow: Window?, oldWindow: Window?, toggleSessionActive: Boolean) {
-            if (toggleSessionActive != active) {
-                active = toggleSessionActive
-                logger.logDebug("::keyboardGrabber::toggling session: $active")
+            if (toggleSessionActive != grabActive) {
+                grabActive = toggleSessionActive
+
                 if (toggleSessionActive) {
-                    lastTime = eventTime.lastEventTime
-                    system.grabKeyboard(rootWindowPropertyHandler.ewmhSupportWindow, lastTime)
+                    grabTime = eventTime.lastEventTime
+                    system.grabKeyboard(rootWindowPropertyHandler.ewmhSupportWindow, grabTime)
                 } else {
                     system.ungrabKeyboard(
-                        if (eventTime.lastEventTime > lastTime) eventTime.lastEventTime else CurrentTime.convert()
+                        if (eventTime.lastEventTime > grabTime)
+                            eventTime.lastEventTime
+                        else
+                            CurrentTime.convert()
                     )
                 }
             }
@@ -204,12 +207,14 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     focusHandler.registerObserver(keyboardGrabber)
 
     focusHandler.registerObserver { activeWindow, _, toggleSessionActive ->
-        if (activeWindow != null && !toggleSessionActive) {
-            logger.logDebug("::startup::set input focus to $activeWindow")
-            system.setInputFocus(activeWindow, RevertToNone, eventTime.lastEventTime)
-        } else if (!toggleSessionActive) {
-            logger.logDebug("::startup::set input focus to root")
-            system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
+        if (!toggleSessionActive) {
+            if (activeWindow != null) {
+                logger.logDebug("::startup::set input focus to $activeWindow")
+                system.setInputFocus(activeWindow, RevertToNone, eventTime.lastEventTime)
+            } else {
+                logger.logDebug("::startup::set input focus to root")
+                system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
+            }
         }
     }
 

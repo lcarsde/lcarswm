@@ -64,7 +64,7 @@ class WindowFocusHandler {
         }
     }
 
-    fun toggleWindowFocus() {
+    fun toggleWindowFocusForward() {
         if (activeWindow == null) {
             return
         }
@@ -72,6 +72,16 @@ class WindowFocusHandler {
         val focusIndex = getIndexOfFocusedWindow()
         val nextWindow = getNextWindowToFocus(focusIndex)
         setFocusedWindowInternal(nextWindow)
+    }
+
+    fun toggleWindowFocusBackward() {
+        if (activeWindow == null) {
+            return
+        }
+        toggleSessionActive = true
+        val focusIndex = getIndexOfFocusedWindow()
+        val previousWindow = getPreviousWindowToFocus(focusIndex)
+        setFocusedWindowInternal(previousWindow)
     }
 
     /**
@@ -91,5 +101,14 @@ class WindowFocusHandler {
     private fun getNextWindowToFocus(currentFocusIndex: Int): Window {
         val nextIndex = (currentFocusIndex + 1).rem(windowIdList.size)
         return windowIdList.elementAt(nextIndex)
+    }
+
+    private fun getPreviousWindowToFocus(currentFocusIndex: Int): Window {
+        val previousIndex = if (currentFocusIndex - 1 == -1) {
+            windowIdList.size - 1
+        } else {
+            currentFocusIndex - 1
+        }
+        return windowIdList.elementAt(previousIndex)
     }
 }

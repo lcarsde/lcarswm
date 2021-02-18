@@ -29,6 +29,10 @@
             <action>window-toggle-forward</action>
         </binding>
         <binding>
+            <keys>Alt+Shift+Tab</keys>
+            <action>window-toggle-forward</action>
+        </binding>
+        <binding>
             <keys>Alt+Lin+Up</keys>
             <action>window-move-up</action>
         </binding>

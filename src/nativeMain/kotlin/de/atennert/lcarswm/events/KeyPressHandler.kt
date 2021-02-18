@@ -45,7 +45,8 @@ class KeyPressHandler(
         when (action) {
             WmAction.WINDOW_MOVE_UP -> moveWindowToNextMonitor()
             WmAction.WINDOW_MOVE_DOWN -> moveWindowToPreviousMonitor()
-            WmAction.WINDOW_TOGGLE -> toggleFocusedWindow()
+            WmAction.WINDOW_TOGGLE_FWD -> toggleFocusedWindowForward()
+            WmAction.WINDOW_TOGGLE_BWD -> toggleFocusedWindowBackward()
             WmAction.SCREEN_MODE_TOGGLE -> toggleScreenMode()
             else -> {/* nothing to do, other actions are handled in key release */}
         }
@@ -66,10 +67,16 @@ class KeyPressHandler(
         uiDrawer.drawWindowManagerFrame()
     }
 
-    private fun toggleFocusedWindow() {
-        windowFocusHandler.toggleWindowFocus()
+    private fun toggleFocusedWindowForward() {
+        windowFocusHandler.toggleWindowFocusForward()
         val newFocusedWindow = windowFocusHandler.getFocusedWindow()
-        logger.logDebug("KeyPressHandler::toggleFocusedWindow::new focused window: $newFocusedWindow")
+        logger.logDebug("KeyPressHandler::toggleFocusedWindowForward::new focused window: $newFocusedWindow")
+    }
+
+    private fun toggleFocusedWindowBackward() {
+        windowFocusHandler.toggleWindowFocusBackward()
+        val newFocusedWindow = windowFocusHandler.getFocusedWindow()
+        logger.logDebug("KeyPressHandler::toggleFocusedWindowBackward::new focused window: $newFocusedWindow")
     }
 
     private fun toggleScreenMode() {

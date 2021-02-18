@@ -1,3 +1,8 @@
+21.2
+* fix window toggling (forward)
+* fix linking for systems with /usr/lib64
+* add window toggling backwards
+
 21.1
 * fix memory leak
 

@@ -32,6 +32,8 @@ class KeyConfiguration(
     }
 
     fun reloadConfig() {
+        toggleSessionManager.resetKeyCodes()
+
         for (keyBinding in keyConfiguration) {
             val (modifierStrings, keyString) = separateKeySymAndModifiers(keyBinding.keys)
 
@@ -43,8 +45,9 @@ class KeyConfiguration(
 
             keySymCommands[Pair(keySym, mask)] = keyBinding
 
-            if (keyBinding is KeyAction && keyBinding.action == WmAction.WINDOW_TOGGLE) {
-                toggleSessionManager.setModifiers(modifiers)
+            if (keyBinding is KeyAction && (keyBinding.action == WmAction.WINDOW_TOGGLE_FWD ||
+                        keyBinding.action == WmAction.WINDOW_TOGGLE_BWD)) {
+                toggleSessionManager.addModifiers(modifiers, keySym, mask)
             }
         }
     }
