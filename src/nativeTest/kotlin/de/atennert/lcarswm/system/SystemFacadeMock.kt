@@ -486,7 +486,7 @@ open class SystemFacadeMock : SystemApi {
     val windowBorderWidth = 2
     override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
         attributes.pointed.border_width = windowBorderWidth
-        return 0
+        return 1
     }
 
     override fun changeWindowAttributes(window: Window, mask: ULong, attributes: CPointer<XSetWindowAttributes>): Int {

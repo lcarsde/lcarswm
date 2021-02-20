@@ -43,7 +43,11 @@ class WindowHandler(
     override fun addWindow(windowId: Window, isSetup: Boolean) {
         system.grabServer()
         val windowAttributes = nativeHeap.alloc<XWindowAttributes>()
-        system.getWindowAttributes(windowId, windowAttributes.ptr)
+        if (system.getWindowAttributes(windowId, windowAttributes.ptr) == X_FALSE) {
+            system.ungrabServer()
+            // not a window or something ...
+            return
+        }
 
         if (windowAttributes.override_redirect != X_FALSE ||
             (isSetup && windowAttributes.map_state != IsViewable)) {

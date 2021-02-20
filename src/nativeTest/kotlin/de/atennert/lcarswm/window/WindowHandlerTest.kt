@@ -59,7 +59,7 @@ class WindowHandlerTest {
         val systemApi = object : SystemFacadeMock() {
             override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
                 attributes.pointed.map_state = IsViewable
-                return 0
+                return 1
             }
         }
         val windowId: Window = systemApi.getNewWindowId()
@@ -146,7 +146,7 @@ class WindowHandlerTest {
         val systemApi = object : SystemFacadeMock() {
             override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
                 attributes.pointed.map_state = IsUnmapped
-                return 0
+                return 1
             }
         }
         testForNoActionDuringSetup(systemApi)
@@ -157,7 +157,7 @@ class WindowHandlerTest {
         val systemApi = object : SystemFacadeMock() {
             override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
                 attributes.pointed.override_redirect = X_TRUE
-                return 0
+                return 1
             }
         }
         testForNoActionDuringSetup(systemApi)
@@ -203,7 +203,7 @@ class WindowHandlerTest {
         val systemApi = object : SystemFacadeMock() {
             override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
                 attributes.pointed.override_redirect = X_TRUE
-                return 0
+                return 1
             }
         }
         val windowId: Window = systemApi.getNewWindowId()
