@@ -7,6 +7,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.drawing.*
 import de.atennert.lcarswm.events.*
+import de.atennert.lcarswm.keys.FocusSessionKeyboardGrabber
 import de.atennert.lcarswm.keys.KeyConfiguration
 import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.keys.KeySessionManager
@@ -181,42 +182,10 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         windowList
     )
 
-    val keyboardGrabber = object : FocusObserver {
-        private var grabActive = false
-        private var grabTime: Time = CurrentTime.convert()
+    focusHandler.registerObserver(
+        FocusSessionKeyboardGrabber(system, eventTime, rootWindowPropertyHandler.ewmhSupportWindow))
 
-        override fun invoke(activeWindow: Window?, oldWindow: Window?, toggleSessionActive: Boolean) {
-            if (toggleSessionActive != grabActive) {
-                grabActive = toggleSessionActive
-
-                if (toggleSessionActive) {
-                    grabTime = eventTime.lastEventTime
-                    system.grabKeyboard(rootWindowPropertyHandler.ewmhSupportWindow, grabTime)
-                } else {
-                    system.ungrabKeyboard(
-                        if (eventTime.lastEventTime > grabTime)
-                            eventTime.lastEventTime
-                        else
-                            CurrentTime.convert()
-                    )
-                }
-            }
-        }
-    }
-
-    focusHandler.registerObserver(keyboardGrabber)
-
-    focusHandler.registerObserver { activeWindow, _, toggleSessionActive ->
-        if (!toggleSessionActive) {
-            if (activeWindow != null) {
-                logger.logDebug("::startup::set input focus to $activeWindow")
-                system.setInputFocus(activeWindow, RevertToNone, eventTime.lastEventTime)
-            } else {
-                logger.logDebug("::startup::set input focus to root")
-                system.setInputFocus(screen.root, RevertToPointerRoot, eventTime.lastEventTime)
-            }
-        }
-    }
+    focusHandler.registerObserver(InputFocusHandler(logger, system, eventTime, screen.root))
 
     focusHandler.registerObserver { activeWindow, oldWindow, _ ->
         listOf(oldWindow, activeWindow).forEach {
@@ -269,10 +238,8 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         windowRegistration
     )
 
-    val xEventResources =
-        XEventResources(eventManager, eventTime, eventBuffer)
-    val appMenuResources =
-        AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
+    val xEventResources = XEventResources(eventManager, eventTime, eventBuffer)
+    val appMenuResources = AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
 
     return RuntimeResources(xEventResources, appMenuResources)
 }
