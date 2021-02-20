@@ -39,11 +39,12 @@ Thank you very much to the creators of the following resources:
 * If a monitor is removed, it's windows are moved to the primary monitor
 * The settings file contains key handling and general settings per user and is created as `~/.config/lcarswm/settings.xml` if it doesn't exist and can be edited afterwards
   * Key handling
-    * Windows-key + Q closes the window manager
-    * Windows-key + M toggles the display mode between normal, maximized and fullscreen
-    * Alt-key + Tab toggles through the windows
-    * Alt-key + Windows-key + Up/Down moves the active window to other monitors
-    * Alt-key + F4 closes the active window
+    * Windows + Q closes the window manager
+    * Windows + M toggles the display mode between normal, maximized and fullscreen
+    * Alt + Tab toggles through the windows
+    * Alt + Shift + Tab toggles backwards through the windows
+    * Alt + Windows + Up/Down moves the active window to other monitors
+    * Alt + F4 closes the active window
     * Other key combinations can be connected to commands via a settings file
     * Modifier keys are
       * Shift
