@@ -50,6 +50,20 @@ class ColorFactoryTest {
         assertEquals(1.toULong(), drawApi.pixel)
     }
 
+    @Test
+    fun `create different GCs for different drawables`() {
+        val colorFactory = ColorFactory(drawApi, screen)
+        val color = Color(0xFFFF, 0x9999, 0)
+
+        val gc1 = colorFactory.createColorGC(1.convert(), color)
+        val gc2 = colorFactory.createColorGC(2.convert(), color)
+
+        assertNotNull(gc1)
+        assertNotNull(gc2)
+        assertNotEquals(gc1, gc2)
+        assertEquals(1.toULong(), drawApi.pixel)
+    }
+
     private val drawApi = object : DrawApiDummy() {
         val gcs = mutableListOf<GC>()
 

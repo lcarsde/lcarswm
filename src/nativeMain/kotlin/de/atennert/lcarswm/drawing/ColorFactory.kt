@@ -22,7 +22,8 @@ class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
 
     val colorPixels: List<ULong> by lazy(this::allocateCompleteColorMap)
 
-    private val knownColors = mutableMapOf<Color, Pair<GC, ULong>>()
+    private val knownColors = mutableMapOf<Color, ULong>()
+    private val knownGCs = mutableMapOf<Pair<Color, Drawable>, GC>()
 
     init {
         closeWith(ColorFactory::cleanupColorMap)
@@ -44,10 +45,11 @@ class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
     }
 
     private fun cleanupColorMap() {
-        val pixels = knownColors.values.map { it.second }.toULongArray().toCValues()
+        val pixels = knownColors.values.toULongArray().toCValues()
         drawApi.freeColors(colorMapId, pixels, pixels.size)
-        knownColors.values.forEach { drawApi.freeGC(it.first) }
+        knownGCs.values.forEach { drawApi.freeGC(it) }
         knownColors.clear()
+        knownGCs.clear()
 
         drawApi.freeColors(colorMapId, colorPixels.toULongArray().toCValues(), colorPixels.size)
         drawApi.freeColormap(colorMapId)
@@ -79,28 +81,33 @@ class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
     }
 
     fun createColorGC(drawable: Drawable, color: Color): GC? {
-        knownColors[color]?.let {
-            return it.first
-        }
 
-        val xColor = color.toXColor()
-        drawApi.allocColor(colorMapId, xColor.ptr)
+        val pixel = knownColors[color]
+            ?: color.let {
+                val xColor = it.toXColor()
+                drawApi.allocColor(colorMapId, xColor.ptr)
+                val px = xColor.pixel
+                nativeHeap.free(xColor)
+                knownColors[color] = px
+                px
+            }
 
-        val gcValues = createGcValues(xColor)
-        val mask = GCForeground or GCGraphicsExposures or GCArcMode
-        val gc = drawApi.createGC(drawable, mask.convert(), gcValues.ptr)!!
-
-        knownColors[color] = Pair(gc, xColor.pixel)
-
-        nativeHeap.free(gcValues)
-        nativeHeap.free(xColor)
+        val gc = knownGCs[Pair(color, drawable)]
+            ?: pixel.let {
+                val gcValues = createGcValues(it)
+                val mask = GCForeground or GCGraphicsExposures or GCArcMode
+                val gc = drawApi.createGC(drawable, mask.convert(), gcValues.ptr)!!
+                knownGCs[Pair(color, drawable)] = gc
+                nativeHeap.free(gcValues)
+                gc
+            }
 
         return gc
     }
 
-    private fun createGcValues(xColor: XColor): XGCValues {
+    private fun createGcValues(pixel: ULong): XGCValues {
         val gcValues = nativeHeap.alloc<XGCValues>()
-        gcValues.foreground = xColor.pixel
+        gcValues.foreground = pixel
         gcValues.graphics_exposures = 0
         gcValues.arc_mode = ArcPieSlice
         return gcValues
