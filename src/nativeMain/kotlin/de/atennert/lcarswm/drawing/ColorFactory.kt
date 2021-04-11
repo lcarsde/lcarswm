@@ -44,6 +44,11 @@ class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
     }
 
     private fun cleanupColorMap() {
+        val pixels = knownColors.values.map { it.second }.toULongArray().toCValues()
+        drawApi.freeColors(colorMapId, pixels, pixels.size)
+        knownColors.values.forEach { drawApi.freeGC(it.first) }
+        knownColors.clear()
+
         drawApi.freeColors(colorMapId, colorPixels.toULongArray().toCValues(), colorPixels.size)
         drawApi.freeColormap(colorMapId)
     }
