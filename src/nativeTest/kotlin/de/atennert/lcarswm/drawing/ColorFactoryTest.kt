@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.drawing
 
 import de.atennert.lcarswm.system.DrawApiDummy
-import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
 import xlib.*
 import kotlin.test.*
@@ -19,8 +18,11 @@ class ColorFactoryTest {
         val color = Color(0xFFFF, 0x9999, 0)
 
         val gc = colorFactory.createColorGC(1.convert(), color)
+
         assertNotNull(gc)
         assertEquals(1.toULong(), drawApi.pixel)
+
+        nativeHeap.free(gc)
     }
 
     @Test
@@ -35,6 +37,9 @@ class ColorFactoryTest {
         assertNotNull(gc1)
         assertNotNull(gc2)
         assertEquals(2.toULong(), drawApi.pixel)
+
+        nativeHeap.free(gc1)
+        nativeHeap.free(gc2)
     }
 
     @Test
@@ -48,6 +53,8 @@ class ColorFactoryTest {
         assertNotNull(gc1)
         assertEquals(gc1, gc2)
         assertEquals(1.toULong(), drawApi.pixel)
+
+        nativeHeap.free(gc1)
     }
 
     @Test
@@ -60,19 +67,46 @@ class ColorFactoryTest {
 
         assertNotNull(gc1)
         assertNotNull(gc2)
-        assertNotEquals(gc1, gc2)
+        assertNotSame(gc1, gc2)
         assertEquals(1.toULong(), drawApi.pixel)
+
+        nativeHeap.free(gc1)
+        nativeHeap.free(gc2)
+    }
+
+    @Test
+    fun `create XFT color by color`() {
+        val colorFactory = ColorFactory(drawApi, screen)
+        val color = Color(0xFFFF, 0x9999, 0)
+
+        val xftColor = colorFactory.createXftColor(color)
+
+        assertEquals(color.red, xftColor.color.red.toInt())
+        assertEquals(color.green, xftColor.color.green.toInt())
+        assertEquals(color.blue, xftColor.color.blue.toInt())
+        assertEquals(drawApi.pixel, xftColor.pixel)
+
+        nativeHeap.free(xftColor)
+    }
+
+    @Test
+    fun `get same XFT color twice`() {
+        val colorFactory = ColorFactory(drawApi, screen)
+        val color = Color(0xFFFF, 0x9999, 0)
+
+        val xftColor1 = colorFactory.createXftColor(color)
+        val xftColor2 = colorFactory.createXftColor(color)
+
+        assertEquals(xftColor1.rawPtr, xftColor2.rawPtr)
+
+        nativeHeap.free(xftColor1)
     }
 
     private val drawApi = object : DrawApiDummy() {
-        val gcs = mutableListOf<GC>()
-
         var pixel = 0.toULong()
 
         fun clear() {
             pixel = 0.convert()
-            gcs.forEach { nativeHeap.free(it) }
-            gcs.clear()
         }
 
         override fun createColormap(window: Window, visual: CValuesRef<Visual>, alloc: Int): Colormap {
@@ -87,9 +121,7 @@ class ColorFactoryTest {
         }
 
         override fun createGC(drawable: Drawable, mask: ULong, gcValues: CValuesRef<XGCValues>?): GC? {
-            val gc: GC = nativeHeap.alloc<GCVar>().ptr.reinterpret()
-            gcs.add(gc)
-            return gc
+            return nativeHeap.alloc<GCVar>().ptr.reinterpret()
         }
     }
 
