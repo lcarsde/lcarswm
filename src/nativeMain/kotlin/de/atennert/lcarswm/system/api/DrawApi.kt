@@ -16,6 +16,8 @@ interface DrawApi {
 
     fun fillRectangles(drawable: Drawable, graphicsContext: GC, rects: CValuesRef<XRectangle>, rectCount: Int): Int
 
+    fun drawPoint(drawable: Drawable, graphicsContext: GC, x: Int, y: Int): Int
+
     fun putImage(drawable: Drawable, graphicsContext: GC, image: CValuesRef<XImage>,
                   x: Int, y: Int, width: UInt, height: UInt): Int
 

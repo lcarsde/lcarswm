@@ -21,7 +21,35 @@ class RootWindowDrawer(
     settings: Map<GeneralSetting, String>,
     private val fontProvider: FontProvider
 ) : UIDrawing {
-    private val graphicsContexts = colorFactory.loadForegroundGraphicContexts(screen.root, colorFactory.colorPixels)
+    private val barEndOpacities = getOuterArcOpacities(BAR_HEIGHT / 2)
+
+    private val barEndLeftColors = getArcAntialiasing(COLOR_BAR_ENDS, barEndOpacities, BAR_HEIGHT / 2, 2, 3)
+    private val barEndRightColors = getArcAntialiasing(COLOR_BAR_ENDS, barEndOpacities, BAR_HEIGHT / 2, 1, 4)
+
+    private fun getArcAntialiasing(
+        baseColor: Color,
+        opacities: List<Triple<Int, Int, Double>>,
+        radius: Int,
+        vararg quadrants: Int
+    ): List<Triple<Int, Int, Color>> {
+        val colors = mutableListOf<Triple<Int, Int, Color>>()
+        val adjust = { opacity: Double ->
+            baseColor.run { Color((red * opacity).toInt(), (green * opacity).toInt(), (blue * opacity).toInt()) }
+        }
+
+        for ((x, y, opacity) in opacities) {
+            for (quadrant in quadrants) {
+                when (quadrant) {
+                    1 -> colors.add(Triple(x + radius, -y + radius - 1, adjust(opacity)))
+                    2 -> colors.add(Triple(-x + radius - 1, -y + radius - 1, adjust(opacity)))
+                    3 -> colors.add(Triple(-x + radius - 1, y + radius, adjust(opacity)))
+                    4 -> colors.add(Triple(x + radius, y + radius, adjust(opacity)))
+                    else -> throw IllegalArgumentException("There are only quadrants 1 to 4, not $quadrant")
+                }
+            }
+        }
+        return colors
+    }
 
     private val logoImage: CPointer<XImage>?
     private val logoText: String
@@ -45,7 +73,12 @@ class RootWindowDrawer(
 
     override fun drawWindowManagerFrame() {
         val screenSize = monitorManager.getCombinedScreenSize()
-        val pixmap = drawApi.createPixmap(screen.root, screenSize.first.convert(), screenSize.second.convert(), screen.root_depth.convert())
+        val pixmap = drawApi.createPixmap(
+            screen.root,
+            screenSize.first.convert(),
+            screenSize.second.convert(),
+            screen.root_depth.convert()
+        )
         monitorManager.getMonitors().forEach {
             when (it.getScreenMode()) {
                 ScreenMode.NORMAL -> drawNormalFrame(it, pixmap)
@@ -71,9 +104,11 @@ class RootWindowDrawer(
         fontApi.getLayoutPixelExtents(fontProvider.layout, rect.ptr)
 
         val backgroundGC = getGC(COLOR_BACKGROUND)
-        drawApi.fillRectangle(pixmap, backgroundGC,
+        drawApi.fillRectangle(
+            pixmap, backgroundGC,
             x, y,
-            (rect.width + 16 - 1).convert(), BAR_HEIGHT.convert())
+            (rect.width + 16 - 1).convert(), BAR_HEIGHT.convert()
+        )
 
         val line = fontApi.getLayoutLineReadonly(fontProvider.layout, 0)
 
@@ -97,9 +132,11 @@ class RootWindowDrawer(
         val logoX = barX + barWidth - rect.width - 8
 
         val backgroundGC = getGC(COLOR_BACKGROUND)
-        drawApi.fillRectangle(pixmap, backgroundGC,
+        drawApi.fillRectangle(
+            pixmap, backgroundGC,
             logoX + 1, y,
-            (rect.width + 16 - 1).convert(), BAR_HEIGHT.convert())
+            (rect.width + 16 - 1).convert(), BAR_HEIGHT.convert()
+        )
 
         val line = fontApi.getLayoutLineReadonly(fontProvider.layout, 0)
 
@@ -115,13 +152,17 @@ class RootWindowDrawer(
         val gcCopyImage = drawApi.createGC(screen.root, 0.convert(), null)!!
 
         val backgroundGC = getGC(COLOR_BACKGROUND)
-        drawApi.fillRectangle(pixmap, backgroundGC,
+        drawApi.fillRectangle(
+            pixmap, backgroundGC,
             x, y,
-            (logoImage.pointed.width + 16).convert(), BAR_HEIGHT.convert())
+            (logoImage.pointed.width + 16).convert(), BAR_HEIGHT.convert()
+        )
 
-        drawApi.putImage(pixmap, gcCopyImage,
+        drawApi.putImage(
+            pixmap, gcCopyImage,
             logoImage, x + 8, y,
-            logoImage.pointed.width.convert(), BAR_HEIGHT.convert())
+            logoImage.pointed.width.convert(), BAR_HEIGHT.convert()
+        )
 
         drawApi.freeGC(gcCopyImage)
     }
@@ -189,8 +230,36 @@ class RootWindowDrawer(
 
         drawApi.fillArcs(pixmap, barEndsGC, arcs, 4)
         drawApi.fillRectangles(pixmap, barEndsGC, rects, 4)
-        drawApi.fillRectangle(pixmap, maxBarUpGC, bars[0].x.toInt(), bars[0].y.toInt(), bars[0].width.convert(), bars[0].height.convert())
-        drawApi.fillRectangle(pixmap, maxBarDownGC, bars[1].x.toInt(), bars[1].y.toInt(), bars[1].width.convert(), bars[1].height.convert())
+        drawApi.fillRectangle(
+            pixmap,
+            maxBarUpGC,
+            bars[0].x.toInt(),
+            bars[0].y.toInt(),
+            bars[0].width.convert(),
+            bars[0].height.convert()
+        )
+        drawApi.fillRectangle(
+            pixmap,
+            maxBarDownGC,
+            bars[1].x.toInt(),
+            bars[1].y.toInt(),
+            bars[1].width.convert(),
+            bars[1].height.convert()
+        )
+
+        // left bar end anti-aliasing
+        for ((x, y, color) in barEndLeftColors) {
+            val gc = getGC(color)
+            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + y)
+            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + monitor.height - BAR_HEIGHT + y)
+        }
+
+        // right bar end anti-aliasing
+        for ((x, y, color) in barEndRightColors) {
+            val gc = getGC(color)
+            drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + y)
+            drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + monitor.height - BAR_HEIGHT + y)
+        }
 
         if (logoImage != null) {
             drawLogo(pixmap, monitor.x + 32, monitor.y)
@@ -232,7 +301,7 @@ class RootWindowDrawer(
         arcs[0].y = monitor.y.convert()
 
         arcs[1].x = (monitor.x + monitor.width - 40).convert()
-        arcs[1].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        arcs[1].y = (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
 
         arcs[2].x = (monitor.x + monitor.width - 40).convert()
         arcs[2].y = (monitor.y + monitor.height - 40).convert()
@@ -247,7 +316,7 @@ class RootWindowDrawer(
         rects[0].y = monitor.y.convert()
 
         rects[1].x = (monitor.x + monitor.width - 32).convert()
-        rects[1].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        rects[1].y = (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
 
         rects[2].x = (monitor.x + monitor.width - 32).convert()
         rects[2].y = (monitor.y + monitor.height - 40).convert()
@@ -269,23 +338,27 @@ class RootWindowDrawer(
 
         // upper middle bars
         middleBars[0].x = (monitor.x + 232 + 32).convert()
-        middleBars[0].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        middleBars[0].y =
+            (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
         middleBars[0].width = (middleSegmentWidth * 6 - 32).convert()
         middleBars[0].height = 16.convert()
 
         middleBars[1].x = (monitor.x + 240 + middleSegmentWidth * 6).convert()
-        middleBars[1].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        middleBars[1].y =
+            (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
         middleBars[1].width = (middleSegmentWidth * 2).convert()
         middleBars[1].height = 16.convert()
 
         // lower middle bars
         middleBars[2].x = (monitor.x + 232 + 32).convert()
-        middleBars[2].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
+        middleBars[2].y =
+            (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
         middleBars[2].width = (middleSegmentWidth * 3 - 32).convert()
         middleBars[2].height = 16.convert()
 
         middleBars[3].x = (monitor.x + 240 + middleSegmentWidth * 3).convert()
-        middleBars[3].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
+        middleBars[3].y =
+            (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
         middleBars[3].width = (middleSegmentWidth * 5).convert()
         middleBars[3].height = 16.convert()
 
@@ -311,12 +384,14 @@ class RootWindowDrawer(
         cornerOuterArcs[0].height = 80.convert()
         cornerOuterArcs[0].angle1 = 90.shl(6)
 
-        cornerOuterArcs[1].y = (monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        cornerOuterArcs[1].y =
+            (monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
         cornerOuterArcs[1].width = 32.convert()
         cornerOuterArcs[1].height = 32.convert()
         cornerOuterArcs[1].angle1 = 180.shl(6)
 
-        cornerOuterArcs[2].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
+        cornerOuterArcs[2].y =
+            (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
         cornerOuterArcs[2].width = 32.convert()
         cornerOuterArcs[2].height = 32.convert()
         cornerOuterArcs[2].angle1 = 90.shl(6)
@@ -333,8 +408,9 @@ class RootWindowDrawer(
             cornerRects[i].height = 16.convert()
         }
         cornerRects[0].y = (monitor.y + BAR_HEIGHT).convert()
-        cornerRects[1].y = (monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
-        cornerRects[2].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + 2*BAR_HEIGHT_SMALL).convert()
+        cornerRects[1].y = (monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        cornerRects[2].y =
+            (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + 2 * BAR_HEIGHT_SMALL).convert()
         cornerRects[3].y = (monitor.y + monitor.height - BAR_HEIGHT - INNER_CORNER_RADIUS).convert()
 
         for (i in 4 until 6) {
@@ -351,8 +427,10 @@ class RootWindowDrawer(
             cornerRects[i].width = 240.convert()
             cornerRects[i].height = BAR_HEIGHT_SMALL.convert()
         }
-        cornerRects[6].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
-        cornerRects[7].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
+        cornerRects[6].y =
+            (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        cornerRects[7].y =
+            (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
 
         val cornerInnerArcs = nativeHeap.allocArray<XArc>(4)
         for (i in 0 until 4) {
@@ -364,10 +442,11 @@ class RootWindowDrawer(
         cornerInnerArcs[0].y = (monitor.y + 40).convert()
         cornerInnerArcs[0].angle1 = 90.shl(6)
 
-        cornerInnerArcs[1].y = (monitor.y + BAR_HEIGHT + 2*BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
+        cornerInnerArcs[1].y = (monitor.y + BAR_HEIGHT + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT).convert()
         cornerInnerArcs[1].angle1 = 180.shl(6)
 
-        cornerInnerArcs[2].y = (monitor.y + BAR_HEIGHT + 2*INNER_CORNER_RADIUS + 3*BAR_GAP_SIZE + DATA_BAR_HEIGHT + 2*BAR_HEIGHT_SMALL).convert()
+        cornerInnerArcs[2].y =
+            (monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + 2 * BAR_HEIGHT_SMALL).convert()
         cornerInnerArcs[2].angle1 = 90.shl(6)
 
         cornerInnerArcs[3].y = (monitor.y + monitor.height - 72).convert()
@@ -403,6 +482,14 @@ class RootWindowDrawer(
         drawApi.fillRectangles(pixmap, corner3GC, cornerRects[7].ptr, 1)
         drawApi.fillArcs(pixmap, backgroundGC, cornerInnerArcs, 4)
 
+        // right bar end anti-aliasing
+        for ((x, y, color) in barEndRightColors) {
+            val gc = getGC(color)
+            drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + y)
+            drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + monitor.height - BAR_HEIGHT + y)
+            drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + y)
+        }
+
         if (logoImage != null) {
             drawLogo(pixmap, monitor.x + monitor.width - 48 - logoImage.pointed.width, monitor.y)
         } else {
@@ -421,7 +508,14 @@ class RootWindowDrawer(
 
     private fun clearScreen(monitor: Monitor, pixmap: Pixmap) {
         val backgroundGC = getGC(COLOR_BACKGROUND)
-        drawApi.fillRectangle(pixmap, backgroundGC, monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
+        drawApi.fillRectangle(
+            pixmap,
+            backgroundGC,
+            monitor.x,
+            monitor.y,
+            monitor.width.convert(),
+            monitor.height.convert()
+        )
     }
 
     private inline fun getGC(color: Color): GC = colorFactory.createColorGC(screen.root, color)

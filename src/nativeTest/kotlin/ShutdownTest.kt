@@ -510,7 +510,8 @@ class ShutdownTest {
     }
 
     private fun checkFreeingOfGraphicsContexts(functionCalls: MutableList<FunctionCall>) {
-        repeat(5) {
+        println("gcs: ${functionCalls.sumOf { (if (it.name == "freeGC") 1 else 0) as Int }}")
+        repeat(20) {
             assertEquals(
                 "freeGC",
                 functionCalls.removeAt(0).name,

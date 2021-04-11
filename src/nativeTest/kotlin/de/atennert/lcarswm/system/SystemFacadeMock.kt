@@ -96,6 +96,10 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun drawPoint(drawable: Drawable, graphicsContext: GC, x: Int, y: Int): Int {
+        return 1
+    }
+
     override fun putImage(
         drawable: Drawable,
         graphicsContext: GC,

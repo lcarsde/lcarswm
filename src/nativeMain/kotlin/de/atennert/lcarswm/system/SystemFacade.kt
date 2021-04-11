@@ -520,6 +520,10 @@ class SystemFacade : SystemApi {
         return XFillRectangles(display, drawable, graphicsContext, rects, rectCount)
     }
 
+    override fun drawPoint(drawable: Drawable, graphicsContext: GC, x: Int, y: Int): Int {
+        return XDrawPoint(display, drawable, graphicsContext, x, y)
+    }
+
     override fun putImage(
         drawable: Drawable,
         graphicsContext: GC,

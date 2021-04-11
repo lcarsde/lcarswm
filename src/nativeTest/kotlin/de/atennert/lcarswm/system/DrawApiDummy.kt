@@ -32,6 +32,10 @@ open class DrawApiDummy : DrawApi {
         throw NotImplementedError()
     }
 
+    override fun drawPoint(drawable: Drawable, graphicsContext: GC, x: Int, y: Int): Int {
+        throw NotImplementedError()
+    }
+
     override fun putImage(
         drawable: Drawable,
         graphicsContext: GC,
