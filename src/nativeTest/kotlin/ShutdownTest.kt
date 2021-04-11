@@ -336,9 +336,8 @@ class ShutdownTest {
         checkThatTheLoggerIsClosed(logger)
         checkFinalizingSync(functionCalls)
         checkClosingOfAppMenuMessageQueues(functionCalls)
+        checkFreeingOfColors(functionCalls)
         checkFreeingOfGraphicsContexts(functionCalls)
-        checkFreeingOfColors(functionCalls)
-        checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
         checkWindowPropertyRemoval(functionCalls, testFacade.atomMap, "_NET_SUPPORTED")
         checkSelectInputSetting(functionCalls, NoEventMask)
@@ -402,9 +401,8 @@ class ShutdownTest {
         checkThatTheLoggerIsClosed(logger)
         checkFinalizingSync(functionCalls)
         checkClosingOfAppMenuMessageQueues(functionCalls)
+        checkFreeingOfColors(functionCalls)
         checkFreeingOfGraphicsContexts(functionCalls)
-        checkFreeingOfColors(functionCalls)
-        checkFreeingOfColors(functionCalls)
         checkFreeingOfColorMap(functionCalls)
         checkWindowPropertyRemoval(functionCalls, testFacade.atomMap, "_NET_SUPPORTED")
         checkSelectInputSetting(functionCalls, NoEventMask)
@@ -512,7 +510,7 @@ class ShutdownTest {
     }
 
     private fun checkFreeingOfGraphicsContexts(functionCalls: MutableList<FunctionCall>) {
-        repeat(9) {
+        repeat(5) {
             assertEquals(
                 "freeGC",
                 functionCalls.removeAt(0).name,

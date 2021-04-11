@@ -20,32 +20,15 @@ class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
 
     val colorMapId = drawApi.createColormap(screen.root, screen.root_visual!!, AllocNone)
 
-    val colorPixels: List<ULong> by lazy(this::allocateCompleteColorMap)
-
     private val knownColors = mutableMapOf<Color, ULong>()
     private val knownGCs = mutableMapOf<Pair<Color, Drawable>, GC>()
     private val knownXftColors = mutableMapOf<Color, XftColor>()
 
     init {
-        closeWith(ColorFactory::cleanupColorMap)
+        closeWith(ColorFactory::cleanupColorStuff)
     }
 
-    private fun allocateCompleteColorMap(): List<ULong> {
-        return colors
-            .asSequence()
-            .map { (red, green, blue) ->
-                val color = nativeHeap.alloc<XColor>()
-                color.red = red.convert()
-                color.green = green.convert()
-                color.blue = blue.convert()
-                drawApi.allocColor(colorMapId, color.ptr)
-                color.pixel
-            }
-            .filterNotNull()
-            .toList()
-    }
-
-    private fun cleanupColorMap() {
+    private fun cleanupColorStuff() {
         val pixels = knownColors.values.toULongArray().toCValues()
         drawApi.freeColors(colorMapId, pixels, pixels.size)
         knownColors.clear()
@@ -56,26 +39,10 @@ class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
         knownXftColors.values.forEach(nativeHeap::free)
         knownXftColors.clear()
 
-        drawApi.freeColors(colorMapId, colorPixels.toULongArray().toCValues(), colorPixels.size)
         drawApi.freeColormap(colorMapId)
     }
 
-    fun loadForegroundGraphicContexts(
-        window: Window,
-        colors: List<ULong>
-    ): List<GC> = colors
-        .map { color ->
-            val gcValues = nativeHeap.alloc<XGCValues>()
-            gcValues.foreground = color
-            gcValues.graphics_exposures = 0
-            gcValues.arc_mode = ArcPieSlice
-
-            val mask = GCForeground or GCGraphicsExposures or GCArcMode
-            drawApi.createGC(window, mask.convert(), gcValues.ptr)!!
-        }
-
-    fun createColorGC(drawable: Drawable, color: Color): GC? {
-
+    fun createColorGC(drawable: Drawable, color: Color): GC {
         val pixel = knownColors[color]
             ?: let {
                 val xColor = color.toXColor()
@@ -118,14 +85,19 @@ class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
 
         return knownXftColors[color]
             ?: let {
-                val xftColor = nativeHeap.alloc<XftColor>()
-                xftColor.color.red = color.red.convert()
-                xftColor.color.green = color.green.convert()
-                xftColor.color.blue = color.blue.convert()
-                xftColor.color.alpha = 0xffff.convert()
-                xftColor.pixel = pixel
+                val xftColor = createXftColor(color, pixel)
                 knownXftColors[color] = xftColor
                 xftColor
             }
+    }
+
+    private fun createXftColor(color: Color, pixel: ULong): XftColor {
+        val xftColor = nativeHeap.alloc<XftColor>()
+        xftColor.color.red = color.red.convert()
+        xftColor.color.green = color.green.convert()
+        xftColor.color.blue = color.blue.convert()
+        xftColor.color.alpha = 0xffff.convert()
+        xftColor.pixel = pixel
+        return xftColor
     }
 }

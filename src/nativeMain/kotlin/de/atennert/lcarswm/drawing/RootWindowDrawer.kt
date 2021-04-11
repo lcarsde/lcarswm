@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.drawing
 
 import de.atennert.lcarswm.*
-import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.settings.GeneralSetting
@@ -42,8 +41,6 @@ class RootWindowDrawer(
             null
         }
         logoText = settings[GeneralSetting.TITLE] ?: "LCARS"
-
-        closeWith(RootWindowDrawer::close)
     }
 
     override fun drawWindowManagerFrame() {
@@ -61,10 +58,6 @@ class RootWindowDrawer(
         drawApi.freePixmap(pixmap)
     }
 
-    private fun close() {
-        graphicsContexts.forEach { drawApi.freeGC(it) }
-    }
-
     private fun drawLogoTextFront(pixmap: Pixmap, x: Int, y: Int, barWidth: Int) {
         val rect = nativeHeap.alloc<PangoRectangle>()
         val maxTextWidth = barWidth - 16
@@ -77,7 +70,8 @@ class RootWindowDrawer(
         fontApi.setLayoutWidth(fontProvider.layout, maxTextWidth * PANGO_SCALE)
         fontApi.getLayoutPixelExtents(fontProvider.layout, rect.ptr)
 
-        drawApi.fillRectangle(pixmap, graphicsContexts[0],
+        val backgroundGC = getGC(COLOR_BACKGROUND)
+        drawApi.fillRectangle(pixmap, backgroundGC,
             x, y,
             (rect.width + 16 - 1).convert(), BAR_HEIGHT.convert())
 
@@ -102,7 +96,8 @@ class RootWindowDrawer(
         fontApi.getLayoutPixelExtents(fontProvider.layout, rect.ptr)
         val logoX = barX + barWidth - rect.width - 8
 
-        drawApi.fillRectangle(pixmap, graphicsContexts[0],
+        val backgroundGC = getGC(COLOR_BACKGROUND)
+        drawApi.fillRectangle(pixmap, backgroundGC,
             logoX + 1, y,
             (rect.width + 16 - 1).convert(), BAR_HEIGHT.convert())
 
@@ -119,7 +114,8 @@ class RootWindowDrawer(
 
         val gcCopyImage = drawApi.createGC(screen.root, 0.convert(), null)!!
 
-        drawApi.fillRectangle(pixmap, graphicsContexts[0],
+        val backgroundGC = getGC(COLOR_BACKGROUND)
+        drawApi.fillRectangle(pixmap, backgroundGC,
             x, y,
             (logoImage.pointed.width + 16).convert(), BAR_HEIGHT.convert())
 
@@ -133,8 +129,9 @@ class RootWindowDrawer(
     private fun drawMaximizedFrame(monitor: Monitor, pixmap: Pixmap) {
         clearScreen(monitor, pixmap)
 
-        val gcPurple2 = graphicsContexts[6]
-        val gcOrchid = graphicsContexts[2]
+        val barEndsGC = getGC(COLOR_BAR_ENDS)
+        val maxBarUpGC = getGC(COLOR_MAX_BAR_UP)
+        val maxBarDownGC = getGC(COLOR_MAX_BAR_DOWN)
 
         // TODO create bar ends as pixmaps
         val arcs = nativeHeap.allocArray<XArc>(4)
@@ -190,9 +187,10 @@ class RootWindowDrawer(
         bars[1].width = (monitor.width - 80).convert()
         bars[1].height = 40.convert()
 
-        drawApi.fillArcs(pixmap, gcPurple2, arcs, 4)
-        drawApi.fillRectangles(pixmap, gcPurple2, rects, 4)
-        drawApi.fillRectangles(pixmap, gcOrchid, bars, 2)
+        drawApi.fillArcs(pixmap, barEndsGC, arcs, 4)
+        drawApi.fillRectangles(pixmap, barEndsGC, rects, 4)
+        drawApi.fillRectangle(pixmap, maxBarUpGC, bars[0].x.toInt(), bars[0].y.toInt(), bars[0].width.convert(), bars[0].height.convert())
+        drawApi.fillRectangle(pixmap, maxBarDownGC, bars[1].x.toInt(), bars[1].y.toInt(), bars[1].width.convert(), bars[1].height.convert())
 
         if (logoImage != null) {
             drawLogo(pixmap, monitor.x + 32, monitor.y)
@@ -207,11 +205,20 @@ class RootWindowDrawer(
     private fun drawNormalFrame(monitor: Monitor, pixmap: Pixmap) {
         clearScreen(monitor, pixmap)
 
-        val gcBlack = graphicsContexts[0]
-        val gcPurple2 = graphicsContexts[6]
-        val gcOrchid = graphicsContexts[2]
-        val gcPurple1 = graphicsContexts[3]
-        val gcBrick = graphicsContexts[4]
+        val backgroundGC = getGC(COLOR_BACKGROUND)
+        val barEndGC = getGC(COLOR_BAR_ENDS)
+        val barUpGC = getGC(COLOR_NORMAL_BAR_UP)
+        val barDownGC = getGC(COLOR_NORMAL_BAR_DOWN)
+        val sideBarUpGC = getGC(COLOR_NORMAL_SIDEBAR_UP)
+        val sideBarDownGC = getGC(COLOR_NORMAL_SIDEBAR_DOWN)
+        val middleBar1GC = getGC(COLOR_NORMAL_BAR_MIDDLE_1)
+        val middleBar2GC = getGC(COLOR_NORMAL_BAR_MIDDLE_2)
+        val middleBar3GC = getGC(COLOR_NORMAL_BAR_MIDDLE_3)
+        val middleBar4GC = getGC(COLOR_NORMAL_BAR_MIDDLE_4)
+        val corner1GC = getGC(COLOR_NORMAL_CORNER_1)
+        val corner2GC = getGC(COLOR_NORMAL_CORNER_2)
+        val corner3GC = getGC(COLOR_NORMAL_CORNER_3)
+        val corner4GC = getGC(COLOR_NORMAL_CORNER_4)
 
         // TODO create bar ends as pixmaps
         val arcs = nativeHeap.allocArray<XArc>(3)
@@ -366,23 +373,35 @@ class RootWindowDrawer(
         cornerInnerArcs[3].y = (monitor.y + monitor.height - 72).convert()
         cornerInnerArcs[3].angle1 = 180.shl(6)
 
-        drawApi.fillArcs(pixmap, gcPurple2, arcs, 3)
-        drawApi.fillRectangles(pixmap, gcPurple2, rects, 3)
-        drawApi.fillRectangles(pixmap, gcPurple2, bigBars, 2)
+        drawApi.fillArcs(pixmap, barEndGC, arcs, 3)
+        drawApi.fillRectangles(pixmap, barEndGC, rects, 3)
+        drawApi.fillRectangles(pixmap, barUpGC, bigBars[0].ptr, 1)
+        drawApi.fillRectangles(pixmap, barDownGC, bigBars[1].ptr, 1)
 
         // middle bars
-        drawApi.fillRectangles(pixmap, gcPurple1, middleBars[0].ptr, 1)
-        drawApi.fillRectangles(pixmap, gcBrick, middleBars[1].ptr, 1)
-        drawApi.fillRectangles(pixmap, gcPurple2, middleBars[2].ptr, 1)
-        drawApi.fillRectangles(pixmap, gcOrchid, middleBars[3].ptr, 1)
+        drawApi.fillRectangles(pixmap, middleBar1GC, middleBars[0].ptr, 1)
+        drawApi.fillRectangles(pixmap, middleBar2GC, middleBars[1].ptr, 1)
+        drawApi.fillRectangles(pixmap, middleBar3GC, middleBars[2].ptr, 1)
+        drawApi.fillRectangles(pixmap, middleBar4GC, middleBars[3].ptr, 1)
 
         // side bars
-        drawApi.fillRectangles(pixmap, gcPurple1, sideBars, 2)
+        drawApi.fillRectangles(pixmap, sideBarUpGC, sideBars[0].ptr, 1)
+        drawApi.fillRectangles(pixmap, sideBarDownGC, sideBars[1].ptr, 1)
 
         // corner pieces
-        drawApi.fillArcs(pixmap, gcOrchid, cornerOuterArcs, 4)
-        drawApi.fillRectangles(pixmap, gcOrchid, cornerRects, 8)
-        drawApi.fillArcs(pixmap, gcBlack, cornerInnerArcs, 4)
+        drawApi.fillArcs(pixmap, corner1GC, cornerOuterArcs[0].ptr, 1)
+        drawApi.fillArcs(pixmap, corner2GC, cornerOuterArcs[1].ptr, 1)
+        drawApi.fillArcs(pixmap, corner3GC, cornerOuterArcs[2].ptr, 1)
+        drawApi.fillArcs(pixmap, corner4GC, cornerOuterArcs[3].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner1GC, cornerRects[0].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner2GC, cornerRects[1].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner3GC, cornerRects[2].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner4GC, cornerRects[3].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner1GC, cornerRects[4].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner4GC, cornerRects[5].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner2GC, cornerRects[6].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner3GC, cornerRects[7].ptr, 1)
+        drawApi.fillArcs(pixmap, backgroundGC, cornerInnerArcs, 4)
 
         if (logoImage != null) {
             drawLogo(pixmap, monitor.x + monitor.width - 48 - logoImage.pointed.width, monitor.y)
@@ -401,6 +420,9 @@ class RootWindowDrawer(
     }
 
     private fun clearScreen(monitor: Monitor, pixmap: Pixmap) {
-        drawApi.fillRectangle(pixmap, graphicsContexts[0], monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
+        val backgroundGC = getGC(COLOR_BACKGROUND)
+        drawApi.fillRectangle(pixmap, backgroundGC, monitor.x, monitor.y, monitor.width.convert(), monitor.height.convert())
     }
+
+    private inline fun getGC(color: Color): GC = colorFactory.createColorGC(screen.root, color)
 }
