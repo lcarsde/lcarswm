@@ -18,19 +18,19 @@ class RootWindowDrawer(
     private val fontApi: FontApi,
     private val monitorManager: MonitorManager,
     private val screen: Screen,
-    private val colors: Colors,
+    private val colorFactory: ColorFactory,
     settings: Map<GeneralSetting, String>,
     private val fontProvider: FontProvider
 ) : UIDrawing {
-    private val graphicsContexts = colors.loadForegroundGraphicContexts(screen.root, colors.colorMap.second)
+    private val graphicsContexts = colorFactory.loadForegroundGraphicContexts(screen.root, colorFactory.colorPixels)
 
     private val logoImage: CPointer<XImage>?
     private val logoText: String
 
-    private val logoColor = colors.getXftColor(1)
+    private val logoColor = colorFactory.getXftColor(1)
 
     private val colorMap: Colormap
-        get() = colors.colorMap.first
+        get() = colorFactory.colorMapId
 
     init {
         val imageArray = nativeHeap.allocArrayOfPointersTo(nativeHeap.alloc<XImage>())

@@ -21,17 +21,17 @@ class FrameDrawer(
     private val drawApi: DrawApi,
     private val focusHandler: WindowFocusHandler,
     private val fontProvider: FontProvider,
-    private val colors: Colors,
+    private val colorFactory: ColorFactory,
     private val screen: Screen
 ) : IFrameDrawer {
 
-    private val activeTextColor = colors.getXftColor(1)
-    private val inactiveTextColor = colors.getXftColor(4)
-    private val primaryBarColor = colors.getXftColor(2)
-    private val secondaryBarColor = colors.getXftColor(6)
-    private val backgroundColor = colors.getXftColor(0)
+    private val activeTextColor = colorFactory.getXftColor(1)
+    private val inactiveTextColor = colorFactory.getXftColor(4)
+    private val primaryBarColor = colorFactory.getXftColor(2)
+    private val secondaryBarColor = colorFactory.getXftColor(6)
+    private val backgroundColor = colorFactory.getXftColor(0)
     override val colorMap: Colormap
-            get() = colors.colorMap.first
+            get() = colorFactory.colorMapId
 
     init {
         closeWith(FrameDrawer::close)

@@ -5,7 +5,7 @@ import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
 import xlib.*
 
-class Colors(private val drawApi: DrawApi, private val screen: Screen) {
+class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
     private val colors = listOf(
         Triple(0, 0, 0), // black
         Triple(0xFFFF, 0x9999, 0), // yellow
@@ -18,16 +18,18 @@ class Colors(private val drawApi: DrawApi, private val screen: Screen) {
         Triple(0xCCCC, 0x6666, 0x9999)  // dark pink
     )
 
-    val colorMap = allocateCompleteColorMap()
+    val colorMapId = drawApi.createColormap(screen.root, screen.root_visual!!, AllocNone)
+
+    val colorPixels: List<ULong> by lazy(this::allocateCompleteColorMap)
+
+    private val knownColors = mutableMapOf<Color, Pair<GC, ULong>>()
 
     init {
-        closeWith(Colors::cleanupColorMap)
+        closeWith(ColorFactory::cleanupColorMap)
     }
 
-    private fun allocateCompleteColorMap(): Pair<Colormap, List<ULong>> {
-        val colorMapId = drawApi.createColormap(screen.root, screen.root_visual!!, AllocNone)
-
-        val colorReplies = colors
+    private fun allocateCompleteColorMap(): List<ULong> {
+        return colors
             .asSequence()
             .map { (red, green, blue) ->
                 val color = nativeHeap.alloc<XColor>()
@@ -39,14 +41,11 @@ class Colors(private val drawApi: DrawApi, private val screen: Screen) {
             }
             .filterNotNull()
             .toList()
-
-        return Pair(colorMapId, colorReplies)
     }
 
     private fun cleanupColorMap() {
-        val colorPixels = ULongArray(colorMap.second.size) { colorMap.second[it] }
-        drawApi.freeColors(colorMap.first, colorPixels.toCValues(), colorPixels.size)
-        drawApi.freeColormap(colorMap.first)
+        drawApi.freeColors(colorMapId, colorPixels.toULongArray().toCValues(), colorPixels.size)
+        drawApi.freeColormap(colorMapId)
     }
 
     fun loadForegroundGraphicContexts(
@@ -70,7 +69,35 @@ class Colors(private val drawApi: DrawApi, private val screen: Screen) {
         color.color.green = colorCode.second.convert()
         color.color.blue = colorCode.third.convert()
         color.color.alpha = 0xffff.convert()
-        color.pixel = colorMap.second[colorIndex]
+        color.pixel = colorPixels[colorIndex]
         return color
+    }
+
+    fun createColorGC(drawable: Drawable, color: Color): GC? {
+        knownColors[color]?.let {
+            return it.first
+        }
+
+        val xColor = color.toXColor()
+        drawApi.allocColor(colorMapId, xColor.ptr)
+
+        val gcValues = createGcValues(xColor)
+        val mask = GCForeground or GCGraphicsExposures or GCArcMode
+        val gc = drawApi.createGC(drawable, mask.convert(), gcValues.ptr)!!
+
+        knownColors[color] = Pair(gc, xColor.pixel)
+
+        nativeHeap.free(gcValues)
+        nativeHeap.free(xColor)
+
+        return gc
+    }
+
+    private fun createGcValues(xColor: XColor): XGCValues {
+        val gcValues = nativeHeap.alloc<XGCValues>()
+        gcValues.foreground = xColor.pixel
+        gcValues.graphics_exposures = 0
+        gcValues.arc_mode = ArcPieSlice
+        return gcValues
     }
 }

@@ -118,7 +118,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     val monitorManager = MonitorManagerImpl(system, screen.root)
 
     val fontProvider = FontProvider(system, settings.generalSettings, system.defaultScreenNumber())
-    val colorHandler = Colors(system, screen)
+    val colorHandler = ColorFactory(system, screen)
     val uiDrawer =
         RootWindowDrawer(system, system, monitorManager, screen, colorHandler, settings.generalSettings, fontProvider)
 
