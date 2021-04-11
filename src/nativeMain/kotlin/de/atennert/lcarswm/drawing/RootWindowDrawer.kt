@@ -27,7 +27,7 @@ class RootWindowDrawer(
     private val logoImage: CPointer<XImage>?
     private val logoText: String
 
-    private val logoColor = colorFactory.getXftColor(1)
+    private val logoColor = colorFactory.createXftColor(COLOR_LOGO)
 
     private val colorMap: Colormap
         get() = colorFactory.colorMapId
@@ -63,7 +63,6 @@ class RootWindowDrawer(
 
     private fun close() {
         graphicsContexts.forEach { drawApi.freeGC(it) }
-        nativeHeap.free(logoColor.rawPtr)
     }
 
     private fun drawLogoTextFront(pixmap: Pixmap, x: Int, y: Int, barWidth: Int) {

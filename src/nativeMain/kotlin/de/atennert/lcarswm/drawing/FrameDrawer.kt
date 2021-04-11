@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.drawing
 
 import de.atennert.lcarswm.*
-import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.api.DrawApi
 import de.atennert.lcarswm.system.api.FontApi
@@ -25,17 +24,14 @@ class FrameDrawer(
     private val screen: Screen
 ) : IFrameDrawer {
 
-    private val activeTextColor = colorFactory.getXftColor(1)
-    private val inactiveTextColor = colorFactory.getXftColor(4)
-    private val primaryBarColor = colorFactory.getXftColor(2)
-    private val secondaryBarColor = colorFactory.getXftColor(6)
-    private val backgroundColor = colorFactory.getXftColor(0)
+    private val activeTextColor = colorFactory.createXftColor(COLOR_ACTIVE_TITLE)
+    private val inactiveTextColor = colorFactory.createXftColor(COLOR_INACTIVE_TITLE)
+    private val maxBarColor = colorFactory.createXftColor(COLOR_MAX_BAR_DOWN)
+    private val normalBarColor = colorFactory.createXftColor(COLOR_NORMAL_BAR_DOWN)
+    private val normalCornerDownColor = colorFactory.createXftColor(COLOR_NORMAL_CORNER_4)
+    private val backgroundColor = colorFactory.createXftColor(COLOR_BACKGROUND)
     override val colorMap: Colormap
             get() = colorFactory.colorMapId
-
-    init {
-        closeWith(FrameDrawer::close)
-    }
 
     override fun drawFrame(window: FramedWindow, monitor: Monitor) {
         val windowMeasurements = monitor.getWindowMeasurements()
@@ -74,25 +70,17 @@ class FrameDrawer(
         if (monitor.getScreenMode() == ScreenMode.NORMAL) {
             val primBarWidth = LOWER_CORNER_WIDTH - NORMAL_WINDOW_LEFT_OFFSET
             val secBarWidth = textX - primBarWidth - 2 * BAR_GAP_SIZE + FIRST_LETTER_OFFSET
-            drawApi.xftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  primBarWidth.convert(), BAR_HEIGHT.convert())
-            drawApi.xftDrawRect(xftDraw, secondaryBarColor.ptr, primBarWidth + BAR_GAP_SIZE, TITLE_BAR_OFFSET,  secBarWidth.convert(), BAR_HEIGHT.convert())
+            drawApi.xftDrawRect(xftDraw, normalCornerDownColor.ptr, 0, TITLE_BAR_OFFSET,  primBarWidth.convert(), BAR_HEIGHT.convert())
+            drawApi.xftDrawRect(xftDraw, normalBarColor.ptr, primBarWidth + BAR_GAP_SIZE, TITLE_BAR_OFFSET,  secBarWidth.convert(), BAR_HEIGHT.convert())
         } else {
             val barWidth = textX - BAR_GAP_SIZE + FIRST_LETTER_OFFSET
-            drawApi.xftDrawRect(xftDraw, primaryBarColor.ptr, 0, TITLE_BAR_OFFSET,  barWidth.convert(), BAR_HEIGHT.convert())
+            drawApi.xftDrawRect(xftDraw, maxBarColor.ptr, 0, TITLE_BAR_OFFSET,  barWidth.convert(), BAR_HEIGHT.convert())
         }
 
         drawApi.setWindowBackgroundPixmap(window.titleBar, pixmap)
         drawApi.clearWindow(window.titleBar)
         drawApi.freePixmap(pixmap)
         nativeHeap.free(rect.rawPtr)
-    }
-
-    private fun close() {
-        nativeHeap.free(activeTextColor.rawPtr)
-        nativeHeap.free(inactiveTextColor.rawPtr)
-        nativeHeap.free(primaryBarColor.rawPtr)
-        nativeHeap.free(secondaryBarColor.rawPtr)
-        nativeHeap.free(backgroundColor.rawPtr)
     }
 
     companion object {

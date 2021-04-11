@@ -74,17 +74,6 @@ class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
             drawApi.createGC(window, mask.convert(), gcValues.ptr)!!
         }
 
-    fun getXftColor(colorIndex: Int): XftColor {
-        val color = nativeHeap.alloc<XftColor>()
-        val colorCode = colors[colorIndex]
-        color.color.red = colorCode.first.convert()
-        color.color.green = colorCode.second.convert()
-        color.color.blue = colorCode.third.convert()
-        color.color.alpha = 0xffff.convert()
-        color.pixel = colorPixels[colorIndex]
-        return color
-    }
-
     fun createColorGC(drawable: Drawable, color: Color): GC? {
 
         val pixel = knownColors[color]
@@ -136,7 +125,6 @@ class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
                 xftColor.color.alpha = 0xffff.convert()
                 xftColor.pixel = pixel
                 knownXftColors[color] = xftColor
-
                 xftColor
             }
     }
