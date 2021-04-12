@@ -1,3 +1,7 @@
+21.3
+* refactor color management
+* add manual anti-aliasing for corners and bar ends
+
 21.2
 * fix window toggling (forward)
 * fix linking for systems with /usr/lib64
