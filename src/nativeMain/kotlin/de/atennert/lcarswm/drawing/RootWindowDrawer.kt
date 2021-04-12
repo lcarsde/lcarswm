@@ -22,9 +22,15 @@ class RootWindowDrawer(
     private val fontProvider: FontProvider
 ) : UIDrawing {
     private val barEndOpacities = getOuterArcOpacities(BAR_HEIGHT / 2)
+    private val bigOuterCornerOpacities = getOuterArcOpacities(OUTER_CORNER_RADIUS_BIG)
+    private val smallOuterCornerOpacities = getOuterArcOpacities(OUTER_CORNER_RADIUS_SMALL)
 
     private val barEndLeftColors = getArcAntialiasing(COLOR_BAR_ENDS, barEndOpacities, BAR_HEIGHT / 2, 2, 3)
     private val barEndRightColors = getArcAntialiasing(COLOR_BAR_ENDS, barEndOpacities, BAR_HEIGHT / 2, 1, 4)
+    private val corner1OuterColors = getArcAntialiasing(COLOR_NORMAL_CORNER_1, bigOuterCornerOpacities, OUTER_CORNER_RADIUS_BIG, 2)
+    private val corner4OuterColors = getArcAntialiasing(COLOR_NORMAL_CORNER_4, bigOuterCornerOpacities, OUTER_CORNER_RADIUS_BIG, 3)
+    private val corner2OuterColors = getArcAntialiasing(COLOR_NORMAL_CORNER_2, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 3)
+    private val corner3OuterColors = getArcAntialiasing(COLOR_NORMAL_CORNER_3, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 2)
 
     private fun getArcAntialiasing(
         baseColor: Color,
@@ -486,8 +492,32 @@ class RootWindowDrawer(
         for ((x, y, color) in barEndRightColors) {
             val gc = getGC(color)
             drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + y)
-            drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + monitor.height - BAR_HEIGHT + y)
             drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + y)
+            drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + monitor.height - BAR_HEIGHT + y)
+        }
+
+        // corner 1 outer anti-aliasing
+        for ((x, y, color) in corner1OuterColors) {
+            val gc = getGC(color)
+            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + y)
+        }
+
+        // corner 2 outer anti-aliasing
+        for ((x, y, color) in corner2OuterColors) {
+            val gc = getGC(color)
+            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + y)
+        }
+
+        // corner 3 outer anti-aliasing
+        for ((x, y, color) in corner3OuterColors) {
+            val gc = getGC(color)
+            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + BAR_HEIGHT + 2 * INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL + y)
+        }
+
+        // corner 4 outer anti-aliasing
+        for ((x, y, color) in corner4OuterColors) {
+            val gc = getGC(color)
+            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + monitor.height - OUTER_CORNER_RADIUS_BIG * 2 + y)
         }
 
         if (logoImage != null) {
