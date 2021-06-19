@@ -36,6 +36,9 @@ class SettingsReader(
         var usedSettings = settingsFilePath
         if (!doUserSettingsExist()) {
             usedSettings = defaultSettingsFilePath
+            logger.logDebug("SettingsReader::init::using system settings")
+        } else {
+            logger.logDebug("SettingsReader::init::using user settings")
         }
 
         loadSettings(usedSettings)
@@ -179,8 +182,8 @@ class SettingsReader(
             KeyExecution("XF86AudioLowerVolume", "amixer set Master 3%-"),
             KeyAction("Alt+Tab", WmAction.WINDOW_TOGGLE_FWD),
             KeyAction("Alt+Shift+Tab", WmAction.WINDOW_TOGGLE_BWD),
-            KeyAction("Lin+Alt+Up", WmAction.WINDOW_MOVE_UP),
-            KeyAction("Lin+Alt+Down", WmAction.WINDOW_MOVE_DOWN),
+            KeyAction("Lin+Alt+Up", WmAction.WINDOW_MOVE_NEXT),
+            KeyAction("Lin+Alt+Down", WmAction.WINDOW_MOVE_PREVIOUS),
             KeyAction("Alt+F4", WmAction.WINDOW_CLOSE),
             KeyAction("Lin+M", WmAction.SCREEN_MODE_TOGGLE),
             KeyAction("Lin+Q", WmAction.WM_QUIT)

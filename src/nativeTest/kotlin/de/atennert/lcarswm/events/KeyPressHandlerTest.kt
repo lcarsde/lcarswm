@@ -20,8 +20,8 @@ import kotlin.test.assertTrue
 class KeyPressHandlerTest {
 
     private val keySetting = setOf(
-        KeyAction("Alt+Up", WmAction.WINDOW_MOVE_UP),
-        KeyAction("Alt+Down", WmAction.WINDOW_MOVE_DOWN),
+        KeyAction("Alt+Up", WmAction.WINDOW_MOVE_NEXT),
+        KeyAction("Alt+Down", WmAction.WINDOW_MOVE_PREVIOUS),
         KeyAction("Alt+Tab", WmAction.WINDOW_TOGGLE_FWD),
         KeyAction("Alt+Shift+Tab", WmAction.WINDOW_TOGGLE_BWD),
         KeyAction("Lin+M", WmAction.SCREEN_MODE_TOGGLE)

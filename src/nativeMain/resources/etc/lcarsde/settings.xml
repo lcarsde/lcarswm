@@ -34,11 +34,11 @@
         </binding>
         <binding>
             <keys>Alt+Lin+Up</keys>
-            <action>window-move-up</action>
+            <action>window-move-previous</action>
         </binding>
         <binding>
             <keys>Alt+Lin+Down</keys>
-            <action>window-move-down</action>
+            <action>window-move-next</action>
         </binding>
         <binding>
             <keys>Alt+F4</keys>

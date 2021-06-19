@@ -43,8 +43,8 @@ class KeyPressHandler(
 
     private fun act(action: WmAction): Boolean {
         when (action) {
-            WmAction.WINDOW_MOVE_UP -> moveWindowToNextMonitor()
-            WmAction.WINDOW_MOVE_DOWN -> moveWindowToPreviousMonitor()
+            WmAction.WINDOW_MOVE_NEXT -> moveWindowToNextMonitor()
+            WmAction.WINDOW_MOVE_PREVIOUS -> moveWindowToPreviousMonitor()
             WmAction.WINDOW_TOGGLE_FWD -> toggleFocusedWindowForward()
             WmAction.WINDOW_TOGGLE_BWD -> toggleFocusedWindowBackward()
             WmAction.SCREEN_MODE_TOGGLE -> toggleScreenMode()

@@ -12,5 +12,5 @@ data class KeyExecution(override val keys: String, override val command: String)
 /** The key action defines a key binding for a window manager action */
 data class KeyAction(override val keys: String, val action: WmAction) : KeyBinding() {
     override val command: String
-        get() = action.key
+        get() = action.keys.first()
 }
