@@ -25,7 +25,7 @@ class FileReader(private val posixApi: PosixApi, private val filePath: String) {
             while (posixApi.fgets(entry.addressOf(0), readBufferSize, filePointer) != null) {
                 bufferString += entry.get()
                     .takeWhile { it > 0 }
-                    .fold("") {acc, b -> acc + b.toChar()}
+                    .fold("") {acc, b -> acc + b.toInt().toChar()}
 
                 if (bufferString.endsWith('\n') || posixApi.feof(filePointer) != 0) {
                     consumer(bufferString.trimEnd('\r', '\n'))

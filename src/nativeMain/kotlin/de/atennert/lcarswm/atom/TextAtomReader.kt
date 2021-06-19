@@ -53,7 +53,7 @@ class TextAtomReader(private val system: SystemApi, private val atomLibrary: Ato
 
         return name.trim()
                 .ifEmpty { NO_NAME }
-                .toUpperCase()
+                .uppercase()
     }
 
     private fun hasCorrectEncoding(textProperty: XTextProperty): Boolean {
