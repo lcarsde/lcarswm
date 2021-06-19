@@ -2,6 +2,7 @@
 * refactor color management
 * add manual anti-aliasing for corners and bar ends
 * update kotlin version to 1.5.10
+* adjust ordering of monitors by y and x values
 
 21.2
 * fix window toggling (forward)
