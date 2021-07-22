@@ -25,6 +25,10 @@ interface InputApi {
 
     fun ungrabButton(button: UInt, modifiers: UInt, window: Window): Int
 
+    fun createFontCursor(fontValue: Int): Cursor
+
+    fun defineCursor(window: Window, cursor: Cursor): Int
+
     fun getModifierMapping(): CPointer<XModifierKeymap>?
 
     fun getDisplayKeyCodeMinMaxCounts(): Pair<Int, Int>

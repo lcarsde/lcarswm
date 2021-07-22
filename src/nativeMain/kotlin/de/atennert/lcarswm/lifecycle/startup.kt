@@ -101,6 +101,8 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     system.setErrorHandler(staticCFunction { _, err -> staticLogger?.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
 
+    system.defineCursor(screen.root, system.createFontCursor(XC_left_ptr))
+
     rootWindowPropertyHandler
         .closeWith(RootWindowPropertyHandler::unsetWindowProperties)
         .setSupportWindowProperties()

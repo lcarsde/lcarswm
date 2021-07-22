@@ -5,6 +5,7 @@ headers = X11/Xlib.h \
     X11/xpm.h \
     X11/extensions/Xrandr.h \
     X11/XF86keysym.h \
+    X11/cursorfont.h \
     pango/pango.h \
     pango/pangoxft.h \
     libxml/parser.h

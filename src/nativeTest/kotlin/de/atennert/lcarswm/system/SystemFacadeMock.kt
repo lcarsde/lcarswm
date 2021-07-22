@@ -230,6 +230,14 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
+    override fun createFontCursor(fontValue: Int): Cursor {
+        return 0.convert()
+    }
+
+    override fun defineCursor(window: Window, cursor: Cursor): Int {
+        return 1
+    }
+
     override fun allowEvents(eventMode: Int, time: Time) {
         functionCalls.add(FunctionCall("allowEvents", eventMode, time))
     }

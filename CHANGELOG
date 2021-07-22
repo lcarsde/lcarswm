@@ -4,6 +4,7 @@
 * update kotlin version to 1.5.10
 * adjust ordering of monitors by y and x values
 * include alternative actions window-move-next and window-move-previous
+* set cursor on root window
 
 21.2
 * fix window toggling (forward)

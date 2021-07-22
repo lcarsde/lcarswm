@@ -413,6 +413,14 @@ class SystemFacade : SystemApi {
         return XUngrabButton(display, button, modifiers, window)
     }
 
+    override fun createFontCursor(fontValue: Int): Cursor {
+        return XCreateFontCursor(display, fontValue.convert())
+    }
+
+    override fun defineCursor(window: Window, cursor: Cursor): Int {
+        return XDefineCursor(display, window, cursor)
+    }
+
     override fun allowEvents(eventMode: Int, time: Time) {
         XAllowEvents(display, eventMode, time)
     }
