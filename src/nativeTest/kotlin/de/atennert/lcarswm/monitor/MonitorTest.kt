@@ -142,4 +142,42 @@ class MonitorTest {
 
         assertEquals(WindowMeasurements(0, 0, 800, 600, 600), defaultMeasurements)
     }
+
+    @Test
+    fun `verify on single monitor`() {
+        val monitorManager = object : MonitorManagerMock() {
+            override fun getScreenMode(): ScreenMode = ScreenMode.FULLSCREEN
+        }
+        val monitor = Monitor(monitorManager, 1.convert(), "name", false)
+        monitor.setMonitorMeasurements(0, 0, 800.convert(), 600.convert())
+
+        assertTrue(monitor.isOnMonitor(0, 0), "upper left corner")
+        assertTrue(monitor.isOnMonitor(799, 0), "upper right corner")
+        assertTrue(monitor.isOnMonitor(0, 599), "lower left corner")
+        assertTrue(monitor.isOnMonitor(799, 599), "lower right corner")
+        assertTrue(monitor.isOnMonitor(400, 300), "middle")
+        assertFalse(monitor.isOnMonitor(400, -1), "outer up")
+        assertFalse(monitor.isOnMonitor(800, 300), "outer right")
+        assertFalse(monitor.isOnMonitor(400, 600), "outer down")
+        assertFalse(monitor.isOnMonitor(-1, 300), "outer left")
+    }
+
+    @Test
+    fun `verify on offset monitor`() {
+        val monitorManager = object : MonitorManagerMock() {
+            override fun getScreenMode(): ScreenMode = ScreenMode.FULLSCREEN
+        }
+        val monitor = Monitor(monitorManager, 1.convert(), "name", false)
+        monitor.setMonitorMeasurements(800, 600, 800.convert(), 600.convert())
+
+        assertTrue(monitor.isOnMonitor(800, 600), "upper left corner")
+        assertTrue(monitor.isOnMonitor(1599, 600), "upper right corner")
+        assertTrue(monitor.isOnMonitor(800, 1199), "lower left corner")
+        assertTrue(monitor.isOnMonitor(1599, 1199), "lower right corner")
+        assertTrue(monitor.isOnMonitor(1200, 900), "middle")
+        assertFalse(monitor.isOnMonitor(1200, 599), "outer up")
+        assertFalse(monitor.isOnMonitor(1600, 900), "outer right")
+        assertFalse(monitor.isOnMonitor(1200, 1200), "outer down")
+        assertFalse(monitor.isOnMonitor(799, 900), "outer left")
+    }
 }

@@ -87,6 +87,14 @@ data class Monitor(
     }
 
     /**
+     * Check if a pixel is shown on this monitor.
+     * @return <code>true</code> if the pixel is on the monitor, <code>false</code> otherwise
+     */
+    fun isOnMonitor(x: Int, y: Int): Boolean {
+        return this.x <= x && x < (this.x + this.width) && this.y <= y && y < (this.y + this.height)
+    }
+
+    /**
      * @return the current window measurements in the form [x, y, width, height], depending on the current screenMode
      */
     fun getWindowMeasurements(): WindowMeasurements = when (getScreenMode()) {

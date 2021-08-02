@@ -5,6 +5,7 @@
 * adjust ordering of monitors by y and x values
 * include alternative actions window-move-next and window-move-previous
 * set cursor on root window
+* add moving of windows with mouse
 
 21.2
 * fix window toggling (forward)

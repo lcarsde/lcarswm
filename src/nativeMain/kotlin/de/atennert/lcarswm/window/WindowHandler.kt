@@ -7,6 +7,7 @@ import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
+import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -25,10 +26,11 @@ class WindowHandler(
     private val textAtomReader: TextAtomReader,
     private val appMenuHandler: AppMenuHandler,
     private val statusBarHandler: StatusBarHandler,
-    private val windowList: WindowList
+    private val windowList: WindowList,
+    private val keyManager: KeyManager
 ) : WindowRegistration {
 
-    private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or ButtonPressMask
+    private val frameEventMask = SubstructureRedirectMask or FocusChangeMask or ButtonPressMask or ButtonReleaseMask
 
     private val clientEventMask = PropertyChangeMask or StructureNotifyMask or ColormapChangeMask
 
@@ -50,7 +52,8 @@ class WindowHandler(
         }
 
         if (windowAttributes.override_redirect != X_FALSE ||
-            (isSetup && windowAttributes.map_state != IsViewable)) {
+            (isSetup && windowAttributes.map_state != IsViewable)
+        ) {
             logger.logInfo("WindowHandler::addWindow::skipping window $windowId")
             system.ungrabServer()
 
@@ -88,11 +91,15 @@ class WindowHandler(
 
         val measurements = windowCoordinator.addWindowToMonitor(window)
 
-        window.frame = system.createSimpleWindow(screen.root,
-            listOf(measurements.x, measurements.y, measurements.width, measurements.frameHeight))
+        window.frame = system.createSimpleWindow(
+            screen.root,
+            listOf(measurements.x, measurements.y, measurements.width, measurements.frameHeight)
+        )
 
-        window.titleBar = system.createSimpleWindow(window.frame,
-            listOf(0, measurements.frameHeight - BAR_HEIGHT_WITH_OFFSET, measurements.width, BAR_HEIGHT_WITH_OFFSET))
+        window.titleBar = system.createSimpleWindow(
+            window.frame,
+            listOf(0, measurements.frameHeight - BAR_HEIGHT_WITH_OFFSET, measurements.width, BAR_HEIGHT_WITH_OFFSET)
+        )
 
         logger.logDebug("WindowHandler::addWindow::reparenting $windowId (${window.title}) to ${window.frame}")
 
@@ -105,14 +112,24 @@ class WindowHandler(
         system.reparentWindow(windowId, window.frame, 0, 0)
 
         buttonsToGrab.forEach { button ->
-            system.grabButton(
+            keyManager.grabButton(
                 button.convert(),
-                AnyModifier.convert(),
-                window.frame,
-                true,
+                AnyModifier,
+                window.id,
                 ButtonPressMask.convert(),
-                GrabModeSync, GrabModeAsync,
-                None.convert(), None.convert())
+                GrabModeSync,
+                None.convert()
+            )
+        }
+        buttonsToGrab.forEach { button ->
+            keyManager.grabButton(
+                button.convert(),
+                AnyModifier,
+                window.titleBar,
+                (ButtonPressMask or ButtonReleaseMask or ButtonMotionMask).convert(),
+                GrabModeAsync,
+                None.convert()
+            )
         }
 
         system.resizeWindow(window.id, measurements.width.convert(), measurements.height.convert())
@@ -153,7 +170,8 @@ class WindowHandler(
 
         system.selectInput(windowId, NoEventMask)
         buttonsToGrab.forEach {
-            system.ungrabButton(it.convert(), AnyModifier.convert(), framedWindow.frame)
+            keyManager.ungrabButton(it.convert(), AnyModifier, framedWindow.frame)
+            keyManager.ungrabButton(it.convert(), AnyModifier, framedWindow.id)
         }
 
         system.unmapWindow(framedWindow.titleBar)

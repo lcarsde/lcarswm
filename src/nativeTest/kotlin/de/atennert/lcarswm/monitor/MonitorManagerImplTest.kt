@@ -32,7 +32,7 @@ class MonitorManagerImplTest {
         assertTrue(monitorList.contains(primaryMonitor), "The primary monitor should be part of the monitor list")
         assertEquals(systemApi.primaryOutput, primaryMonitor.id, "The ID of the primary monitor should match")
 
-        assertEquals(1, eventObserver.monitorUpdates, "The event observer should have gotten an update for the monitors")
+        assertEquals(2, eventObserver.monitorUpdates, "The event observer should have gotten updates for the monitors")
     }
 
     @Test
@@ -160,7 +160,7 @@ class MonitorManagerImplTest {
 
         var monitorUpdates = 0
 
-        override fun updateMonitors() {
+        override fun updateMonitors(monitors: List<Monitor>) {
             monitorUpdates++
         }
     }

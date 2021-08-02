@@ -14,6 +14,7 @@ import de.atennert.lcarswm.keys.KeySessionManager
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorManagerImpl
+import de.atennert.lcarswm.mouse.MoveWindowManager
 import de.atennert.lcarswm.settings.SettingsReader
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.signal.SignalHandler
@@ -181,8 +182,11 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         windowNameReader,
         appMenuHandler,
         statusBarHandler,
-        windowList
+        windowList,
+        keyManager
     )
+
+    val moveWindowManager = MoveWindowManager(logger, windowCoordinator)
 
     focusHandler.registerObserver(
         FocusSessionKeyboardGrabber(system, eventTime, rootWindowPropertyHandler.ewmhSupportWindow))
@@ -207,6 +211,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     monitorManager.registerObserver(appMenuHandler)
     monitorManager.registerObserver(statusBarHandler)
+    monitorManager.registerObserver(moveWindowManager)
 
     windowList.registerObserver(appMenuHandler.windowListObserver)
 
@@ -220,6 +225,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         windowCoordinator,
         focusHandler,
         keyManager,
+        moveWindowManager,
         toggleSessionManager,
         uiDrawer,
         atomLibrary,
@@ -341,6 +347,7 @@ private fun createEventManager(
     windowCoordinator: WindowCoordinator,
     focusHandler: WindowFocusHandler,
     keyManager: KeyManager,
+    moveWindowManager: MoveWindowManager,
     toggleSessionManager: KeySessionManager,
     uiDrawer: UIDrawing,
     atomLibrary: AtomLibrary,
@@ -357,10 +364,12 @@ private fun createEventManager(
     return EventDistributor.Builder(logger)
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler, statusBarHandler))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler, statusBarHandler))
-        .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler))
+        .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler, moveWindowManager))
+        .addEventHandler(ButtonReleaseHandler(logger, moveWindowManager))
         .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, toggleSessionManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
         .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, toggleSessionManager, atomLibrary))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
+        .addEventHandler(MotionNotifyHandler(logger, moveWindowManager))
         .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
         .addEventHandler(screenChangeHandler)
         .addEventHandler(ReparentNotifyHandler(logger, windowRegistration))

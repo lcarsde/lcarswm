@@ -81,6 +81,17 @@ class ActiveWindowCoordinator(
         frameDrawer.drawFrame(window, nextMonitor)
     }
 
+    override fun moveWindowToMonitor(windowId: Window, monitor: Monitor) {
+        val window = windowsOnMonitors.keys.single { it.id == windowId }
+        windowsOnMonitors[window] = monitor
+        adjustWindowPositionAndSize(
+            eventApi,
+            monitor.getWindowMeasurements(),
+            window
+        )
+        frameDrawer.drawFrame(window, monitor)
+    }
+
     override fun getMonitorForWindow(windowId: Window): Monitor {
         return windowsOnMonitors.entries.single { (window, _) -> window.id == windowId }.value
     }

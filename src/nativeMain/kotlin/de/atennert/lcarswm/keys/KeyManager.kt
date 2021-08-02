@@ -183,6 +183,28 @@ class KeyManager(private val inputApi: InputApi) {
         }
     }
 
+    fun grabButton(button: UInt, modifiers: Int, windowId: Window, mask: UInt, pointerMode: Int, cursor: Cursor) {
+        lockMasks.forEach { lockMask ->
+            inputApi.grabButton(
+                button,
+                (modifiers or lockMask).convert(),
+                windowId,
+                true,
+                mask,
+                pointerMode,
+                GrabModeAsync,
+                None.convert(),
+                cursor
+            )
+        }
+    }
+
+    fun ungrabButton(button: UInt, modifiers: Int, windowId: Window) {
+        lockMasks.forEach { lockMask ->
+            inputApi.ungrabButton(button, (modifiers or lockMask).convert(), windowId)
+        }
+    }
+
     /**
      * @return key sym for a given key code
      */

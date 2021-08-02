@@ -18,6 +18,7 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
 
     fun registerObserver(observer: MonitorObserver) {
         observers.add(observer)
+        observer.updateMonitors(monitors)
     }
 
     override fun updateMonitorList() {
@@ -40,7 +41,7 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
             .map { (monitor, outputInfo) -> addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData) }
             .sortedBy { (it.y + it.height).toULong().shl(32) + it.x.toULong() }
 
-        observers.forEach { it.updateMonitors() }
+        observers.forEach { it.updateMonitors(monitors) }
     }
 
     private fun getMonitorData(): CPointer<XRRScreenResources> {

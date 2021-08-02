@@ -4,6 +4,7 @@ import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.atom.TextAtomReader
+import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
@@ -29,6 +30,7 @@ class WindowHandlerTest {
         val windowList = WindowList()
         val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
         val statusBarHandler = StatusBarHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -44,7 +46,8 @@ class WindowHandlerTest {
             TextAtomReader(systemApi, atomLibrary),
             appMenuHandler,
             statusBarHandler,
-            windowList
+            windowList,
+            keyManager
         )
 
         windowRegistration.addWindow(windowId, false)
@@ -70,6 +73,7 @@ class WindowHandlerTest {
         val windowList = WindowList()
         val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
         val statusBarHandler = StatusBarHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -85,7 +89,8 @@ class WindowHandlerTest {
             TextAtomReader(systemApi, atomLibrary),
             appMenuHandler,
             statusBarHandler,
-            windowList
+            windowList,
+            keyManager
         )
 
         windowRegistration.addWindow(windowId, true)
@@ -119,7 +124,9 @@ class WindowHandlerTest {
         assertEquals("setWindowBorderWidth", setupCalls.removeAt(0).name, "Set the border width of the window to 0")
         assertEquals("reparentWindow", setupCalls.removeAt(0).name, "child window should be reparented to frame")
         usedButtons.forEach {
-            assertEquals("grabButton", setupCalls.removeAt(0).name, "grab the buttons for click focus")
+            for (i in 0..15) {
+               assertEquals("grabButton", setupCalls.removeAt(0).name, "grab the buttons for click focus")
+            }
         }
         assertEquals("resizeWindow", setupCalls.removeAt(0).name, "resize window to monitor required dimensions")
         assertEquals("ungrabServer", setupCalls.removeAt(0).name, "ungrab the server to allow updates again")
@@ -172,6 +179,7 @@ class WindowHandlerTest {
         val windowList = WindowList()
         val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
         val statusBarHandler = StatusBarHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -187,7 +195,8 @@ class WindowHandlerTest {
             TextAtomReader(systemApi, atomLibrary),
             appMenuHandler,
             statusBarHandler,
-            windowList
+            windowList,
+            keyManager
         )
 
         windowRegistration.addWindow(windowId, true)
@@ -214,6 +223,7 @@ class WindowHandlerTest {
         val windowList = WindowList()
         val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
         val statusBarHandler = StatusBarHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -229,7 +239,8 @@ class WindowHandlerTest {
             TextAtomReader(systemApi, atomLibrary),
             appMenuHandler,
             statusBarHandler,
-            windowList
+            windowList,
+            keyManager
         )
 
         windowRegistration.addWindow(windowId, false)
@@ -259,6 +270,7 @@ class WindowHandlerTest {
         val windowList = WindowList()
         val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
         val statusBarHandler = StatusBarHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         val screen = nativeHeap.alloc<Screen>()
 
@@ -272,7 +284,8 @@ class WindowHandlerTest {
             TextAtomReader(systemApi, atomLibrary),
             appMenuHandler,
             statusBarHandler,
-            windowList
+            windowList,
+            keyManager
         )
 
         assertFalse(windowRegistration.isWindowManaged(windowId), "An unknown window should not be reported managed")
@@ -297,6 +310,7 @@ class WindowHandlerTest {
         val windowList = WindowList()
         val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
         val statusBarHandler = StatusBarHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         val screen = nativeHeap.alloc<Screen>()
         screen.root = rootWindowId
@@ -311,7 +325,8 @@ class WindowHandlerTest {
             TextAtomReader(systemApi, atomLibrary),
             appMenuHandler,
             statusBarHandler,
-            windowList
+            windowList,
+            keyManager
         )
         windowRegistration.addWindow(windowId, false)
 
@@ -328,7 +343,9 @@ class WindowHandlerTest {
         assertEquals(NoEventMask, selectInputCall.parameters[1], "set no event mask for events from unregistered window")
 
         usedButtons.forEach {
-            assertEquals("ungrabButton", unregisterSystemCalls.removeAt(0).name, "Ungrab the buttons")
+            for (i in 0..15) {
+                assertEquals("ungrabButton", unregisterSystemCalls.removeAt(0).name, "Ungrab the buttons")
+            }
         }
 
         val unmapTitleBarCall = unregisterSystemCalls.removeAt(0)
@@ -380,6 +397,7 @@ class WindowHandlerTest {
         val windowList = WindowList()
         val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
         val statusBarHandler = StatusBarHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         val screen = nativeHeap.alloc<Screen>()
         screen.root = rootWindowId
@@ -394,7 +412,8 @@ class WindowHandlerTest {
             TextAtomReader(systemApi, atomLibrary),
             appMenuHandler,
             statusBarHandler,
-            windowList
+            windowList,
+            keyManager
         )
         windowRegistration.addWindow(windowId, false)
 
@@ -428,6 +447,7 @@ class WindowHandlerTest {
         val windowList = WindowList()
         val appMenuHandler = AppMenuHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
         val statusBarHandler = StatusBarHandler(systemApi, atomLibrary, MonitorManagerMock(), systemApi.rootWindowId)
+        val keyManager = KeyManager(systemApi)
 
         systemApi.functionCalls.clear() // remove AtomLibrary setup
 
@@ -443,7 +463,8 @@ class WindowHandlerTest {
             TextAtomReader(systemApi, atomLibrary),
             appMenuHandler,
             statusBarHandler,
-            windowList
+            windowList,
+            keyManager
         )
 
         windowRegistration.addWindow(windowId, false)

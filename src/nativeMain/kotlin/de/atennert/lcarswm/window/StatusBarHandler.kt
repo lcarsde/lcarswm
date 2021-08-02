@@ -6,6 +6,7 @@ import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.events.sendConfigureNotify
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.monitor.MonitorObserver
 import de.atennert.lcarswm.system.api.SystemApi
@@ -74,7 +75,7 @@ class StatusBarHandler(
         systemApi.unmapWindow(window.frame)
     }
 
-    override fun updateMonitors() {
+    override fun updateMonitors(monitors: List<Monitor>) {
         window?.let { window ->
             resizeWindow(window)
         }

@@ -53,6 +53,7 @@ Thank you very much to the creators of the following resources:
       * Win / Lin / Super
       * Meta
       * Hyper
+    * By clicking and holding a window title bar with the left mouse button and dragging the window can be moved between monitors
   * General settings
     * title: title that is displayed in the top bar in normal and maximized mode
     * title-image: optional, path to image in XPM format, if set, it will be shown instead of the title. Should have a height of 40px and be at least 16px shorter then the normal modes' top bar.

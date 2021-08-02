@@ -31,6 +31,10 @@ class WindowCoordinatorMock : WindowCoordinator {
         functionCalls.add(FunctionCall("moveWindowToPreviousMonitor", windowId))
     }
 
+    override fun moveWindowToMonitor(windowId: Window, monitor: Monitor) {
+        TODO("Not yet implemented")
+    }
+
     override fun getMonitorForWindow(windowId: Window): Monitor {
         return Monitor(MonitorManagerMock(), 1.convert(), "some monitor", false)
     }
