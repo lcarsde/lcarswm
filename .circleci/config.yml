@@ -53,11 +53,13 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - build
+            - build/*
 
   deploy:
     docker:
       - image: cimg/openjdk:8.0.292
+
+    working_directory: ~/repo
 
     steps:
       - checkout
