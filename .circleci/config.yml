@@ -44,3 +44,35 @@ jobs:
 
       # run tests!
       - run: gradle allTests
+
+      - run: cd ..
+      - persist_to_workspace:
+          root: repo
+          paths:
+            - build
+
+  deploy:
+    docker:
+      - image: cimg/openjdk:8.0.292
+
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: repo
+
+      - run: |
+          if [[ -f "repo/build/processedResources/native/main/etc/lcarsde/autostart" ]]; then
+            echo "It worked!";
+          else
+            echo "Nope!"; exit 1
+          fi
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
