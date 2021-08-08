@@ -31,7 +31,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-{{ checksum "build.gradle.kts" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
@@ -40,14 +40,16 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
 
       # run tests!
-      - run: gradle allTests
+      - run: gradle nativeTest
 
-      - run: cd ..
+      - store_test_results:
+          path: build/test-results
+
       - persist_to_workspace:
-          root: repo
+          root: ~/repo
           paths:
             - build
 
@@ -59,7 +61,7 @@ jobs:
       - checkout
 
       - attach_workspace:
-          at: repo
+          at: ~/repo
 
       - run: |
           if [[ -f "repo/build/processedResources/native/main/etc/lcarsde/autostart" ]]; then
