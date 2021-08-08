@@ -26,7 +26,7 @@ jobs:
 
       # install dependencies
       - run: sudo apt-get update
-      - run: sudo apt-get install -y openjdk-8-jdk-headless libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev
+      - run: sudo apt-get install -y openjdk-8-jdk-headless libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo5
 
       # Download and cache dependencies
       - restore_cache:
