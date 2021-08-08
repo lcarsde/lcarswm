@@ -45,10 +45,10 @@ jobs:
       - run: gradle build
 
       # run tests! https://youtrack.jetbrains.com/issue/KT-32608
-      - run: gradle nativeTest
+#      - run: gradle nativeTest
 
-      - store_test_results:
-          path: build/test-results
+#      - store_test_results:
+#          path: build/test-results
 
       - persist_to_workspace:
           root: ~/repo
@@ -67,7 +67,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: ls build/processedResources
+      - run: ls build/processedResources/native
 
       - run: |
           if [[ -f "~/repo/build/processedResources/native/main/etc/lcarsde/autostart" ]]; then
