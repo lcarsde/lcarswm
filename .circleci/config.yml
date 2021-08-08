@@ -42,13 +42,44 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle.kts" }}
 
-      - run: gradle build
-
       # run tests! https://youtrack.jetbrains.com/issue/KT-32608
-#      - run: gradle nativeTest
+      - run: gradle nativeTest
 
-#      - store_test_results:
-#          path: build/test-results
+      - store_test_results:
+          path: build/test-results
+
+  build:
+    docker:
+      # specify the version you desire here
+      - image: cimg/openjdk:8.0.292
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+
+    steps:
+      - checkout
+
+      # install dependencies
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y openjdk-8-jdk-headless libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo5
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle.kts" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: gradle build
 
       - persist_to_workspace:
           root: ~/repo
@@ -67,8 +98,6 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: ls build/processedResources/native/main/etc/lcarsde
-
       - run: |
           if [[ -f "build/processedResources/native/main/etc/lcarsde/autostart" ]]; then
             echo "It worked!";
@@ -80,7 +109,10 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - build_and_test
+      - test
+      - build:
+          requires:
+            - test
       - deploy:
           requires:
-            - build_and_test
+            - build
