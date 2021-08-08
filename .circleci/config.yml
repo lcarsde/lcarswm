@@ -67,10 +67,10 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: ls build/processedResources/native
+      - run: ls build/processedResources/native/main/etc/lcarsde
 
       - run: |
-          if [[ -f "~/repo/build/processedResources/native/main/etc/lcarsde/autostart" ]]; then
+          if [[ -f "build/processedResources/native/main/etc/lcarsde/autostart" ]]; then
             echo "It worked!";
           else
             echo "Nope!"; exit 1
