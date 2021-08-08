@@ -42,7 +42,7 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle.kts" }}
 
-      # run tests!
+      # run tests! https://youtrack.jetbrains.com/issue/KT-32608
       - run: gradle nativeTest
 
       - store_test_results:
