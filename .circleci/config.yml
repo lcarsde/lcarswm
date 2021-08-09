@@ -66,6 +66,7 @@ jobs:
       TERM: dumb
 
     steps:
+      # TODO remove checkout?
       - checkout
 
       # install dependencies
@@ -93,8 +94,6 @@ jobs:
     working_directory: ~/repo
 
     steps:
-      - checkout
-
       - attach_workspace:
           at: ~/repo
 
