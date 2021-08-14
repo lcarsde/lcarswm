@@ -57,7 +57,7 @@ jobs:
 
   deploy_aur:
     docker:
-      - image: atennert/archlinux-cci-aur:0.0.2
+      - image: atennert/archlinux-cci-aur:0.0.3
         auth:
           username: atennert
           password: $DOCKERHUB_PASSWORD
@@ -81,7 +81,6 @@ jobs:
 
       # get deployment files for lcarswm
       - run: git clone ssh://aur@aur.archlinux.org/lcarswm.git
-      - run: cd lcarswm
 
       # log the current contents
       - run: cat lcarswm/PKGBUILD
