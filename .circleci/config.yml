@@ -90,6 +90,7 @@ jobs:
       - run: cd lcarswm && sed -i -e "s/^pkgver=[0-9\.]*$/pkgver=21.2/" PKGBUILD
       - run: cd lcarswm && updpkgsums
       - run: cd lcarswm && makepkg --printsrcinfo > .SRCINFO
+      - run: ls -a lcarswm
 
       # log the new contents
       - run: cat lcarswm/PKGBUILD
