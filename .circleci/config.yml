@@ -85,11 +85,11 @@ jobs:
 
       - run: git clone ssh://aur@aur.archlinux.org/lcarswm.git
 
-      - run: cd lcarswm
+      - run: ls lcarswm
 
-      - run: cat PKGBUILD
+      - run: cat lcarswm/PKGBUILD
 
-      - run: cat .SRCINFO
+      - run: cat lcarswm/.SRCINFO
 
 workflows:
   version: 2
