@@ -81,8 +81,19 @@ jobs:
 
       # get deployment files for lcarswm
       - run: git clone ssh://aur@aur.archlinux.org/lcarswm.git
+      - run: cd lcarswm
+      - run: pwd
 
       # log the current contents
+      - run: cat lcarswm/PKGBUILD
+      - run: cat lcarswm/.SRCINFO
+
+      # update content
+      - run: sed -i -e "s/^pkgver=[0-9\.]*$/pkgver=21.2/" PKGBUILD
+      - run: updpkgsums
+      - run: makepkg --printsrcinfo > .SRCINFO
+
+      # log the new contents
       - run: cat lcarswm/PKGBUILD
       - run: cat lcarswm/.SRCINFO
 
