@@ -95,6 +95,8 @@ workflows:
             tags:
               only: /.*/
       - deploy_aur:
+          context:
+            - lcarsde-context
           requires:
             - test
           filters:
