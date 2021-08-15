@@ -62,22 +62,10 @@ jobs:
           username: atennert
           password: $DOCKERHUB_PASSWORD
 
-    working_directory: ~/repo
-
     steps:
       - add_ssh_keys:
           fingerprints:
             - 78:cd:db:a2:c1:cb:65:7a:16:75:b9:ec:08:7b:62:c3
-
-      - attach_workspace:
-          at: ~/repo
-
-      - run: |
-          if [[ -f "build/processedResources/native/main/etc/lcarsde/autostart" ]]; then
-            echo "It worked!";
-          else
-            echo "Nope!"; exit 1
-          fi
 
       # get deployment files for lcarswm
       - run: git clone ssh://aur@aur.archlinux.org/lcarswm.git
@@ -87,20 +75,30 @@ jobs:
       - run: cat lcarswm/.SRCINFO
 
       # update content
-      - run: cd lcarswm && sed -i -e "s/^pkgver=[0-9\.]*$/pkgver=21.2/" PKGBUILD
+      - run: cd lcarswm && sed -i -e "s/^pkgver=[0-9\.]*$/pkgver=$CIRCLE_TAG/" PKGBUILD
       - run: cd lcarswm && updpkgsums
       - run: cd lcarswm && makepkg --printsrcinfo > .SRCINFO
-      - run: ls -a lcarswm
 
       # log the new contents
       - run: cat lcarswm/PKGBUILD
       - run: cat lcarswm/.SRCINFO
 
+      # upload new contents
+      - run: cd lcarswm && git add -u && git commit -m "update to version $CIRCLE_TAG" && git push
+
 workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - test
+      - test:
+          filters:
+            tags:
+              only: /.*/
       - deploy_aur:
           requires:
             - test
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
