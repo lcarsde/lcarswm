@@ -32,7 +32,7 @@ class FileLoggerTest {
     fun `open and close file logger`() {
         FileLogger(this.posixApi, this.filePath)
         assertEquals(this.filePath, this.posixApi.fopenFileName, "handed in file path not used")
-        assertEquals("w", this.posixApi.fopenMode, "not using log file for write only")
+        assertEquals("r", this.posixApi.fopenMode, "not using log file for write only")
 
         closeClosables()
         assertEquals(this.filePointer, this.posixApi.fcloseFile, "closed other file then opened")
