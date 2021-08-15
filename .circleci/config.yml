@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  test:
     docker:
       # specify the version you desire here
       - image: cimg/openjdk:8.0.292
@@ -31,7 +31,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-{{ checksum "build.gradle.kts" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
@@ -40,7 +40,65 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
 
-      # run tests!
-      - run: gradle allTests
+      # run tests! https://youtrack.jetbrains.com/issue/KT-32608
+      - run: gradle nativeTest
+
+      - store_test_results:
+          path: build/test-results
+
+      - run: gradle build
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - build/*
+
+  deploy_aur:
+    docker:
+      - image: atennert/archlinux-cci-aur:0.0.3
+        auth:
+          username: atennert
+          password: $DOCKERHUB_PASSWORD
+
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - 78:cd:db:a2:c1:cb:65:7a:16:75:b9:ec:08:7b:62:c3
+
+      # get deployment files for lcarswm
+      - run: git clone ssh://aur@aur.archlinux.org/lcarswm.git
+
+      # log the current contents
+      - run: cat lcarswm/PKGBUILD
+      - run: cat lcarswm/.SRCINFO
+
+      # update content
+      - run: cd lcarswm && sed -i -e "s/^pkgver=[0-9\.]*$/pkgver=$CIRCLE_TAG/" PKGBUILD
+      - run: cd lcarswm && updpkgsums
+      - run: cd lcarswm && makepkg --printsrcinfo > .SRCINFO
+
+      # log the new contents
+      - run: cat lcarswm/PKGBUILD
+      - run: cat lcarswm/.SRCINFO
+
+      # upload new contents
+      - run: cd lcarswm && git add -u && git commit -m "update to version $CIRCLE_TAG" && git push
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /.*/
+      - deploy_aur:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
