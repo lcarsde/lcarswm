@@ -61,12 +61,12 @@ Thank you very much to the creators of the following resources:
 
 ## Required
 ### For compiling
-* ncurses5-compat-libs: apparently libtinfo.so.5 is used by the compiler that is used by this package.
-* header files and development libraries for XLib, randr, xpm, libxml2, glib and pango. Check the travis yaml file to find the build dependencies in the install routines for Ubuntu.
+* libtinfo5: apparently libtinfo.so.5 is used by the clang compiler that is used by kotlin.
+* header files and development libraries for XLib, randr, xpm, libxml2, glib and pango. Check the [circle ci config file](.circleci/config.yml) to find the build dependencies in the install routines for Ubuntu.
 
 ### For using
 * Ubuntu Condensed font: It comes close enough to LCARS letters and is used by lcarswm as default for writing.
-* Libraries for XLib, randr, xpm, libxml2, glib and pango. Check the travis yaml for details via the corresponding dev libs.
+* Libraries for XLib, randr, xpm, libxml2, glib and pango. Check the [circle ci config file](.circleci/config.yml) for details via the corresponding dev libs.
 * Python 3.8 with Python 3 PyGObject, posix-ipc, numpy, psutil and pyalsaaudio packages for the app menu
 * The applications for the default keybindings are recommended in the debian setup and are xterm, firefox and alsa-utils (amixer). The default application key bindings are
   * Lin+T -> xterm
