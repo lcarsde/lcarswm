@@ -102,7 +102,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: deploy-deb.sh
+      - run: ./deploy-deb.sh
 
       - store_artifacts:
           path: ~/repo/build/deb/deploy
