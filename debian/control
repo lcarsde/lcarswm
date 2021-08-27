@@ -1,0 +1,15 @@
+Source: lcarswm
+Maintainer: Andreas Tennert <lcarsde@andreas-tennert.de>
+Section: x11
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9), openjdk-8-jdk-headless, libx11-dev, libxpm-dev, libxrandr-dev, libpango1.0-dev, libxml2-dev, libtinfo5
+
+Package: lcarswm
+Architecture: any
+Depends: libx11-6, libxpm4, libxrandr2, libpango1.0-0, libpangoxft-1.0-0, libxml2
+Recommends: fonts-ubuntu, xterm, firefox, alsa-utils
+Suggests: x-display-manager, kdm | gdm
+Provides: x-window-manager
+Description: A simple window manager that looks like the LCARS interface
+ https://lcarsde.github.io

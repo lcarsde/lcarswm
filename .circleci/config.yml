@@ -86,6 +86,27 @@ jobs:
       # upload new contents
       - run: cd lcarswm && git add -u && git commit -m "update to version $CIRCLE_TAG" && git push
 
+  deploy_ubuntu:
+    docker:
+      - image: cimg/base:stable
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # install dependencies
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y devscripts debhelper fakeroot
+
+      - attach_workspace:
+          at: ~/repo
+
+      - run: deploy-deb.sh
+
+      - store_artifacts:
+          path: ~/repo/build/deb/deploy
+
 workflows:
   version: 2
   build_and_deploy:
@@ -104,3 +125,8 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
+      - deploy_ubuntu:
+          context:
+            - lcarsde-context
+          requires:
+            - test
