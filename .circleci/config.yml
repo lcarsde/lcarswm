@@ -98,7 +98,7 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: ./deploy-deb.sh
+      - run: ./deploy-deb.sh lcarswm
 
       - run: |
           if ls -1qA ~/repo/build/deb/deploy | grep -q . ; then
