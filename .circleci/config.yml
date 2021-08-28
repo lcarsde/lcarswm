@@ -37,21 +37,17 @@ jobs:
 
       - run: gradle dependencies
 
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
-
       # run tests! https://youtrack.jetbrains.com/issue/KT-32608
       - run: gradle nativeTest
 
+      - save_cache:
+          paths:
+            - ~/.gradle
+            - ~/.konan
+          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
+
       - store_test_results:
           path: build/test-results
-
-      - persist_to_workspace:
-          root: ~/.konan
-          paths:
-            - ./*
 
   deploy_aur:
     docker:
@@ -97,10 +93,29 @@ jobs:
       - run: sudo apt-get update
       - run: sudo apt-get install -y default-jdk-headless devscripts debhelper fakeroot libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo5
 
-      - attach_workspace:
-          at: ~/.konan
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle.kts" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: gradle dependencies
 
       - run: ./deploy-deb.sh
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+            - ~/.konan
+          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
+
+      - run: |
+          if [[ -f ~/repo/build/deb/deploy ]]; then
+            echo "deb package built!";
+          else
+            echo "deb package not built"; exit 1
+          fi
 
       - store_artifacts:
           path: ~/repo/build/deb/deploy
