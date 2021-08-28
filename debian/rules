@@ -13,11 +13,11 @@ export DH_OPTIONS=-v   # what commands are executed by each dh_command
 # package maintainers to append LDFLAGS
 #export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
-#clean:
-#   dh_testdir
-#   dh_testroot
-#   dh_autoreconf_clean
-#   dh_clean
+clean:
+   dh_testdir
+   dh_testroot
+   dh_autoreconf_clean
+   dh_clean
 
 build:
     dh_testdir
