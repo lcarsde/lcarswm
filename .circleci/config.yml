@@ -107,7 +107,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle.kts" }}
 
       - run: |
-          if [[ -f ~/repo/build/deb/deploy ]]; then
+          if ls -1qA ~/repo/build/deb/deploy | grep -q . ; then
             echo "deb package built!";
           else
             echo "deb package not built"; exit 1
