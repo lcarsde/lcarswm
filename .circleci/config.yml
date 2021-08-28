@@ -110,6 +110,21 @@ jobs:
       - store_artifacts:
           path: ~/repo/build/deb/deploy
 
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - build/deb/deploy
+
+  publish_github_release:
+    docker:
+      - image: cibuilds/github:0.10
+
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
+      - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} 21.3 ~/repo/build/deb/deploy/
+
 workflows:
   version: 2
   build_and_deploy:
@@ -133,3 +148,8 @@ workflows:
             - lcarsde-context
           requires:
             - test
+      - publish_github_release:
+          context:
+            - lcarsde-context
+          requires:
+            - deploy_ubuntu
