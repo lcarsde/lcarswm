@@ -120,7 +120,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n "Version $CIRCLE_TAG" ${CIRCLE_TAG} ~/repo/build/deb/deploy/
+      - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${CIRCLE_TAG} ~/repo/build/deb/deploy/
 
 workflows:
   version: 2
