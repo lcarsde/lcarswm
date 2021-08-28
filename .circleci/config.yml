@@ -48,6 +48,11 @@ jobs:
       - store_test_results:
           path: build/test-results
 
+      - persist_to_workspace:
+          root: ~/.konan
+          paths:
+            - *
+
   deploy_aur:
     docker:
       - image: atennert/archlinux-cci-aur:0.0.3
@@ -91,6 +96,9 @@ jobs:
       # install dependencies
       - run: sudo apt-get update
       - run: sudo apt-get install -y default-jdk-headless devscripts debhelper fakeroot libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo5
+
+      - attach_workspace:
+          at: ~/.konan
 
       - run: ./deploy-deb.sh
 
