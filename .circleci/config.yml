@@ -51,7 +51,7 @@ jobs:
       - persist_to_workspace:
           root: ~/.konan
           paths:
-            - *
+            - ./*
 
   deploy_aur:
     docker:
