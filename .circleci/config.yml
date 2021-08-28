@@ -26,7 +26,7 @@ jobs:
 
       # install dependencies
       - run: sudo apt-get update
-      - run: sudo apt-get install -y openjdk-8-jdk-headless libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo5
+      - run: sudo apt-get install -y libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo5
 
       # Download and cache dependencies
       - restore_cache:
@@ -35,25 +35,17 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: gradle dependencies
+      # run tests! https://youtrack.jetbrains.com/issue/KT-32608
+      - run: gradle nativeTest
 
       - save_cache:
           paths:
             - ~/.gradle
+            - ~/.konan
           key: v1-dependencies-{{ checksum "build.gradle.kts" }}
-
-      # run tests! https://youtrack.jetbrains.com/issue/KT-32608
-      - run: gradle nativeTest
 
       - store_test_results:
           path: build/test-results
-
-      - run: gradle build
-
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - build/*
 
   deploy_aur:
     docker:
@@ -86,6 +78,50 @@ jobs:
       # upload new contents
       - run: cd lcarswm && git add -u && git commit -m "update to version $CIRCLE_TAG" && git push
 
+  deploy_ubuntu:
+    docker:
+      - image: cimg/base:stable
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # install dependencies
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y default-jdk-headless devscripts debhelper fakeroot libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo5
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle.kts" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: ./deploy-deb.sh
+
+      - run: |
+          if ls -1qA ~/repo/build/deb/deploy | grep -q . ; then
+            echo "deb package built!";
+          else
+            echo "deb package not built"; exit 1
+          fi
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - build/deb/deploy
+
+  publish_github_release:
+    docker:
+      - image: cibuilds/github:0.10
+
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
+      - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n "Version $CIRCLE_TAG" ${CIRCLE_TAG} ~/repo/build/deb/deploy/
+
 workflows:
   version: 2
   build_and_deploy:
@@ -99,6 +135,26 @@ workflows:
             - lcarsde-context
           requires:
             - test
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - deploy_ubuntu:
+          context:
+            - lcarsde-context
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - publish_github_release:
+          context:
+            - lcarsde-context
+          requires:
+            - deploy_ubuntu
           filters:
             tags:
               only: /.*/
