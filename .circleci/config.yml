@@ -107,9 +107,6 @@ jobs:
             echo "deb package not built"; exit 1
           fi
 
-      - store_artifacts:
-          path: ~/repo/build/deb/deploy
-
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -123,7 +120,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} 21.3 ~/repo/build/deb/deploy/
+      - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n "Version $CIRCLE_TAG" ${CIRCLE_TAG} ~/repo/build/deb/deploy/
 
 workflows:
   version: 2
@@ -148,8 +145,18 @@ workflows:
             - lcarsde-context
           requires:
             - test
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
       - publish_github_release:
           context:
             - lcarsde-context
           requires:
             - deploy_ubuntu
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
