@@ -100,12 +100,6 @@ jobs:
 
       - run: ./deploy-deb.sh
 
-      - save_cache:
-          paths:
-            - ~/.gradle
-            - ~/.konan
-          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
-
       - run: |
           if ls -1qA ~/repo/build/deb/deploy | grep -q . ; then
             echo "deb package built!";
