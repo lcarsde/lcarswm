@@ -44,7 +44,7 @@ debuild -us -uc
 cd ..
 ls -l
 mkdir "deploy"
-mv "$1_*.deb" deploy/
+mv "$1_${CIRCLE_TAG}_amd64.deb" deploy/
 
 cd ../..
 
