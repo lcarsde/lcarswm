@@ -1,4 +1,4 @@
-lcarswm (%version%) UNRELEASED; urgency=low
+lcarswm (%version%) unstable; urgency=low
 
   * Upstream release.
   * Check https://github.com/lcarsde/lcarswm/blob/master/CHANGELOG
