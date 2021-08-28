@@ -3,4 +3,4 @@ lcarswm (%version%) unstable; urgency=low
   * Upstream release.
   * Check https://github.com/lcarsde/lcarswm/blob/master/CHANGELOG
 
--- Andreas Tennert <lcarsde@andreas-tennert.de>  %time%
+ -- Andreas Tennert <lcarsde@andreas-tennert.de>  %time%
