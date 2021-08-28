@@ -3,6 +3,7 @@
 export LC_ALL=en_US.UTF-8
 TIME="$(date '+%a, %d %b %Y %T %z')"
 YEAR="$(date '+%Y')"
+CIRCLE_TAG=21.3
 
 echo "preparing debian package build for lcarswm-${CIRCLE_TAG}"
 
