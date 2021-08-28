@@ -35,8 +35,6 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: gradle dependencies
-
       # run tests! https://youtrack.jetbrains.com/issue/KT-32608
       - run: gradle nativeTest
 
@@ -99,8 +97,6 @@ jobs:
             - v1-dependencies-{{ checksum "build.gradle.kts" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-
-      - run: gradle dependencies
 
       - run: ./deploy-deb.sh
 
