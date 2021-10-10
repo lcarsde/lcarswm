@@ -137,7 +137,7 @@ jobs:
       - run: git clone git@github.com:lcarsde/lcarsde.github.io.git
 
       # update content
-      - run: sed -i -e "s/[0-9\.]*\/lcarswm_[0-9\.]*_amd64.deb">lcarswm ([0-9\.]*)/$CIRCLE_TAG\/lcarswm_$CIRCLE_TAG_amd64.deb">lcarswm ($CIRCLE_TAG)/" installation.html
+      - run: sed -i -e 's/[0-9\.]*\/lcarswm_[0-9\.]*_amd64.deb">lcarswm ([0-9\.]*)/$CIRCLE_TAG\/lcarswm_$CIRCLE_TAG_amd64.deb">lcarswm ($CIRCLE_TAG)/' installation.html
 
       # upload new contents
       - run: git add -u && git commit -m "update lcarswm deb file link to version $CIRCLE_TAG" && git push
