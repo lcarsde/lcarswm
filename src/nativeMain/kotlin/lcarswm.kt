@@ -37,10 +37,14 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
 
     val runtimeResources = startup(system, logger)
 
-    runtimeResources?.let {
-        runAutostartApps(system)
+    try {
+        runtimeResources?.let {
+            runAutostartApps(system)
 
-        runEventLoops(logger, it)
+            runEventLoops(logger, it)
+        }
+    } catch (e: Throwable) {
+        logger.logError("::runWindowManager::error during startup or runtime", e)
     }
 
     shutdown(system)

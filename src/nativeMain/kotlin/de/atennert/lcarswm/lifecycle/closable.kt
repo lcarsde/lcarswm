@@ -16,7 +16,7 @@ fun closeClosables() {
         .forEach { closable ->
             try {
                 closable()
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 // don't do anything
             }
         }

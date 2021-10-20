@@ -32,6 +32,10 @@ class FileLogger(private val posixApi: PosixApi, logFilePath: String) : Logger {
         writeLog("ERROR", text)
     }
 
+    override fun logError(text: String, throwable: Throwable) {
+        writeLog("ERROR", "$text: ${throwable.message}")
+    }
+
     private fun writeLog(prefix: String, text: String) {
         posixApi.fputs("${posixApi.gettimeofday()} - $prefix: $text\n", file)
     }

@@ -7,10 +7,7 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
 import platform.posix.FILE
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 class FileLoggerTest {
     private val filePath = "/this/is/my/logfile.log"
@@ -79,6 +76,20 @@ class FileLoggerTest {
 
         fileLogger.logError(text)
         assertEquals("0 - ERROR: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
+        assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
+    }
+
+    @Test
+    fun `log error with throwable to file`() {
+        val text = "this is my error"
+        val errorMessage = "some error message"
+        val throwable = Throwable(errorMessage)
+
+        val fileLogger = FileLogger(this.posixApi, this.filePath)
+
+        fileLogger.logError(text, throwable)
+        assertTrue(this.posixApi.fputsText!!.startsWith("0 - ERROR: $text: $errorMessage\n"),
+            "the written text doesn't fit (maybe missing \\n?):\n${this.posixApi.fputsText}")
         assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
     }
 

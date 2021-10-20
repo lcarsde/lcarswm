@@ -15,4 +15,9 @@ interface Logger {
 
     /** log information in error mode */
     fun logError(text: String)
+
+    /**
+     * log information in error mode with throwable
+     */
+    fun logError(text: String, throwable: Throwable)
 }
