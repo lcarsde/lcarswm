@@ -13,7 +13,13 @@ private val closables = mutableListOf<() -> Unit>()
  */
 fun closeClosables() {
     closables.asReversed()
-            .forEach { it() }
+        .forEach { closable ->
+            try {
+                closable()
+            } catch (e: Exception) {
+                // don't do anything
+            }
+        }
 
     closables.clear()
 }
