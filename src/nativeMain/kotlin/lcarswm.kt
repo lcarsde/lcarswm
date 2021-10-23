@@ -19,15 +19,19 @@ var staticLogger: Logger? = null
  */
 val exitState = atomic<Int?>(null)
 
-// the main method apparently must not be inside of a package so it can be compiled with Kotlin/Native
+// the main method apparently must not be inside a package, so it can be compiled with Kotlin/Native
 fun main() = runBlocking {
-    val system = SystemFacade()
-    val cacheDirPath = system.getenv(HOME_CACHE_DIR_PROPERTY)?.toKString() ?: error("::main::cache dir not set")
-    val logger = FileLogger(system, cacheDirPath + LOG_FILE_PATH)
+    try {
+        val system = SystemFacade()
+        val cacheDirPath = system.getenv(HOME_CACHE_DIR_PROPERTY)?.toKString() ?: error("::main::cache dir not set")
+        val logger = FileLogger(system, cacheDirPath + LOG_FILE_PATH)
 
-    runWindowManager(system, logger)
+        runWindowManager(system, logger)
 
-    system.exit(exitState.value ?: -1)
+        system.exit(exitState.value ?: -1)
+    } catch (e: Throwable) {
+        println(e.message)
+    }
 }
 
 suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope {
@@ -35,16 +39,25 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
     exitState.value = null
     staticLogger = logger
 
-    val runtimeResources = startup(system, logger)
-
-    try {
-        runtimeResources?.let {
-            runAutostartApps(system)
-
-            runEventLoops(logger, it)
-        }
+    val runtimeResources: RuntimeResources? = try {
+        startup(system, logger)
     } catch (e: Throwable) {
-        logger.logError("::runWindowManager::error during startup or runtime", e)
+        logger.logError("::runWindowManager::error starting applications", e)
+        null
+    }
+
+    runtimeResources?.let { rr ->
+        try {
+            runAutostartApps(system)
+        } catch (e: Throwable) {
+            logger.logError("::runWindowManager::error starting applications", e)
+        }
+
+        try {
+            runEventLoops(logger, rr)
+        } catch (e: Throwable) {
+            logger.logError("::runWindowManager::error during runtime", e)
+        }
     }
 
     shutdown(system)
