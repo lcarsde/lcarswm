@@ -33,7 +33,7 @@ class FileLogger(private val posixApi: PosixApi, logFilePath: String) : Logger {
     }
 
     override fun logError(text: String, throwable: Throwable) {
-        writeLog("ERROR", "$text: ${throwable.message}")
+        writeLog("ERROR", "$text: ${throwable.message}\n${throwable.stackTraceToString()}")
     }
 
     private fun writeLog(prefix: String, text: String) {

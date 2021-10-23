@@ -1,8 +1,8 @@
 import de.atennert.lcarswm.HOME_CACHE_DIR_PROPERTY
 import de.atennert.lcarswm.LOG_FILE_PATH
 import de.atennert.lcarswm.lifecycle.*
-import de.atennert.lcarswm.log.FileLogger
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.log.createLogger
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.atomicfu.atomic
@@ -21,17 +21,13 @@ val exitState = atomic<Int?>(null)
 
 // the main method apparently must not be inside a package, so it can be compiled with Kotlin/Native
 fun main() = runBlocking {
-    try {
-        val system = SystemFacade()
-        val cacheDirPath = system.getenv(HOME_CACHE_DIR_PROPERTY)?.toKString() ?: error("::main::cache dir not set")
-        val logger = FileLogger(system, cacheDirPath + LOG_FILE_PATH)
+    val system = SystemFacade()
+    val cacheDirPath = system.getenv(HOME_CACHE_DIR_PROPERTY)?.toKString()?.plus(LOG_FILE_PATH)
+    val logger = createLogger(system, cacheDirPath)
 
-        runWindowManager(system, logger)
+    runWindowManager(system, logger)
 
-        system.exit(exitState.value ?: -1)
-    } catch (e: Throwable) {
-        println(e.message)
-    }
+    system.exit(exitState.value ?: -1)
 }
 
 suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope {
