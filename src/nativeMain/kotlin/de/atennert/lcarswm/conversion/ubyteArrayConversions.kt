@@ -12,6 +12,14 @@ fun ULong.toUByteArray(): UByteArray {
     )
 }
 
+/** Convert ULongArray to byte array as used in X properties */
+fun ULongArray.toUByteArray(): UByteArray {
+    return this
+        .flatMap { it.toUByteArray() }
+        .toUByteArray()
+}
+
+/** Convert a UByteArray to a ULongArray */
 fun UByteArray.toULongArray(): ULongArray {
     if (this.size % 4 != 0) {
         throw ArithmeticException("UByte array needs to be divisible by 4 for conversion to ULong")
