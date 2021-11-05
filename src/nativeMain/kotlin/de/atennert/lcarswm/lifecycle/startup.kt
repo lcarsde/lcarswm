@@ -213,7 +213,8 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
     monitorManager.registerObserver(statusBarHandler)
     monitorManager.registerObserver(moveWindowManager)
 
-    windowList.registerObserver(appMenuHandler.windowListObserver)
+    windowList.register(appMenuHandler.windowListObserver)
+    windowList.register(WindowListAtomHandler(screen.root, system, atomLibrary))
 
     toggleSessionManager.addListener(focusHandler.keySessionListener)
 

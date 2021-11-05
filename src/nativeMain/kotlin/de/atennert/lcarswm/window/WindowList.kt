@@ -7,7 +7,7 @@ class WindowList {
 
     private val observers = mutableSetOf<Observer>()
 
-    fun registerObserver(observer: Observer) {
+    fun register(observer: Observer) {
         observers.add(observer)
     }
 
