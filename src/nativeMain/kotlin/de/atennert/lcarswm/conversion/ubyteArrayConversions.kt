@@ -12,6 +12,19 @@ fun ULong.toUByteArray(): UByteArray {
     )
 }
 
+fun UByteArray.toULongArray(): ULongArray {
+    if (this.size % 4 != 0) {
+        throw ArithmeticException("UByte array needs to be divisible by 4 for conversion to ULong")
+    }
+    return ULongArray(this.size / 4) {
+        val pos = it * 4
+        this[pos].toULong() +
+                this[pos + 1].toULong().shl(8) +
+                this[pos + 2].toULong().shl(16) +
+                this[pos + 3].toULong().shl(24)
+    }
+}
+
 /** Convert string to byte array as used in X properties */
 fun String.toUByteArray(): UByteArray {
     return this.encodeToByteArray().asUByteArray()

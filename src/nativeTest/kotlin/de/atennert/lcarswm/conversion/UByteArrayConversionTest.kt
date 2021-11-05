@@ -3,6 +3,7 @@ package de.atennert.lcarswm.conversion
 import kotlinx.cinterop.convert
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class UByteArrayConversionTest {
 
@@ -17,6 +18,27 @@ class UByteArrayConversionTest {
         assertEquals(0x56.toUByte(), uByteArray[1], "The second byte should be 0x34")
         assertEquals(0x34.toUByte(), uByteArray[2], "The third byte should be 0x56")
         assertEquals(0x12.toUByte(), uByteArray[3], "The fourth byte should be 0x78")
+    }
+
+    @Test
+    fun `convert ByteArray to ULongArray`() {
+        val uByteArray = ubyteArrayOf(0x78.convert(), 0x56.convert(), 0x34.convert(), 0x12.convert())
+
+        val uLongArray = uByteArray.toULongArray()
+
+        assertEquals(1, uLongArray.size)
+        assertEquals(uLongArray[0], 0x12345678.toULong())
+    }
+
+    @Test
+    fun `convert incomplete ByteArray to ULongArray throws exception`() {
+        val uByteArray = ubyteArrayOf(0x78.convert(), 0x56.convert(), 0x34.convert(), 0x12.convert(), 0x12.convert())
+
+        try {
+            uByteArray.toULongArray()
+            fail("converting an incomplete UByteArray to ULongArray shouldn't be possible")
+        } catch (e: ArithmeticException) {
+        }
     }
 
     @Test
