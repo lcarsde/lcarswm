@@ -133,6 +133,9 @@ jobs:
           fingerprints:
             - 92:97:77:77:03:73:3e:41:6a:18:d9:8d:c2:3a:52:3e
 
+      # make github a known host
+      - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+
       # get lcarsde.github.io
       - run: git clone git@github.com:lcarsde/lcarsde.github.io.git
 
