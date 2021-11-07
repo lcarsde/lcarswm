@@ -49,7 +49,7 @@ jobs:
 
   deploy_aur:
     docker:
-      - image: atennert/archlinux-cci-aur:0.0.3
+      - image: atennert/archlinux-cci-aur:0.0.4
         auth:
           username: atennert
           password: $DOCKERHUB_PASSWORD
