@@ -1,4 +1,9 @@
 21.4
+* catch exception on highest level
+* catch exceptions for shutdown hooks
+* add stdout print logger
+* provide NET_CLIENT_LIST
+* update kotlin version to 1.6.0
 
 21.3
 * refactor color management

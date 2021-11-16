@@ -61,7 +61,6 @@ Thank you very much to the creators of the following resources:
 
 ## Required
 ### For compiling
-* libtinfo5: apparently libtinfo.so.5 is used by the clang compiler that is used by kotlin.
 * header files and development libraries for XLib, randr, xpm, libxml2, glib and pango. Check the [circle ci config file](.circleci/config.yml) to find the build dependencies in the install routines for Ubuntu.
 
 ### For using

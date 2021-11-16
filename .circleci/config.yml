@@ -26,7 +26,7 @@ jobs:
 
       # install dependencies
       - run: sudo apt-get update
-      - run: sudo apt-get install -y libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo5
+      - run: sudo apt-get install -y libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo6
 
       # Download and cache dependencies
       - restore_cache:
@@ -89,7 +89,7 @@ jobs:
 
       # install dependencies
       - run: sudo apt-get update
-      - run: sudo apt-get install -y default-jdk-headless devscripts debhelper fakeroot libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo5
+      - run: sudo apt-get install -y default-jdk-headless devscripts debhelper fakeroot libx11-dev libxpm-dev libxrandr-dev libpango1.0-dev libicu-dev libxml2-dev libtinfo6
 
       # Download and cache dependencies
       - restore_cache:
