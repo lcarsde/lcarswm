@@ -4,6 +4,7 @@
 * add stdout print logger
 * provide NET_CLIENT_LIST
 * update kotlin version to 1.6.0
+* remove autostart file (deprecated)
 
 21.3
 * refactor color management

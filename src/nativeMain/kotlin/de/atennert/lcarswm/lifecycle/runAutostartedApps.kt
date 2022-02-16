@@ -17,16 +17,18 @@ private fun fileExist(posixApi: PosixApi, filePath: String): Boolean {
 
 /**
  * Get the users (if available) or default autostart file path.
+ * @deprecated autostart files should not be used anymore but stay for compatibility
  */
-private fun getAutostartFile(posixApi: PosixApi): String {
+private fun getAutostartFile(posixApi: PosixApi): String? {
     val userConfigPath = posixApi.getenv(HOME_CONFIG_DIR_PROPERTY)
     val userAutostartPath = userConfigPath?.toKString()?.let { "$it$AUTOSTART_FILE" }
 
-    return if (userAutostartPath != null && fileExist(posixApi, userAutostartPath)) {
-        userAutostartPath
-    } else {
-        // Fallback to autostart file in etc
-        "/etc$AUTOSTART_FILE"
+    return when {
+        userAutostartPath != null && fileExist(posixApi, userAutostartPath) ->
+            userAutostartPath
+        fileExist(posixApi, "/etc$AUTOSTART_FILE") ->
+            "/etc$AUTOSTART_FILE"
+        else -> null
     }
 }
 
@@ -38,11 +40,18 @@ private fun runCommand(posixApi: PosixApi, command: String) {
     runProgram(posixApi, commandParts[0], commandParts)
 }
 
+// TODO run apps in ~/.config/autostart
+// TODO run apps in /etc/xdg/autostart
+// don't run doubles from local autostart
+// check for Hidden=true
+// check OnlyShownIn
+// check NotShowIn
+
 /**
  * Start all the apps / run the commands from the users or default autostart file.
  */
 fun runAutostartApps(posixApi: PosixApi) {
-    val autostartPath = getAutostartFile(posixApi)
-
-    FileReader(posixApi, autostartPath).readLines { runCommand(posixApi, it) }
+    getAutostartFile(posixApi)?.let { path ->
+        FileReader(posixApi, path).readLines { runCommand(posixApi, it) }
+    }
 }
