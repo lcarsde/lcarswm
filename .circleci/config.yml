@@ -122,29 +122,6 @@ jobs:
 
       - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${CIRCLE_TAG} ~/repo/build/deb/deploy/
 
-  update_website:
-    docker:
-      - image: cimg/base:stable
-
-    working_directory: ~/repo
-
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - 92:97:77:77:03:73:3e:41:6a:18:d9:8d:c2:3a:52:3e
-
-      # make github a known host
-      - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-      # get lcarsde.github.io
-      - run: git clone git@github.com:lcarsde/lcarsde.github.io.git
-
-      # update content
-      - run: sed -i -e "s/[0-9\.]*\/lcarswm_[0-9\.]*_amd64.deb\">lcarswm ([0-9\.]*)/$CIRCLE_TAG\/lcarswm_$CIRCLE_TAG_amd64.deb\">lcarswm ($CIRCLE_TAG)/" installation.html
-
-      # upload new contents
-      - run: git add -u && git commit -m "update lcarswm deb file link to version $CIRCLE_TAG" && git push
-
 workflows:
   version: 2
   build_and_deploy:
@@ -178,15 +155,6 @@ workflows:
             - lcarsde-context
           requires:
             - deploy_ubuntu
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-      - update_website:
-          requires:
-            - deploy_aur
-            - publish_github_release
           filters:
             tags:
               only: /.*/
