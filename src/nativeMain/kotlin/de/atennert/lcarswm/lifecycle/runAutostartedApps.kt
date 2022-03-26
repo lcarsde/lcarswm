@@ -2,13 +2,12 @@ package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.AUTOSTART_FILE
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
+import de.atennert.lcarswm.file.DirectoryFactory
 import de.atennert.lcarswm.runProgram
 import de.atennert.lcarswm.settings.FileReader
 import de.atennert.lcarswm.system.api.PosixApi
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
-import platform.posix.*
+import platform.posix.F_OK
 
 /**
  * Check whether a given file exists.
@@ -43,19 +42,17 @@ private fun runCommand(posixApi: PosixApi, command: String) {
 }
 
 /**
- * Read the *.desktop file entries from the directory entry stream.
+ * Read the *.desktop file names from the directory.
  */
-fun CPointer<DIR>.readFiles(): Set<String> {
-    val desktopFiles = mutableSetOf<String>()
-    while (true) {
-        val fileEntry = readdir(this) ?: break // TODO check if it was an error
-        val fileName = fileEntry.pointed.d_name.toKString()
-        if (fileName.endsWith(".desktop")) {
-            desktopFiles.add(fileName)
-        }
-    }
-    closedir(this)
-    return desktopFiles
+fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory): List<String> {
+    val directory = dirFactory.getDirectory(directoryPath)
+        ?: return emptyList()
+
+    val files = directory.readFiles()
+        .filter { file -> file.endsWith(".desktop") }
+
+    directory.close()
+    return files
 }
 
 /**
@@ -90,6 +87,7 @@ private class Autostart {
             "onlyshowin" -> excludeByShow = !value.lowercase().contains("lcarsde")
             "notshowin" -> excludeByShow = value.lowercase().contains("lcarsde")
             "exec" -> exec = value.trim()
+            else -> { /* nothing to do */}
         }
     }
 }
@@ -97,28 +95,26 @@ private class Autostart {
 /**
  * Start all the apps / run the commands from the users or default autostart file.
  */
-fun runAutostartApps(posixApi: PosixApi) {
+fun runAutostartApps(posixApi: PosixApi, dirFactory: DirectoryFactory) {
     getAutostartFile(posixApi)?.let { path ->
         FileReader(posixApi, path).readLines { runCommand(posixApi, it) }
     }
 
-    var localApps = emptySet<String>()
+    var localApps = emptyList<String>()
     val globalAutostart = "/etc/xdg/autostart"
     val localAutostart = posixApi.getenv(HOME_CONFIG_DIR_PROPERTY)
         ?.toKString()
         ?.let { "$it/autostart" }
 
     localAutostart
-        ?.let { opendir(localAutostart) }
-        ?.readFiles()
+        ?.let { readDesktopFiles(it, dirFactory) }
         ?.also { localApps = it }
         ?.map { "$localAutostart/$it" }
         ?.checkAndExecute(posixApi)
 
-    opendir(globalAutostart)
-        ?.readFiles()
+    readDesktopFiles(globalAutostart, dirFactory)
         // local definitions override global definitions
-        ?.filterNot { localApps.contains(it) }
-        ?.map { "$globalAutostart/$it" }
-        ?.checkAndExecute(posixApi)
+        .filterNot { localApps.contains(it) }
+        .map { "$globalAutostart/$it" }
+        .checkAndExecute(posixApi)
 }

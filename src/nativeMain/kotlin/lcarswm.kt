@@ -1,5 +1,6 @@
 import de.atennert.lcarswm.HOME_CACHE_DIR_PROPERTY
 import de.atennert.lcarswm.LOG_FILE_PATH
+import de.atennert.lcarswm.file.PosixDirectoryFactory
 import de.atennert.lcarswm.lifecycle.*
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.log.createLogger
@@ -44,7 +45,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
 
     runtimeResources?.let { rr ->
         try {
-            runAutostartApps(system)
+            runAutostartApps(system, PosixDirectoryFactory())
         } catch (e: Throwable) {
             logger.logError("::runWindowManager::error starting applications", e)
         }

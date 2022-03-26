@@ -1,6 +1,8 @@
 package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
+import de.atennert.lcarswm.file.Directory
+import de.atennert.lcarswm.file.DirectoryFactory
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.*
@@ -12,22 +14,74 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class RunAutostartAppsTest {
-    @Test
-    fun `run apps from user autostart file`() {
-        val fakeApi = object : FakePosixApi() {
+    private fun createFakeApi(fileLinesMap: Map<String, List<String>>): FakePosixApi {
+        return object : FakePosixApi() {
             override fun getLines(fileName: String): List<String> {
-                if (fileName == "/home/me/config/lcarsde/autostart") {
-                    return listOf("myapp1", "myapp2 --arg1 -v 42")
-                }
-                return super.getLines(fileName)
+                return fileLinesMap[fileName]
+                    ?: super.getLines(fileName)
             }
 
             override fun access(fileName: String, mode: Int): Int {
-                return if (fileName == "/home/me/config/lcarsde/autostart") 1 else -1
+                return if (fileLinesMap.containsKey(fileName)) 1 else -1
             }
         }
+    }
 
-        runAutostartApps(fakeApi)
+    private fun createFakeDirectoryFactory(dirFilesMap: Map<String, Set<String>> = emptyMap()): DirectoryFactory {
+        return object : DirectoryFactory {
+            override fun getDirectory(path: String): Directory? {
+                return dirFilesMap[path]
+                    ?.let { object : Directory{
+                        override fun readFiles(): Set<String> = it
+                        override fun close() {}
+                    } }
+            }
+        }
+    }
+
+    @Test
+    fun `run apps from user desktop file`() {
+        val fakeApi = createFakeApi(mapOf(
+            "/home/me/config/autostart/runMe.desktop" to listOf("exec=myapp --arg1 -v 42")
+        ))
+
+        val fakeFactory = createFakeDirectoryFactory(mapOf(
+            "/home/me/config/autostart" to setOf("runMe.desktop")
+        ))
+
+        runAutostartApps(fakeApi, fakeFactory)
+
+        assertTrue(fakeApi.areAllFilesClosed())
+        assertEquals(mapOf(
+            "myapp" to listOf("myapp", "--arg1", "-v", "42")
+        ), fakeApi.executions)
+    }
+
+    @Test
+    fun `run apps from global desktop file`() {
+        val fakeApi = createFakeApi(mapOf(
+            "/etc/xdg/autostart/runMe.desktop" to listOf("exec=myapp --arg1 -v 42")
+        ))
+
+        val fakeFactory = createFakeDirectoryFactory(mapOf(
+            "/etc/xdg/autostart" to setOf("runMe.desktop")
+        ))
+
+        runAutostartApps(fakeApi, fakeFactory)
+
+        assertTrue(fakeApi.areAllFilesClosed())
+        assertEquals(mapOf(
+            "myapp" to listOf("myapp", "--arg1", "-v", "42")
+        ), fakeApi.executions)
+    }
+
+    @Test
+    fun `run apps from user autostart file`() {
+        val fakeApi = createFakeApi(mapOf(
+            "/home/me/config/lcarsde/autostart" to listOf("myapp1", "myapp2 --arg1 -v 42")
+        ))
+
+        runAutostartApps(fakeApi, createFakeDirectoryFactory())
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertEquals(mapOf(
@@ -38,20 +92,11 @@ class RunAutostartAppsTest {
 
     @Test
     fun `run apps from default autostart file`() {
-        val fakeApi = object : FakePosixApi() {
-            override fun getLines(fileName: String): List<String> {
-                if (fileName == "/etc/lcarsde/autostart") {
-                    return listOf("myapp1", "myapp2 --arg1 -v 42")
-                }
-                return super.getLines(fileName)
-            }
+        val fakeApi = createFakeApi(mapOf(
+            "/etc/lcarsde/autostart" to listOf("myapp1", "myapp2 --arg1 -v 42")
+        ))
 
-            override fun access(fileName: String, mode: Int): Int {
-                return if (fileName == "/etc/lcarsde/autostart") 1 else -1
-            }
-        }
-
-        runAutostartApps(fakeApi)
+        runAutostartApps(fakeApi, createFakeDirectoryFactory())
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertEquals(mapOf(
@@ -68,7 +113,7 @@ class RunAutostartAppsTest {
             override fun access(fileName: String, mode: Int): Int = -1
         }
 
-        runAutostartApps(fakeApi)
+        runAutostartApps(fakeApi, createFakeDirectoryFactory())
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertTrue(fakeApi.executions.isEmpty())
