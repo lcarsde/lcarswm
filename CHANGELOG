@@ -1,4 +1,4 @@
-21.4
+22.1
 * catch exception on highest level
 * catch exceptions for shutdown hooks
 * add stdout print logger
@@ -6,6 +6,7 @@
 * update kotlin version to 1.6.0
 * remove autostart file (deprecated)
 * run desktop files from autostart folders
+* auto-select the architecture to build for
 
 21.3
 * refactor color management
