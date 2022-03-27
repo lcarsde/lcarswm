@@ -1,14 +1,15 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.keys.*
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.WindowFocusHandler
 import de.atennert.lcarswm.window.closeWindow
-import kotlinx.cinterop.*
-import xlib.*
+import kotlinx.cinterop.convert
+import xlib.KeyRelease
+import xlib.XEvent
 
 /**
  * Handles key release events. This covers a few internal codes as well as configured key bindings.
@@ -20,7 +21,8 @@ class KeyReleaseHandler(
     private val keyManager: KeyManager,
     private val keyConfiguration: KeyConfiguration,
     private val toggleSessionManager: KeySessionManager,
-    private val atomLibrary: AtomLibrary
+    private val atomLibrary: AtomLibrary,
+    private val commander: Commander
 ) :
     XEventHandler {
     override val xEventType = KeyRelease
@@ -37,7 +39,7 @@ class KeyReleaseHandler(
                 logger.logDebug("KeyReleaseHandler::handleEvent::run command: ${keyBinding.command}")
                 return when (keyBinding) {
                     is KeyExecution -> {
-                        execute(keyBinding.command)
+                        commander.run(keyBinding.command)
                         false
                     }
                     is KeyAction -> act(keyBinding.action)
@@ -46,11 +48,6 @@ class KeyReleaseHandler(
         }
 
         return false
-    }
-
-    private fun execute(execCommand: String) {
-        val commandParts = execCommand.split(' ')
-        runProgram(systemApi, commandParts[0], commandParts)
     }
 
     private fun act(action: WmAction): Boolean {

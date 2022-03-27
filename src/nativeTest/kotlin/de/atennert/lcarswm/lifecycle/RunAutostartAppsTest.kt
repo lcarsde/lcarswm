@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
+import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.file.Directory
 import de.atennert.lcarswm.file.DirectoryFactory
 import de.atennert.lcarswm.signal.Signal
@@ -10,7 +11,7 @@ import platform.linux.mq_attr
 import platform.linux.mqd_t
 import platform.posix.*
 import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
 class RunAutostartAppsTest {
@@ -39,6 +40,15 @@ class RunAutostartAppsTest {
         }
     }
 
+    private class FakeCommander : Commander() {
+        val calls = mutableListOf<List<String>>()
+
+        override fun run(command: List<String>): Boolean {
+            calls.add(command)
+            return true
+        }
+    }
+
     @Test
     fun `run apps from user desktop file`() {
         val fakeApi = createFakeApi(mapOf(
@@ -49,12 +59,12 @@ class RunAutostartAppsTest {
             "/home/me/config/autostart" to setOf("runMe.desktop")
         ))
 
-        runAutostartApps(fakeApi, fakeFactory)
+        val commander = FakeCommander()
+
+        runAutostartApps(fakeApi, fakeFactory, commander)
 
         assertTrue(fakeApi.areAllFilesClosed())
-        assertEquals(mapOf(
-            "myapp" to listOf("myapp", "--arg1", "-v", "42")
-        ), fakeApi.executions)
+        assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
     }
 
     @Test
@@ -67,12 +77,12 @@ class RunAutostartAppsTest {
             "/etc/xdg/autostart" to setOf("runMe.desktop")
         ))
 
-        runAutostartApps(fakeApi, fakeFactory)
+        val commander = FakeCommander()
+
+        runAutostartApps(fakeApi, fakeFactory, commander)
 
         assertTrue(fakeApi.areAllFilesClosed())
-        assertEquals(mapOf(
-            "myapp" to listOf("myapp", "--arg1", "-v", "42")
-        ), fakeApi.executions)
+        assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
     }
 
     @Test
@@ -81,13 +91,13 @@ class RunAutostartAppsTest {
             "/home/me/config/lcarsde/autostart" to listOf("myapp1", "myapp2 --arg1 -v 42")
         ))
 
-        runAutostartApps(fakeApi, createFakeDirectoryFactory())
+        val commander = FakeCommander()
+
+        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander)
 
         assertTrue(fakeApi.areAllFilesClosed())
-        assertEquals(mapOf(
-            "myapp1" to listOf("myapp1"),
-            "myapp2" to listOf("myapp2", "--arg1", "-v", "42")
-        ), fakeApi.executions)
+        assertContains(commander.calls, listOf("myapp1"))
+        assertContains(commander.calls, listOf("myapp2", "--arg1", "-v", "42"))
     }
 
     @Test
@@ -96,13 +106,13 @@ class RunAutostartAppsTest {
             "/etc/lcarsde/autostart" to listOf("myapp1", "myapp2 --arg1 -v 42")
         ))
 
-        runAutostartApps(fakeApi, createFakeDirectoryFactory())
+        val commander = FakeCommander()
+
+        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander)
 
         assertTrue(fakeApi.areAllFilesClosed())
-        assertEquals(mapOf(
-            "myapp1" to listOf("myapp1"),
-            "myapp2" to listOf("myapp2", "--arg1", "-v", "42")
-        ), fakeApi.executions)
+        assertContains(commander.calls, listOf("myapp1"))
+        assertContains(commander.calls, listOf("myapp2", "--arg1", "-v", "42"))
     }
 
     @Test
@@ -113,10 +123,12 @@ class RunAutostartAppsTest {
             override fun access(fileName: String, mode: Int): Int = -1
         }
 
-        runAutostartApps(fakeApi, createFakeDirectoryFactory())
+        val commander = FakeCommander()
+
+        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander)
 
         assertTrue(fakeApi.areAllFilesClosed())
-        assertTrue(fakeApi.executions.isEmpty())
+        assertTrue(commander.calls.isEmpty())
     }
 
     open class FakePosixApi : PosixApi {
@@ -175,30 +187,11 @@ class RunAutostartAppsTest {
             return if (fileMap.contains(file) && fileMap[file]!!.isEmpty()) 1 else 0
         }
 
-        override fun fork(): __pid_t {
-            return 0
-        }
-
-        override fun setsid(): __pid_t {
-            return 0
-        }
-
         override fun setenv(name: String, value: String): Int {
             throw NotImplementedError()
         }
 
-        override fun perror(s: String) {
-            throw NotImplementedError()
-        }
-
         override fun exit(status: Int) {
-        }
-
-        val executions = mutableMapOf<String, List<String>>()
-
-        override fun execvp(fileName: String, args: List<String>): Int {
-            executions[fileName] = args
-            return 0
         }
 
         override fun gettimeofday(): Long {

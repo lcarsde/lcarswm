@@ -5,8 +5,11 @@ import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.RootWindowPropertyHandler
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.TextAtomReader
+import de.atennert.lcarswm.command.Commander
+import de.atennert.lcarswm.command.PosixCommander
 import de.atennert.lcarswm.drawing.*
 import de.atennert.lcarswm.events.*
+import de.atennert.lcarswm.file.PosixDirectoryFactory
 import de.atennert.lcarswm.keys.FocusSessionKeyboardGrabber
 import de.atennert.lcarswm.keys.KeyConfiguration
 import de.atennert.lcarswm.keys.KeyManager
@@ -218,6 +221,9 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     toggleSessionManager.addListener(focusHandler.keySessionListener)
 
+    val commander = PosixCommander()
+    val dirFactory = PosixDirectoryFactory()
+
     val eventManager = createEventManager(
         system,
         logger,
@@ -237,6 +243,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
         statusBarHandler,
         frameDrawer,
         windowList,
+        commander,
         screen.root
     )
 
@@ -249,8 +256,9 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     val xEventResources = XEventResources(eventManager, eventTime, eventBuffer)
     val appMenuResources = AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
+    val platformResources = PlatformResources(commander, dirFactory)
 
-    return RuntimeResources(xEventResources, appMenuResources)
+    return RuntimeResources(xEventResources, appMenuResources, platformResources)
 }
 
 /**
@@ -359,6 +367,7 @@ private fun createEventManager(
     statusBarHandler: StatusBarHandler,
     frameDrawer: FrameDrawer,
     windowList: WindowList,
+    commander: Commander,
     rootWindowId: Window
 ): EventDistributor {
 
@@ -368,7 +377,7 @@ private fun createEventManager(
         .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler, moveWindowManager))
         .addEventHandler(ButtonReleaseHandler(logger, moveWindowManager))
         .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, toggleSessionManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
-        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, toggleSessionManager, atomLibrary))
+        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, toggleSessionManager, atomLibrary, commander))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))
         .addEventHandler(MotionNotifyHandler(logger, moveWindowManager))
         .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))

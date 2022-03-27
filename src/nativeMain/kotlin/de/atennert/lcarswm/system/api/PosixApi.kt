@@ -24,22 +24,9 @@ interface PosixApi {
 
     fun feof(file: CPointer<FILE>): Int
 
-    fun fork(): __pid_t
-
-    fun setsid(): __pid_t
-
     fun setenv(name: String, value: String): Int
 
-    fun perror(s: String)
-
     fun exit(status: Int)
-
-    /**
-     * Run a program
-     * @param fileName The programs executable file name
-     * @param args The program arguments (including the fileName)
-     */
-    fun execvp(fileName: String, args: List<String>): Int
 
     fun gettimeofday(): Long
 

@@ -1,3 +1,3 @@
 package de.atennert.lcarswm.lifecycle
 
-data class RuntimeResources(val xEvent: XEventResources, val appMenu: AppMenuResources)
+data class RuntimeResources(val xEvent: XEventResources, val appMenu: AppMenuResources, val platform: PlatformResources)

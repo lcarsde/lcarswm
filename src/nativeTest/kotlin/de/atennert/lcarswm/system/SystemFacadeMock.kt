@@ -7,12 +7,11 @@ import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import platform.linux.mq_attr
 import platform.linux.mqd_t
-import platform.posix.*
 import platform.posix.FILE
-import platform.posix.__pid_t
 import platform.posix.mode_t
 import platform.posix.sigaction
 import platform.posix.sigset_t
+import platform.posix.size_t
 import platform.posix.ssize_t
 import xlib.*
 import kotlin.test.assertEquals
@@ -686,32 +685,13 @@ open class SystemFacadeMock : SystemApi {
         return if (fileMap.contains(file) && fileMap[file]!!.isEmpty()) 1 else 0
     }
 
-    override fun fork(): __pid_t {
-        functionCalls.add(FunctionCall("fork"))
-        return 0
-    }
-
-    override fun setsid(): __pid_t {
-        functionCalls.add(FunctionCall("setsid"))
-        return 0
-    }
-
     override fun setenv(name: String, value: String): Int {
         functionCalls.add(FunctionCall("setenv", name, value))
         return 0
     }
 
-    override fun perror(s: String) {
-        functionCalls.add(FunctionCall("perror", s))
-    }
-
     override fun exit(status: Int) {
         functionCalls.add(FunctionCall("exit", status))
-    }
-
-    override fun execvp(fileName: String, args: List<String>): Int {
-        functionCalls.add(FunctionCall("execvp", fileName, args))
-        return 0
     }
 
     override fun gettimeofday(): Long {

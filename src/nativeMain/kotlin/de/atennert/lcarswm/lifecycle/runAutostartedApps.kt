@@ -2,8 +2,8 @@ package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.AUTOSTART_FILE
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
+import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.file.DirectoryFactory
-import de.atennert.lcarswm.runProgram
 import de.atennert.lcarswm.settings.FileReader
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.toKString
@@ -34,14 +34,6 @@ private fun getAutostartFile(posixApi: PosixApi): String? {
 }
 
 /**
- * Run a command from the autostart file.
- */
-private fun runCommand(posixApi: PosixApi, command: String) {
-    val commandParts = command.split(' ')
-    runProgram(posixApi, commandParts[0], commandParts)
-}
-
-/**
  * Read the *.desktop file names from the directory.
  */
 fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory): List<String> {
@@ -58,12 +50,12 @@ fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory): List<
 /**
  * Read the data from *.desktop file, check if we can/should autostart it and do so.
  */
-fun Iterable<String>.checkAndExecute(posixApi: PosixApi) {
+fun Iterable<String>.checkAndExecute(posixApi: PosixApi, commander: Commander) {
     this.map { path ->
         Autostart().apply { FileReader(posixApi, path).readLines { line -> this.readLine(line) } }
     }
         .filterNot { it.hidden || it.excludeByShow }
-        .forEach { it.exec?.let { exec -> runCommand(posixApi, exec) } }
+        .forEach { it.exec?.let { exec -> commander.run(exec) } }
 }
 
 /**
@@ -95,9 +87,9 @@ private class Autostart {
 /**
  * Start all the apps / run the commands from the users or default autostart file.
  */
-fun runAutostartApps(posixApi: PosixApi, dirFactory: DirectoryFactory) {
+fun runAutostartApps(posixApi: PosixApi, dirFactory: DirectoryFactory, commander: Commander) {
     getAutostartFile(posixApi)?.let { path ->
-        FileReader(posixApi, path).readLines { runCommand(posixApi, it) }
+        FileReader(posixApi, path).readLines { commander.run(it) }
     }
 
     var localApps = emptyList<String>()
@@ -110,11 +102,11 @@ fun runAutostartApps(posixApi: PosixApi, dirFactory: DirectoryFactory) {
         ?.let { readDesktopFiles(it, dirFactory) }
         ?.also { localApps = it }
         ?.map { "$localAutostart/$it" }
-        ?.checkAndExecute(posixApi)
+        ?.checkAndExecute(posixApi, commander)
 
     readDesktopFiles(globalAutostart, dirFactory)
         // local definitions override global definitions
         .filterNot { localApps.contains(it) }
         .map { "$globalAutostart/$it" }
-        .checkAndExecute(posixApi)
+        .checkAndExecute(posixApi, commander)
 }

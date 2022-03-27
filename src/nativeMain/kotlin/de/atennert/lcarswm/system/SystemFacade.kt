@@ -8,12 +8,8 @@ import kotlinx.cinterop.*
 import platform.linux.*
 import platform.posix.*
 import platform.posix.FILE
-import platform.posix.__pid_t
 import platform.posix.mode_t
 import platform.posix.sigaction
-import platform.posix.sigemptyset
-import platform.posix.sigfillset
-import platform.posix.sigprocmask
 import platform.posix.sigset_t
 import platform.posix.ssize_t
 import platform.posix.timeval
@@ -280,34 +276,12 @@ class SystemFacade : SystemApi {
         return platform.posix.feof(file)
     }
 
-    override fun fork(): __pid_t {
-        return platform.posix.fork()
-    }
-
-    override fun setsid(): __pid_t {
-        return platform.posix.setsid()
-    }
-
     override fun setenv(name: String, value: String): Int {
         return platform.posix.setenv(name, value, X_TRUE)
     }
 
-    override fun perror(s: String) {
-        platform.posix.perror(s)
-    }
-
     override fun exit(status: Int) {
         platform.posix.exit(status)
-    }
-
-    override fun execvp(fileName: String, args: List<String>): Int {
-        val byteArgs = args.map { it.encodeToByteArray().pin() }
-        val convertedArgs = nativeHeap.allocArrayOfPointersTo(byteArgs.map { it.addressOf(0).pointed })
-
-        val result = platform.posix.execvp(fileName, convertedArgs)
-
-        byteArgs.map { it.unpin() }
-        return result
     }
 
     override fun gettimeofday(): Long {
