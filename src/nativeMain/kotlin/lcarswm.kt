@@ -44,7 +44,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger) = coroutineScope
 
     runtimeResources?.let { rr ->
         try {
-            runAutostartApps(system, rr.platform.dirFactory, rr.platform.commander)
+            runAutostartApps(system, rr.platform.dirFactory, rr.platform.commander, rr.platform.files)
         } catch (e: Throwable) {
             logger.logError("::runWindowManager::error starting applications", e)
         }

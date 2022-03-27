@@ -754,10 +754,6 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    override fun access(fileName: String, mode: Int): Int {
-        return 0
-    }
-
     override fun xftGetContext(screen: Int): CPointer<PangoContext>? {
         return nativeHeap.allocPointerTo<PangoContext>().value
     }

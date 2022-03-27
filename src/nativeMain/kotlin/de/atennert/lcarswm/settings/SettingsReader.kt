@@ -1,21 +1,41 @@
 package de.atennert.lcarswm.settings
 
-import de.atennert.lcarswm.*
+import de.atennert.lcarswm.SETTINGS_FILE
 import de.atennert.lcarswm.conversion.toKString
 import de.atennert.lcarswm.conversion.toUByteArray
+import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.keys.KeyAction
 import de.atennert.lcarswm.keys.KeyBinding
 import de.atennert.lcarswm.keys.KeyExecution
 import de.atennert.lcarswm.keys.WmAction
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
-import kotlinx.cinterop.*
-import platform.posix.F_OK
-import xlib.*
+import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.get
+import kotlinx.cinterop.pointed
+import kotlinx.cinterop.toCValues
+import xlib.XML_ELEMENT_NODE
+import xlib._xmlNode
+import xlib.xmlDoc
+import xlib.xmlStrcmp
+import kotlin.collections.Map
+import kotlin.collections.Set
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.emptyMap
+import kotlin.collections.emptySet
+import kotlin.collections.forEach
+import kotlin.collections.mapOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.mutableSetOf
+import kotlin.collections.set
+import kotlin.collections.setOf
+import kotlin.collections.toMutableMap
 
 class SettingsReader(
     private val logger: Logger,
     private val systemApi: SystemApi,
+    files: Files,
     configPath: String
 ) {
     private val settingsFilePath = "$configPath$SETTINGS_FILE"
@@ -34,7 +54,7 @@ class SettingsReader(
 
     init {
         var usedSettings = settingsFilePath
-        if (!doUserSettingsExist()) {
+        if (!files.exists(settingsFilePath)) {
             usedSettings = defaultSettingsFilePath
             logger.logDebug("SettingsReader::init::using system settings")
         } else {
@@ -42,10 +62,6 @@ class SettingsReader(
         }
 
         loadSettings(usedSettings)
-    }
-
-    private fun doUserSettingsExist(): Boolean {
-        return systemApi.access(settingsFilePath, F_OK) != -1
     }
 
     private fun loadSettings(settingsFilePath: String) {

@@ -4,30 +4,23 @@ import de.atennert.lcarswm.AUTOSTART_FILE
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.file.DirectoryFactory
+import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.settings.FileReader
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.toKString
-import platform.posix.F_OK
-
-/**
- * Check whether a given file exists.
- */
-private fun fileExist(posixApi: PosixApi, filePath: String): Boolean {
-    return posixApi.access(filePath, F_OK) != -1
-}
 
 /**
  * Get the users (if available) or default autostart file path.
  * @deprecated autostart files should not be used anymore but stay for compatibility
  */
-private fun getAutostartFile(posixApi: PosixApi): String? {
+private fun getAutostartFile(posixApi: PosixApi, files: Files): String? {
     val userConfigPath = posixApi.getenv(HOME_CONFIG_DIR_PROPERTY)
     val userAutostartPath = userConfigPath?.toKString()?.let { "$it$AUTOSTART_FILE" }
 
     return when {
-        userAutostartPath != null && fileExist(posixApi, userAutostartPath) ->
+        userAutostartPath != null && files.exists(userAutostartPath) ->
             userAutostartPath
-        fileExist(posixApi, "/etc$AUTOSTART_FILE") ->
+        files.exists("/etc$AUTOSTART_FILE") ->
             "/etc$AUTOSTART_FILE"
         else -> null
     }
@@ -87,8 +80,8 @@ private class Autostart {
 /**
  * Start all the apps / run the commands from the users or default autostart file.
  */
-fun runAutostartApps(posixApi: PosixApi, dirFactory: DirectoryFactory, commander: Commander) {
-    getAutostartFile(posixApi)?.let { path ->
+fun runAutostartApps(posixApi: PosixApi, dirFactory: DirectoryFactory, commander: Commander, files: Files) {
+    getAutostartFile(posixApi, files)?.let { path ->
         FileReader(posixApi, path).readLines { commander.run(it) }
     }
 

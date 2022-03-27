@@ -4,6 +4,7 @@ import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.file.Directory
 import de.atennert.lcarswm.file.DirectoryFactory
+import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.*
@@ -20,10 +21,6 @@ class RunAutostartAppsTest {
             override fun getLines(fileName: String): List<String> {
                 return fileLinesMap[fileName]
                     ?: super.getLines(fileName)
-            }
-
-            override fun access(fileName: String, mode: Int): Int {
-                return if (fileLinesMap.containsKey(fileName)) 1 else -1
             }
         }
     }
@@ -49,6 +46,12 @@ class RunAutostartAppsTest {
         }
     }
 
+    private class FakeFiles(val files: List<String>) : Files {
+        override fun exists(path: String): Boolean {
+            return files.contains(path)
+        }
+    }
+
     @Test
     fun `run apps from user desktop file`() {
         val fakeApi = createFakeApi(mapOf(
@@ -61,7 +64,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, fakeFactory, commander)
+        runAutostartApps(fakeApi, fakeFactory, commander, FakeFiles(listOf()))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
@@ -79,7 +82,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, fakeFactory, commander)
+        runAutostartApps(fakeApi, fakeFactory, commander, FakeFiles(listOf()))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
@@ -93,7 +96,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander)
+        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander, FakeFiles(listOf("/home/me/config/lcarsde/autostart")))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertContains(commander.calls, listOf("myapp1"))
@@ -108,7 +111,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander)
+        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander, FakeFiles(listOf("/etc/lcarsde/autostart")))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertContains(commander.calls, listOf("myapp1"))
@@ -119,13 +122,11 @@ class RunAutostartAppsTest {
     fun `handle unavailable autostart file`() {
         val fakeApi = object : FakePosixApi() {
             override fun fopen(fileName: String, modes: String): CPointer<FILE>? = null
-
-            override fun access(fileName: String, mode: Int): Int = -1
         }
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander)
+        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander, FakeFiles(listOf()))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertTrue(commander.calls.isEmpty())
@@ -244,10 +245,6 @@ class RunAutostartAppsTest {
         }
 
         override fun mqUnlink(name: String): Int {
-            throw NotImplementedError()
-        }
-
-        override fun access(fileName: String, mode: Int): Int {
             throw NotImplementedError()
         }
     }

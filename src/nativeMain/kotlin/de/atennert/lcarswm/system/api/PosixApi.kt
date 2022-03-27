@@ -51,6 +51,4 @@ interface PosixApi {
     fun mqReceive(mq: mqd_t, msgPtr: CPointer<ByteVar>, msgSize: size_t, msgPrio: CPointer<UIntVar>?): ssize_t
 
     fun mqUnlink(name: String): Int
-
-    fun access(fileName: String, mode: Int): Int
 }

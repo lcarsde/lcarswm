@@ -9,7 +9,9 @@ import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.command.PosixCommander
 import de.atennert.lcarswm.drawing.*
 import de.atennert.lcarswm.events.*
+import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.file.PosixDirectoryFactory
+import de.atennert.lcarswm.file.PosixFiles
 import de.atennert.lcarswm.keys.FocusSessionKeyboardGrabber
 import de.atennert.lcarswm.keys.KeyConfiguration
 import de.atennert.lcarswm.keys.KeyManager
@@ -40,6 +42,10 @@ private const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotify
         RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
 
 fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
+    val commander = PosixCommander()
+    val dirFactory = PosixDirectoryFactory()
+    val files = PosixFiles()
+
     val signalHandler = SignalHandler(system)
 
     wmDetected = false
@@ -113,7 +119,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     eventTime.resetEventTime()
 
-    val settings = loadSettings(logger, system)
+    val settings = loadSettings(logger, system, files)
     if (settings == null) {
         logger.logError("::runWindowManager::unable to load settings")
         return null
@@ -221,9 +227,6 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     toggleSessionManager.addListener(focusHandler.keySessionListener)
 
-    val commander = PosixCommander()
-    val dirFactory = PosixDirectoryFactory()
-
     val eventManager = createEventManager(
         system,
         logger,
@@ -256,7 +259,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     val xEventResources = XEventResources(eventManager, eventTime, eventBuffer)
     val appMenuResources = AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
-    val platformResources = PlatformResources(commander, dirFactory)
+    val platformResources = PlatformResources(commander, dirFactory, files)
 
     return RuntimeResources(xEventResources, appMenuResources, platformResources)
 }
@@ -317,11 +320,11 @@ private fun setupScreen(
 /**
  * Load the key configuration from the users key configuration file.
  */
-private fun loadSettings(logger: Logger, systemApi: SystemApi): SettingsReader? {
+private fun loadSettings(logger: Logger, systemApi: SystemApi, files: Files): SettingsReader? {
     val configPathBytes = systemApi.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return null
     val configPath = configPathBytes.toKString()
 
-    return SettingsReader(logger, systemApi, configPath)
+    return SettingsReader(logger, systemApi, files, configPath)
 }
 
 /**
