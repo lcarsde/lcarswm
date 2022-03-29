@@ -2,6 +2,7 @@ package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.command.Commander
+import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.file.Directory
 import de.atennert.lcarswm.file.DirectoryFactory
 import de.atennert.lcarswm.file.Files
@@ -19,8 +20,7 @@ class RunAutostartAppsTest {
     private fun createFakeApi(fileLinesMap: Map<String, List<String>>): FakePosixApi {
         return object : FakePosixApi() {
             override fun getLines(fileName: String): List<String> {
-                return fileLinesMap[fileName]
-                    ?: super.getLines(fileName)
+                return fileLinesMap[fileName] ?: super.getLines(fileName)
             }
         }
     }
@@ -52,6 +52,17 @@ class RunAutostartAppsTest {
         }
     }
 
+    private class FakeEnvironment : Environment {
+        override fun get(name: String): String? {
+            return when(name) {
+                HOME_CONFIG_DIR_PROPERTY -> "/home/me/config"
+                else -> null
+            }
+        }
+
+        override fun set(name: String, value: String): Boolean = false
+    }
+
     @Test
     fun `run apps from user desktop file`() {
         val fakeApi = createFakeApi(mapOf(
@@ -64,7 +75,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, fakeFactory, commander, FakeFiles(listOf()))
+        runAutostartApps(fakeApi, FakeEnvironment(), fakeFactory, commander, FakeFiles(listOf()))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
@@ -82,7 +93,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, fakeFactory, commander, FakeFiles(listOf()))
+        runAutostartApps(fakeApi, FakeEnvironment(), fakeFactory, commander, FakeFiles(listOf()))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
@@ -96,7 +107,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander, FakeFiles(listOf("/home/me/config/lcarsde/autostart")))
+        runAutostartApps(fakeApi, FakeEnvironment(), createFakeDirectoryFactory(), commander, FakeFiles(listOf("/home/me/config/lcarsde/autostart")))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertContains(commander.calls, listOf("myapp1"))
@@ -111,7 +122,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander, FakeFiles(listOf("/etc/lcarsde/autostart")))
+        runAutostartApps(fakeApi, FakeEnvironment(), createFakeDirectoryFactory(), commander, FakeFiles(listOf("/etc/lcarsde/autostart")))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertContains(commander.calls, listOf("myapp1"))
@@ -126,20 +137,13 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(fakeApi, createFakeDirectoryFactory(), commander, FakeFiles(listOf()))
+        runAutostartApps(fakeApi, FakeEnvironment(), createFakeDirectoryFactory(), commander, FakeFiles(listOf()))
 
         assertTrue(fakeApi.areAllFilesClosed())
         assertTrue(commander.calls.isEmpty())
     }
 
     open class FakePosixApi : PosixApi {
-        override fun getenv(name: String): CPointer<ByteVar>? {
-            return when (name) {
-                HOME_CONFIG_DIR_PROPERTY -> "/home/me/config"
-                else -> error("getenv with unsimulated key: $name")
-            }.encodeToByteArray().pin().addressOf(0)
-        }
-
         private val fileMap = mutableMapOf<CPointer<FILE>, MutableList<String>>()
 
         override fun fopen(fileName: String, modes: String): CPointer<FILE>? {
@@ -186,13 +190,6 @@ class RunAutostartAppsTest {
 
         override fun feof(file: CPointer<FILE>): Int {
             return if (fileMap.contains(file) && fileMap[file]!!.isEmpty()) 1 else 0
-        }
-
-        override fun setenv(name: String, value: String): Int {
-            throw NotImplementedError()
-        }
-
-        override fun exit(status: Int) {
         }
 
         override fun gettimeofday(): Long {

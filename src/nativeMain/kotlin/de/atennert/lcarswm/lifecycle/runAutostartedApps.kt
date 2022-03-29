@@ -3,19 +3,19 @@ package de.atennert.lcarswm.lifecycle
 import de.atennert.lcarswm.AUTOSTART_FILE
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.command.Commander
+import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.file.DirectoryFactory
 import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.settings.FileReader
 import de.atennert.lcarswm.system.api.PosixApi
-import kotlinx.cinterop.toKString
 
 /**
  * Get the users (if available) or default autostart file path.
  * @deprecated autostart files should not be used anymore but stay for compatibility
  */
-private fun getAutostartFile(posixApi: PosixApi, files: Files): String? {
-    val userConfigPath = posixApi.getenv(HOME_CONFIG_DIR_PROPERTY)
-    val userAutostartPath = userConfigPath?.toKString()?.let { "$it$AUTOSTART_FILE" }
+private fun getAutostartFile(environment: Environment, files: Files): String? {
+    val userConfigPath = environment[HOME_CONFIG_DIR_PROPERTY]
+    val userAutostartPath = userConfigPath?.let { "$it$AUTOSTART_FILE" }
 
     return when {
         userAutostartPath != null && files.exists(userAutostartPath) ->
@@ -80,15 +80,14 @@ private class Autostart {
 /**
  * Start all the apps / run the commands from the users or default autostart file.
  */
-fun runAutostartApps(posixApi: PosixApi, dirFactory: DirectoryFactory, commander: Commander, files: Files) {
-    getAutostartFile(posixApi, files)?.let { path ->
+fun runAutostartApps(posixApi: PosixApi, environment: Environment, dirFactory: DirectoryFactory, commander: Commander, files: Files) {
+    getAutostartFile(environment, files)?.let { path ->
         FileReader(posixApi, path).readLines { commander.run(it) }
     }
 
     var localApps = emptyList<String>()
     val globalAutostart = "/etc/xdg/autostart"
-    val localAutostart = posixApi.getenv(HOME_CONFIG_DIR_PROPERTY)
-        ?.toKString()
+    val localAutostart = environment[HOME_CONFIG_DIR_PROPERTY]
         ?.let { "$it/autostart" }
 
     localAutostart

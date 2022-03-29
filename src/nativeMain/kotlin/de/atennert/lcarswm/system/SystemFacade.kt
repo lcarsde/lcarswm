@@ -251,10 +251,6 @@ class SystemFacade : SystemApi {
         return XDestroyWindow(display, window)
     }
 
-    override fun getenv(name: String): CPointer<ByteVar>? {
-        return platform.posix.getenv(name)
-    }
-
     override fun fopen(fileName: String, modes: String): CPointer<FILE>? {
         return platform.posix.fopen(fileName, modes)
     }
@@ -274,14 +270,6 @@ class SystemFacade : SystemApi {
 
     override fun feof(file: CPointer<FILE>): Int {
         return platform.posix.feof(file)
-    }
-
-    override fun setenv(name: String, value: String): Int {
-        return platform.posix.setenv(name, value, X_TRUE)
-    }
-
-    override fun exit(status: Int) {
-        platform.posix.exit(status)
     }
 
     override fun gettimeofday(): Long {

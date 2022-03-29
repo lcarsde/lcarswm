@@ -2,12 +2,14 @@ package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.AppMenuMessageHandler
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
+import de.atennert.lcarswm.ResourceGenerator
 import de.atennert.lcarswm.RootWindowPropertyHandler
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.command.PosixCommander
 import de.atennert.lcarswm.drawing.*
+import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.file.PosixDirectoryFactory
@@ -41,10 +43,11 @@ const val ROOT_WINDOW_MASK = SubstructureRedirectMask or StructureNotifyMask or 
 private const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotifyMask or
         RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
 
-fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
+fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenerator): RuntimeResources? {
     val commander = PosixCommander()
     val dirFactory = PosixDirectoryFactory()
     val files = PosixFiles()
+    val environment = resourceGenerator.createEnvironment()
 
     val signalHandler = SignalHandler(system)
 
@@ -79,7 +82,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     system.synchronize(false)
 
-    setDisplayEnvironment(system)
+    setDisplayEnvironment(system, environment)
 
     val rootWindowPropertyHandler = RootWindowPropertyHandler(
         logger,
@@ -119,7 +122,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     eventTime.resetEventTime()
 
-    val settings = loadSettings(logger, system, files)
+    val settings = loadSettings(logger, system, files, environment)
     if (settings == null) {
         logger.logError("::runWindowManager::unable to load settings")
         return null
@@ -259,7 +262,7 @@ fun startup(system: SystemApi, logger: Logger): RuntimeResources? {
 
     val xEventResources = XEventResources(eventManager, eventTime, eventBuffer)
     val appMenuResources = AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
-    val platformResources = PlatformResources(commander, dirFactory, files)
+    val platformResources = PlatformResources(commander, dirFactory, files, environment)
 
     return RuntimeResources(xEventResources, appMenuResources, platformResources)
 }
@@ -282,9 +285,9 @@ private fun handleSignal(signalValue: Int, exitState: AtomicRef<Int?>) {
     }
 }
 
-private fun setDisplayEnvironment(system: SystemApi) {
+private fun setDisplayEnvironment(system: SystemApi, environment: Environment) {
     val displayString = system.getDisplayString()
-    system.setenv("DISPLAY", displayString)
+    environment["DISPLAY"] = displayString
 }
 
 private fun setupScreen(
@@ -320,9 +323,8 @@ private fun setupScreen(
 /**
  * Load the key configuration from the users key configuration file.
  */
-private fun loadSettings(logger: Logger, systemApi: SystemApi, files: Files): SettingsReader? {
-    val configPathBytes = systemApi.getenv(HOME_CONFIG_DIR_PROPERTY) ?: return null
-    val configPath = configPathBytes.toKString()
+private fun loadSettings(logger: Logger, systemApi: SystemApi, files: Files, environment: Environment): SettingsReader? {
+    val configPath = environment[HOME_CONFIG_DIR_PROPERTY] ?: return null
 
     return SettingsReader(logger, systemApi, files, configPath)
 }

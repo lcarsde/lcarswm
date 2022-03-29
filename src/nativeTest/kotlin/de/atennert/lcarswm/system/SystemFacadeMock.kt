@@ -1,7 +1,5 @@
 package de.atennert.lcarswm.system
 
-import de.atennert.lcarswm.HOME_CACHE_DIR_PROPERTY
-import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
@@ -630,14 +628,6 @@ open class SystemFacadeMock : SystemApi {
         functionCalls.add(FunctionCall("xFree", xObject))
     }
 
-    override fun getenv(name: String): CPointer<ByteVar>? {
-        return when(name) {
-            HOME_CONFIG_DIR_PROPERTY -> "/home/me"
-            HOME_CACHE_DIR_PROPERTY -> "/home/me"
-            else -> error("getenv with unsimulated key: $name")
-        }.encodeToByteArray().pin().addressOf(0)
-    }
-
     private val fileMap = mutableMapOf<CPointer<FILE>, MutableList<String>>()
 
     override fun fopen(fileName: String, modes: String): CPointer<FILE>? {
@@ -683,15 +673,6 @@ open class SystemFacadeMock : SystemApi {
 
     override fun feof(file: CPointer<FILE>): Int {
         return if (fileMap.contains(file) && fileMap[file]!!.isEmpty()) 1 else 0
-    }
-
-    override fun setenv(name: String, value: String): Int {
-        functionCalls.add(FunctionCall("setenv", name, value))
-        return 0
-    }
-
-    override fun exit(status: Int) {
-        functionCalls.add(FunctionCall("exit", status))
     }
 
     override fun gettimeofday(): Long {

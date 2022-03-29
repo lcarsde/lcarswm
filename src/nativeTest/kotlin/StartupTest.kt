@@ -1,19 +1,51 @@
+import de.atennert.lcarswm.ResourceGenerator
 import de.atennert.lcarswm.atom.Atoms
+import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
-import kotlinx.cinterop.*
+import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.pointed
 import kotlinx.coroutines.runBlocking
 import xlib.*
-import kotlin.test.*
+import kotlin.collections.MutableList
+import kotlin.collections.filter
+import kotlin.collections.find
+import kotlin.collections.forEach
+import kotlin.collections.getValue
+import kotlin.collections.listOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
+import kotlin.collections.singleOrNull
+import kotlin.collections.takeWhile
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 
 class StartupTest {
+    private class FakeResourceGenerator : ResourceGenerator {
+        val variables = mutableMapOf<String, String>()
+
+        override fun createEnvironment(): Environment {
+            return object : Environment {
+                override fun get(name: String): String? = null
+                override fun set(name: String, value: String): Boolean {
+                    variables[name] = value
+                    return true
+                }
+            }
+        }
+    }
+
     @Test
     fun `check startup`() = runBlocking {
         val systemFacade = StartupFacadeMock()
+        val resourceGenerator = FakeResourceGenerator()
 
-        runWindowManager(systemFacade, LoggerMock())
+        runWindowManager(systemFacade, LoggerMock(), resourceGenerator)
 
         val startupCalls = systemFacade.functionCalls
 
@@ -29,7 +61,7 @@ class StartupTest {
 
         assertEquals("synchronize", startupCalls.removeAt(0).name, "synchronize after getting the display and randr resources")
 
-        checkForSettingDisplayEnvironmentVariable(startupCalls, systemFacade)
+        assertEquals(systemFacade.displayString, resourceGenerator.variables["DISPLAY"])
 
         checkCreatingTheSupportWindow(startupCalls, systemFacade)
 
@@ -68,19 +100,6 @@ class StartupTest {
             }
     }
 
-    private fun checkForSettingDisplayEnvironmentVariable(startupCalls: MutableList<FunctionCall>, system: SystemFacadeMock) {
-        val setDisplayCall = startupCalls.removeAt(0)
-
-        assertEquals("setenv", setDisplayCall.name, "setenv should be called to set the DISPLAY name")
-        assertEquals("DISPLAY", setDisplayCall.parameters[0], "setenv should be called to set the _DISPLAY_ name")
-
-        assertEquals(
-            system.displayString,
-            setDisplayCall.parameters[1],
-            "the DISPLAY environment variable should be set to the return value of getDisplayString"
-        )
-    }
-
     private fun checkCreatingTheSupportWindow(startupCalls: MutableList<FunctionCall>, system: SystemFacadeMock) {
         val createSupportWindowCall = startupCalls.removeAt(0)
         val mapSupportWindowCall = startupCalls.removeAt(0)
@@ -105,8 +124,9 @@ class StartupTest {
     @Test
     fun `send client message informing that we are the WM`() = runBlocking {
         val systemFacade = StartupFacadeMock()
+        val resourceGenerator = FakeResourceGenerator()
 
-        runWindowManager(systemFacade, LoggerMock())
+        runWindowManager(systemFacade, LoggerMock(), resourceGenerator)
 
         val startupCalls = systemFacade.functionCalls.takeWhile { it.name != "nextEvent" }
 
@@ -127,8 +147,9 @@ class StartupTest {
         val systemFacade = StartupFacadeMock()
         val rootWindow: Window = 1.convert() // hard coded in SystemFacadeMock
         val supportWindow: Window = systemFacade.nextWindowId // first created window starts at 2 in SystemFacadeMock
+        val resourceGenerator = FakeResourceGenerator()
 
-        runWindowManager(systemFacade, LoggerMock())
+        runWindowManager(systemFacade, LoggerMock(), resourceGenerator)
 
         val propertyCalls = systemFacade.functionCalls.filter { it.name == "changeProperty" }
         val atoms = systemFacade.atomMap

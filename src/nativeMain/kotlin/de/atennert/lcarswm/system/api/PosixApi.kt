@@ -12,8 +12,6 @@ import platform.posix.*
  * Interface for accessing POSIX functions
  */
 interface PosixApi {
-    fun getenv(name: String): CPointer<ByteVar>?
-
     fun fopen(fileName: String, modes: String): CPointer<FILE>?
 
     fun fgets(buffer: CPointer<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>?
@@ -23,10 +21,6 @@ interface PosixApi {
     fun fclose(file: CPointer<FILE>): Int
 
     fun feof(file: CPointer<FILE>): Int
-
-    fun setenv(name: String, value: String): Int
-
-    fun exit(status: Int)
 
     fun gettimeofday(): Long
 

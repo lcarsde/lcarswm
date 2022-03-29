@@ -1,3 +1,7 @@
+import de.atennert.lcarswm.HOME_CACHE_DIR_PROPERTY
+import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
+import de.atennert.lcarswm.ResourceGenerator
+import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.lifecycle.ROOT_WINDOW_MASK
 import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.log.LoggerMock
@@ -12,6 +16,19 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ShutdownTest {
+    private class FakeResourceGenerator : ResourceGenerator {
+        override fun createEnvironment(): Environment {
+            return object : Environment {
+                override fun get(name: String): String? = when(name) {
+                    HOME_CONFIG_DIR_PROPERTY -> "/home/me"
+                    HOME_CACHE_DIR_PROPERTY -> "/home/me"
+                    else -> error("getenv with unsimulated key: $name")
+                }
+                override fun set(name: String, value: String): Boolean = true
+            }
+        }
+    }
+
     @Test
     fun `shutdown when there's no display to get`() = runBlocking {
         val logger = LoggerMock().closeWith(LoggerMock::close)
@@ -21,8 +38,9 @@ class ShutdownTest {
                 return false
             }
         }
+        val resourceGenerator = FakeResourceGenerator()
 
-        runWindowManager(testFacade, logger)
+        runWindowManager(testFacade, logger, resourceGenerator)
 
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "openDisplay" }
@@ -39,6 +57,7 @@ class ShutdownTest {
     @Test
     fun `shutdown when there's no default screen to get`() = runBlocking {
         val logger = LoggerMock().closeWith(LoggerMock::close)
+        val resourceGenerator = FakeResourceGenerator()
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
         val testFacade = object : SystemFacadeMock() {
@@ -61,7 +80,7 @@ class ShutdownTest {
                 return keymapRef
             }
         }
-        runWindowManager(testFacade, logger)
+        runWindowManager(testFacade, logger, resourceGenerator)
 
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "defaultScreenOfDisplay" }
@@ -82,6 +101,7 @@ class ShutdownTest {
         val logger = LoggerMock().closeWith(LoggerMock::close)
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
+        val resourceGenerator = FakeResourceGenerator()
         val testFacade = object : SystemFacadeMock() {
             override fun defaultScreenNumber(): Int = 23
 
@@ -130,7 +150,7 @@ class ShutdownTest {
             }
         }
 
-        runWindowManager(testFacade, logger)
+        runWindowManager(testFacade, logger, resourceGenerator)
 
         val functionCalls = testFacade.functionCalls
                 .dropWhile { it.name != "setSelectionOwner" }
@@ -153,6 +173,7 @@ class ShutdownTest {
         val logger = LoggerMock().closeWith(LoggerMock::close)
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
+        val resourceGenerator = FakeResourceGenerator()
         val testFacade = object : SystemFacadeMock() {
             var selectionOwnerCounter = 0
 
@@ -198,7 +219,7 @@ class ShutdownTest {
             }
         }
 
-        runWindowManager(testFacade, logger)
+        runWindowManager(testFacade, logger, resourceGenerator)
 
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "getSelectionOwner" || it.parameters.elementAtOrNull(1) != 1 }
@@ -220,6 +241,7 @@ class ShutdownTest {
         val logger = LoggerMock().closeWith(LoggerMock::close)
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
+        val resourceGenerator = FakeResourceGenerator()
         val testFacade = object : SystemFacadeMock() {
             private lateinit var errorHandler: XErrorHandler
 
@@ -263,7 +285,7 @@ class ShutdownTest {
                 return keymapRef
             }
         }
-        runWindowManager(testFacade, logger)
+        runWindowManager(testFacade, logger, resourceGenerator)
 
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "setErrorHandler" }
@@ -287,6 +309,7 @@ class ShutdownTest {
         val logger = LoggerMock().closeWith(LoggerMock::close)
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
+        val resourceGenerator = FakeResourceGenerator()
         val testFacade = object : SystemFacadeMock() {
             override fun getQueuedEvents(mode: Int): Int {
                 return 1
@@ -326,7 +349,7 @@ class ShutdownTest {
             }
         }
 
-        runWindowManager(testFacade, logger)
+        runWindowManager(testFacade, logger, resourceGenerator)
 
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "nextEvent" }
@@ -354,6 +377,7 @@ class ShutdownTest {
         val logger = LoggerMock().closeWith(LoggerMock::close)
         lateinit var modifierKeymapRef: CPointer<XModifierKeymap>
         lateinit var keymapRef: CPointer<KeySymVar>
+        val resourceGenerator = FakeResourceGenerator()
         val testFacade = object : SystemFacadeMock() {
 
             override fun getQueuedEvents(mode: Int): Int {
@@ -391,7 +415,7 @@ class ShutdownTest {
             }
         }
 
-        runWindowManager(testFacade, logger)
+        runWindowManager(testFacade, logger, resourceGenerator)
 
         val functionCalls = testFacade.functionCalls
             .dropWhile { it.name != "nextEvent" }
