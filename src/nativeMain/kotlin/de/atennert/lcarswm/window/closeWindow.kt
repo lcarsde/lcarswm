@@ -10,7 +10,7 @@ import xlib.ClientMessage
 import xlib.Window
 import xlib.XEvent
 
-fun closeWindow(logger:Logger, systemApi: SystemApi, atomLibrary: AtomLibrary, windowId: Window) {
+fun closeWindow(logger: Logger, systemApi: SystemApi, atomLibrary: AtomLibrary, windowId: Window) {
     logger.logInfo("::closeActiveWindow::focused window: $windowId")
 
     val supportedProtocols = nativeHeap.allocPointerTo<AtomVar>()

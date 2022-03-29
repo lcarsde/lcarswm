@@ -6,8 +6,6 @@ import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.file.DirectoryFactory
 import de.atennert.lcarswm.file.Files
-import de.atennert.lcarswm.settings.FileReader
-import de.atennert.lcarswm.system.api.PosixApi
 
 /**
  * Get the users (if available) or default autostart file path.
@@ -43,9 +41,9 @@ fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory): List<
 /**
  * Read the data from *.desktop file, check if we can/should autostart it and do so.
  */
-fun Iterable<String>.checkAndExecute(posixApi: PosixApi, commander: Commander) {
+fun Iterable<String>.checkAndExecute(files: Files, commander: Commander) {
     this.map { path ->
-        Autostart().apply { FileReader(posixApi, path).readLines { line -> this.readLine(line) } }
+        Autostart().apply { files.readLines(path) { line -> this.readLine(line) } }
     }
         .filterNot { it.hidden || it.excludeByShow }
         .forEach { it.exec?.let { exec -> commander.run(exec) } }
@@ -80,9 +78,9 @@ private class Autostart {
 /**
  * Start all the apps / run the commands from the users or default autostart file.
  */
-fun runAutostartApps(posixApi: PosixApi, environment: Environment, dirFactory: DirectoryFactory, commander: Commander, files: Files) {
+fun runAutostartApps(environment: Environment, dirFactory: DirectoryFactory, commander: Commander, files: Files) {
     getAutostartFile(environment, files)?.let { path ->
-        FileReader(posixApi, path).readLines { commander.run(it) }
+        files.readLines(path) { commander.run(it) }
     }
 
     var localApps = emptyList<String>()
@@ -94,11 +92,11 @@ fun runAutostartApps(posixApi: PosixApi, environment: Environment, dirFactory: D
         ?.let { readDesktopFiles(it, dirFactory) }
         ?.also { localApps = it }
         ?.map { "$localAutostart/$it" }
-        ?.checkAndExecute(posixApi, commander)
+        ?.checkAndExecute(files, commander)
 
     readDesktopFiles(globalAutostart, dirFactory)
         // local definitions override global definitions
         .filterNot { localApps.contains(it) }
         .map { "$globalAutostart/$it" }
-        .checkAndExecute(posixApi, commander)
+        .checkAndExecute(files, commander)
 }

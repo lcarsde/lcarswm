@@ -255,10 +255,6 @@ class SystemFacade : SystemApi {
         return platform.posix.fopen(fileName, modes)
     }
 
-    override fun fgets(buffer: CPointer<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
-        return platform.posix.fgets(buffer, bufferSize, file)
-    }
-
     override fun fputs(s: String, file: CPointer<FILE>): Int {
         return platform.posix.fputs(s, file)
     }
@@ -266,10 +262,6 @@ class SystemFacade : SystemApi {
     override fun fclose(file: CPointer<FILE>): Int {
         platform.posix.fflush(file)
         return platform.posix.fclose(file)
-    }
-
-    override fun feof(file: CPointer<FILE>): Int {
-        return platform.posix.feof(file)
     }
 
     override fun gettimeofday(): Long {

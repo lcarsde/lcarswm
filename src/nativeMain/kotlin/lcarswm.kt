@@ -52,7 +52,6 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger, resourceGenerato
     runtimeResources?.let { rr ->
         try {
             runAutostartApps(
-                system,
                 rr.platform.environment,
                 rr.platform.dirFactory,
                 rr.platform.commander,

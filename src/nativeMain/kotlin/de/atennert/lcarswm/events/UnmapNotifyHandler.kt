@@ -2,7 +2,6 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.log.Logger
-import de.atennert.lcarswm.window.AppMenuHandler
 import de.atennert.lcarswm.window.WindowRegistration
 import xlib.UnmapNotify
 import xlib.XEvent

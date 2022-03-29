@@ -1,6 +1,7 @@
 import de.atennert.lcarswm.ResourceGenerator
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.environment.Environment
+import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.FunctionCall
@@ -10,16 +11,7 @@ import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import kotlinx.coroutines.runBlocking
 import xlib.*
-import kotlin.collections.MutableList
-import kotlin.collections.filter
-import kotlin.collections.find
-import kotlin.collections.forEach
-import kotlin.collections.getValue
-import kotlin.collections.listOf
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
-import kotlin.collections.singleOrNull
-import kotlin.collections.takeWhile
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -36,6 +28,14 @@ class StartupTest {
                     variables[name] = value
                     return true
                 }
+            }
+        }
+
+        override fun createFiles(): Files {
+            return object : Files {
+                override fun exists(path: String): Boolean = true
+
+                override fun readLines(path: String, consumer: (String) -> Unit) {}
             }
         }
     }

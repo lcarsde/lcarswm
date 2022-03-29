@@ -14,13 +14,9 @@ import platform.posix.*
 interface PosixApi {
     fun fopen(fileName: String, modes: String): CPointer<FILE>?
 
-    fun fgets(buffer: CPointer<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>?
-
     fun fputs(s: String, file: CPointer<FILE>): Int
 
     fun fclose(file: CPointer<FILE>): Int
-
-    fun feof(file: CPointer<FILE>): Int
 
     fun gettimeofday(): Long
 

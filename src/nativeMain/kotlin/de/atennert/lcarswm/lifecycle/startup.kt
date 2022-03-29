@@ -13,7 +13,6 @@ import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.file.PosixDirectoryFactory
-import de.atennert.lcarswm.file.PosixFiles
 import de.atennert.lcarswm.keys.FocusSessionKeyboardGrabber
 import de.atennert.lcarswm.keys.KeyConfiguration
 import de.atennert.lcarswm.keys.KeyManager
@@ -46,7 +45,7 @@ private const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotify
 fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenerator): RuntimeResources? {
     val commander = PosixCommander()
     val dirFactory = PosixDirectoryFactory()
-    val files = PosixFiles()
+    val files = resourceGenerator.createFiles()
     val environment = resourceGenerator.createEnvironment()
 
     val signalHandler = SignalHandler(system)

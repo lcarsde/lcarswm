@@ -6,7 +6,6 @@ import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.WindowCoordinator
 import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.pin
 import kotlinx.cinterop.usePinned
 import xlib.RRScreenChangeNotify
 import xlib.XEvent

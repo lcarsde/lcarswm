@@ -639,25 +639,6 @@ open class SystemFacadeMock : SystemApi {
 
     open fun getLines(fileName: String): List<String> = emptyList()
 
-    override fun fgets(buffer: CPointer<ByteVar>, bufferSize: Int, file: CPointer<FILE>): CPointer<ByteVar>? {
-        val lines = fileMap[file]?: return null
-        if (lines.isEmpty()) {
-            return null
-        }
-
-        val nextLine = lines.removeAt(0)
-        val maxUsableCharacters = bufferSize - 1
-        if (nextLine.length > maxUsableCharacters) {
-            lines.add(0, nextLine.drop(maxUsableCharacters))
-        }
-
-        val providedCharacters = nextLine.take(maxUsableCharacters) + "\u0000"
-        providedCharacters.encodeToByteArray()
-            .forEachIndexed { index, value -> buffer[index] = value }
-
-        return buffer
-    }
-
     override fun fputs(s: String, file: CPointer<FILE>): Int {
         // Only used for logging, which we usually don't want to check
         return 0
@@ -669,10 +650,6 @@ open class SystemFacadeMock : SystemApi {
         fileMap.remove(file)
         nativeHeap.free(file)
         return 0
-    }
-
-    override fun feof(file: CPointer<FILE>): Int {
-        return if (fileMap.contains(file) && fileMap[file]!!.isEmpty()) 1 else 0
     }
 
     override fun gettimeofday(): Long {

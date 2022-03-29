@@ -2,9 +2,6 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.mouse.MoveWindowManager
-import de.atennert.lcarswm.system.api.InputApi
-import de.atennert.lcarswm.window.WindowFocusHandler
-import de.atennert.lcarswm.window.WindowList
 import xlib.ButtonRelease
 import xlib.XEvent
 
