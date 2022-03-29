@@ -27,7 +27,7 @@ private fun getAutostartFile(environment: Environment, files: Files): String? {
 /**
  * Read the *.desktop file names from the directory.
  */
-fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory): List<String> {
+private fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory): List<String> {
     val directory = dirFactory.getDirectory(directoryPath)
         ?: return emptyList()
 
@@ -41,7 +41,7 @@ fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory): List<
 /**
  * Read the data from *.desktop file, check if we can/should autostart it and do so.
  */
-fun Iterable<String>.checkAndExecute(files: Files, commander: Commander) {
+private fun Iterable<String>.checkAndExecute(files: Files, commander: Commander) {
     this.map { path ->
         Autostart().apply { files.readLines(path) { line -> this.readLine(line) } }
     }
