@@ -43,6 +43,7 @@ private fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory
  */
 private fun Iterable<String>.checkAndExecute(files: Files, commander: Commander) {
     this.map { path ->
+        // TODO secure against crash
         Autostart().apply { files.readLines(path) { line -> this.readLine(line) } }
     }
         .filterNot { it.hidden || it.excludeByShow }
@@ -52,7 +53,7 @@ private fun Iterable<String>.checkAndExecute(files: Files, commander: Commander)
 /**
  * Encapsulates the data from an autostart desktop file.
  */
-private class Autostart {
+private class Autostart() {
     var hidden = false
         private set
     var excludeByShow = false
@@ -64,6 +65,9 @@ private class Autostart {
      * Evaluate a line from an autostart desktop file.
      */
     fun readLine(line: String) {
+        if (!line.contains('=')) {
+            return
+        }
         val (key, value) = line.split('=')
         when (key.trim().lowercase()) {
             "hidden" -> hidden = value.trim().lowercase() == "true"
