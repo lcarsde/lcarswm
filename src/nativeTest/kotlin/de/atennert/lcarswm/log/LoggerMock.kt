@@ -12,6 +12,8 @@ class LoggerMock : Logger {
 
     override fun logWarning(text: String) {}
 
+    override fun logWarning(text: String, throwable: Throwable) {}
+
     override fun logError(text: String) {}
 
     override fun logError(text: String, throwable: Throwable) {}

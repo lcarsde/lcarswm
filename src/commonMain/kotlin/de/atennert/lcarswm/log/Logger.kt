@@ -13,6 +13,9 @@ interface Logger {
     /** log information in warning mode */
     fun logWarning(text: String)
 
+    /** log information in warning mode */
+    fun logWarning(text: String, throwable: Throwable)
+
     /** log information in error mode */
     fun logError(text: String)
 

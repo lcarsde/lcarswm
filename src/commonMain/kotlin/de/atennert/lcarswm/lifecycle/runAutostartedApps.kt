@@ -6,6 +6,7 @@ import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.file.DirectoryFactory
 import de.atennert.lcarswm.file.Files
+import de.atennert.lcarswm.log.Logger
 
 /**
  * Get the users (if available) or default autostart file path.
@@ -41,10 +42,14 @@ private fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory
 /**
  * Read the data from *.desktop file, check if we can/should autostart it and do so.
  */
-private fun Iterable<String>.checkAndExecute(files: Files, commander: Commander) {
-    this.map { path ->
-        // TODO secure against crash
-        Autostart().apply { files.readLines(path) { line -> this.readLine(line) } }
+private fun Iterable<String>.checkAndExecute(files: Files, commander: Commander, logger: Logger) {
+    this.mapNotNull { path ->
+        try {
+            Autostart().apply { files.readLines(path) { line -> this.readLine(line) } }
+        } catch (e: Error) {
+            logger.logWarning("::checkAndExecute::error loading application data: $path", e)
+            null
+        }
     }
         .filterNot { it.hidden || it.excludeByShow }
         .forEach { it.exec?.let { exec -> commander.run(exec) } }
@@ -53,7 +58,7 @@ private fun Iterable<String>.checkAndExecute(files: Files, commander: Commander)
 /**
  * Encapsulates the data from an autostart desktop file.
  */
-private class Autostart() {
+private class Autostart {
     var hidden = false
         private set
     var excludeByShow = false
@@ -82,7 +87,7 @@ private class Autostart() {
 /**
  * Start all the apps / run the commands from the users or default autostart file.
  */
-fun runAutostartApps(environment: Environment, dirFactory: DirectoryFactory, commander: Commander, files: Files) {
+fun runAutostartApps(environment: Environment, dirFactory: DirectoryFactory, commander: Commander, files: Files, logger: Logger) {
     getAutostartFile(environment, files)?.let { path ->
         files.readLines(path) { commander.run(it) }
     }
@@ -96,11 +101,11 @@ fun runAutostartApps(environment: Environment, dirFactory: DirectoryFactory, com
         ?.let { readDesktopFiles(it, dirFactory) }
         ?.also { localApps = it }
         ?.map { "$localAutostart/$it" }
-        ?.checkAndExecute(files, commander)
+        ?.checkAndExecute(files, commander, logger)
 
     readDesktopFiles(globalAutostart, dirFactory)
         // local definitions override global definitions
         .filterNot { localApps.contains(it) }
         .map { "$globalAutostart/$it" }
-        .checkAndExecute(files, commander)
+        .checkAndExecute(files, commander, logger)
 }

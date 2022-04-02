@@ -6,6 +6,7 @@ import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.file.Directory
 import de.atennert.lcarswm.file.DirectoryFactory
 import de.atennert.lcarswm.file.Files
+import de.atennert.lcarswm.log.PrintLogger
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertTrue
@@ -65,7 +66,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(FakeEnvironment(), fakeFactory, commander, FakeFiles(listOf(), lines))
+        runAutostartApps(FakeEnvironment(), fakeFactory, commander, FakeFiles(listOf(), lines), PrintLogger())
 
         assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
     }
@@ -82,7 +83,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(FakeEnvironment(), fakeFactory, commander, FakeFiles(listOf(), lines))
+        runAutostartApps(FakeEnvironment(), fakeFactory, commander, FakeFiles(listOf(), lines), PrintLogger())
 
         assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
     }
@@ -95,7 +96,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(FakeEnvironment(), createFakeDirectoryFactory(), commander, FakeFiles(listOf("/home/me/config/lcarsde/autostart"), lines))
+        runAutostartApps(FakeEnvironment(), createFakeDirectoryFactory(), commander, FakeFiles(listOf("/home/me/config/lcarsde/autostart"), lines), PrintLogger())
 
         assertContains(commander.calls, listOf("myapp1"))
         assertContains(commander.calls, listOf("myapp2", "--arg1", "-v", "42"))
@@ -109,7 +110,7 @@ class RunAutostartAppsTest {
 
         val commander = FakeCommander()
 
-        runAutostartApps(FakeEnvironment(), createFakeDirectoryFactory(), commander, FakeFiles(listOf("/etc/lcarsde/autostart"), lines))
+        runAutostartApps(FakeEnvironment(), createFakeDirectoryFactory(), commander, FakeFiles(listOf("/etc/lcarsde/autostart"), lines), PrintLogger())
 
         assertContains(commander.calls, listOf("myapp1"))
         assertContains(commander.calls, listOf("myapp2", "--arg1", "-v", "42"))
@@ -119,7 +120,7 @@ class RunAutostartAppsTest {
     fun `handle unavailable autostart file`() {
         val commander = FakeCommander()
 
-        runAutostartApps(FakeEnvironment(), createFakeDirectoryFactory(), commander, FakeFiles(listOf(), mapOf()))
+        runAutostartApps(FakeEnvironment(), createFakeDirectoryFactory(), commander, FakeFiles(listOf(), mapOf()), PrintLogger())
 
         assertTrue(commander.calls.isEmpty())
     }

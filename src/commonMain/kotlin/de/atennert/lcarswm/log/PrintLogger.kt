@@ -13,6 +13,10 @@ class PrintLogger : Logger {
         writeLog("WARN", text)
     }
 
+    override fun logWarning(text: String, throwable: Throwable) {
+        writeLog("WARN", "$text: ${throwable.message}")
+    }
+
     override fun logError(text: String) {
         writeLog("ERROR", text)
     }

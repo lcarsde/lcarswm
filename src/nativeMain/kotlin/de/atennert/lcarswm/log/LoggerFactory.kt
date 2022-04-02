@@ -21,6 +21,10 @@ fun createLogger(posixApi: PosixApi, logFilePath: String?): Logger {
             internalLogger.forEach { it.logWarning(text) }
         }
 
+        override fun logWarning(text: String, throwable: Throwable) {
+            internalLogger.forEach { it.logWarning(text, throwable) }
+        }
+
         override fun logError(text: String) {
             internalLogger.forEach { it.logError(text) }
         }
