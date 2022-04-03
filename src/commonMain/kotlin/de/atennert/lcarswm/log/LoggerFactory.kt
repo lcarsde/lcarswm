@@ -1,11 +1,12 @@
 package de.atennert.lcarswm.log
 
-import de.atennert.lcarswm.system.api.PosixApi
+import de.atennert.lcarswm.file.FileFactory
+import de.atennert.lcarswm.time.Time
 
-fun createLogger(posixApi: PosixApi, logFilePath: String?): Logger {
+fun createLogger(fileFactory: FileFactory, logFilePath: String?, time: Time): Logger {
     return object : Logger {
         val internalLogger = setOfNotNull(
-            logFilePath?.let { FileLogger(posixApi, logFilePath) },
+            logFilePath?.let { FileLogger(fileFactory, logFilePath, time) },
             PrintLogger()
         )
 

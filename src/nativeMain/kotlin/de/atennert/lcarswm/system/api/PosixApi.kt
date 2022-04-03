@@ -12,14 +12,6 @@ import platform.posix.*
  * Interface for accessing POSIX functions
  */
 interface PosixApi {
-    fun fopen(fileName: String, modes: String): CPointer<FILE>?
-
-    fun fputs(s: String, file: CPointer<FILE>): Int
-
-    fun fclose(file: CPointer<FILE>): Int
-
-    fun gettimeofday(): Long
-
     fun usleep(time: UInt)
 
     fun abort()

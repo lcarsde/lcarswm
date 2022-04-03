@@ -1,16 +1,16 @@
 package de.atennert.lcarswm.log
 
+import de.atennert.lcarswm.file.AccessMode
+import de.atennert.lcarswm.file.File
+import de.atennert.lcarswm.file.FileFactory
 import de.atennert.lcarswm.lifecycle.closeWith
-import de.atennert.lcarswm.system.api.PosixApi
-import kotlinx.cinterop.CPointer
-import platform.posix.FILE
+import de.atennert.lcarswm.time.Time
 
 /**
  * Logger that logs into a file at the given path.
  */
-class FileLogger(private val posixApi: PosixApi, logFilePath: String) : Logger {
-    private val file: CPointer<FILE> = posixApi.fopen(logFilePath, "w")
-        ?: error("FileLogger::init::unable to get the log file $logFilePath")
+class FileLogger(fileFactory: FileFactory, logFilePath: String, val time: Time) : Logger {
+    private val file: File = fileFactory.getFile(logFilePath, AccessMode.WRITE)
 
     init {
         closeWith(FileLogger::close)
@@ -41,11 +41,11 @@ class FileLogger(private val posixApi: PosixApi, logFilePath: String) : Logger {
     }
 
     private fun writeLog(prefix: String, text: String) {
-        posixApi.fputs("${posixApi.gettimeofday()} - $prefix: $text\n", file)
+        file.writeLine("${time.getTime("%Y-%m-%d %H:%M:%S")} - $prefix: $text")
     }
 
     private fun close() {
         logInfo("FileLogger::close::lcarswm stopped $this")
-        posixApi.fclose(file)
+        file.close()
     }
 }

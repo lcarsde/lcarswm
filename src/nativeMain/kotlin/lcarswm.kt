@@ -7,6 +7,7 @@ import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.log.createLogger
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.SystemApi
+import de.atennert.lcarswm.time.PosixTime
 import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.toKString
 import kotlinx.coroutines.coroutineScope
@@ -27,8 +28,8 @@ val exitState = atomic<Int?>(null)
 fun main() = runBlocking {
     val system = SystemFacade()
     val cacheDirPath = getenv(HOME_CACHE_DIR_PROPERTY)?.toKString()?.plus(LOG_FILE_PATH)
-    val logger = createLogger(system, cacheDirPath)
     val resourceGenerator = PosixResourceGenerator()
+    val logger = createLogger(resourceGenerator.createFileFactory(), cacheDirPath, PosixTime())
 
     runWindowManager(system, logger, resourceGenerator)
 
@@ -53,7 +54,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger, resourceGenerato
         try {
             runAutostartApps(
                 rr.platform.environment,
-                rr.platform.dirFactory,
+                rr.platform.fileFactory,
                 rr.platform.commander,
                 rr.platform.files,
                 logger

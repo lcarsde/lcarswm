@@ -2,7 +2,7 @@ import de.atennert.lcarswm.HOME_CACHE_DIR_PROPERTY
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.ResourceGenerator
 import de.atennert.lcarswm.environment.Environment
-import de.atennert.lcarswm.file.Files
+import de.atennert.lcarswm.file.*
 import de.atennert.lcarswm.lifecycle.ROOT_WINDOW_MASK
 import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.log.LoggerMock
@@ -34,6 +34,16 @@ class ShutdownTest {
                 override fun exists(path: String): Boolean = true
 
                 override fun readLines(path: String, consumer: (String) -> Unit) {}
+            }
+        }
+
+        override fun createFileFactory(): FileFactory {
+            return object : FileFactory {
+                override fun getDirectory(path: String): Directory? = null
+
+                override fun getFile(path: String, accessMode: AccessMode): File {
+                    throw NotImplementedError()
+                }
             }
         }
     }

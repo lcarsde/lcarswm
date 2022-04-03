@@ -7,12 +7,10 @@ import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import platform.linux.*
 import platform.posix.*
-import platform.posix.FILE
 import platform.posix.mode_t
 import platform.posix.sigaction
 import platform.posix.sigset_t
 import platform.posix.ssize_t
-import platform.posix.timeval
 import xlib.*
 
 /**
@@ -249,27 +247,6 @@ class SystemFacade : SystemApi {
 
     override fun destroyWindow(window: Window): Int {
         return XDestroyWindow(display, window)
-    }
-
-    override fun fopen(fileName: String, modes: String): CPointer<FILE>? {
-        return platform.posix.fopen(fileName, modes)
-    }
-
-    override fun fputs(s: String, file: CPointer<FILE>): Int {
-        return platform.posix.fputs(s, file)
-    }
-
-    override fun fclose(file: CPointer<FILE>): Int {
-        platform.posix.fflush(file)
-        return platform.posix.fclose(file)
-    }
-
-    override fun gettimeofday(): Long {
-        val timeStruct = nativeHeap.alloc<timeval>()
-        platform.posix.gettimeofday(timeStruct.ptr, null)
-        val time = timeStruct.tv_sec
-        nativeHeap.free(timeStruct)
-        return time
     }
 
     override fun usleep(time: UInt) {

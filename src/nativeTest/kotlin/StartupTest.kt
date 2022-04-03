@@ -1,7 +1,7 @@
 import de.atennert.lcarswm.ResourceGenerator
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.environment.Environment
-import de.atennert.lcarswm.file.Files
+import de.atennert.lcarswm.file.*
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.FunctionCall
@@ -36,6 +36,16 @@ class StartupTest {
                 override fun exists(path: String): Boolean = true
 
                 override fun readLines(path: String, consumer: (String) -> Unit) {}
+            }
+        }
+
+        override fun createFileFactory(): FileFactory {
+            return object : FileFactory {
+                override fun getDirectory(path: String): Directory? = null
+
+                override fun getFile(path: String, accessMode: AccessMode): File {
+                    throw NotImplementedError()
+                }
             }
         }
     }

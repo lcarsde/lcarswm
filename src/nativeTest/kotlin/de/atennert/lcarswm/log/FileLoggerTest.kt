@@ -1,23 +1,49 @@
 package de.atennert.lcarswm.log
 
+import de.atennert.lcarswm.file.AccessMode
+import de.atennert.lcarswm.file.Directory
+import de.atennert.lcarswm.file.File
+import de.atennert.lcarswm.file.FileFactory
 import de.atennert.lcarswm.lifecycle.closeClosables
-import de.atennert.lcarswm.system.SystemFacadeMock
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.nativeHeap
-import kotlinx.cinterop.ptr
-import platform.posix.FILE
-import kotlin.test.*
+import de.atennert.lcarswm.time.Time
+import kotlin.test.AfterTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class FileLoggerTest {
     private val filePath = "/this/is/my/logfile.log"
-    private lateinit var filePointer: CPointer<FILE>
-    private lateinit var posixApi: PosixApiMock
 
-    @BeforeTest
-    fun setup() {
-        this.filePointer = nativeHeap.alloc<FILE>().ptr
-        this.posixApi = PosixApiMock(filePointer)
+    class FakeTime : Time {
+        override fun getTime(format: String): String = "0"
+    }
+
+    class FakeFile(val path: String, val accessMode: AccessMode) : File {
+        var closed = false
+        var text = ""
+
+        override fun write(text: String) {
+            this.text = text
+        }
+
+        override fun writeLine(text: String) {
+            this.text = text + "\n"
+        }
+
+        override fun close() {
+            closed = true
+        }
+    }
+
+    class FakeFileFactory : FileFactory {
+        val openedFiles = mutableListOf<FakeFile>()
+
+        override fun getFile(path: String, accessMode: AccessMode): File {
+            return FakeFile(path, accessMode)
+                .also { openedFiles.add(it) }
+        }
+
+        override fun getDirectory(path: String): Directory? = null
     }
 
     @AfterTest
@@ -27,56 +53,71 @@ class FileLoggerTest {
 
     @Test
     fun `open and close file logger`() {
-        FileLogger(this.posixApi, this.filePath)
-        assertEquals(this.filePath, this.posixApi.fopenFileName, "handed in file path not used")
-        assertEquals("w", this.posixApi.fopenMode, "not using log file for write only")
+        val fileFactory = FakeFileFactory()
+        FileLogger(fileFactory, this.filePath, FakeTime())
+        assertEquals(this.filePath, fileFactory.openedFiles[0].path, "handed in file path not used")
+        assertEquals(AccessMode.WRITE, fileFactory.openedFiles[0].accessMode, "not using log file for write only")
 
         closeClosables()
-        assertEquals(this.filePointer, this.posixApi.fcloseFile, "closed other file then opened")
+        assertTrue(fileFactory.openedFiles[0].closed, "closed other file then opened")
     }
 
     @Test
     fun `log debug info to file`() {
         val text = "this is my text"
 
-        val fileLogger = FileLogger(this.posixApi, this.filePath)
+        val fileFactory = FakeFileFactory()
+        val fileLogger = FileLogger(fileFactory, this.filePath, FakeTime())
 
         fileLogger.logDebug(text)
-        assertEquals("0 - DEBUG: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
-        assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
+        assertEquals("0 - DEBUG: $text\n", fileFactory.openedFiles[0].text, "the written text doesn't fit (maybe missing \\n?)")
     }
 
     @Test
     fun `log info to file`() {
         val text = "this is my text"
 
-        val fileLogger = FileLogger(this.posixApi, this.filePath)
+        val fileFactory = FakeFileFactory()
+        val fileLogger = FileLogger(fileFactory, this.filePath, FakeTime())
 
         fileLogger.logInfo(text)
-        assertEquals("0 -  INFO: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
-        assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
+        assertEquals("0 -  INFO: $text\n", fileFactory.openedFiles[0].text, "the written text doesn't fit (maybe missing \\n?)")
     }
 
     @Test
     fun `log warning to file`() {
         val text = "this is my warning"
 
-        val fileLogger = FileLogger(this.posixApi, this.filePath)
+        val fileFactory = FakeFileFactory()
+        val fileLogger = FileLogger(fileFactory, this.filePath, FakeTime())
 
         fileLogger.logWarning(text)
-        assertEquals("0 -  WARN: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
-        assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
+        assertEquals("0 -  WARN: $text\n", fileFactory.openedFiles[0].text, "the written text doesn't fit (maybe missing \\n?)")
+    }
+
+    @Test
+    fun `log warning with throwable to file`() {
+        val text = "this is my warning"
+        val errorMessage = "some error message"
+        val throwable = Throwable(errorMessage)
+
+        val fileFactory = FakeFileFactory()
+        val fileLogger = FileLogger(fileFactory, this.filePath, FakeTime())
+
+        fileLogger.logWarning(text, throwable)
+        assertTrue(fileFactory.openedFiles[0].text.startsWith("0 -  WARN: $text: $errorMessage\n"),
+            "the written text doesn't fit (maybe missing \\n?):\n${fileFactory.openedFiles[0].text}")
     }
 
     @Test
     fun `log error to file`() {
         val text = "this is my error"
 
-        val fileLogger = FileLogger(this.posixApi, this.filePath)
+        val fileFactory = FakeFileFactory()
+        val fileLogger = FileLogger(fileFactory, this.filePath, FakeTime())
 
         fileLogger.logError(text)
-        assertEquals("0 - ERROR: $text\n", this.posixApi.fputsText, "the written text doesn't fit (maybe missing \\n?)")
-        assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
+        assertEquals("0 - ERROR: $text\n", fileFactory.openedFiles[0].text, "the written text doesn't fit (maybe missing \\n?)")
     }
 
     @Test
@@ -85,39 +126,11 @@ class FileLoggerTest {
         val errorMessage = "some error message"
         val throwable = Throwable(errorMessage)
 
-        val fileLogger = FileLogger(this.posixApi, this.filePath)
+        val fileFactory = FakeFileFactory()
+        val fileLogger = FileLogger(fileFactory, this.filePath, FakeTime())
 
         fileLogger.logError(text, throwable)
-        assertTrue(this.posixApi.fputsText!!.startsWith("0 - ERROR: $text: $errorMessage\n"),
-            "the written text doesn't fit (maybe missing \\n?):\n${this.posixApi.fputsText}")
-        assertEquals(this.filePointer, this.posixApi.fputsFile, "doesn't write output to given file")
-    }
-
-    private class PosixApiMock(val filePointer: CPointer<FILE>) : SystemFacadeMock() {
-        var fopenFileName: String? = null
-        var fopenMode: String? = null
-
-        var fcloseFile: CPointer<FILE>? = null
-
-        var fputsText: String? = null
-        var fputsFile: CPointer<FILE>? = null
-
-        override fun fopen(fileName: String, modes: String): CPointer<FILE>? {
-            this.fopenFileName = fileName
-            this.fopenMode = modes
-            return this.filePointer
-        }
-
-        override fun fclose(file: CPointer<FILE>): Int {
-            this.fcloseFile = file
-            nativeHeap.free(file.rawValue)
-            return 0
-        }
-
-        override fun fputs(s: String, file: CPointer<FILE>): Int {
-            this.fputsText = s
-            this.fputsFile = file
-            return 0
-        }
+        assertTrue(fileFactory.openedFiles[0].text.startsWith("0 - ERROR: $text: $errorMessage\n"),
+            "the written text doesn't fit (maybe missing \\n?):\n${fileFactory.openedFiles[0].text}")
     }
 }

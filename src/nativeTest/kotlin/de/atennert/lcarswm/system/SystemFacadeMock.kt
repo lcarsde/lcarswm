@@ -5,7 +5,6 @@ import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
 import platform.linux.mq_attr
 import platform.linux.mqd_t
-import platform.posix.FILE
 import platform.posix.mode_t
 import platform.posix.sigaction
 import platform.posix.sigset_t
@@ -13,7 +12,6 @@ import platform.posix.size_t
 import platform.posix.ssize_t
 import xlib.*
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 open class SystemFacadeMock : SystemApi {
     val functionCalls = mutableListOf<FunctionCall>()
@@ -626,35 +624,6 @@ open class SystemFacadeMock : SystemApi {
 
     override fun xFree(xObject: CPointer<*>?) {
         functionCalls.add(FunctionCall("xFree", xObject))
-    }
-
-    private val fileMap = mutableMapOf<CPointer<FILE>, MutableList<String>>()
-
-    override fun fopen(fileName: String, modes: String): CPointer<FILE>? {
-        functionCalls.add(FunctionCall("fopen", fileName, modes))
-        val newFilePointer = nativeHeap.alloc<FILE>()
-        fileMap[newFilePointer.ptr] = getLines(fileName).toMutableList()
-        return newFilePointer.ptr
-    }
-
-    open fun getLines(fileName: String): List<String> = emptyList()
-
-    override fun fputs(s: String, file: CPointer<FILE>): Int {
-        // Only used for logging, which we usually don't want to check
-        return 0
-    }
-
-    override fun fclose(file: CPointer<FILE>): Int {
-        functionCalls.add(FunctionCall("fclose", file))
-        assertTrue(fileMap.contains(file))
-        fileMap.remove(file)
-        nativeHeap.free(file)
-        return 0
-    }
-
-    override fun gettimeofday(): Long {
-        functionCalls.add(FunctionCall("gettimeofday"))
-        return 0
     }
 
     override fun usleep(time: UInt) {

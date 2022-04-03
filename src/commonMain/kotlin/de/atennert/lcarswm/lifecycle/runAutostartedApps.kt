@@ -4,7 +4,7 @@ import de.atennert.lcarswm.AUTOSTART_FILE
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.environment.Environment
-import de.atennert.lcarswm.file.DirectoryFactory
+import de.atennert.lcarswm.file.FileFactory
 import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.log.Logger
 
@@ -28,7 +28,7 @@ private fun getAutostartFile(environment: Environment, files: Files): String? {
 /**
  * Read the *.desktop file names from the directory.
  */
-private fun readDesktopFiles(directoryPath: String, dirFactory: DirectoryFactory): List<String> {
+private fun readDesktopFiles(directoryPath: String, dirFactory: FileFactory): List<String> {
     val directory = dirFactory.getDirectory(directoryPath)
         ?: return emptyList()
 
@@ -87,7 +87,7 @@ private class Autostart {
 /**
  * Start all the apps / run the commands from the users or default autostart file.
  */
-fun runAutostartApps(environment: Environment, dirFactory: DirectoryFactory, commander: Commander, files: Files, logger: Logger) {
+fun runAutostartApps(environment: Environment, dirFactory: FileFactory, commander: Commander, files: Files, logger: Logger) {
     getAutostartFile(environment, files)?.let { path ->
         files.readLines(path) { commander.run(it) }
     }

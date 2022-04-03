@@ -3,6 +3,8 @@ package de.atennert.lcarswm.file
 /**
  * Used to get instances of Directory.
  */
-interface DirectoryFactory {
+interface FileFactory {
     fun getDirectory(path: String): Directory?
+
+    fun getFile(path: String, accessMode: AccessMode): File
 }
