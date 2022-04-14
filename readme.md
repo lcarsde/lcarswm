@@ -37,6 +37,7 @@ Thank you very much to the creators of the following resources:
 * Windows are resized when the screen resolution is changed and the size depends on the window manager mode.
 * Windows are always opened on the primary monitor
 * If a monitor is removed, it's windows are moved to the primary monitor
+* Autostart applications from *.desktop files in `/etc/xdg/autostart/` and `~/.config/autostart/`
 * The settings file contains key handling and general settings per user and is created as `~/.config/lcarswm/settings.xml` if it doesn't exist and can be edited afterwards
   * Key handling
     * Windows + Q closes the window manager
