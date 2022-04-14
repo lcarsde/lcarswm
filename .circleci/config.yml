@@ -61,6 +61,8 @@ jobs:
 
       # get deployment files for lcarswm
       - run: git clone ssh://aur@aur.archlinux.org/lcarswm.git
+      - run: cd lcarswm && git config user.email "$AUR_GIT_EMAIL"
+      - run: cd lcarswm && git config user.name "$AUR_GIT_NAME"
 
       # log the current contents
       - run: cat lcarswm/PKGBUILD
