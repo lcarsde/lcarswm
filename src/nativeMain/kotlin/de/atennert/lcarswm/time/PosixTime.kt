@@ -11,7 +11,7 @@ class PosixTime : Time {
         platform.posix.gettimeofday(timeStruct.ptr, null)
         val timeSeconds = timeStruct.tv_sec
         nativeHeap.free(timeStruct)
-        val timeInfo = localtime(timeSeconds.toCPointer())
+        val timeInfo = localtime(cValuesOf(timeSeconds))
 
         return if (timeInfo != null) {
             val timeString = ByteArray(64)
@@ -21,7 +21,6 @@ class PosixTime : Time {
                     }
                 }
                 .toKString()
-            nativeHeap.free(timeInfo)
             timeString
         } else {
             "[unknown time]"

@@ -52,6 +52,7 @@ private fun Iterable<String>.checkAndExecute(files: Files, commander: Commander,
         }
     }
         .filterNot { it.hidden || it.excludeByShow }
+        .onEach { logger.logDebug("run ${it.exec}") }
         .forEach { it.exec?.let { exec -> commander.run(exec) } }
 }
 
@@ -89,7 +90,10 @@ private class Autostart {
  */
 fun runAutostartApps(environment: Environment, dirFactory: FileFactory, commander: Commander, files: Files, logger: Logger) {
     getAutostartFile(environment, files)?.let { path ->
-        files.readLines(path) { commander.run(it) }
+        files.readLines(path) {
+            logger.logDebug("starting $it")
+            commander.run(it)
+        }
     }
 
     var localApps = emptyList<String>()
