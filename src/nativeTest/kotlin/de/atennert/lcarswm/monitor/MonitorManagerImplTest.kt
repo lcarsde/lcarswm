@@ -36,7 +36,7 @@ class MonitorManagerImplTest {
     }
 
     @Test
-    fun `check the first monitor becomes primary, if there's no primary`() {
+    fun `check the first monitor becomes primary if there's no primary`() {
         val systemApi = object : SystemFacadeMock() {
             override fun rGetOutputPrimary(window: Window): RROutput = 0.convert()
         }
