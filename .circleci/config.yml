@@ -70,6 +70,7 @@ jobs:
 
       # update content
       - run: cd lcarswm && sed -i -e "s/^pkgver=[0-9\.]*$/pkgver=$CIRCLE_TAG/" PKGBUILD
+      - run: cd lcarswm && sed -i -e "s/^pkgrel=[0-9]*$/pkgrel=1/" PKGBUILD
       - run: cd lcarswm && updpkgsums
       - run: cd lcarswm && makepkg --printsrcinfo > .SRCINFO
 
