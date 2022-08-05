@@ -50,7 +50,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     wmDetected = false
     if (!system.openDisplay()) {
-        logger.logError("::runWindowManager::got no display")
+        logger.logError("::startup::got no display")
         return null
     }
     system.closeWith { closeDisplay() }
@@ -73,7 +73,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     val screen = system.defaultScreenOfDisplay()?.pointed
     if (screen == null) {
-        logger.logError("::runWindowManager::got no screen")
+        logger.logError("::startup::got no screen")
         return null
     }
 
@@ -92,7 +92,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
     val eventTime = EventTime(system, eventBuffer, atomLibrary, rootWindowPropertyHandler)
 
     if (!rootWindowPropertyHandler.becomeScreenOwner(eventTime)) {
-        logger.logError("::runWindowManager::Detected another active window manager")
+        logger.logError("::startup::Detected another active window manager")
         return null
     }
 
@@ -104,12 +104,12 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
     system.sync(false)
 
     if (wmDetected) {
-        logger.logError("::runWindowManager::Detected another active window manager")
+        logger.logError("::startup::Detected another active window manager")
         return null
     }
     system.closeWith { selectInput(screen.root, NoEventMask) }
 
-    system.setErrorHandler(staticCFunction { _, err -> staticLogger?.logError("::runWindowManager::error code: ${err?.pointed?.error_code}"); 0 })
+    system.setErrorHandler(staticCFunction { _, err -> staticLogger?.logError("::startup::error code: ${err?.pointed?.error_code}"); 0 })
 
     system.defineCursor(screen.root, system.createFontCursor(XC_left_ptr))
 
@@ -121,11 +121,11 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     val settings = loadSettings(logger, system, files, environment)
     if (settings == null) {
-        logger.logError("::runWindowManager::unable to load settings")
+        logger.logError("::startup::unable to load settings")
         return null
     }
 
-    logger.logDebug("::runWindowManager::Screen size: ${screen.width}/${screen.height}, root: ${screen.root}")
+    logger.logDebug("::startup::Screen size: ${screen.width}/${screen.height}, root: ${screen.root}")
 
     val monitorManager = MonitorManagerImpl(system, screen.root)
 
