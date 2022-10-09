@@ -6,18 +6,6 @@ import kotlinx.cinterop.*
 import xlib.*
 
 class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
-    private val colors = listOf(
-        Triple(0, 0, 0), // black
-        Triple(0xFFFF, 0x9999, 0), // yellow
-        Triple(0xCCCC, 0x9999, 0xCCCC), // orchid
-        Triple(0x9999, 0x9999, 0xCCCC), // dampened purple
-        Triple(0xCCCC, 0x6666, 0x6666), // dark red
-        Triple(0xFFFF, 0xCCCC, 0x9999), // sand
-        Triple(0x9999, 0x9999, 0xFFFF), // bright purple
-        Triple(0xFFFF, 0x9999, 0x6666), // orange
-        Triple(0xCCCC, 0x6666, 0x9999)  // dark pink
-    )
-
     val colorMapId = drawApi.createColormap(screen.root, screen.root_visual!!, AllocNone)
 
     private val knownColors = mutableMapOf<Color, ULong>()
