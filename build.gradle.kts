@@ -1,7 +1,7 @@
 import java.io.ByteArrayOutputStream
 
 plugins {
-    kotlin("multiplatform") version "1.6.20"
+    kotlin("multiplatform") version "1.7.20"
 }
 
 group "de.atennert"
@@ -63,6 +63,6 @@ kotlin {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "6.5.1"
+    gradleVersion = "7.1.1"
     distributionType = Wrapper.DistributionType.ALL
 }
