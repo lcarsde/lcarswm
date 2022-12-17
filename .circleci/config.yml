@@ -83,7 +83,7 @@ jobs:
 
   deploy_ubuntu:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current-22.04
 
     working_directory: ~/repo
 
