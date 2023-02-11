@@ -2,5 +2,6 @@
 Name=lcarswm
 Comment=lcarswm - Window management in LCARS design
 Exec=/usr/bin/startlcarswm
-# Icon=
+Icon=
 Type=Application
+DesktopNames=lcarswm
