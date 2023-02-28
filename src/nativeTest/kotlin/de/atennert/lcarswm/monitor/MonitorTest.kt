@@ -113,7 +113,7 @@ class MonitorTest {
         val defaultMeasurements = monitor.getWindowMeasurements()
 
         val x = SIDE_BAR_WIDTH + BAR_GAP_SIZE + BAR_END_WIDTH + BAR_GAP_SIZE
-        val width = monitor.width - x - BAR_GAP_SIZE - BAR_END_WIDTH
+        val width = monitor.width - x
         assertEquals(WindowMeasurements(x, 240, width, 312, 360), defaultMeasurements)
     }
 
@@ -127,7 +127,7 @@ class MonitorTest {
 
         val defaultMeasurements = monitor.getWindowMeasurements()
 
-        assertEquals(WindowMeasurements(40, 48, 720, 504, 552), defaultMeasurements)
+        assertEquals(WindowMeasurements(0, 48, 800, 504, 552), defaultMeasurements)
     }
 
     @Test

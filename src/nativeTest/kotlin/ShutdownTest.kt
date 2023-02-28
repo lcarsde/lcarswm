@@ -20,7 +20,7 @@ class ShutdownTest {
     private class FakeResourceGenerator : ResourceGenerator {
         override fun createEnvironment(): Environment {
             return object : Environment {
-                override fun get(name: String): String? = when(name) {
+                override fun get(name: String): String = when(name) {
                     HOME_CONFIG_DIR_PROPERTY -> "/home/me"
                     HOME_CACHE_DIR_PROPERTY -> "/home/me"
                     else -> error("getenv with unsimulated key: $name")
@@ -85,7 +85,7 @@ class ShutdownTest {
                 return null
             }
 
-            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+            override fun getModifierMapping(): CPointer<XModifierKeymap> {
                 modifierKeymapRef = super.getModifierMapping()!!
                 return modifierKeymapRef
             }
@@ -94,7 +94,7 @@ class ShutdownTest {
                 firstKeyCode: KeyCode,
                 keyCodeCount: Int,
                 keySymsPerKeyCode: CPointer<IntVar>
-            ): CPointer<KeySymVar>? {
+            ): CPointer<KeySymVar> {
                 keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
                 return keymapRef
             }
@@ -154,7 +154,7 @@ class ShutdownTest {
 
             override fun usleep(time: UInt) {}
 
-            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+            override fun getModifierMapping(): CPointer<XModifierKeymap> {
                 modifierKeymapRef = super.getModifierMapping()!!
                 return modifierKeymapRef
             }
@@ -163,7 +163,7 @@ class ShutdownTest {
                 firstKeyCode: KeyCode,
                 keyCodeCount: Int,
                 keySymsPerKeyCode: CPointer<IntVar>
-            ): CPointer<KeySymVar>? {
+            ): CPointer<KeySymVar> {
                 keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
                 return keymapRef
             }
@@ -223,7 +223,7 @@ class ShutdownTest {
                 return Success
             }
 
-            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+            override fun getModifierMapping(): CPointer<XModifierKeymap> {
                 modifierKeymapRef = super.getModifierMapping()!!
                 return modifierKeymapRef
             }
@@ -232,7 +232,7 @@ class ShutdownTest {
                 firstKeyCode: KeyCode,
                 keyCodeCount: Int,
                 keySymsPerKeyCode: CPointer<IntVar>
-            ): CPointer<KeySymVar>? {
+            ): CPointer<KeySymVar> {
                 keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
                 return keymapRef
             }
@@ -290,7 +290,7 @@ class ShutdownTest {
                 return Success
             }
 
-            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+            override fun getModifierMapping(): CPointer<XModifierKeymap> {
                 modifierKeymapRef = super.getModifierMapping()!!
                 return modifierKeymapRef
             }
@@ -299,7 +299,7 @@ class ShutdownTest {
                 firstKeyCode: KeyCode,
                 keyCodeCount: Int,
                 keySymsPerKeyCode: CPointer<IntVar>
-            ): CPointer<KeySymVar>? {
+            ): CPointer<KeySymVar> {
                 keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
                 return keymapRef
             }
@@ -353,7 +353,7 @@ class ShutdownTest {
                 return Success
             }
 
-            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+            override fun getModifierMapping(): CPointer<XModifierKeymap> {
                 modifierKeymapRef = super.getModifierMapping()!!
                 return modifierKeymapRef
             }
@@ -362,7 +362,7 @@ class ShutdownTest {
                 firstKeyCode: KeyCode,
                 keyCodeCount: Int,
                 keySymsPerKeyCode: CPointer<IntVar>
-            ): CPointer<KeySymVar>? {
+            ): CPointer<KeySymVar> {
                 keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
                 return keymapRef
             }
@@ -419,7 +419,7 @@ class ShutdownTest {
                 return Success
             }
 
-            override fun getModifierMapping(): CPointer<XModifierKeymap>? {
+            override fun getModifierMapping(): CPointer<XModifierKeymap> {
                 modifierKeymapRef = super.getModifierMapping()!!
                 return modifierKeymapRef
             }
@@ -428,7 +428,7 @@ class ShutdownTest {
                 firstKeyCode: KeyCode,
                 keyCodeCount: Int,
                 keySymsPerKeyCode: CPointer<IntVar>
-            ): CPointer<KeySymVar>? {
+            ): CPointer<KeySymVar> {
                 keymapRef = super.getKeyboardMapping(firstKeyCode, keyCodeCount, keySymsPerKeyCode)!!
                 return keymapRef
             }
@@ -554,7 +554,7 @@ class ShutdownTest {
 
     private fun checkFreeingOfGraphicsContexts(functionCalls: MutableList<FunctionCall>) {
         println("gcs: ${functionCalls.takeWhile { it.name == "freeGC" }.count()}")
-        repeat(64) {
+        repeat(49) {
             assertEquals(
                 "freeGC",
                 functionCalls.removeAt(0).name,

@@ -111,7 +111,7 @@ class StatusBarHandler(
         return WindowMeasurements(
             monitor.x + NORMAL_WINDOW_LEFT_OFFSET,
             monitor.y + BAR_HEIGHT + BAR_GAP_SIZE,
-            (monitor.width - NORMAL_WINDOW_LEFT_OFFSET - BAR_GAP_SIZE - BAR_END_WIDTH).convert(),
+            (monitor.width - NORMAL_WINDOW_LEFT_OFFSET).convert(),
             (DATA_AREA_HEIGHT).convert(),
             (DATA_AREA_HEIGHT).convert()
         )

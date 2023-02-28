@@ -193,7 +193,7 @@ class ActiveWindowCoordinatorTest {
         monitorManager.screenMode = ScreenMode.MAXIMIZED
         activeWindowCoordinator.realignWindows()
         var measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
-        assertEquals(WindowMeasurements(40, 48, 720, 504, 552), measurments, "")
+        assertEquals(WindowMeasurements(0, 48, 800, 504, 552), measurments, "")
         checkMoveWindow(systemApi.functionCalls, window)
 
         monitorManager.screenMode = ScreenMode.FULLSCREEN
@@ -205,7 +205,7 @@ class ActiveWindowCoordinatorTest {
         monitorManager.screenMode = ScreenMode.NORMAL
         activeWindowCoordinator.realignWindows()
         measurments = activeWindowCoordinator.getWindowMeasurements(window.id)
-        assertEquals(WindowMeasurements(232, 240, 528, 312, 360), measurments, "")
+        assertEquals(WindowMeasurements(232, 240, 568, 312, 360), measurments, "")
         checkMoveWindow(systemApi.functionCalls, window)
     }
 }
