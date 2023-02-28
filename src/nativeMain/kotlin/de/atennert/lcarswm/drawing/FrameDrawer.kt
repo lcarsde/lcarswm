@@ -28,7 +28,7 @@ class FrameDrawer(
     private val inactiveTextColor = colorFactory.createXftColor(COLOR_INACTIVE_TITLE)
     private val maxBarColor = colorFactory.createXftColor(COLOR_MAX_BAR_DOWN)
     private val normalBarColor = colorFactory.createXftColor(COLOR_NORMAL_BAR_DOWN)
-    private val normalCornerDownColor = colorFactory.createXftColor(COLOR_NORMAL_CORNER_4)
+    private val normalCornerDownColor = colorFactory.createXftColor(COLOR_NORMAL_CORNER_3)
     private val backgroundColor = colorFactory.createXftColor(COLOR_BACKGROUND)
     override val colorMap: Colormap
             get() = colorFactory.colorMapId

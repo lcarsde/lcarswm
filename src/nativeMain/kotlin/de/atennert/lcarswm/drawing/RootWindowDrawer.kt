@@ -25,12 +25,12 @@ class RootWindowDrawer(
     private val smallOuterCornerOpacities = getFilledArcOpacities(OUTER_CORNER_RADIUS_SMALL)
     private val innerCornerOpacities = invertOpacities(getFilledArcOpacities(INNER_CORNER_RADIUS))
 
-    private val corner4OuterColors = getArcs(COLOR_NORMAL_CORNER_4, bigOuterCornerOpacities, OUTER_CORNER_RADIUS_BIG, 3)
-    private val corner2OuterColors = getArcs(COLOR_NORMAL_CORNER_2, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 3)
-    private val corner3OuterColors = getArcs(COLOR_NORMAL_CORNER_3, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 2)
-    private val corner4InnerColors = getArcs(COLOR_NORMAL_CORNER_4, innerCornerOpacities, INNER_CORNER_RADIUS, 3)
-    private val corner2InnerColors = getArcs(COLOR_NORMAL_CORNER_2, innerCornerOpacities, INNER_CORNER_RADIUS, 3)
-    private val corner3InnerColors = getArcs(COLOR_NORMAL_CORNER_3, innerCornerOpacities, INNER_CORNER_RADIUS, 2)
+    private val corner1OuterColors = getArcs(COLOR_NORMAL_CORNER_1, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 3)
+    private val corner2OuterColors = getArcs(COLOR_NORMAL_CORNER_2, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 2)
+    private val corner3OuterColors = getArcs(COLOR_NORMAL_CORNER_3, bigOuterCornerOpacities, OUTER_CORNER_RADIUS_BIG, 3)
+    private val corner1InnerColors = getArcs(COLOR_NORMAL_CORNER_1, innerCornerOpacities, INNER_CORNER_RADIUS, 3)
+    private val corner2InnerColors = getArcs(COLOR_NORMAL_CORNER_2, innerCornerOpacities, INNER_CORNER_RADIUS, 2)
+    private val corner3InnerColors = getArcs(COLOR_NORMAL_CORNER_3, innerCornerOpacities, INNER_CORNER_RADIUS, 3)
 
     private fun getArcs(
         baseColor: Color,
@@ -154,27 +154,21 @@ class RootWindowDrawer(
 
         val maxBarDownGC = getGC(COLOR_MAX_BAR_DOWN)
 
-        val bars = nativeHeap.allocArray<XRectangle>(1)
-        // bottom bar
-        bars[0].x = (monitor.x).convert()
-        bars[0].y = (monitor.y + monitor.height - 40).convert()
-        bars[0].width = (monitor.width).convert()
-        bars[0].height = 40.convert()
+        val bottomBar = nativeHeap.alloc<XRectangle>()
+        bottomBar.x = (monitor.x).convert()
+        bottomBar.y = (monitor.y + monitor.height - 40).convert()
+        bottomBar.width = (monitor.width).convert()
+        bottomBar.height = 40.convert()
 
-        drawApi.fillRectangle(
-            pixmap,
-            maxBarDownGC,
-            bars[0].x.toInt(),
-            bars[0].y.toInt(),
-            bars[0].width.convert(),
-            bars[0].height.convert()
-        )
+        drawApi.fillRectangles(pixmap, maxBarDownGC, bottomBar.ptr, 1)
 
         if (logoImage != null) {
             drawLogo(pixmap, monitor.x + monitor.width - 8 - logoImage.pointed.width, monitor.y)
         } else {
             drawLogoTextBack(pixmap, monitor.x + 290, monitor.y, monitor.width - 300)
         }
+
+        nativeHeap.free(bottomBar)
     }
 
     private fun drawNormalFrame(monitor: Monitor, pixmap: Pixmap) {
@@ -187,16 +181,15 @@ class RootWindowDrawer(
         val middleBar2GC = getGC(COLOR_NORMAL_BAR_MIDDLE_2)
         val middleBar3GC = getGC(COLOR_NORMAL_BAR_MIDDLE_3)
         val middleBar4GC = getGC(COLOR_NORMAL_BAR_MIDDLE_4)
+        val corner1GC = getGC(COLOR_NORMAL_CORNER_1)
         val corner2GC = getGC(COLOR_NORMAL_CORNER_2)
         val corner3GC = getGC(COLOR_NORMAL_CORNER_3)
-        val corner4GC = getGC(COLOR_NORMAL_CORNER_4)
 
-        val bigBars = nativeHeap.allocArray<XRectangle>(1)
-        // bottom bar
-        bigBars[0].x = (monitor.x + 320).convert()
-        bigBars[0].y = (monitor.y + monitor.height - 40).convert()
-        bigBars[0].width = (monitor.width - 320).convert()
-        bigBars[0].height = 40.convert()
+        val bottomBar = nativeHeap.alloc<XRectangle>()
+        bottomBar.x = (monitor.x + 320).convert()
+        bottomBar.y = (monitor.y + monitor.height - 40).convert()
+        bottomBar.width = (monitor.width - 320).convert()
+        bottomBar.height = 40.convert()
 
         val middleBars = nativeHeap.allocArray<XRectangle>(4)
         val middleSegmentWidth = (monitor.width - 240) / 8
@@ -264,11 +257,10 @@ class RootWindowDrawer(
         cornerRects[5].y =
             (monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL).convert()
 
-        // bottom bar
-        drawApi.fillRectangles(pixmap, barDownGC, bigBars[0].ptr, 1)
+        drawApi.fillRectangles(pixmap, barDownGC, bottomBar.ptr, 1)
 
         // middle bars
-        drawApi.fillRectangles(pixmap, middleBar1GC, middleBars[0].ptr, 1)
+        drawApi.fillRectangles(pixmap, middleBar1GC, middleBars[0].ptr, 4)
         drawApi.fillRectangles(pixmap, middleBar2GC, middleBars[1].ptr, 1)
         drawApi.fillRectangles(pixmap, middleBar3GC, middleBars[2].ptr, 1)
         drawApi.fillRectangles(pixmap, middleBar4GC, middleBars[3].ptr, 1)
@@ -278,45 +270,45 @@ class RootWindowDrawer(
         drawApi.fillRectangles(pixmap, sideBarDownGC, sideBars[1].ptr, 1)
 
         // corner pieces
-        drawApi.fillRectangles(pixmap, corner2GC, cornerRects[0].ptr, 1)
-        drawApi.fillRectangles(pixmap, corner3GC, cornerRects[1].ptr, 1)
-        drawApi.fillRectangles(pixmap, corner4GC, cornerRects[2].ptr, 1)
-        drawApi.fillRectangles(pixmap, corner4GC, cornerRects[3].ptr, 1)
-        drawApi.fillRectangles(pixmap, corner2GC, cornerRects[4].ptr, 1)
-        drawApi.fillRectangles(pixmap, corner3GC, cornerRects[5].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner1GC, cornerRects[0].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner2GC, cornerRects[1].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner3GC, cornerRects[2].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner3GC, cornerRects[3].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner1GC, cornerRects[4].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner2GC, cornerRects[5].ptr, 1)
 
         // corner 2 outer
-        for ((x, y, color) in corner2OuterColors) {
+        for ((x, y, color) in corner1OuterColors) {
             val gc = getGC(color)
             drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + BAR_HEIGHT + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + y)
         }
 
         // corner 3 outer
-        for ((x, y, color) in corner3OuterColors) {
+        for ((x, y, color) in corner2OuterColors) {
             val gc = getGC(color)
             drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL + y)
         }
 
         // corner 4 outer
-        for ((x, y, color) in corner4OuterColors) {
+        for ((x, y, color) in corner3OuterColors) {
             val gc = getGC(color)
             drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + monitor.height - OUTER_CORNER_RADIUS_BIG * 2 + y)
         }
 
         // corner 2 inner
-        for ((x, y, color) in corner2InnerColors) {
+        for ((x, y, color) in corner1InnerColors) {
             val gc = getGC(color)
             drawApi.drawPoint(pixmap, gc, monitor.x + SIDE_BAR_WIDTH + x, monitor.y + BAR_HEIGHT + DATA_BAR_HEIGHT + y)
         }
 
         // corner 3 inner
-        for ((x, y, color) in corner3InnerColors) {
+        for ((x, y, color) in corner2InnerColors) {
             val gc = getGC(color)
             drawApi.drawPoint(pixmap, gc, monitor.x + SIDE_BAR_WIDTH + x, monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + 2 * BAR_HEIGHT_SMALL + y)
         }
 
         // corner 4 inner
-        for ((x, y, color) in corner4InnerColors) {
+        for ((x, y, color) in corner3InnerColors) {
             val gc = getGC(color)
             drawApi.drawPoint(pixmap, gc, monitor.x + SIDE_BAR_WIDTH + x, monitor.y + monitor.height - BAR_HEIGHT - 2 * INNER_CORNER_RADIUS + y)
         }
@@ -327,7 +319,7 @@ class RootWindowDrawer(
             drawLogoTextBack(pixmap, monitor.x + 290, monitor.y, monitor.width - 300)
         }
 
-        nativeHeap.free(bigBars)
+        nativeHeap.free(bottomBar)
         nativeHeap.free(middleBars)
         nativeHeap.free(sideBars)
         nativeHeap.free(cornerRects)
