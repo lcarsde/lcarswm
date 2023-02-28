@@ -12,15 +12,15 @@
         </binding>
         <binding>
             <keys>XF86AudioMute</keys>
-            <exec>amixer set Master toggle</exec>
+            <exec>amixer -D pulse set Master toggle</exec>
         </binding>
         <binding>
             <keys>XF86AudioRaiseVolume</keys>
-            <exec>amixer set Master 3%+</exec>
+            <exec>amixer -D pulse set Master 3%+</exec>
         </binding>
         <binding>
             <keys>XF86AudioLowerVolume</keys>
-            <exec>amixer set Master 3%-</exec>
+            <exec>amixer -D pulse set Master 3%-</exec>
         </binding>
 
         <!-- Window manager action keys ... only edit the following when you know what you're doing -->
