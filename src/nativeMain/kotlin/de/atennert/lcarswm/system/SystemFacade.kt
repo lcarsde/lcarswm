@@ -17,7 +17,8 @@ import xlib.*
  * This is the facade for accessing system functions.
  */
 class SystemFacade : SystemApi {
-    private var display: CPointer<Display>? = null
+    override var display: CPointer<Display>? = null
+        private set
 
     override fun openDisplay(): Boolean {
         this.display = XOpenDisplay(null)

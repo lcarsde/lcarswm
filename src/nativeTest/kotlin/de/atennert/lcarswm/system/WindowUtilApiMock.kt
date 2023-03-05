@@ -5,6 +5,8 @@ import kotlinx.cinterop.*
 import xlib.*
 
 open class WindowUtilApiMock : WindowUtilApi {
+    override val display: CPointer<Display>? = null
+
     override fun openDisplay(): Boolean {
         TODO("Not yet implemented")
     }

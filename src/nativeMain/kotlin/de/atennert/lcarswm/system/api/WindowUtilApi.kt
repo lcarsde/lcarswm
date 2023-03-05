@@ -7,6 +7,8 @@ import xlib.*
  *
  */
 interface WindowUtilApi {
+    val display: CPointer<Display>?
+
     /** @return true on success, false otherwise */
     fun openDisplay(): Boolean
 

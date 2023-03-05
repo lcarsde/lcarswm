@@ -103,10 +103,11 @@ class RootWindowDrawer(
     private fun drawLogoTextBack(pixmap: Pixmap, barX: Int, y: Int, barWidth: Int) {
         val rect = nativeHeap.alloc<PangoRectangle>()
         val maxTextWidth = barWidth - 16
+        val (ascent, descent) = fontProvider.getAscDsc(WINDOW_TITLE_FONT_SIZE, PANGO_WEIGHT_BOLD)
 
         val textY = y + (((BAR_HEIGHT_WITH_OFFSET * PANGO_SCALE)
-                - (fontProvider.ascent + fontProvider.descent))
-                / 2 + fontProvider.ascent) / PANGO_SCALE
+                - (ascent + descent))
+                / 2 + ascent) / PANGO_SCALE
 
         fontApi.setLayoutText(fontProvider.layout, logoText)
         fontApi.setLayoutWidth(fontProvider.layout, maxTextWidth * PANGO_SCALE)

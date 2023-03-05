@@ -7,16 +7,55 @@ import de.atennert.lcarswm.lifecycle.ROOT_WINDOW_MASK
 import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.signal.Signal
-import de.atennert.lcarswm.system.FunctionCall
-import de.atennert.lcarswm.system.SystemFacadeMock
+import de.atennert.lcarswm.system.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.runBlocking
 import xlib.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class ShutdownTest {
+    @BeforeTest
+    fun setup() {
+        wrapXCreateSimpleWindow = ::mockXCreateSimpleWindow
+        wrapXDestroyWindow = ::mockXDestroyWindow
+        wrapXMapWindow = ::mockXMapWindow
+        wrapXUnmapWindow = ::mockXUnmapWindow
+        wrapXClearWindow = ::mockXClearWindow
+        wrapXMoveWindow = ::mockXMoveWindow
+        wrapXCreatePixmap = ::mockXCreatePixmap
+        wrapXFreePixmap = ::mockXFreePixmap
+        wrapXSetWindowBackgroundPixmap = ::mockXSetWindowBackgroundPixmap
+        wrapXftDrawCreate = ::mockXftDrawCreate
+        wrapXftDrawDestroy = ::mockXftDrawDestroy
+        wrapXftDrawRect = ::mockXftDrawRect
+        wrapPangoLayoutSetText = ::mockPangoLayoutSetText
+        wrapPangoLayoutSetWidth = ::mockPangoLayoutSetWidth
+        wrapPangoLayoutGetPixelExtents = ::mockPangoLayoutGetPixelExtents
+        wrapPangoLayoutGetLineReadonly = ::mockPangoLayoutGetLineReadonly
+        wrapPangoXftRenderLayoutLine = ::mockPangoXftRenderLayoutLine
+    }
+
+    @AfterTest
+    fun teardown() {
+        wrapXCreateSimpleWindow = ::XCreateSimpleWindow
+        wrapXDestroyWindow = ::XDestroyWindow
+        wrapXMapWindow = ::XMapWindow
+        wrapXUnmapWindow = ::XUnmapWindow
+        wrapXClearWindow = ::XClearWindow
+        wrapXMoveWindow = ::XMoveWindow
+        wrapXCreatePixmap = ::XCreatePixmap
+        wrapXFreePixmap = ::XFreePixmap
+        wrapXftDrawCreate = ::XftDrawCreate
+        wrapXftDrawDestroy = ::XftDrawDestroy
+        wrapXftDrawRect = ::XftDrawRect
+        wrapPangoLayoutSetText = ::pango_layout_set_text
+        wrapPangoLayoutSetWidth = ::pango_layout_set_width
+        wrapPangoLayoutGetPixelExtents = ::pango_layout_get_pixel_extents
+        wrapPangoLayoutGetLineReadonly = ::pango_layout_get_line_readonly
+        wrapPangoXftRenderLayoutLine = ::pango_xft_render_layout_line
+        wrapXSetWindowBackgroundPixmap = ::XSetWindowBackgroundPixmap
+    }
+
     private class FakeResourceGenerator : ResourceGenerator {
         override fun createEnvironment(): Environment {
             return object : Environment {

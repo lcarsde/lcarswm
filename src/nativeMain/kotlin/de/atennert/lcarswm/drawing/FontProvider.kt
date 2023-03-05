@@ -1,6 +1,5 @@
 package de.atennert.lcarswm.drawing
 
-import de.atennert.lcarswm.WINDOW_TITLE_FONT_SIZE
 import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.settings.GeneralSetting
 import de.atennert.lcarswm.system.api.FontApi
@@ -16,31 +15,30 @@ class FontProvider(
     val layout = fontApi.newLayout(pango)
     val font = fontApi.getFontDescription()
 
-    val ascent: Int
-    val descent: Int
-
     init {
-        val ascDesc = initializeFontObjects()
-        ascent = ascDesc.first
-        descent = ascDesc.second
+        initializeFontObjects()
 
         closeWith(FontProvider::close)
     }
 
-    private fun initializeFontObjects(): Pair<Int, Int> {
-        val lang = fontApi.getDefaultLanguage()
+    private fun initializeFontObjects() {
         fontApi.setFontDescriptionFamily(font, generalSettings.getValue(GeneralSetting.FONT))
-        fontApi.setFontDescriptionWeight(font, PANGO_WEIGHT_BOLD)
         fontApi.setFontDescriptionStyle(font, PangoStyle.PANGO_STYLE_NORMAL)
-        fontApi.setFontDescriptionSize(font, WINDOW_TITLE_FONT_SIZE * PANGO_SCALE)
 
-        fontApi.setLayoutFontDescription(layout, font)
         fontApi.setLayoutWrapMode(layout, PangoWrapMode.PANGO_WRAP_WORD_CHAR)
         fontApi.setLayoutEllipsizeMode(layout, PangoEllipsizeMode.PANGO_ELLIPSIZE_END)
         fontApi.setLayoutSingleParagraphMode(layout, true)
+    }
 
+    fun getAscDsc(fontSize: Int, fontWeight: PangoWeight): Pair<Int, Int> {
+        fontApi.setFontDescriptionWeight(font, fontWeight)
+        fontApi.setFontDescriptionSize(font, fontSize * PANGO_SCALE)
+        fontApi.setLayoutFontDescription(layout, font)
+
+        val lang = fontApi.getDefaultLanguage()
         val metrics = fontApi.getFontMetrics(pango, font, lang)
         val ascDesc = fontApi.getFontAscentDescent(metrics)
+
         fontApi.freeFontMetrics(metrics)
 
         return ascDesc

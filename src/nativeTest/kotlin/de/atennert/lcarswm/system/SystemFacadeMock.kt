@@ -425,7 +425,7 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    private var display: CPointer<Display>? = null
+    override var display: CPointer<Display>? = null
 
     override fun flush() {
         functionCalls.add(FunctionCall("flush"))

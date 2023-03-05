@@ -10,10 +10,7 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
-import xlib.Colormap
-import xlib.PANGO_SCALE
-import xlib.PangoRectangle
-import xlib.Screen
+import xlib.*
 
 class FrameDrawer(
     private val fontApi: FontApi,
@@ -42,10 +39,11 @@ class FrameDrawer(
         }
         val textH = BAR_HEIGHT_WITH_OFFSET
         val rect = nativeHeap.alloc<PangoRectangle>()
+        val (ascent, descent) = fontProvider.getAscDsc(WINDOW_TITLE_FONT_SIZE, PANGO_WEIGHT_BOLD)
 
         val textY = (((textH * PANGO_SCALE)
-                - (fontProvider.ascent + fontProvider.descent))
-                / 2 + fontProvider.ascent) / PANGO_SCALE
+                - (ascent + descent))
+                / 2 + ascent) / PANGO_SCALE
 
         val pixmap = drawApi.createPixmap(screen.root, windowMeasurements.width.convert(), textH.convert(), screen.root_depth.convert())
         val xftDraw = drawApi.xftDrawCreate(pixmap, screen.root_visual!!, colorMap)

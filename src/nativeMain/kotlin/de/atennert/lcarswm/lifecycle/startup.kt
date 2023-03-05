@@ -1,9 +1,6 @@
 package de.atennert.lcarswm.lifecycle
 
-import de.atennert.lcarswm.AppMenuMessageHandler
-import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
-import de.atennert.lcarswm.ResourceGenerator
-import de.atennert.lcarswm.RootWindowPropertyHandler
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.command.Commander
@@ -153,6 +150,15 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
     val frameDrawer = FrameDrawer(system, system, focusHandler, fontProvider, colorHandler, screen)
 
     val windowCoordinator = ActiveWindowCoordinator(system, monitorManager, frameDrawer)
+
+    val windowFactory = PosixWindowFactory(system.display, screen, colorHandler, fontProvider, keyManager)
+
+    windowFactory.createButton("MODE", DARK_RED, 0, 0, SIDE_BAR_WIDTH, BAR_HEIGHT) {
+        // TODO
+        monitorManager.toggleScreenMode()
+        windowCoordinator.realignWindows()
+        uiDrawer.drawWindowManagerFrame()
+    }
 
     val screenChangeHandler =
         setupRandr(
