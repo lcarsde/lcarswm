@@ -108,7 +108,7 @@ class ColorFactoryTest {
             return 1
         }
 
-        override fun createGC(drawable: Drawable, mask: ULong, gcValues: CValuesRef<XGCValues>?): GC? {
+        override fun createGC(drawable: Drawable, mask: ULong, gcValues: CValuesRef<XGCValues>?): GC {
             return nativeHeap.alloc<GCVar>().ptr.reinterpret()
         }
 
