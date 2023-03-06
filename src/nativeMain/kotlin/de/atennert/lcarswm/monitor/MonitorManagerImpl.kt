@@ -97,15 +97,22 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
             )
         }
 
-    override fun getScreenMode(): ScreenMode {
-        return screenMode
-    }
+    override fun getScreenMode(): ScreenMode = screenMode
 
     override fun toggleScreenMode() {
         screenMode = when (screenMode) {
             ScreenMode.NORMAL -> ScreenMode.MAXIMIZED
             ScreenMode.MAXIMIZED -> ScreenMode.FULLSCREEN
             ScreenMode.FULLSCREEN -> ScreenMode.NORMAL
+        }
+        observers.forEach { it.toggleScreenMode(screenMode) }
+    }
+
+    override fun toggleFramedScreenMode() {
+        screenMode = if (screenMode == ScreenMode.NORMAL) {
+            ScreenMode.MAXIMIZED
+        } else {
+            ScreenMode.NORMAL
         }
         observers.forEach { it.toggleScreenMode(screenMode) }
     }

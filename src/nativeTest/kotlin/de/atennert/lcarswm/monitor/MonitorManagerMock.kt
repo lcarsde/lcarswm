@@ -24,4 +24,8 @@ open class MonitorManagerMock : MonitorManager {
     override fun toggleScreenMode() {
         functionCalls.add(FunctionCall("toggleScreenMode"))
     }
+
+    override fun toggleFramedScreenMode() {
+        functionCalls.add(FunctionCall("toggleFramedScreenMode"))
+    }
 }

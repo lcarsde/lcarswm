@@ -12,29 +12,29 @@ import xlib.*
 
 class PosixButton(
     private val display: CPointer<Display>?,
-    val screen: Screen,
-    colorFactory: ColorFactory,
-    fontProvider: FontProvider,
-    val keyManager: KeyManager,
-    text: String,
+    private val screen: Screen,
+    private val colorFactory: ColorFactory,
+    private val fontProvider: FontProvider,
+    keyManager: KeyManager,
+    private val text: String,
     backgroundColor: Color,
     x: Int,
     y: Int,
-    width: Int,
-    height: Int,
-    onClick: () -> Unit
-) : Button(onClick) {
+    private val width: Int,
+    private val height: Int,
+    private val onClick: () -> Unit
+) : Button<Window> {
     private val backgroundColorXft = colorFactory.createXftColor(backgroundColor)
     private val textColorXft = colorFactory.createXftColor(BLACK)
 
-    private val windowId: Window
+    override val id: Window
 
     private val borderSpace = 4
 
     init {
         closeWith(PosixButton::cleanup)
 
-        windowId = wrapXCreateSimpleWindow(
+        id = wrapXCreateSimpleWindow(
             display,
             screen.root,
             x,
@@ -49,18 +49,23 @@ class PosixButton(
         keyManager.grabButton(
             Button1.convert(),
             AnyModifier,
-            windowId,
+            id,
             (ButtonPressMask or ButtonReleaseMask or ButtonMotionMask).convert(),
             GrabModeAsync,
             None.convert()
         )
 
-        wrapXMapWindow(display, windowId)
+        wrapXMapWindow(display, id)
 
-        val pixmap = wrapXCreatePixmap(display, screen.root, width.convert(), height.convert(), screen.root_depth.convert())
+        draw()
+    }
+
+    private fun draw() {
+        val pixmap =
+            wrapXCreatePixmap(display, screen.root, width.convert(), height.convert(), screen.root_depth.convert())
         val xftDraw = wrapXftDrawCreate(display, pixmap, screen.root_visual!!, colorFactory.colorMapId)
 
-        wrapXftDrawRect(xftDraw, backgroundColorXft.ptr, 0, 0,  width.convert(), height.convert())
+        wrapXftDrawRect(xftDraw, backgroundColorXft.ptr, 0, 0, width.convert(), height.convert())
 
         val textW = width - 2 * borderSpace
         val textH = 11
@@ -76,8 +81,8 @@ class PosixButton(
         val line = wrapPangoLayoutGetLineReadonly(fontProvider.layout, 0)
         wrapPangoXftRenderLayoutLine(xftDraw, textColorXft.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
 
-        wrapXSetWindowBackgroundPixmap(display, windowId, pixmap)
-        wrapXClearWindow(display, windowId)
+        wrapXSetWindowBackgroundPixmap(display, id, pixmap)
+        wrapXClearWindow(display, id)
         wrapXftDrawDestroy(xftDraw)
         wrapXFreePixmap(display, pixmap)
 
@@ -85,11 +90,20 @@ class PosixButton(
     }
 
     override fun changePosition(x: Int, y: Int) {
-        wrapXMoveWindow(display, windowId, x, y)
+        wrapXMoveWindow(display, id, x, y)
+    }
+
+    override fun press() {
+        // TODO press coloring
+    }
+
+    override fun release() {
+        // TODO normal coloring
+        onClick()
     }
 
     private fun cleanup() {
-        wrapXUnmapWindow(display, windowId)
-        wrapXDestroyWindow(display, windowId)
+        wrapXUnmapWindow(display, id)
+        wrapXDestroyWindow(display, id)
     }
 }

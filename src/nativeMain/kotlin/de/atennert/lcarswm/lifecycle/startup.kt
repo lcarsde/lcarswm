@@ -153,9 +153,15 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     val windowFactory = PosixWindowFactory(system.display, screen, colorHandler, fontProvider, keyManager)
 
-    windowFactory.createButton("MODE", DARK_RED, 0, 0, SIDE_BAR_WIDTH, BAR_HEIGHT) {
-        // TODO
-        monitorManager.toggleScreenMode()
+    val modeButton = windowFactory.createButton(
+        "MODE",
+        DARK_RED,
+        0,
+        0,
+        SIDE_BAR_WIDTH,
+        BAR_HEIGHT
+    ) {
+        monitorManager.toggleFramedScreenMode()
         windowCoordinator.realignWindows()
         uiDrawer.drawWindowManagerFrame()
     }
@@ -227,6 +233,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
     monitorManager.registerObserver(appMenuHandler)
     monitorManager.registerObserver(statusBarHandler)
     monitorManager.registerObserver(moveWindowManager)
+    // TODO create/move button on monitor update
 
     windowList.register(appMenuHandler.windowListObserver)
     windowList.register(WindowListAtomHandler(screen.root, system, atomLibrary))
@@ -253,7 +260,8 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
         frameDrawer,
         windowList,
         commander,
-        screen.root
+        screen.root,
+        modeButton
     )
 
     setupScreen(
@@ -376,14 +384,15 @@ private fun createEventManager(
     frameDrawer: FrameDrawer,
     windowList: WindowList,
     commander: Commander,
-    rootWindowId: Window
+    rootWindowId: Window,
+    modeButton: Button<Window>,
 ): EventDistributor {
 
     return EventDistributor.Builder(logger)
         .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler, statusBarHandler))
         .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler, statusBarHandler))
-        .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler, moveWindowManager))
-        .addEventHandler(ButtonReleaseHandler(logger, moveWindowManager))
+        .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler, moveWindowManager, modeButton))
+        .addEventHandler(ButtonReleaseHandler(logger, moveWindowManager, modeButton))
         .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, toggleSessionManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
         .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, toggleSessionManager, atomLibrary, commander))
         .addEventHandler(MapRequestHandler(logger, windowRegistration))

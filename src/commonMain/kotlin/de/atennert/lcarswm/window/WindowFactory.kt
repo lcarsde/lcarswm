@@ -2,7 +2,7 @@ package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.drawing.Color
 
-interface WindowFactory {
+interface WindowFactory<ID> {
     fun createButton(
         text: String,
         backgroundColor: Color,
@@ -11,5 +11,5 @@ interface WindowFactory {
         width: Int,
         height: Int,
         onClick: () -> Unit
-    ): Button
+    ): Button<ID>
 }

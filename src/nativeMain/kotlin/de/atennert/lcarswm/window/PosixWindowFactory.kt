@@ -7,6 +7,7 @@ import de.atennert.lcarswm.keys.KeyManager
 import kotlinx.cinterop.CPointer
 import xlib.Display
 import xlib.Screen
+import xlib.Window
 
 class PosixWindowFactory(
     private val display: CPointer<Display>?,
@@ -14,7 +15,7 @@ class PosixWindowFactory(
     private val colorFactory: ColorFactory,
     private val fontProvider: FontProvider,
     private val keyManager: KeyManager
-) : WindowFactory {
+) : WindowFactory<Window> {
     override fun createButton(
         text: String,
         backgroundColor: Color,
@@ -23,7 +24,7 @@ class PosixWindowFactory(
         width: Int,
         height: Int,
         onClick: () -> Unit
-    ): Button {
+    ): Button<Window> {
         return PosixButton(
             display, screen, colorFactory, fontProvider, keyManager,
             text, backgroundColor, x, y, width, height, onClick

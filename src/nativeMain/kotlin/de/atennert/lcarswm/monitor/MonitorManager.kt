@@ -36,4 +36,9 @@ interface MonitorManager {
      * Toggle between all ScreenModes
      */
     fun toggleScreenMode()
+
+    /**
+     * Toggle between ScreenModes that have a frame.
+     */
+    fun toggleFramedScreenMode()
 }
