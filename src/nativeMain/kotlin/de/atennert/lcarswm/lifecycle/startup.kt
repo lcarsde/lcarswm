@@ -233,7 +233,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
     monitorManager.registerObserver(appMenuHandler)
     monitorManager.registerObserver(statusBarHandler)
     monitorManager.registerObserver(moveWindowManager)
-    // TODO create/move button on monitor update
+    monitorManager.registerObserver(modeButton)
 
     windowList.register(appMenuHandler.windowListObserver)
     windowList.register(WindowListAtomHandler(screen.root, system, atomLibrary))

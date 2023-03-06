@@ -1,11 +1,14 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.BLACK
+import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.drawing.Color
 import de.atennert.lcarswm.drawing.ColorFactory
 import de.atennert.lcarswm.drawing.FontProvider
 import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.lifecycle.closeWith
+import de.atennert.lcarswm.monitor.Monitor
+import de.atennert.lcarswm.monitor.MonitorObserver
 import de.atennert.lcarswm.system.*
 import kotlinx.cinterop.*
 import xlib.*
@@ -23,7 +26,7 @@ class PosixButton(
     private val width: Int,
     private val height: Int,
     private val onClick: () -> Unit
-) : Button<Window> {
+) : Button<Window>, MonitorObserver {
     private val backgroundColorXft = colorFactory.createXftColor(backgroundColor)
     private val textColorXft = colorFactory.createXftColor(BLACK)
 
@@ -105,5 +108,19 @@ class PosixButton(
     private fun cleanup() {
         wrapXUnmapWindow(display, id)
         wrapXDestroyWindow(display, id)
+    }
+
+    override fun toggleScreenMode(newScreenMode: ScreenMode) {
+        if (newScreenMode == ScreenMode.FULLSCREEN) {
+            wrapXUnmapWindow(display, id)
+        } else {
+            wrapXMapWindow(display, id)
+        }
+    }
+
+    override fun updateMonitors(monitors: List<Monitor>) {
+        monitors.find { it.isPrimary }?.let {
+            this.changePosition(it.x, it.y)
+        }
     }
 }

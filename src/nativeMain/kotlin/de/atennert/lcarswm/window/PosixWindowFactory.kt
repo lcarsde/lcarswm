@@ -24,7 +24,7 @@ class PosixWindowFactory(
         width: Int,
         height: Int,
         onClick: () -> Unit
-    ): Button<Window> {
+    ): PosixButton {
         return PosixButton(
             display, screen, colorFactory, fontProvider, keyManager,
             text, backgroundColor, x, y, width, height, onClick
