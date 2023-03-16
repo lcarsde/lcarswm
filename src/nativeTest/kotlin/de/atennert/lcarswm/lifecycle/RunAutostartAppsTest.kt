@@ -70,7 +70,7 @@ class RunAutostartAppsTest {
 
         runAutostartApps(FakeEnvironment(), fakeFactory, commander, FakeFiles(listOf(), lines), PrintLogger())
 
-        assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
+        assertContains(commander.calls, listOf("/usr/share/lcarsde/tools/launcher.py", "/home/me/config/autostart/runMe.desktop"))
     }
 
     @Test
@@ -87,7 +87,7 @@ class RunAutostartAppsTest {
 
         runAutostartApps(FakeEnvironment(), fakeFactory, commander, FakeFiles(listOf(), lines), PrintLogger())
 
-        assertContains(commander.calls, listOf("myapp", "--arg1", "-v", "42"))
+        assertContains(commander.calls, listOf("/usr/share/lcarsde/tools/launcher.py", "/etc/xdg/autostart/runMe.desktop"))
     }
 
     @Test

@@ -46,7 +46,7 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger, resourceGenerato
     val runtimeResources: RuntimeResources? = try {
         startup(system, logger, resourceGenerator)
     } catch (e: Throwable) {
-        logger.logError("::runWindowManager::error starting applications", e)
+        logger.logError("::runWindowManager::error starting lcarswm", e)
         null
     }
 

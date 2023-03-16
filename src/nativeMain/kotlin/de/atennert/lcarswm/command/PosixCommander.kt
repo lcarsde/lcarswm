@@ -1,36 +1,33 @@
 package de.atennert.lcarswm.command
 
+import de.atennert.lcarswm.log.Logger
 import kotlinx.cinterop.*
 import platform.posix.*
+import kotlin.system.exitProcess
 
-class PosixCommander : Commander() {
+class PosixCommander(private val logger: Logger) : Commander() {
     override fun run(command: List<String>): Boolean {
-        when (fork()) {
-            -1 -> return false
+        return when (fork()) {
+            -1 -> false
             0 -> {
                 if (setsid() == -1) {
-                    perror("setsid failed")
-                    exit(1)
+                    exitProcess(1)
                 }
 
-                if (!execute(command[0], command)) {
-                    perror("execvp failed")
-                    exit(1)
-                }
-
-                exit(0)
+                execute(command[0], command)
+                exitProcess(1)
             }
+            else -> true
         }
-        return true
     }
 
-    private fun execute(fileName: String, args: List<String>): Boolean {
-        val byteArgs = args.map { it.encodeToByteArray().pin() }
-        val convertedArgs = nativeHeap.allocArrayOfPointersTo(byteArgs.map { it.addressOf(0).pointed })
+    private fun execute(fileName: String, args: List<String>) {
+        memScoped {
+            execvp(fileName, allocArrayOf(args.map { it.cstr.ptr }.plus(NULL?.reinterpret()) ))
+        }
 
-        val result = execvp(fileName, convertedArgs)
-
-        byteArgs.map { it.unpin() }
-        return result != -1
+        strerror(errno)?.toKString()?.let { reason ->
+            logger.logError("PosixCommander::run::(child) execvp failed: $reason")
+        }
     }
 }

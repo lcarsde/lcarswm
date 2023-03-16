@@ -12,6 +12,7 @@ class PosixFile(
 
     override fun write(text: String) {
         fputs(text, file)
+        fflush(file)
     }
 
     override fun writeLine(text: String) {
@@ -19,7 +20,6 @@ class PosixFile(
     }
 
     override fun close() {
-        fflush(file)
         fclose(file)
     }
 }

@@ -42,18 +42,18 @@ private fun readDesktopFiles(directoryPath: String, dirFactory: FileFactory): Li
 /**
  * Read the data from *.desktop file, check if we can/should autostart it and do so.
  */
-private fun Iterable<String>.checkAndExecute(files: Files, commander: Commander, logger: Logger) {
-    this.mapNotNull { path ->
-        try {
-            Autostart().apply { files.readLines(path) { line -> this.readLine(line) } }
-        } catch (e: Error) {
-            logger.logWarning("::checkAndExecute::error loading application data: $path", e)
-            null
-        }
+private fun checkAndExecute(path: String, files: Files, commander: Commander, logger: Logger) {
+    val autoStart = try {
+        Autostart().apply { files.readLines(path) { line -> this.readLine(line) } }
+    } catch (e: Error) {
+        logger.logWarning("::checkAndExecute::error loading application data: $path", e)
+        return
     }
-        .filterNot { it.hidden || it.excludeByShow }
-        .onEach { logger.logDebug("run ${it.exec}") }
-        .forEach { it.exec?.let { exec -> commander.run(exec) } }
+
+    if (!autoStart.hidden && !autoStart.excludeByShow){
+        logger.logDebug("run $path")
+        commander.run("/usr/share/lcarsde/tools/launcher.py $path")
+    }
 }
 
 /**
@@ -63,8 +63,6 @@ private class Autostart {
     var hidden = false
         private set
     var excludeByShow = false
-        private set
-    var exec: String? = null
         private set
 
     /**
@@ -79,7 +77,6 @@ private class Autostart {
             "hidden" -> hidden = value.trim().lowercase() == "true"
             "onlyshowin" -> excludeByShow = !value.lowercase().contains("lcarsde")
             "notshowin" -> excludeByShow = value.lowercase().contains("lcarsde")
-            "exec" -> exec = value.trim()
             else -> { /* nothing to do */}
         }
     }
@@ -105,11 +102,11 @@ fun runAutostartApps(environment: Environment, dirFactory: FileFactory, commande
         ?.let { readDesktopFiles(it, dirFactory) }
         ?.also { localApps = it }
         ?.map { "$localAutostart/$it" }
-        ?.checkAndExecute(files, commander, logger)
+        ?.forEach { checkAndExecute(it, files, commander, logger) }
 
     readDesktopFiles(globalAutostart, dirFactory)
         // local definitions override global definitions
         .filterNot { localApps.contains(it) }
         .map { "$globalAutostart/$it" }
-        .checkAndExecute(files, commander, logger)
+        .forEach { checkAndExecute(it, files, commander, logger) }
 }

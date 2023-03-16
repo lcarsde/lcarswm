@@ -39,7 +39,7 @@ private const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotify
         RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
 
 fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenerator): RuntimeResources? {
-    val commander = PosixCommander()
+    val commander = PosixCommander(logger)
     val files = resourceGenerator.createFiles()
     val environment = resourceGenerator.createEnvironment()
     val fileFactory = resourceGenerator.createFileFactory()

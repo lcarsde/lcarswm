@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 9), default-jdk-headless | default-jdk, libx11-dev,
 
 Package: lcarswm
 Architecture: any
-Depends: libx11-6, libxpm4, libxrandr2, libpango1.0-0, libpangoxft-1.0-0, libxml2
+Depends: libx11-6, libxpm4, libxrandr2, libpango1.0-0, libpangoxft-1.0-0, libxml2, python3, python3-gi
 Recommends: fonts-ubuntu, xterm, firefox, alsa-utils
 Suggests: x-display-manager, kdm | gdm
 Provides: x-window-manager
