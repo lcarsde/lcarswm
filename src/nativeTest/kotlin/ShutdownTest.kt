@@ -593,7 +593,7 @@ class ShutdownTest {
 
     private fun checkFreeingOfGraphicsContexts(functionCalls: MutableList<FunctionCall>) {
         println("gcs: ${functionCalls.takeWhile { it.name == "freeGC" }.count()}")
-        repeat(49) {
+        repeat(64) {
             assertEquals(
                 "freeGC",
                 functionCalls.removeAt(0).name,

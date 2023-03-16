@@ -21,10 +21,13 @@ class RootWindowDrawer(
     settings: Map<GeneralSetting, String>,
     private val fontProvider: FontProvider
 ) : UIDrawing {
+    private val barEndOpacities = getFilledArcOpacities(BAR_HEIGHT / 2)
     private val bigOuterCornerOpacities = getFilledArcOpacities(OUTER_CORNER_RADIUS_BIG)
     private val smallOuterCornerOpacities = getFilledArcOpacities(OUTER_CORNER_RADIUS_SMALL)
     private val innerCornerOpacities = invertOpacities(getFilledArcOpacities(INNER_CORNER_RADIUS))
 
+    private val barEndLeftColors = getArcs(COLOR_BAR_ENDS, barEndOpacities, BAR_HEIGHT / 2, 2, 3)
+    private val barEndRightColors = getArcs(COLOR_BAR_ENDS, barEndOpacities, BAR_HEIGHT / 2, 1, 4)
     private val corner1OuterColors = getArcs(COLOR_NORMAL_CORNER_1, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 3)
     private val corner2OuterColors = getArcs(COLOR_NORMAL_CORNER_2, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 2)
     private val corner3OuterColors = getArcs(COLOR_NORMAL_CORNER_3, bigOuterCornerOpacities, OUTER_CORNER_RADIUS_BIG, 3)
@@ -153,23 +156,86 @@ class RootWindowDrawer(
     private fun drawMaximizedFrame(monitor: Monitor, pixmap: Pixmap) {
         clearScreen(monitor, pixmap)
 
+        val barEndsGC = getGC(COLOR_BAR_ENDS)
+        val maxBarUpGC = getGC(COLOR_MAX_BAR_UP)
         val maxBarDownGC = getGC(COLOR_MAX_BAR_DOWN)
 
-        val bottomBar = nativeHeap.alloc<XRectangle>()
-        bottomBar.x = (monitor.x).convert()
-        bottomBar.y = (monitor.y + monitor.height - 40).convert()
-        bottomBar.width = (monitor.width).convert()
-        bottomBar.height = 40.convert()
+        val rects = nativeHeap.allocArray<XRectangle>(4)
+        // extensions for round pieces
+        for (i in 0 until 4) {
+            rects[i].width = 12.convert()
+            rects[i].height = 40.convert()
+        }
+        rects[0].x = (monitor.x + 20).convert()
+        rects[0].y = monitor.y.convert()
 
-        drawApi.fillRectangles(pixmap, maxBarDownGC, bottomBar.ptr, 1)
+        rects[1].x = (monitor.x + 20).convert()
+        rects[1].y = (monitor.y + monitor.height - 40).convert()
 
-        if (logoImage != null) {
-            drawLogo(pixmap, monitor.x + monitor.width - 8 - logoImage.pointed.width, monitor.y)
-        } else {
-            drawLogoTextBack(pixmap, monitor.x + 290, monitor.y, monitor.width - 300)
+        rects[2].x = (monitor.x + monitor.width - 32).convert()
+        rects[2].y = monitor.y.convert()
+
+        rects[3].x = (monitor.x + monitor.width - 32).convert()
+        rects[3].y = (monitor.y + monitor.height - 40).convert()
+
+        val bars = nativeHeap.allocArray<XRectangle>(2)
+        // top bar
+        bars[0].x = (monitor.x + 40).convert()
+        bars[0].y = monitor.y.toShort()
+        bars[0].width = (monitor.width - 80).convert()
+        bars[0].height = 40.convert()
+
+        // bottom bar
+        bars[1].x = (monitor.x + 40).convert()
+        bars[1].y = (monitor.y + monitor.height - 40).convert()
+        bars[1].width = (monitor.width - 80).convert()
+        bars[1].height = 40.convert()
+
+        drawApi.fillRectangles(pixmap, barEndsGC, rects, 4)
+        drawApi.fillRectangle(
+            pixmap,
+            maxBarUpGC,
+            bars[0].x.toInt(),
+            bars[0].y.toInt(),
+            bars[0].width.convert(),
+            bars[0].height.convert()
+        )
+        drawApi.fillRectangle(
+            pixmap,
+            maxBarDownGC,
+            bars[1].x.toInt(),
+            bars[1].y.toInt(),
+            bars[1].width.convert(),
+            bars[1].height.convert()
+        )
+
+        // left bar end
+        for ((x, y, color) in barEndLeftColors) {
+            val gc = getGC(color)
+            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + y)
+            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + monitor.height - BAR_HEIGHT + y)
         }
 
-        nativeHeap.free(bottomBar)
+        // right bar end
+        for ((x, y, color) in barEndRightColors) {
+            val gc = getGC(color)
+            drawApi.drawPoint(pixmap, gc, monitor.x + monitor.width - 40 + x, monitor.y + y)
+            drawApi.drawPoint(
+                pixmap,
+                gc,
+                monitor.x + monitor.width - 40 + x,
+                monitor.y + monitor.height - BAR_HEIGHT + y
+            )
+        }
+
+        if (logoImage != null) {
+            drawLogo(pixmap, monitor.x + monitor.width - BAR_GAP_SIZE - BAR_END_WIDTH - logoImage.pointed.width, monitor.y)
+        } else {
+            drawLogoTextBack(pixmap, monitor.x + BAR_GAP_SIZE + BAR_END_WIDTH, monitor.y, monitor.width - 2 * (BAR_GAP_SIZE + BAR_END_WIDTH))
+        }
+
+        nativeHeap.free(rects)
+        nativeHeap.free(bars)
     }
 
     private fun drawNormalFrame(monitor: Monitor, pixmap: Pixmap) {
