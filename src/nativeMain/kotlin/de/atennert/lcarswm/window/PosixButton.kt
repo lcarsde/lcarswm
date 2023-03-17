@@ -1,5 +1,7 @@
 package de.atennert.lcarswm.window
 
+import de.atennert.lcarswm.BAR_END_WIDTH
+import de.atennert.lcarswm.BAR_GAP_SIZE
 import de.atennert.lcarswm.BLACK
 import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.drawing.Color
@@ -21,8 +23,8 @@ class PosixButton(
     keyManager: KeyManager,
     private val text: String,
     backgroundColor: Color,
-    x: Int,
-    y: Int,
+    private var x: Int,
+    private var y: Int,
     private val width: Int,
     private val height: Int,
     private val onClick: () -> Unit
@@ -33,6 +35,8 @@ class PosixButton(
     override val id: Window
 
     private val borderSpace = 4
+
+    private var xOffset = 0
 
     init {
         closeWith(PosixButton::cleanup)
@@ -111,16 +115,26 @@ class PosixButton(
     }
 
     override fun toggleScreenMode(newScreenMode: ScreenMode) {
-        if (newScreenMode == ScreenMode.FULLSCREEN) {
-            wrapXUnmapWindow(display, id)
-        } else {
-            wrapXMapWindow(display, id)
+        when (newScreenMode) {
+            ScreenMode.NORMAL -> {
+                xOffset = 0
+                changePosition(x, y)
+                wrapXMapWindow(display, id)
+            }
+            ScreenMode.MAXIMIZED -> {
+                xOffset = BAR_END_WIDTH + BAR_GAP_SIZE
+                changePosition(x + xOffset, y)
+                wrapXMapWindow(display, id)
+            }
+            ScreenMode.FULLSCREEN -> wrapXUnmapWindow(display, id)
         }
     }
 
     override fun updateMonitors(monitors: List<Monitor>) {
         monitors.find { it.isPrimary }?.let {
-            this.changePosition(it.x, it.y)
+            x = it.x
+            y = it.y
+            this.changePosition(it.x + xOffset, it.y)
         }
     }
 }

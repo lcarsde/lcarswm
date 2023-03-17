@@ -28,8 +28,10 @@ class RootWindowDrawer(
 
     private val barEndLeftColors = getArcs(COLOR_BAR_ENDS, barEndOpacities, BAR_HEIGHT / 2, 2, 3)
     private val barEndRightColors = getArcs(COLOR_BAR_ENDS, barEndOpacities, BAR_HEIGHT / 2, 1, 4)
-    private val corner1OuterColors = getArcs(COLOR_NORMAL_CORNER_1, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 3)
-    private val corner2OuterColors = getArcs(COLOR_NORMAL_CORNER_2, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 2)
+    private val corner1OuterColors =
+        getArcs(COLOR_NORMAL_CORNER_1, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 3)
+    private val corner2OuterColors =
+        getArcs(COLOR_NORMAL_CORNER_2, smallOuterCornerOpacities, OUTER_CORNER_RADIUS_SMALL, 2)
     private val corner3OuterColors = getArcs(COLOR_NORMAL_CORNER_3, bigOuterCornerOpacities, OUTER_CORNER_RADIUS_BIG, 3)
     private val corner1InnerColors = getArcs(COLOR_NORMAL_CORNER_1, innerCornerOpacities, INNER_CORNER_RADIUS, 3)
     private val corner2InnerColors = getArcs(COLOR_NORMAL_CORNER_2, innerCornerOpacities, INNER_CORNER_RADIUS, 2)
@@ -61,7 +63,7 @@ class RootWindowDrawer(
     }
 
     private fun invertOpacities(opacities: List<Triple<Int, Int, Double>>): List<Triple<Int, Int, Double>> =
-        opacities.map { (x , y, opacity) -> Triple(x, y, 1 - opacity) }
+        opacities.map { (x, y, opacity) -> Triple(x, y, 1 - opacity) }
 
     private val logoImage: CPointer<XImage>?
     private val logoText: String
@@ -180,10 +182,17 @@ class RootWindowDrawer(
 
         val bars = nativeHeap.allocArray<XRectangle>(2)
         // top bar
-        bars[0].x = (monitor.x + 40).convert()
+        bars[0].x = if (monitor.isPrimary)
+            (monitor.x + 2 * BAR_GAP_SIZE + BAR_END_WIDTH + SIDE_BAR_WIDTH).convert()
+        else
+            (monitor.x + BAR_GAP_SIZE + BAR_END_WIDTH).convert()
         bars[0].y = monitor.y.toShort()
-        bars[0].width = (monitor.width - 80).convert()
-        bars[0].height = 40.convert()
+        bars[0].width = if (monitor.isPrimary)
+            (monitor.width - 3 * BAR_GAP_SIZE - 2 * BAR_END_WIDTH - SIDE_BAR_WIDTH).convert()
+        else
+            (monitor.width - 2 * (BAR_GAP_SIZE + BAR_END_WIDTH)).convert()
+        bars[0].height = BAR_HEIGHT.convert()
+
 
         // bottom bar
         bars[1].x = (monitor.x + 40).convert()
@@ -229,9 +238,18 @@ class RootWindowDrawer(
         }
 
         if (logoImage != null) {
-            drawLogo(pixmap, monitor.x + monitor.width - BAR_GAP_SIZE - BAR_END_WIDTH - logoImage.pointed.width, monitor.y)
+            drawLogo(
+                pixmap,
+                monitor.x + monitor.width - BAR_GAP_SIZE - BAR_END_WIDTH - logoImage.pointed.width,
+                monitor.y
+            )
         } else {
-            drawLogoTextBack(pixmap, monitor.x + BAR_GAP_SIZE + BAR_END_WIDTH, monitor.y, monitor.width - 2 * (BAR_GAP_SIZE + BAR_END_WIDTH))
+            drawLogoTextBack(
+                pixmap,
+                monitor.x + BAR_GAP_SIZE + BAR_END_WIDTH,
+                monitor.y,
+                monitor.width - 2 * (BAR_GAP_SIZE + BAR_END_WIDTH)
+            )
         }
 
         nativeHeap.free(rects)
@@ -347,13 +365,23 @@ class RootWindowDrawer(
         // corner 2 outer
         for ((x, y, color) in corner1OuterColors) {
             val gc = getGC(color)
-            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + BAR_HEIGHT + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + y)
+            drawApi.drawPoint(
+                pixmap,
+                gc,
+                monitor.x + x,
+                monitor.y + BAR_HEIGHT + 2 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + y
+            )
         }
 
         // corner 3 outer
         for ((x, y, color) in corner2OuterColors) {
             val gc = getGC(color)
-            drawApi.drawPoint(pixmap, gc, monitor.x + x, monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL + y)
+            drawApi.drawPoint(
+                pixmap,
+                gc,
+                monitor.x + x,
+                monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + BAR_HEIGHT_SMALL + y
+            )
         }
 
         // corner 4 outer
@@ -371,13 +399,23 @@ class RootWindowDrawer(
         // corner 3 inner
         for ((x, y, color) in corner2InnerColors) {
             val gc = getGC(color)
-            drawApi.drawPoint(pixmap, gc, monitor.x + SIDE_BAR_WIDTH + x, monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + 2 * BAR_HEIGHT_SMALL + y)
+            drawApi.drawPoint(
+                pixmap,
+                gc,
+                monitor.x + SIDE_BAR_WIDTH + x,
+                monitor.y + BAR_HEIGHT + INNER_CORNER_RADIUS + 3 * BAR_GAP_SIZE + DATA_BAR_HEIGHT + 2 * BAR_HEIGHT_SMALL + y
+            )
         }
 
         // corner 4 inner
         for ((x, y, color) in corner3InnerColors) {
             val gc = getGC(color)
-            drawApi.drawPoint(pixmap, gc, monitor.x + SIDE_BAR_WIDTH + x, monitor.y + monitor.height - BAR_HEIGHT - 2 * INNER_CORNER_RADIUS + y)
+            drawApi.drawPoint(
+                pixmap,
+                gc,
+                monitor.x + SIDE_BAR_WIDTH + x,
+                monitor.y + monitor.height - BAR_HEIGHT - 2 * INNER_CORNER_RADIUS + y
+            )
         }
 
         if (logoImage != null) {
