@@ -37,31 +37,6 @@ class RootWindowDrawer(
     private val corner2InnerColors = getArcs(COLOR_NORMAL_CORNER_2, innerCornerOpacities, INNER_CORNER_RADIUS, 2)
     private val corner3InnerColors = getArcs(COLOR_NORMAL_CORNER_3, innerCornerOpacities, INNER_CORNER_RADIUS, 3)
 
-    private fun getArcs(
-        baseColor: Color,
-        opacities: List<Triple<Int, Int, Double>>,
-        radius: Int,
-        vararg quadrants: Int
-    ): List<Triple<Int, Int, Color>> {
-        val colors = mutableListOf<Triple<Int, Int, Color>>()
-        val adjust = { opacity: Double ->
-            baseColor.run { Color((red * opacity).toInt(), (green * opacity).toInt(), (blue * opacity).toInt()) }
-        }
-
-        for ((x, y, opacity) in opacities) {
-            for (quadrant in quadrants) {
-                when (quadrant) {
-                    1 -> colors.add(Triple(x + radius, -y + radius - 1, adjust(opacity)))
-                    2 -> colors.add(Triple(-x + radius - 1, -y + radius - 1, adjust(opacity)))
-                    3 -> colors.add(Triple(-x + radius - 1, y + radius, adjust(opacity)))
-                    4 -> colors.add(Triple(x + radius, y + radius, adjust(opacity)))
-                    else -> throw IllegalArgumentException("There are only quadrants 1 to 4, not $quadrant")
-                }
-            }
-        }
-        return colors
-    }
-
     private fun invertOpacities(opacities: List<Triple<Int, Int, Double>>): List<Triple<Int, Int, Double>> =
         opacities.map { (x, y, opacity) -> Triple(x, y, 1 - opacity) }
 
