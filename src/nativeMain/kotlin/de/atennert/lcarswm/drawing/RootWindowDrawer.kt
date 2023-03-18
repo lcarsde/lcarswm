@@ -49,11 +49,11 @@ class RootWindowDrawer(
         get() = colorFactory.colorMapId
 
     init {
-        val imageArray = nativeHeap.allocArrayOfPointersTo(nativeHeap.alloc<XImage>())
+        val imagePtr = nativeHeap.allocPointerTo<XImage>()
         val wmLogoPath = settings[GeneralSetting.TITLE_IMAGE]
         logoImage = if (wmLogoPath != null) {
-            drawApi.readXpmFileToImage(wmLogoPath, imageArray)
-            imageArray[0]!!
+            drawApi.readXpmFileToImage(wmLogoPath, imagePtr.ptr)
+            imagePtr.value
         } else {
             null
         }
@@ -215,7 +215,7 @@ class RootWindowDrawer(
         if (logoImage != null) {
             drawLogo(
                 pixmap,
-                monitor.x + monitor.width - BAR_GAP_SIZE - BAR_END_WIDTH - logoImage.pointed.width,
+                monitor.x + monitor.width - 2 * BAR_GAP_SIZE - BAR_END_WIDTH - logoImage.pointed.width,
                 monitor.y
             )
         } else {
@@ -235,7 +235,6 @@ class RootWindowDrawer(
         clearScreen(monitor, pixmap)
 
         val barDownGC = getGC(COLOR_NORMAL_BAR_DOWN)
-        val sideBarUpGC = getGC(COLOR_NORMAL_SIDEBAR_UP)
         val sideBarDownGC = getGC(COLOR_NORMAL_SIDEBAR_DOWN)
         val middleBar1GC = getGC(COLOR_NORMAL_BAR_MIDDLE_1)
         val middleBar2GC = getGC(COLOR_NORMAL_BAR_MIDDLE_2)
@@ -284,7 +283,7 @@ class RootWindowDrawer(
         sideBars[0].x = monitor.x.convert()
         sideBars[0].y = (monitor.y + BAR_HEIGHT + BAR_GAP_SIZE).convert()
         sideBars[0].width = SIDE_BAR_WIDTH.convert()
-        sideBars[0].height = DATA_BAR_HEIGHT.convert()
+        sideBars[0].height = (DATA_BAR_HEIGHT + BAR_GAP_SIZE).convert()
 
         sideBars[1].x = monitor.x.convert()
         sideBars[1].y = (monitor.y + NORMAL_WINDOW_UPPER_OFFSET + INNER_CORNER_RADIUS).convert()
@@ -326,7 +325,7 @@ class RootWindowDrawer(
         drawApi.fillRectangles(pixmap, middleBar4GC, middleBars[3].ptr, 1)
 
         // side bars
-        drawApi.fillRectangles(pixmap, sideBarUpGC, sideBars[0].ptr, 1)
+        drawApi.fillRectangles(pixmap, corner1GC, sideBars[0].ptr, 1)
         drawApi.fillRectangles(pixmap, sideBarDownGC, sideBars[1].ptr, 1)
 
         // corner pieces
@@ -394,7 +393,7 @@ class RootWindowDrawer(
         }
 
         if (logoImage != null) {
-            drawLogo(pixmap, monitor.x + monitor.width - 8 - logoImage.pointed.width, monitor.y)
+            drawLogo(pixmap, monitor.x + monitor.width - 16 - logoImage.pointed.width, monitor.y)
         } else {
             drawLogoTextBack(pixmap, monitor.x + 290, monitor.y, monitor.width - 300)
         }
