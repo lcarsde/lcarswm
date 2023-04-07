@@ -2,6 +2,7 @@ package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.atom.NumberAtomReader
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.command.PosixCommander
@@ -176,7 +177,8 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
             screen.root
         )
 
-    val windowNameReader = TextAtomReader(system, atomLibrary)
+    val textAtomReader = TextAtomReader(system, atomLibrary)
+    val numberAtomHandler = NumberAtomReader(system.display, atomLibrary)
 
     val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager, screen.root)
     val statusBarHandler = StatusBarHandler(system, atomLibrary, monitorManager, screen.root)
@@ -194,13 +196,15 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
     )
 
     val windowRegistration = WindowHandler(
+        system.display,
         system,
         logger,
         windowCoordinator,
         focusHandler,
         atomLibrary,
         screen,
-        windowNameReader,
+        textAtomReader,
+        numberAtomHandler,
         appMenuHandler,
         statusBarHandler,
         windowList,
@@ -254,7 +258,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
         atomLibrary,
         screenChangeHandler,
         keyConfiguration,
-        windowNameReader,
+        textAtomReader,
         appMenuHandler,
         statusBarHandler,
         frameDrawer,

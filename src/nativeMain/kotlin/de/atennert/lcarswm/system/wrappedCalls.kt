@@ -14,11 +14,17 @@ var wrapXClearWindow = ::XClearWindow
 
 var wrapXMoveWindow = ::XMoveWindow
 
+var wrapXGetWindowProperty = ::XGetWindowProperty
+
 var wrapXCreatePixmap = ::XCreatePixmap
 
 var wrapXFreePixmap = ::XFreePixmap
 
+var wrapXFree = ::XFree
+
 var wrapXSetWindowBackgroundPixmap = ::XSetWindowBackgroundPixmap
+
+var wrapXGetTransientForHint = ::XGetTransientForHint
 
 var wrapXftDrawCreate = ::XftDrawCreate
 

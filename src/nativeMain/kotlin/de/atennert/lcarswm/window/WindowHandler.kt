@@ -4,12 +4,14 @@ import de.atennert.lcarswm.BAR_HEIGHT_WITH_OFFSET
 import de.atennert.lcarswm.X_FALSE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
+import de.atennert.lcarswm.atom.NumberAtomReader
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
+import de.atennert.lcarswm.system.wrapXGetTransientForHint
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -17,6 +19,7 @@ import xlib.*
  * Manages the all handled client windows.
  */
 class WindowHandler(
+    private val display: CPointer<Display>?,
     private val system: SystemApi,
     private val logger: Logger,
     private val windowCoordinator: WindowCoordinator,
@@ -24,6 +27,7 @@ class WindowHandler(
     private val atomLibrary: AtomLibrary,
     private val screen: Screen,
     private val textAtomReader: TextAtomReader,
+    private val numberAtomReader: NumberAtomReader,
     private val appMenuHandler: AppMenuHandler,
     private val statusBarHandler: StatusBarHandler,
     private val windowList: WindowList,
@@ -83,6 +87,26 @@ class WindowHandler(
         }
 
         window.wmClass = textAtomReader.readTextProperty(windowId, Atoms.WM_CLASS)
+
+        val transientWindow = nativeHeap.alloc(None.toULong())
+        if (wrapXGetTransientForHint(display, windowId, transientWindow.ptr) != 0) {
+            window.isTransient = true
+            if (transientWindow.value != screen.root && window.type != WindowType.DOCK) {
+                window.transientFor = transientWindow.value
+            }
+        }
+        nativeHeap.free(transientWindow)
+
+        val windowTypeList = WindowType.values()
+            .map { Pair(it, atomLibrary[WINDOW_TYPE_ATOM_MAP.getValue(it)]) }
+
+        val windowTypeProperties = numberAtomReader.readULongArrayPropertyOrNull(windowId, Atoms.NET_WM_WINDOW_TYPE, Atoms.ATOM)
+        window.type = windowTypeProperties?.firstNotNullOfOrNull { propertyAtom ->
+            windowTypeList.firstOrNull { it.second == propertyAtom }
+        }?.first ?: if (window.isTransient) WindowType.DIALOG else WindowType.NORMAL
+
+        window.isTransient = window.isTransient
+                || TRANSIENT_WINDOW_TYPES.contains(window.type)
 
         window.title = textAtomReader.readTextProperty(windowId, Atoms.NET_WM_NAME)
         if (window.title == TextAtomReader.NO_NAME) {

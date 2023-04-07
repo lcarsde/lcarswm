@@ -3,11 +3,12 @@ package de.atennert.lcarswm.window
 import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
+import de.atennert.lcarswm.atom.NumberAtomReader
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
-import de.atennert.lcarswm.system.SystemFacadeMock
+import de.atennert.lcarswm.system.*
 import kotlinx.cinterop.*
 import xlib.*
 import kotlin.test.*
@@ -18,6 +19,19 @@ import kotlin.test.*
 class WindowHandlerTest {
 
     private val usedButtons = listOf(Button1, Button2, Button3)
+    @BeforeTest
+    fun setup() {
+        wrapXGetWindowProperty = ::mockXGetWindowProperty
+        wrapXFree = ::mockXFree
+        wrapXGetTransientForHint = ::mockXGetTransientForHint
+    }
+
+    @AfterTest
+    fun teardown() {
+        wrapXGetWindowProperty = ::XGetWindowProperty
+        wrapXFree = ::XFree
+        wrapXGetTransientForHint = ::XGetTransientForHint
+    }
 
     @Test
     fun `check window initialization`() {
@@ -37,6 +51,7 @@ class WindowHandlerTest {
         val screen = nativeHeap.alloc<Screen>()
 
         val windowRegistration = WindowHandler(
+            systemApi.display,
             systemApi,
             LoggerMock(),
             windowCoordinator,
@@ -44,6 +59,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
+            NumberAtomReader(systemApi.display, atomLibrary),
             appMenuHandler,
             statusBarHandler,
             windowList,
@@ -80,6 +96,7 @@ class WindowHandlerTest {
         val screen = nativeHeap.alloc<Screen>()
 
         val windowRegistration = WindowHandler(
+            systemApi.display,
             systemApi,
             LoggerMock(),
             windowCoordinator,
@@ -87,6 +104,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
+            NumberAtomReader(systemApi.display, atomLibrary),
             appMenuHandler,
             statusBarHandler,
             windowList,
@@ -186,6 +204,7 @@ class WindowHandlerTest {
         val screen = nativeHeap.alloc<Screen>()
 
         val windowRegistration = WindowHandler(
+            systemApi.display,
             systemApi,
             LoggerMock(),
             windowCoordinator,
@@ -193,6 +212,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
+            NumberAtomReader(systemApi.display, atomLibrary),
             appMenuHandler,
             statusBarHandler,
             windowList,
@@ -230,6 +250,7 @@ class WindowHandlerTest {
         val screen = nativeHeap.alloc<Screen>()
 
         val windowRegistration = WindowHandler(
+            systemApi.display,
             systemApi,
             LoggerMock(),
             windowCoordinator,
@@ -237,6 +258,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
+            NumberAtomReader(systemApi.display, atomLibrary),
             appMenuHandler,
             statusBarHandler,
             windowList,
@@ -275,6 +297,7 @@ class WindowHandlerTest {
         val screen = nativeHeap.alloc<Screen>()
 
         val windowRegistration = WindowHandler(
+            systemApi.display,
             systemApi,
             LoggerMock(),
             windowCoordinator,
@@ -282,6 +305,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
+            NumberAtomReader(systemApi.display, atomLibrary),
             appMenuHandler,
             statusBarHandler,
             windowList,
@@ -316,6 +340,7 @@ class WindowHandlerTest {
         screen.root = rootWindowId
 
         val windowRegistration = WindowHandler(
+            systemApi.display,
             systemApi,
             LoggerMock(),
             windowCoordinator,
@@ -323,6 +348,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
+            NumberAtomReader(systemApi.display, atomLibrary),
             appMenuHandler,
             statusBarHandler,
             windowList,
@@ -403,6 +429,7 @@ class WindowHandlerTest {
         screen.root = rootWindowId
 
         val windowRegistration = WindowHandler(
+            systemApi.display,
             systemApi,
             LoggerMock(),
             windowCoordinator,
@@ -410,6 +437,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
+            NumberAtomReader(systemApi.display, atomLibrary),
             appMenuHandler,
             statusBarHandler,
             windowList,
@@ -454,6 +482,7 @@ class WindowHandlerTest {
         val screen = nativeHeap.alloc<Screen>()
 
         val windowRegistration = WindowHandler(
+            systemApi.display,
             systemApi,
             LoggerMock(),
             windowCoordinator,
@@ -461,6 +490,7 @@ class WindowHandlerTest {
             atomLibrary,
             screen,
             TextAtomReader(systemApi, atomLibrary),
+            NumberAtomReader(systemApi.display, atomLibrary),
             appMenuHandler,
             statusBarHandler,
             windowList,

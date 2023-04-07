@@ -22,9 +22,12 @@ class ShutdownTest {
         wrapXUnmapWindow = ::mockXUnmapWindow
         wrapXClearWindow = ::mockXClearWindow
         wrapXMoveWindow = ::mockXMoveWindow
+        wrapXGetWindowProperty = ::mockXGetWindowProperty
         wrapXCreatePixmap = ::mockXCreatePixmap
         wrapXFreePixmap = ::mockXFreePixmap
+        wrapXFree = ::mockXFree
         wrapXSetWindowBackgroundPixmap = ::mockXSetWindowBackgroundPixmap
+        wrapXGetTransientForHint = ::mockXGetTransientForHint
         wrapXftDrawCreate = ::mockXftDrawCreate
         wrapXftDrawDestroy = ::mockXftDrawDestroy
         wrapXftDrawRect = ::mockXftDrawRect
@@ -43,8 +46,10 @@ class ShutdownTest {
         wrapXUnmapWindow = ::XUnmapWindow
         wrapXClearWindow = ::XClearWindow
         wrapXMoveWindow = ::XMoveWindow
+        wrapXGetWindowProperty = ::XGetWindowProperty
         wrapXCreatePixmap = ::XCreatePixmap
         wrapXFreePixmap = ::XFreePixmap
+        wrapXFree = ::XFree
         wrapXftDrawCreate = ::XftDrawCreate
         wrapXftDrawDestroy = ::XftDrawDestroy
         wrapXftDrawRect = ::XftDrawRect
@@ -54,6 +59,7 @@ class ShutdownTest {
         wrapPangoLayoutGetLineReadonly = ::pango_layout_get_line_readonly
         wrapPangoXftRenderLayoutLine = ::pango_xft_render_layout_line
         wrapXSetWindowBackgroundPixmap = ::XSetWindowBackgroundPixmap
+        wrapXGetTransientForHint = ::XGetTransientForHint
     }
 
     private class FakeResourceGenerator : ResourceGenerator {

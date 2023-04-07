@@ -23,4 +23,9 @@ data class FramedWindow(val id: Window, val borderWidth: Int) {
 
     /** Name of the program */
     var wmClass: String = TextAtomReader.NO_NAME
+
+    var isTransient: Boolean = false
+    var transientFor: Window? = null
+
+    var type: WindowType = WindowType.NORMAL
 }
