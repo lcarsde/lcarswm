@@ -2,6 +2,7 @@ import java.io.ByteArrayOutputStream
 
 plugins {
     kotlin("multiplatform") version "1.8.10"
+    id("io.kotest.multiplatform") version "5.4.1"
 }
 
 group "de.atennert"
@@ -54,7 +55,10 @@ kotlin {
         }
         commonTest {
             dependencies {
-                implementation( "org.jetbrains.kotlin:kotlin-test-common")
+                implementation("io.kotest:kotest-assertions-core:5.4.1")
+                implementation("io.kotest:kotest-framework-engine:5.4.1")
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
             }
         }
         val nativeMain by getting
