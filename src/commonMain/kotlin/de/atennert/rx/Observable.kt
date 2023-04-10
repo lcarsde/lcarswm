@@ -15,6 +15,19 @@ open class Observable<T>(private val subscribeFn: Subscribe<T>) {
     }
 
     companion object {
+        private val EMPTY: Observable<Any?> = Observable { subscriber ->
+            subscriber.complete()
+            Subscription { subscriber.unsubscribe() }
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        fun <T> empty(): Observable<T> = EMPTY as Observable<T>
+
+        fun <T> error(error: Throwable = Error()) = Observable<T> { subscriber ->
+            subscriber.error(error)
+            Subscription { subscriber.unsubscribe() }
+        }
+
         fun <T> of(vararg elems: T): Observable<T> {
             return Observable { subscriber ->
                 elems.forEach { subscriber.next(it) }

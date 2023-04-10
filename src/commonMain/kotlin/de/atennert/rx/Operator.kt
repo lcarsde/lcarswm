@@ -1,5 +1,5 @@
 package de.atennert.rx
 
 fun interface Operator<X, Y> {
-    fun call(value: Observable<X>): Observable<Y>
+    fun call(source: Observable<X>): Observable<Y>
 }

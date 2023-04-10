@@ -1,5 +1,21 @@
 package de.atennert.rx
 
-fun interface Subscription {
-    fun unsubscribe()
+open class Subscription(private val fUnsubscribe: () -> Unit = {}) {
+    private var isUnsubscribed = false
+
+    private val subscriptions = mutableSetOf<Subscription>()
+    fun add(subscription: Subscription) {
+        if (isUnsubscribed) {
+            subscription.unsubscribe()
+        } else {
+            subscriptions.add(subscription)
+        }
+    }
+
+    open fun unsubscribe() {
+        fUnsubscribe()
+
+        subscriptions.forEach { it.unsubscribe() }
+        subscriptions.clear()
+    }
 }
