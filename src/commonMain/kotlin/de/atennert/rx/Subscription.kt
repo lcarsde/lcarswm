@@ -15,6 +15,7 @@ open class Subscription(private val fUnsubscribe: () -> Unit = {}) {
     open fun unsubscribe() {
         fUnsubscribe()
 
+        isUnsubscribed = true
         subscriptions.forEach { it.unsubscribe() }
         subscriptions.clear()
     }
