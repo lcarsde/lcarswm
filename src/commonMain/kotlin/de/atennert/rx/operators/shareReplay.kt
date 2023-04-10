@@ -3,28 +3,28 @@ package de.atennert.rx.operators
 import de.atennert.rx.*
 
 fun <X> shareReplay(replayCount: Int = 1, refCount: Boolean = false): Operator<X, X> {
-    val values = mutableListOf<X>()
-    var isComplete = false
-    val subscribers = mutableSetOf<Subscriber<X>>()
-
-    var sourceSubscription: Subscription? = null
-
-    fun addValue(value: X) {
-        values.add(value)
-        if (values.size > replayCount) {
-            values.removeFirst()
-        }
-    }
-
-    fun unsubscribeAll() {
-        subscribers.forEach { it.unsubscribe() }
-        subscribers.clear()
-
-        sourceSubscription?.unsubscribe()
-        sourceSubscription = null
-    }
-
     return Operator { source ->
+        val values = mutableListOf<X>()
+        var isComplete = false
+        val subscribers = mutableSetOf<Subscriber<X>>()
+
+        var sourceSubscription: Subscription? = null
+
+        fun addValue(value: X) {
+            values.add(value)
+            if (values.size > replayCount) {
+                values.removeFirst()
+            }
+        }
+
+        fun unsubscribeAll() {
+            subscribers.forEach { it.unsubscribe() }
+            subscribers.clear()
+
+            sourceSubscription?.unsubscribe()
+            sourceSubscription = null
+        }
+
         Observable { subscriber ->
             if (!isComplete) {
                 subscribers.add(subscriber)
