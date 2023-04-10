@@ -33,7 +33,7 @@ class FilterNotNullTest {
                 received.add(error)
             }
         }
-        (Observable.error<Int?>())
+        Observable.error<Int?>()
             .apply(filterNotNull())
             .subscribe(observer)
 

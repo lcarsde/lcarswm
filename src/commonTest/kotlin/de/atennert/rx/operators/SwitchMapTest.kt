@@ -6,7 +6,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertIs
 
-class MapTest {
+class SwitchMapTest {
     @Test
     fun `should map values`() {
         val observer = object : Subscriber<Int>() {
@@ -18,11 +18,16 @@ class MapTest {
                 received.add("complete")
             }
         }
-        Observable.of(1)
-            .apply(map { it + 1 })
+        Observable.of(1, 2)
+            .apply(switchMap { Observable { subscriber ->
+                subscriber.next(1 + it * 10)
+                subscriber.next(2 + it * 10)
+                subscriber.complete()
+                subscriber
+            } })
             .subscribe(observer)
 
-        assertContentEquals(listOf(2, "complete"), observer.received)
+        assertContentEquals(listOf(11, 12, 21, 22, "complete"), observer.received)
     }
 
     @Test
@@ -34,7 +39,12 @@ class MapTest {
             }
         }
         Observable.error<Int>()
-            .apply(map { it + 1 })
+            .apply(switchMap { Observable { subscriber ->
+                subscriber.next(1 + it * 10)
+                subscriber.next(2 + it * 10)
+                subscriber.complete()
+                subscriber
+            } })
             .subscribe(observer)
 
         assertIs<Throwable>(observer.received[0])

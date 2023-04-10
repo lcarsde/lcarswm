@@ -33,7 +33,7 @@ class FilterTest {
                 received.add(error)
             }
         }
-        (Observable.error<Int>())
+        Observable.error<Int>()
             .apply(filter { it % 2 == 0 })
             .subscribe(observer)
 

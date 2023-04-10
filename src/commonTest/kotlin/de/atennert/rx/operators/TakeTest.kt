@@ -51,7 +51,7 @@ class TakeTest {
                 received.add(error)
             }
         }
-        (Observable.error<Int>())
+        Observable.error<Int>()
             .apply(take(1))
             .subscribe(observer)
 
