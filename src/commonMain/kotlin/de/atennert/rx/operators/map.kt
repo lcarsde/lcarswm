@@ -1,25 +1,8 @@
 package de.atennert.rx.operators
 
-import de.atennert.rx.Observable
-import de.atennert.rx.Observer
 import de.atennert.rx.Operator
+import de.atennert.rx.ValueOperator
 
-fun <X,Y> map(f: (X) -> Y): Operator<X, Y> {
-    return Operator { source ->
-        Observable { subscriber ->
-            source.subscribe(object : Observer<X> {
-                override fun next(value: X) {
-                    subscriber.next(f(value))
-                }
-
-                override fun error(error: Throwable) {
-                    subscriber.error(error)
-                }
-
-                override fun complete() {
-                    subscriber.complete()
-                }
-            })
-        }
-    }
+fun <X,Y> map(f: (X) -> Y): Operator<X, Y> = ValueOperator { value, next ->
+    next(f(value))
 }
