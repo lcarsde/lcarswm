@@ -5,7 +5,6 @@ import de.atennert.rx.*
 fun <X> shareReplay(replayCount: Int = 1, refCount: Boolean = false): Operator<X, X> {
     val values = mutableListOf<X>()
     var isComplete = false
-    var error: Throwable? = null
     val subscribers = mutableSetOf<Subscriber<X>>()
 
     var sourceSubscription: Subscription? = null
@@ -27,30 +26,26 @@ fun <X> shareReplay(replayCount: Int = 1, refCount: Boolean = false): Operator<X
 
     return Operator { source ->
         Observable { subscriber ->
-            subscribers.add(subscriber)
-
-            sourceSubscription?.run {
-                val err = error
-                if (err != null) {
-                    subscriber.error(err)
-                } else {
-                    values.forEach { subscriber.next(it) }
-                    if (isComplete) {
-                        subscriber.complete()
-                    }
-                }
+            if (!isComplete) {
+                subscribers.add(subscriber)
             }
 
-            if (sourceSubscription == null) {
+            if (sourceSubscription != null || isComplete) {
+                values.forEach { subscriber.next(it) }
+            }
+            if (isComplete) {
+                subscriber.complete()
+            } else if (sourceSubscription == null) {
+                values.clear()
+                isComplete = false
                 sourceSubscription = source.subscribe(object : Observer<X> {
                     override fun next(value: X) {
                         addValue(value)
                         subscribers.forEach { it.next(value) }
                     }
 
-                    override fun error(err: Throwable) {
-                        error = err
-                        subscribers.forEach { it.error(err) }
+                    override fun error(error: Throwable) {
+                        subscribers.forEach { it.error(error) }
                         unsubscribeAll()
                     }
 
@@ -69,7 +64,6 @@ fun <X> shareReplay(replayCount: Int = 1, refCount: Boolean = false): Operator<X
                 if (refCount && subscribers.size < 1) {
                     sourceSubscription?.unsubscribe()
                     sourceSubscription = null
-                    values.clear()
                 }
             }
         }
