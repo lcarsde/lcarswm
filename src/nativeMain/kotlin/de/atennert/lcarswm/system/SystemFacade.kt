@@ -100,7 +100,7 @@ class SystemFacade : SystemApi {
     ): Int {
         val bytesPerData = format.div(8)
         val dataCount = data?.size?.div(bytesPerData) ?: 0
-        return XChangeProperty(display, window, propertyAtom, typeAtom, format, PropModeReplace, data?.toCValues(), dataCount)
+        return XChangeProperty(display, window, propertyAtom, typeAtom, format, mode, data?.toCValues(), dataCount)
     }
 
     override fun deleteProperty(window: Window, propertyAtom: Atom): Int {
