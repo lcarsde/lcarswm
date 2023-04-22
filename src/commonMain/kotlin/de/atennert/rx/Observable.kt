@@ -1,5 +1,7 @@
 package de.atennert.rx
 
+import de.atennert.rx.operators.mergeWith
+
 fun interface Subscribe<T> {
     fun subscribe(subscriber: Subscriber<T>): Subscription
 }
@@ -34,6 +36,13 @@ open class Observable<T>(private val subscribeFn: Subscribe<T>) {
                 subscriber.complete()
                 Subscription { subscriber.unsubscribe() }
             }
+        }
+
+        fun <T> merge(vararg obss: Observable<T>): Observable<T> {
+            if (obss.isEmpty()) {
+                return empty()
+            }
+            return obss[0].apply(mergeWith(*obss.drop(1).toTypedArray()))
         }
     }
 }
