@@ -1,5 +1,6 @@
 package de.atennert.rx
 
+import de.atennert.rx.operators.last
 import de.atennert.rx.operators.mergeWith
 
 fun interface Subscribe<T> {
@@ -43,6 +44,46 @@ open class Observable<T>(private val subscribeFn: Subscribe<T>) {
                 return empty()
             }
             return obss[0].apply(mergeWith(*obss.drop(1).toTypedArray()))
+        }
+
+        fun <T> forkJoin(obss: List<Observable<T>>): Observable<List<T>> {
+            if (obss.isEmpty()) {
+                return empty()
+            }
+
+            return Observable { subscriber ->
+                val valueBuffer = mutableMapOf<Int, T>()
+                val subscription = Subscription()
+
+                obss.map { it.apply(last()) }
+                    .forEachIndexed { index, obs ->
+                        subscription.add(obs.subscribe(object : Observer<T> {
+                            override fun next(value: T) {
+                                valueBuffer[index] = value
+                            }
+
+                            override fun error(error: Throwable) {
+                                subscriber.error(error)
+                                subscription.unsubscribe()
+                            }
+
+                            override fun complete() {
+                                if (valueBuffer.size == obss.size) {
+                                    val values = valueBuffer.keys
+                                        .sorted()
+                                        .map { valueBuffer.getValue(it) }
+
+                                    subscriber.next(values)
+                                    subscriber.complete()
+                                }
+                            }
+                        }
+                        ))
+                    }
+                subscription.add(subscriber)
+
+                subscription
+            }
         }
     }
 }
