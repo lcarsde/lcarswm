@@ -1,16 +1,12 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.X_FALSE
+import de.atennert.lcarswm.system.wrapXSendEvent
 import de.atennert.lcarswm.window.WindowMeasurements
-import de.atennert.lcarswm.system.api.EventApi
 import kotlinx.cinterop.*
 import xlib.*
 
-/**
- *
- */
 fun sendConfigureNotify(
-    eventApi: EventApi,
+    display: CPointer<Display>?,
     window: Window,
     measurements: WindowMeasurements
 ) {
@@ -24,6 +20,6 @@ fun sendConfigureNotify(
     e.xconfigure.height = measurements.height
     e.xconfigure.border_width = 0
     e.xconfigure.above = None.convert()
-    e.xconfigure.override_redirect = X_FALSE
-    eventApi.sendEvent(window, false, StructureNotifyMask, e.ptr)
+    e.xconfigure.override_redirect = False
+    wrapXSendEvent(display, window, False, StructureNotifyMask, e.ptr)
 }

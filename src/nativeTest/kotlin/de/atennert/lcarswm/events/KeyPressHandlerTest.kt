@@ -1,21 +1,19 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.*
-import de.atennert.lcarswm.drawing.UIDrawingMock
+import de.atennert.lcarswm.LCARS_WM_KEY_SYMS
 import de.atennert.lcarswm.keys.*
+import de.atennert.lcarswm.lifecycle.closeClosables
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
 import de.atennert.lcarswm.window.WindowCoordinatorMock
 import de.atennert.lcarswm.window.WindowFocusHandler
+import de.atennert.lcarswm.window.WindowList
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
 import xlib.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class KeyPressHandlerTest {
 
@@ -27,13 +25,17 @@ class KeyPressHandlerTest {
         KeyAction("Lin+M", WmAction.SCREEN_MODE_TOGGLE)
     )
 
+    @AfterTest
+    fun teardown() {
+        closeClosables()
+    }
+
     @Test
     fun `return the event type KeyPressHandler`() {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
-        val windowFocusHandler = WindowFocusHandler()
-        val uiDrawing = UIDrawingMock()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
         val monitorManager = MonitorManagerMock()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -44,7 +46,7 @@ class KeyPressHandlerTest {
             systemApi.rootWindowId
         )
 
-        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawing)
+        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler)
 
         assertEquals(KeyPress, keyPressHandler.xEventType, "The key press handler should have the correct type")
     }
@@ -54,8 +56,7 @@ class KeyPressHandlerTest {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
-        val windowFocusHandler = WindowFocusHandler()
-        val uiDrawer = UIDrawingMock()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
         val monitorManager = MonitorManagerMock()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -67,7 +68,7 @@ class KeyPressHandlerTest {
         )
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
-        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
@@ -81,9 +82,6 @@ class KeyPressHandlerTest {
         val moveWindowCall = windowCoordinator.functionCalls.removeAt(0)
         assertEquals("moveWindowToNextMonitor", moveWindowCall.name, "The focused window should be moved to the next monitor")
         assertEquals(windowFocusHandler.getFocusedWindow(), moveWindowCall.parameters[0], "The _focused window_ should be moved to the next monitor")
-
-        val uiRedrawCall = uiDrawer.functionCalls.removeAt(0)
-        assertEquals("drawWindowManagerFrame", uiRedrawCall.name, "The WM UI needs to be redrawn")
     }
 
     @Test
@@ -91,8 +89,7 @@ class KeyPressHandlerTest {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
-        val windowFocusHandler = WindowFocusHandler()
-        val uiDrawer = UIDrawingMock()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
         val monitorManager = MonitorManagerMock()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -104,7 +101,7 @@ class KeyPressHandlerTest {
         )
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
-        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
@@ -118,9 +115,6 @@ class KeyPressHandlerTest {
         val moveWindowCall = windowCoordinator.functionCalls.removeAt(0)
         assertEquals("moveWindowToPreviousMonitor", moveWindowCall.name, "The focused window should be moved to the previous monitor")
         assertEquals(windowFocusHandler.getFocusedWindow(), moveWindowCall.parameters[0], "The _focused window_ should be moved to the previous monitor")
-
-        val uiRedrawCall = uiDrawer.functionCalls.removeAt(0)
-        assertEquals("drawWindowManagerFrame", uiRedrawCall.name, "The WM UI needs to be redrawn")
     }
 
     @Test
@@ -128,8 +122,7 @@ class KeyPressHandlerTest {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
-        val windowFocusHandler = WindowFocusHandler()
-        val uiDrawer = UIDrawingMock()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
         val monitorManager = MonitorManagerMock()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -140,7 +133,7 @@ class KeyPressHandlerTest {
             systemApi.rootWindowId
         )
 
-        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
@@ -152,17 +145,14 @@ class KeyPressHandlerTest {
         assertFalse(shutdownValue, "Handling the up-key shouldn't trigger a shutdown")
 
         assertTrue(windowCoordinator.functionCalls.isEmpty(), "There should be no call to the window coordinator without focused window")
-
-        assertTrue(uiDrawer.functionCalls.isEmpty(), "There should be no call to the UI drawer without focused window")
-    }
+   }
 
     @Test
     fun `don't react on move to previous monitor without a focusable window`() {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
-        val windowFocusHandler = WindowFocusHandler()
-        val uiDrawer = UIDrawingMock()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
         val monitorManager = MonitorManagerMock()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -173,7 +163,7 @@ class KeyPressHandlerTest {
             systemApi.rootWindowId
         )
 
-        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
@@ -185,8 +175,6 @@ class KeyPressHandlerTest {
         assertFalse(shutdownValue, "Handling the up-key shouldn't trigger a shutdown")
 
         assertTrue(windowCoordinator.functionCalls.isEmpty(), "There should be no call to the window coordinator without focused window")
-
-        assertTrue(uiDrawer.functionCalls.isEmpty(), "There should be no call to the UI drawer without focused window")
     }
 
     @Test
@@ -201,8 +189,7 @@ class KeyPressHandlerTest {
         }
         val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
-        val windowFocusHandler = WindowFocusHandler()
-        val uiDrawer = UIDrawingMock()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
         val monitorManager = MonitorManagerMock()
         val window1 = systemApi.getNewWindowId()
         val window2 = systemApi.getNewWindowId()
@@ -220,7 +207,7 @@ class KeyPressHandlerTest {
         windowFocusHandler.setFocusedWindow(window3)
         windowFocusHandler.setFocusedWindow(window1)
 
-        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
@@ -252,8 +239,7 @@ class KeyPressHandlerTest {
         }
         val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
-        val windowFocusHandler = WindowFocusHandler()
-        val uiDrawer = UIDrawingMock()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
         val monitorManager = MonitorManagerMock()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -264,7 +250,7 @@ class KeyPressHandlerTest {
             systemApi.rootWindowId
         )
 
-        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
@@ -283,8 +269,7 @@ class KeyPressHandlerTest {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi)
         val windowCoordinator = WindowCoordinatorMock()
-        val windowFocusHandler = WindowFocusHandler()
-        val uiDrawer = UIDrawingMock()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
         val monitorManager = MonitorManagerMock()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -296,7 +281,7 @@ class KeyPressHandlerTest {
         )
         windowFocusHandler.setFocusedWindow(systemApi.getNewWindowId())
 
-        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler, uiDrawer)
+        val keyPressHandler = KeyPressHandler(LoggerMock(), keyManager, keyConfiguration, keySessionManager, monitorManager, windowCoordinator, windowFocusHandler)
 
         val keyPressEvent = nativeHeap.alloc<XEvent>()
         keyPressEvent.type = KeyPress
@@ -309,11 +294,5 @@ class KeyPressHandlerTest {
 
         val monitorModeToggleCall = monitorManager.functionCalls.removeAt(0)
         assertEquals("toggleScreenMode", monitorModeToggleCall.name, "The screen mode should be toggled.")
-
-        val realignWindowsCall = windowCoordinator.functionCalls.removeAt(0)
-        assertEquals("realignWindows", realignWindowsCall.name, "The windows need to be realigned after toggling the screen mode.")
-
-        val redrawUIcall = uiDrawer.functionCalls.removeAt(0)
-        assertEquals("drawWindowManagerFrame", redrawUIcall.name, "The window frame needs to be redrawn on screen mode change.")
     }
 }

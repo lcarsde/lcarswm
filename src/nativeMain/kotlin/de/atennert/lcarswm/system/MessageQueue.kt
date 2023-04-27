@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.system
 
 import de.atennert.lcarswm.lifecycle.closeWith
-import de.atennert.lcarswm.system.api.PosixApi
 import kotlinx.cinterop.*
 import platform.linux.mq_attr
 import platform.linux.mqd_t
@@ -12,11 +11,10 @@ import platform.posix.*
  * by this implementation. Other end points must connect later to the queue and disconnect
  * before it is destroyed.
  *
- * @param posixApi The Posix API adapter
  * @param name The name of the message queue, unique identifier for each queue
  * @param mode The usage mode for this queue in this app: READ, WRITE or READ_WRITE
  */
-class MessageQueue(private val posixApi: PosixApi, private val name: String, private val mode: Mode) {
+class MessageQueue(private val name: String, private val mode: Mode) {
 
     enum class Mode (val flag: Int) {
         READ(O_RDONLY),
@@ -25,7 +23,7 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
     }
 
     private val oFlags = mode.flag or O_NONBLOCK or O_CREAT
-    private val queuePermissions = 432 // 0660
+    private val queuePermissions: mode_t = 432.convert() // 0660
 
     private val maxMessageCount = 10
     private val maxMessageSize = 1024
@@ -39,7 +37,7 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
         mqAttributes.mq_msgsize = maxMessageSize.convert()
         mqAttributes.mq_curmsgs = 0
 
-        mqDes = posixApi.mqOpen(name, oFlags, queuePermissions.convert(), mqAttributes.ptr)
+        mqDes = wrapMqOpen(name, oFlags, queuePermissions, mqAttributes)
 
         closeWith(MessageQueue::close)
     }
@@ -47,7 +45,7 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
     fun sendMessage(message: String) {
         assert(mode == Mode.WRITE || mode == Mode.READ_WRITE)
 
-        posixApi.mqSend(mqDes, message, 0.convert())
+        wrapMqSend(mqDes, message, message.length.convert(), 0.convert())
     }
 
     fun receiveMessage(): String? {
@@ -56,7 +54,7 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
         val msgBuffer = ByteArray(maxMessageSize)
         var msgSize: Long = -1
         msgBuffer.usePinned {
-            msgSize = posixApi.mqReceive(mqDes, it.addressOf(0), maxMessageSize.convert(), null)
+            msgSize = wrapMqReceive(mqDes, it.addressOf(0), maxMessageSize.convert(), null)
         }
         if (msgSize > 0) {
             return msgBuffer.decodeToString(0, msgSize.convert())
@@ -65,10 +63,10 @@ class MessageQueue(private val posixApi: PosixApi, private val name: String, pri
     }
 
     private fun close() {
-        if (posixApi.mqClose(mqDes) == -1 ) {
+        if (wrapMqClose(mqDes) == -1 ) {
             return
         }
 
-        posixApi.mqUnlink(name)
+        wrapMqUnlink(name)
     }
 }

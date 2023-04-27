@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.monitor
 
 import de.atennert.lcarswm.ScreenMode
+import de.atennert.rx.Observable
 
 /**
  * Interface for manager for handling monitors and the current screen mode for those monitors.
@@ -8,29 +9,31 @@ import de.atennert.lcarswm.ScreenMode
  */
 interface MonitorManager {
     /**
+     * Provides the current screen mode.
+     */
+    val screenModeObs: Observable<ScreenMode>
+
+    /**
+     * Provides the list of known active monitors
+     */
+    val monitorsObs: Observable<List<Monitor>>
+    /**
+     * Provides the primary monitor, if there's no monitor marked as primary monitor,
+     * the monitor manager will select the first monitor it finds as primary.
+     * Provides null if there is no monitor.
+     */
+    val primaryMonitorObs: Observable<Monitor?>
+    /**
+     * Provides the combined size of all monitors, depending on the configured
+     * monitor screen size and the positioning of the monitors.
+     * Provides (0, 0) if there is no monitor.
+     */
+    val combinedScreenSizeObs: Observable<Pair<Int, Int>>
+
+    /**
      * Update the list of known active monitors
      */
     fun updateMonitorList()
-
-    /**
-     * @return the list of known active monitors
-     */
-    fun getMonitors(): List<Monitor>
-
-    /**
-     * @return the primary monitor, if there's no monitor marked as primary monitor, the monitor manager will select the first monitor it finds as primary
-     */
-    fun getPrimaryMonitor(): Monitor
-
-    /**
-     * @return the combined size of all monitors, depending on the configured monitor screen size and the positioning of the monitors
-     */
-    fun getCombinedScreenSize(): Pair<Int, Int>
-
-    /**
-     * @return the current screen mode
-     */
-    fun getScreenMode(): ScreenMode
 
     /**
      * Toggle between all ScreenModes

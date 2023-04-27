@@ -1,18 +1,15 @@
 package de.atennert.lcarswm.drawing
 
 import de.atennert.lcarswm.*
-import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.system.api.DrawApi
 import de.atennert.lcarswm.system.api.FontApi
-import de.atennert.lcarswm.window.FramedWindow
-import de.atennert.lcarswm.window.WindowFocusHandler
+import de.atennert.lcarswm.window.WindowMeasurements
 import kotlinx.cinterop.*
 import xlib.*
 
 class FrameDrawer(
     private val fontApi: FontApi,
     private val drawApi: DrawApi,
-    private val focusHandler: WindowFocusHandler,
     private val fontProvider: FontProvider,
     private val colorFactory: ColorFactory,
     private val screen: Screen
@@ -29,12 +26,11 @@ class FrameDrawer(
     override val colorMap: Colormap
             get() = colorFactory.colorMapId
 
-    override fun drawFrame(window: FramedWindow, monitor: Monitor) {
-        val windowMeasurements = monitor.getWindowMeasurements()
-        val textW = if (monitor.getScreenMode() == ScreenMode.NORMAL) {
-            monitor.width - LOWER_CORNER_WIDTH - BAR_GAP_SIZE - WINDOW_TITLE_OFFSET - BAR_GAP_SIZE /* <text> */ - BAR_GAP_SIZE - BAR_END_WIDTH
+    override fun drawFrame(measurements: WindowMeasurements, screenMode: ScreenMode, isFocused: Boolean, title: String, titleBar: Window) {
+        val textW = if (screenMode == ScreenMode.NORMAL) {
+            measurements.width + NORMAL_WINDOW_LEFT_OFFSET - LOWER_CORNER_WIDTH - BAR_GAP_SIZE - WINDOW_TITLE_OFFSET - BAR_GAP_SIZE /* <text> */ - BAR_GAP_SIZE - BAR_END_WIDTH
         } else {
-            windowMeasurements.width - WINDOW_TITLE_OFFSET - BAR_GAP_SIZE
+            measurements.width- BAR_END_WIDTH - BAR_GAP_SIZE - WINDOW_TITLE_OFFSET - BAR_GAP_SIZE /* <text> */ - BAR_GAP_SIZE - BAR_END_WIDTH
         }
         val textH = BAR_HEIGHT_WITH_OFFSET
         val rect = nativeHeap.alloc<PangoRectangle>()
@@ -44,30 +40,30 @@ class FrameDrawer(
                 - (ascent + descent))
                 / 2 + ascent) / PANGO_SCALE
 
-        val pixmap = drawApi.createPixmap(screen.root, windowMeasurements.width.convert(), textH.convert(), screen.root_depth.convert())
+        val pixmap = drawApi.createPixmap(screen.root, measurements.width.convert(), textH.convert(), screen.root_depth.convert())
         val xftDraw = drawApi.xftDrawCreate(pixmap, screen.root_visual!!, colorMap)
 
-        val textColor = if (focusHandler.getFocusedWindow() == window.id) {
+        val textColor = if (isFocused) {
             activeTextColor
         } else {
             inactiveTextColor
         }
 
-        fontApi.setLayoutText(fontProvider.layout, window.title)
+        fontApi.setLayoutText(fontProvider.layout, title)
         fontApi.setLayoutWidth(fontProvider.layout, textW * PANGO_SCALE)
 
         fontApi.getLayoutPixelExtents(fontProvider.layout, rect.ptr)
-        val textX = if (monitor.getScreenMode() == ScreenMode.NORMAL)
-            windowMeasurements.width - rect.width
+        val textX = if (screenMode == ScreenMode.NORMAL)
+            measurements.width - rect.width
         else
-            windowMeasurements.width - rect.width - BAR_END_WIDTH - BAR_GAP_SIZE
+            measurements.width - rect.width - BAR_END_WIDTH - BAR_GAP_SIZE
 
-        drawApi.xftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  windowMeasurements.width.convert(), textH.convert())
+        drawApi.xftDrawRect(xftDraw, backgroundColor.ptr, 0, 0,  measurements.width.convert(), textH.convert())
 
         val line = fontApi.getLayoutLineReadonly(fontProvider.layout, 0)
         fontApi.xftRenderLayoutLine(xftDraw, textColor.ptr, line, textX * PANGO_SCALE, textY * PANGO_SCALE)
 
-        if (monitor.getScreenMode() == ScreenMode.NORMAL) {
+        if (screenMode == ScreenMode.NORMAL) {
             val primBarWidth = LOWER_CORNER_WIDTH - NORMAL_WINDOW_LEFT_OFFSET
             val secBarWidth = textX - primBarWidth - 2 * BAR_GAP_SIZE + FIRST_LETTER_OFFSET
             drawApi.xftDrawRect(xftDraw, normalCornerDownColor.ptr, 0, TITLE_BAR_OFFSET,  primBarWidth.convert(), BAR_HEIGHT.convert())
@@ -82,7 +78,7 @@ class FrameDrawer(
             }
             for ((x, y, color) in barEndRightColors) {
                 val gc = colorFactory.createColorGC(screen.root, color)
-                drawApi.drawPoint(pixmap, gc, windowMeasurements.width - 40 + x, y + 1)
+                drawApi.drawPoint(pixmap, gc, measurements.width - 40 + x, y + 1)
             }
             val barEndsGC = colorFactory.createColorGC(screen.root, COLOR_BAR_ENDS)
             val rects = nativeHeap.allocArray<XRectangle>(2)
@@ -93,13 +89,13 @@ class FrameDrawer(
                 rects[i].y = 1
             }
             rects[0].x = 20
-            rects[1].x = (windowMeasurements.width - 32).convert()
+            rects[1].x = (measurements.width - 32).convert()
 
             drawApi.fillRectangles(pixmap, barEndsGC, rects, 2)
         }
 
-        drawApi.setWindowBackgroundPixmap(window.titleBar, pixmap)
-        drawApi.clearWindow(window.titleBar)
+        drawApi.setWindowBackgroundPixmap(titleBar, pixmap)
+        drawApi.clearWindow(titleBar)
         drawApi.freePixmap(pixmap)
         nativeHeap.free(rect.rawPtr)
     }

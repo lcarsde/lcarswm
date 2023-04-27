@@ -1,15 +1,22 @@
 package de.atennert.lcarswm.window
 
+import de.atennert.lcarswm.lifecycle.closeClosables
 import kotlinx.cinterop.convert
 import xlib.Window
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class WindowFocusHandlerTest {
+    @AfterTest
+    fun teardown() {
+        closeClosables()
+    }
+
     @Test
     fun `check that initially there is no focused window`() {
-        val windowFocusHandler = WindowFocusHandler()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
 
         assertNull(windowFocusHandler.getFocusedWindow(), "There is no focused window")
 
@@ -22,7 +29,7 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `update focused window`() {
-        val windowFocusHandler = WindowFocusHandler()
+        val windowFocusHandler = WindowFocusHandler(WindowList())
         val testWindow1 = 21.convert<Window>()
         val testWindow2 = 22.convert<Window>()
         var newWindow: Window? = 42.convert()
@@ -43,67 +50,64 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `remove last focused window`() {
-        val focusHandler = WindowFocusHandler()
-        val window1: Window = 1.convert()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
 
-        focusHandler.setFocusedWindow(window1)
+        windowList.add(FakeManagedWindow(id = 1.convert()))
 
-        focusHandler.removeWindow(window1)
+        windowList.remove(1.toULong())
 
         assertNull(focusHandler.getFocusedWindow(), "The focused window should be removed")
     }
 
     @Test
     fun `remove second focused window`() {
-        val focusHandler = WindowFocusHandler()
-        val window1: Window = 1.convert()
-        val window2: Window = 2.convert()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
 
-        focusHandler.setFocusedWindow(window1)
-        focusHandler.setFocusedWindow(window2)
+        windowList.add(FakeManagedWindow(id = 1.convert()))
+        windowList.add(FakeManagedWindow(id = 2.convert()))
 
-        focusHandler.removeWindow(window2)
+        windowList.remove(2.toULong())
 
-        assertEquals(window1, focusHandler.getFocusedWindow(), "The fallback should be another focusable window")
+
+        assertEquals(1.convert(), focusHandler.getFocusedWindow(), "The fallback should be another focusable window")
     }
 
     @Test
     fun `remove third focused window`() {
-        val focusHandler = WindowFocusHandler()
-        val window1: Window = 1.convert()
-        val window2: Window = 2.convert()
-        val window3: Window = 3.convert()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
 
-        focusHandler.setFocusedWindow(window1)
-        focusHandler.setFocusedWindow(window2)
-        focusHandler.setFocusedWindow(window3)
+        windowList.add(FakeManagedWindow(id = 1.convert()))
+        windowList.add(FakeManagedWindow(id = 2.convert()))
+        windowList.add(FakeManagedWindow(id = 3.convert()))
 
         // remove currently focused window
-        focusHandler.removeWindow(window3)
+        windowList.remove(3.toULong())
 
         // the last focused window should be focused
-        assertEquals(window2, focusHandler.getFocusedWindow(), "The fallback should be the last focused window")
+        assertEquals(2.convert(), focusHandler.getFocusedWindow(), "The fallback should be the last focused window")
     }
 
     @Test
     fun `remove unfocused window`() {
-        val focusHandler = WindowFocusHandler()
-        val window1: Window = 1.convert()
-        val window2: Window = 2.convert()
-        val window3: Window = 3.convert()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
 
-        focusHandler.setFocusedWindow(window1)
-        focusHandler.setFocusedWindow(window2)
-        focusHandler.setFocusedWindow(window3)
+        windowList.add(FakeManagedWindow(id = 1.convert()))
+        windowList.add(FakeManagedWindow(id = 2.convert()))
+        windowList.add(FakeManagedWindow(id = 3.convert()))
 
-        focusHandler.removeWindow(window2)
+        windowList.remove(2.toULong())
 
-        assertEquals(window3, focusHandler.getFocusedWindow(), "Don't unfocus the focused window")
+        assertEquals(3.convert(), focusHandler.getFocusedWindow(), "Don't unfocus the focused window")
     }
 
     @Test
     fun `toggle through windows`() {
-        val focusHandler = WindowFocusHandler()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -124,7 +128,8 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows with reset`() {
-        val focusHandler = WindowFocusHandler()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -147,7 +152,8 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows reversed`() {
-        val focusHandler = WindowFocusHandler()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -168,7 +174,8 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows reversed with reset`() {
-        val focusHandler = WindowFocusHandler()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -191,7 +198,8 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows mixed`() {
-        val focusHandler = WindowFocusHandler()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -223,7 +231,8 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows mixed with reset`() {
-        val focusHandler = WindowFocusHandler()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -257,7 +266,8 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `don't react on toggle without windows`() {
-        val focusHandler = WindowFocusHandler()
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList)
 
         focusHandler.toggleWindowFocusForward()
 

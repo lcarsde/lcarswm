@@ -1,24 +1,42 @@
 package de.atennert.lcarswm.mouse
 
-import de.atennert.lcarswm.ScreenMode
+import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.Monitor
-import de.atennert.lcarswm.monitor.MonitorObserver
-import de.atennert.lcarswm.window.FramedWindow
+import de.atennert.lcarswm.monitor.MonitorManager
+import de.atennert.lcarswm.window.ManagedWmWindow
 import de.atennert.lcarswm.window.WindowCoordinator
+import de.atennert.rx.NextObserver
+import xlib.Window
 
 class MoveWindowManager(
     private val logger: Logger,
-    private val windowCoordinator: WindowCoordinator
-) : MonitorObserver {
+    private val windowCoordinator: WindowCoordinator,
+    monitorManager: MonitorManager
+) {
 
     private var monitors = emptyList<Monitor>()
 
     private lateinit var lastWindowMonitor: Monitor
 
-    private var targetWindow: FramedWindow? = null
+    private var targetWindow: ManagedWmWindow<Window>? = null
 
-    fun press(window: FramedWindow, x: Int, y: Int) {
+    init {
+        monitorManager.monitorsObs.subscribe(NextObserver { monitors ->
+            // TODO use more RX stuff
+            this.monitors = monitors
+            logger.logDebug("MoveWindowManager::updateMonitors::$monitors")
+
+            // cancel moving the window
+            targetWindow?.let {
+                logger.logWarning("MoveWindowManager::updateMonitors::cancel moving of ${it.id}")
+            }
+            targetWindow = null
+        })
+            .closeWith { this.unsubscribe() }
+    }
+
+    fun press(window: ManagedWmWindow<Window>, x: Int, y: Int) {
         targetWindow?.let {
             logger.logWarning("MoveWindowManager::press::apparently there was a window moving in process for ${it.id}.")
         }
@@ -42,24 +60,11 @@ class MoveWindowManager(
     }
 
     private fun getMonitor(x: Int, y: Int): Monitor? {
-        try {
-            return monitors.first { it.isOnMonitor(x, y) }
+        return try {
+            monitors.first { it.isOnMonitor(x, y) }
         } catch (e: Exception) {
             logger.logError(e.toString())
-            return null
+            null
         }
-    }
-
-    override fun toggleScreenMode(newScreenMode: ScreenMode) {}
-
-    override fun updateMonitors(monitors: List<Monitor>) {
-        this.monitors = monitors
-        logger.logDebug("MoveWindowManager::updateMonitors::$monitors")
-
-        // cancel moving the window
-        targetWindow?.let {
-            logger.logWarning("MoveWindowManager::updateMonitors::cancel moving of ${it.id}")
-        }
-        targetWindow = null
     }
 }

@@ -1,13 +1,13 @@
 package de.atennert.lcarswm.events
 
-import de.atennert.lcarswm.drawing.UIDrawing
 import de.atennert.lcarswm.keys.*
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.window.WindowCoordinator
 import de.atennert.lcarswm.window.WindowFocusHandler
 import kotlinx.cinterop.convert
-import xlib.*
+import xlib.KeyPress
+import xlib.XEvent
 
 class KeyPressHandler(
     private val logger: Logger,
@@ -16,8 +16,7 @@ class KeyPressHandler(
     private val toggleSessionManager: KeySessionManager,
     private val monitorManager: MonitorManager,
     private val windowCoordinator: WindowCoordinator,
-    private val windowFocusHandler: WindowFocusHandler,
-    private val uiDrawer: UIDrawing
+    private val windowFocusHandler: WindowFocusHandler
 ) : XEventHandler {
     override val xEventType = KeyPress
 
@@ -57,14 +56,12 @@ class KeyPressHandler(
         val focusedWindow = windowFocusHandler.getFocusedWindow() ?: return
         logger.logDebug("KeyPressHandler::moveWindowToNextMonitor::focused window: $focusedWindow")
         windowCoordinator.moveWindowToNextMonitor(focusedWindow)
-        uiDrawer.drawWindowManagerFrame()
     }
 
     private fun moveWindowToPreviousMonitor() {
         val focusedWindow = windowFocusHandler.getFocusedWindow() ?: return
         logger.logDebug("KeyPressHandler::moveWindowToPreviousMonitor::focused window: $focusedWindow")
         windowCoordinator.moveWindowToPreviousMonitor(focusedWindow)
-        uiDrawer.drawWindowManagerFrame()
     }
 
     private fun toggleFocusedWindowForward() {
@@ -82,7 +79,5 @@ class KeyPressHandler(
     private fun toggleScreenMode() {
         logger.logDebug("KeyPressHandler::toggleScreenMode::")
         monitorManager.toggleScreenMode()
-        windowCoordinator.realignWindows()
-        uiDrawer.drawWindowManagerFrame()
     }
 }

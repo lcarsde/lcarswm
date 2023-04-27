@@ -10,8 +10,6 @@ import xlib.*
  * API interface for X drawing functions
  */
 interface DrawApi {
-    fun fillArcs(drawable: Drawable, graphicsContext: GC, arcs: CValuesRef<XArc>, arcCount: Int): Int
-
     fun fillRectangle(drawable: Drawable, graphicsContext: GC, x: Int, y: Int, width: UInt, height: UInt): Int
 
     fun fillRectangles(drawable: Drawable, graphicsContext: GC, rects: CValuesRef<XRectangle>, rectCount: Int): Int

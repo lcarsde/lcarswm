@@ -6,7 +6,10 @@ import de.atennert.lcarswm.atom.NumberAtomReader
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.command.PosixCommander
-import de.atennert.lcarswm.drawing.*
+import de.atennert.lcarswm.drawing.ColorFactory
+import de.atennert.lcarswm.drawing.FontProvider
+import de.atennert.lcarswm.drawing.FrameDrawer
+import de.atennert.lcarswm.drawing.RootWindowDrawer
 import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.events.*
 import de.atennert.lcarswm.file.Files
@@ -24,6 +27,10 @@ import de.atennert.lcarswm.signal.SignalHandler
 import de.atennert.lcarswm.system.MessageQueue
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.*
+import de.atennert.rx.NextObserver
+import de.atennert.rx.operators.map
+import de.atennert.rx.operators.withLatestFrom
+import de.atennert.rx.util.Tuple
 import exitState
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.cinterop.*
@@ -40,6 +47,7 @@ private const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotify
         RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
 
 fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenerator): RuntimeResources? {
+    val eventStore = EventStore()
     val commander = PosixCommander(logger)
     val files = resourceGenerator.createFiles()
     val environment = resourceGenerator.createEnvironment()
@@ -61,13 +69,25 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     val eventBuffer = EventBuffer(system)
 
-    listOf(Signal.USR1, Signal.USR2, Signal.TERM, Signal.INT, Signal.HUP, Signal.PIPE, Signal.CHLD, Signal.TTIN, Signal.TTOU)
-        .forEach { signalHandler.addSignalCallback(it, staticCFunction { signal ->
-            handleSignal(
-                signal,
-                exitState
-            )
-        }) }
+    listOf(
+        Signal.USR1,
+        Signal.USR2,
+        Signal.TERM,
+        Signal.INT,
+        Signal.HUP,
+        Signal.PIPE,
+        Signal.CHLD,
+        Signal.TTIN,
+        Signal.TTOU
+    )
+        .forEach {
+            signalHandler.addSignalCallback(it, staticCFunction { signal ->
+                handleSignal(
+                    signal,
+                    exitState
+                )
+            })
+        }
 
     val screen = system.defaultScreenOfDisplay()?.pointed
     if (screen == null) {
@@ -146,13 +166,42 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     system.sync(false)
 
-    val focusHandler = WindowFocusHandler()
+    val windowList = WindowList()
 
-    val frameDrawer = FrameDrawer(system, system, focusHandler, fontProvider, colorHandler, screen)
+    val focusHandler = WindowFocusHandler(windowList)
 
-    val windowCoordinator = ActiveWindowCoordinator(system, monitorManager, frameDrawer)
+    val frameDrawer = FrameDrawer(system, system, fontProvider, colorHandler, screen)
 
-    val windowFactory = PosixWindowFactory(system.display, screen, colorHandler, fontProvider, keyManager)
+    val textAtomReader = TextAtomReader(system, atomLibrary)
+    val numberAtomReader = NumberAtomReader(system.display, atomLibrary)
+
+    val windowFactory = PosixWindowFactory(
+        logger,
+        system.display,
+        screen,
+        colorHandler,
+        fontProvider,
+        keyManager,
+        monitorManager,
+        atomLibrary,
+        eventStore,
+        focusHandler,
+        windowList,
+        textAtomReader,
+        numberAtomReader,
+        frameDrawer,
+    )
+
+    val windowCoordinator =
+        PosixWindowCoordinator(
+            logger,
+            eventStore,
+            monitorManager,
+            windowFactory,
+            windowList,
+            uiDrawer,
+            screen.display
+        )
 
     val modeButton = windowFactory.createButton(
         "MODE",
@@ -163,8 +212,6 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
         BAR_HEIGHT
     ) {
         monitorManager.toggleFramedScreenMode()
-        windowCoordinator.realignWindows()
-        uiDrawer.drawWindowManagerFrame()
     }
 
     val screenChangeHandler =
@@ -172,20 +219,10 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
             system,
             randrHandlerFactory,
             monitorManager,
-            windowCoordinator,
-            uiDrawer,
             screen.root
         )
 
-    val textAtomReader = TextAtomReader(system, atomLibrary)
-    val numberAtomHandler = NumberAtomReader(system.display, atomLibrary)
-
-    val appMenuHandler = AppMenuHandler(system, atomLibrary, monitorManager, screen.root)
-    val statusBarHandler = StatusBarHandler(system, atomLibrary, monitorManager, screen.root)
-
-    val appMenuMessageQueue = MessageQueue(system, "/lcarswm-app-menu-messages", MessageQueue.Mode.READ)
-
-    val windowList = WindowList()
+    val appMenuMessageQueue = MessageQueue("/lcarswm-app-menu-messages", MessageQueue.Mode.READ)
 
     val appMenuMessageHandler = AppMenuMessageHandler(
         logger,
@@ -195,73 +232,48 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
         focusHandler
     )
 
-    val windowRegistration = WindowHandler(
-        system.display,
-        system,
-        logger,
-        windowCoordinator,
-        focusHandler,
-        atomLibrary,
-        screen,
-        textAtomReader,
-        numberAtomHandler,
-        appMenuHandler,
-        statusBarHandler,
-        windowList,
-        keyManager
-    )
-
-    val moveWindowManager = MoveWindowManager(logger, windowCoordinator)
+    val moveWindowManager = MoveWindowManager(logger, windowCoordinator, monitorManager)
 
     focusHandler.registerObserver(
-        FocusSessionKeyboardGrabber(system, eventTime, rootWindowPropertyHandler.ewmhSupportWindow))
+        FocusSessionKeyboardGrabber(system, eventTime, rootWindowPropertyHandler.ewmhSupportWindow)
+    )
 
     focusHandler.registerObserver(InputFocusHandler(logger, system, eventTime, screen.root))
 
-    focusHandler.registerObserver { activeWindow, oldWindow, _ ->
-        listOf(oldWindow, activeWindow).forEach {
-            it?.let { ow ->
-                windowRegistration[ow]?.let { fw ->
-                    frameDrawer.drawFrame(fw, windowCoordinator.getMonitorForWindow(ow))
-                }
-            }
-        }
-    }
+    focusHandler.windowFocusEventObs
+        .apply(withLatestFrom(windowList.windowsObs))
+        .apply(map { (event, windows) ->
+            Tuple(
+                windows.find { it.id == event.oldWindow },
+                windows.find { it.id == event.newWindow }
+            )
+        })
+        .subscribe(NextObserver { (oldWindow, newWindow) ->
+            oldWindow?.unfocus()
+            newWindow?.focus()
+        })
 
     focusHandler.registerObserver { activeWindow, _, _ ->
         activeWindow?.let { windowCoordinator.stackWindowToTheTop(it) }
     }
 
-    focusHandler.registerObserver(appMenuHandler.focusObserver)
-
-    monitorManager.registerObserver(appMenuHandler)
-    monitorManager.registerObserver(statusBarHandler)
-    monitorManager.registerObserver(moveWindowManager)
-    monitorManager.registerObserver(modeButton)
-
-    windowList.register(appMenuHandler.windowListObserver)
-    windowList.register(WindowListAtomHandler(screen.root, system, atomLibrary))
+    updateWindowListAtom(screen.root, system, atomLibrary, windowList)
 
     toggleSessionManager.addListener(focusHandler.keySessionListener)
 
     val eventManager = createEventManager(
+        eventStore,
         system,
         logger,
         monitorManager,
-        windowRegistration,
         windowCoordinator,
         focusHandler,
         keyManager,
         moveWindowManager,
         toggleSessionManager,
-        uiDrawer,
         atomLibrary,
         screenChangeHandler,
         keyConfiguration,
-        textAtomReader,
-        appMenuHandler,
-        statusBarHandler,
-        frameDrawer,
         windowList,
         commander,
         screen.root,
@@ -272,7 +284,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
         system,
         screen.root,
         rootWindowPropertyHandler,
-        windowRegistration
+        windowFactory
     )
 
     val xEventResources = XEventResources(eventManager, eventTime, eventBuffer)
@@ -309,7 +321,7 @@ private fun setupScreen(
     system: SystemApi,
     rootWindow: Window,
     rootWindowPropertyHandler: RootWindowPropertyHandler,
-    windowRegistration: WindowHandler
+    windowFactory: WindowFactory<Window>
 ) {
     system.grabServer()
 
@@ -328,7 +340,7 @@ private fun setupScreen(
         .filter { childId -> childId != rootWindow }
         .filter { childId -> childId != rootWindowPropertyHandler.ewmhSupportWindow }
         .forEach { childId ->
-            windowRegistration.addWindow(childId, true)
+            windowFactory.createWindow(childId, true)
         }
 
     nativeHeap.free(topLevelWindows)
@@ -338,7 +350,12 @@ private fun setupScreen(
 /**
  * Load the key configuration from the users key configuration file.
  */
-private fun loadSettings(logger: Logger, systemApi: SystemApi, files: Files, environment: Environment): SettingsReader? {
+private fun loadSettings(
+    logger: Logger,
+    systemApi: SystemApi,
+    files: Files,
+    environment: Environment
+): SettingsReader? {
     val configPath = environment[HOME_CONFIG_DIR_PROPERTY] ?: return null
 
     return SettingsReader(logger, systemApi, files, configPath)
@@ -351,11 +368,9 @@ private fun setupRandr(
     system: SystemApi,
     randrHandlerFactory: RandrHandlerFactory,
     monitorManager: MonitorManager,
-    windowCoordinator: WindowCoordinator,
-    uiDrawer: UIDrawing,
     rootWindowId: Window
 ): XEventHandler {
-    val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler(monitorManager, windowCoordinator, uiDrawer)
+    val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler(monitorManager)
     val fakeEvent = nativeHeap.alloc<XEvent>()
     screenChangeHandler.handleEvent(fakeEvent)
     nativeHeap.free(fakeEvent)
@@ -369,23 +384,18 @@ private fun setupRandr(
  * Create the event handling for the event loop.
  */
 private fun createEventManager(
+    eventStore: EventStore,
     system: SystemApi,
     logger: Logger,
     monitorManager: MonitorManager,
-    windowRegistration: WindowRegistration,
     windowCoordinator: WindowCoordinator,
     focusHandler: WindowFocusHandler,
     keyManager: KeyManager,
     moveWindowManager: MoveWindowManager,
     toggleSessionManager: KeySessionManager,
-    uiDrawer: UIDrawing,
     atomLibrary: AtomLibrary,
     screenChangeHandler: XEventHandler,
     keyConfiguration: KeyConfiguration,
-    textAtomReader: TextAtomReader,
-    appMenuHandler: AppMenuHandler,
-    statusBarHandler: StatusBarHandler,
-    frameDrawer: FrameDrawer,
     windowList: WindowList,
     commander: Commander,
     rootWindowId: Window,
@@ -393,20 +403,41 @@ private fun createEventManager(
 ): EventDistributor {
 
     return EventDistributor.Builder(logger)
-        .addEventHandler(ConfigureRequestHandler(system, logger, windowRegistration, windowCoordinator, appMenuHandler, statusBarHandler))
-        .addEventHandler(DestroyNotifyHandler(logger, windowRegistration, appMenuHandler, statusBarHandler))
+        .addEventHandler(ConfigureRequestHandler(logger, eventStore))
+        .addEventHandler(DestroyNotifyHandler(logger, eventStore))
         .addEventHandler(ButtonPressHandler(logger, system, windowList, focusHandler, moveWindowManager, modeButton))
         .addEventHandler(ButtonReleaseHandler(logger, moveWindowManager, modeButton))
-        .addEventHandler(KeyPressHandler(logger, keyManager, keyConfiguration, toggleSessionManager, monitorManager, windowCoordinator, focusHandler, uiDrawer))
-        .addEventHandler(KeyReleaseHandler(logger, system, focusHandler, keyManager, keyConfiguration, toggleSessionManager, atomLibrary, commander))
-        .addEventHandler(MapRequestHandler(logger, windowRegistration))
+        .addEventHandler(
+            KeyPressHandler(
+                logger,
+                keyManager,
+                keyConfiguration,
+                toggleSessionManager,
+                monitorManager,
+                windowCoordinator,
+                focusHandler
+            )
+        )
+        .addEventHandler(
+            KeyReleaseHandler(
+                logger,
+                system,
+                focusHandler,
+                keyManager,
+                keyConfiguration,
+                toggleSessionManager,
+                atomLibrary,
+                commander
+            )
+        )
+        .addEventHandler(MapRequestHandler(logger, eventStore))
         .addEventHandler(MotionNotifyHandler(logger, moveWindowManager))
-        .addEventHandler(UnmapNotifyHandler(logger, windowRegistration, uiDrawer))
+        .addEventHandler(UnmapNotifyHandler(logger, eventStore))
         .addEventHandler(screenChangeHandler)
-        .addEventHandler(ReparentNotifyHandler(logger, windowRegistration))
+        .addEventHandler(ReparentNotifyHandler(logger, eventStore))
         .addEventHandler(ClientMessageHandler(logger, atomLibrary))
         .addEventHandler(SelectionClearHandler(logger))
         .addEventHandler(MappingNotifyHandler(logger, keyManager, keyConfiguration, rootWindowId))
-        .addEventHandler(PropertyNotifyHandler(atomLibrary, windowRegistration, textAtomReader, frameDrawer, windowCoordinator, rootWindowId))
+        .addEventHandler(PropertyNotifyHandler(atomLibrary, eventStore))
         .build()
 }

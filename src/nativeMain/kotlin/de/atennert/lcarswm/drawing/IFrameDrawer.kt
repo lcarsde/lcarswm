@@ -1,10 +1,11 @@
 package de.atennert.lcarswm.drawing
 
-import de.atennert.lcarswm.window.FramedWindow
-import de.atennert.lcarswm.monitor.Monitor
+import de.atennert.lcarswm.ScreenMode
+import de.atennert.lcarswm.window.WindowMeasurements
 import xlib.Colormap
+import xlib.Window
 
 interface IFrameDrawer {
     val colorMap: Colormap
-    fun drawFrame(window: FramedWindow, monitor: Monitor)
+    fun drawFrame(measurements: WindowMeasurements, screenMode: ScreenMode, isFocused: Boolean, title: String, titleBar: Window)
 }

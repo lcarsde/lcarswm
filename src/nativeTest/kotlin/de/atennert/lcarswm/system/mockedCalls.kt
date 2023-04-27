@@ -1,7 +1,62 @@
+@file:Suppress("UNUSED_PARAMETER")
+
 package de.atennert.lcarswm.system
 
 import kotlinx.cinterop.*
+import platform.linux.mq_attr
+import platform.linux.mqd_t
+import platform.posix.size_t
 import xlib.*
+
+fun mockXGrabServer(display: CValuesRef<Display>?) = 0
+
+fun mockXUngrabServer(display: CValuesRef<Display>?) = 0
+
+fun mockXGetWindowAttributes(
+    display: CValuesRef<Display>?,
+    window: Window,
+    attributes: CValuesRef<XWindowAttributes>?
+) = 0
+
+fun mockXChangeWindowAttributes(
+    display: CValuesRef<Display>?,
+    window: Window,
+    mask: ULong,
+    attributes: CValuesRef<XSetWindowAttributes>?
+) = 0
+
+fun mockXGetTextProperty(
+    display: CValuesRef<Display>?,
+    window: Window,
+    textProperty: CValuesRef<XTextProperty>?,
+    atom: Atom
+) = 0
+
+fun mockXGetWindowProperty(
+    display: CValuesRef<Display>?,
+    window: Window,
+    property: Atom,
+    offset: Long,
+    length: Long,
+    delete: Int,
+    type: Atom,
+    returnType: CValuesRef<ULongVar>?,
+    returnFormat: CValuesRef<IntVar>?,
+    returnItemCount: CValuesRef<ULongVar>?,
+    returnBytesAfter: CValuesRef<ULongVar>?,
+    returnProperty: CValuesRef<CPointerVar<UByteVar>>?,
+) = 0
+
+fun mockXChangeProperty(
+    display: CValuesRef<Display>?,
+    window: Window,
+    property: Atom,
+    type: Atom,
+    format: Int,
+    mode: Int,
+    data: CValuesRef<UByteVar>?,
+    dataCount: Int,
+) = 0
 
 fun mockXCreateSimpleWindow(
     display: CValuesRef<Display>?,
@@ -25,22 +80,13 @@ fun mockXClearWindow(display: CValuesRef<Display>?, window: Window): Int = 0
 
 fun mockXMoveWindow(display: CValuesRef<Display>?, window: Window, x: Int, y: Int): Int = 0
 
-fun mockXGetWindowProperty(
-    display: CValuesRef<Display>?,
-    window: Window,
-    atom: Atom,
-    longOffset: Long,
-    longLength: Long,
-    delete: Int,
-    type: Atom,
-    actualReturnType: CValuesRef<AtomVar>?,
-    actualReturnFormat: CValuesRef<IntVar>?,
-    returnItemCount: CValuesRef<ULongVar>?,
-    bytesAfterReturn: CValuesRef<ULongVar>?,
-    returnProperty: CValuesRef<CPointerVar<UByteVar>>?
-): Int {
-    return BadAccess
-}
+fun mockXResizeWindow(display: CValuesRef<Display>?, window: Window, width: UInt, height: UInt) = 0
+
+fun mockXMoveResizeWindow(display: CValuesRef<Display>?, window: Window, x: Int, y: Int, width: UInt, height: UInt) = 0
+
+fun mockXSetWindowBorderWidth(display: CValuesRef<Display>?, window: Window, borderWidth: UInt) = 0
+
+fun mockXFlush(display: CValuesRef<Display>?) = 0
 
 fun mockXCreatePixmap(
     display: CValuesRef<Display>?,
@@ -61,6 +107,31 @@ fun mockXGetTransientForHint(
     window: Window,
     propWindowReturn: CValuesRef<WindowVar>?
 ): Int = 0
+
+fun mockXSendEvent(
+    display: CValuesRef<Display>?,
+    window: Window,
+    propagate: Int,
+    eventMask: Long,
+    event: CValuesRef<XEvent>?,
+) = 0
+
+fun mockXConfigureWindow(
+    display: CValuesRef<Display>?,
+    window: Window,
+    valueMask: UInt,
+    changes: CValuesRef<XWindowChanges>?,
+) = 0
+
+fun mockXSelectInput(
+    display: CValuesRef<Display>?,
+    window: Window,
+    eventMask: Long,
+) = 0
+
+fun mockXAddToSaveSet(display: CValuesRef<Display>?, window: Window) = 0
+
+fun mockXRemoveFromSaveSet(display: CValuesRef<Display>?, window: Window) = 0
 
 fun mockXftDrawCreate(
     display: CValuesRef<Display>?,
@@ -108,3 +179,13 @@ fun mockPangoXftRenderLayoutLine(
     y: Int
 ) {
 }
+
+fun mockMqOpen(name: String?, oflag: Int, permissions: mode_t, attributes: mq_attr): mqd_t = 1
+
+fun mockMqClose(mqd: mqd_t) = 0
+
+fun mockMqSend(mqd: mqd_t, message: String?, messageSize: size_t, prio: UInt) = 0
+
+fun mockMqReceive(mqd: mqd_t, message: CValuesRef<ByteVar>?, length: size_t, prio: CValuesRef<UIntVar>?): ssize_t = 0
+
+fun mockMqUnlink(name: String?) = 0

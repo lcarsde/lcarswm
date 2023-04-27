@@ -1,41 +1,43 @@
 package de.atennert.lcarswm.window
 
+import de.atennert.rx.BehaviorSubject
+import de.atennert.rx.Subject
 import xlib.Window
 
+sealed class WindowEvent(val window: ManagedWmWindow<Window>)
+class WindowAddedEvent(window: ManagedWmWindow<Window>) : WindowEvent(window)
+class WindowUpdatedEvent(window: ManagedWmWindow<Window>) : WindowEvent(window)
+class WindowRemovedEvent(window: ManagedWmWindow<Window>) : WindowEvent(window)
+
 class WindowList {
-    private val windows = mutableSetOf<FramedWindow>()
+    private val windowsSj = BehaviorSubject<Set<ManagedWmWindow<Window>>>(emptySet())
+    val windowsObs = windowsSj.asObservable()
+    private var windows by windowsSj
 
-    private val observers = mutableSetOf<Observer>()
+    private val windowEventSj = Subject<WindowEvent>()
+    val windowEventObs = windowEventSj.asObservable()
 
-    fun register(observer: Observer) {
-        observers.add(observer)
+    fun add(window: ManagedWmWindow<Window>) {
+        windows += window
+        windowEventSj.next(WindowAddedEvent(window))
     }
 
-    fun add(window: FramedWindow) {
-        windows.add(window)
-        observers.forEach { observer -> observer.windowAdded(window) }
+    fun remove(window: ManagedWmWindow<Window>) {
+        windows -= window
+        windowEventSj.next(WindowRemovedEvent(window))
     }
 
-    fun remove(window: FramedWindow) {
-        windows.remove(window)
-        observers.forEach { observer -> observer.windowRemoved(window) }
-    }
-
-    fun remove(windowId: Window): FramedWindow? {
+    fun remove(windowId: Window): ManagedWmWindow<Window>? {
         val window = get(windowId) ?: return null
         remove(window)
         return window
     }
 
-    fun get(windowId: Window): FramedWindow? {
+    fun get(windowId: Window): ManagedWmWindow<Window>? {
         return windows.firstOrNull { it.id == windowId }
     }
 
-    fun getByFrame(windowId: Window): FramedWindow? {
-        return windows.firstOrNull { it.frame == windowId }
-    }
-
-    fun getByAny(windowId: Window): FramedWindow? {
+    fun getByAny(windowId: Window): ManagedWmWindow<Window>? {
         return windows.firstOrNull {
             it.id == windowId
                     || it.frame == windowId
@@ -43,24 +45,7 @@ class WindowList {
         }
     }
 
-    fun getAll(): Set<FramedWindow> {
-        return windows
-    }
-
-    fun update(window: FramedWindow) {
-        windows.add(window)
-        observers.forEach { observer -> observer.windowUpdated(window) }
-    }
-
     fun isManaged(windowId: Window): Boolean {
         return windows.any { it.id == windowId }
-    }
-
-    interface Observer {
-        fun windowAdded(window: FramedWindow)
-
-        fun windowRemoved(window: FramedWindow)
-
-        fun windowUpdated(window: FramedWindow)
     }
 }

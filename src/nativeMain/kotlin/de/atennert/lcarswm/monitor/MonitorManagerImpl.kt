@@ -2,6 +2,8 @@ package de.atennert.lcarswm.monitor
 
 import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.system.api.RandrApi
+import de.atennert.rx.BehaviorSubject
+import de.atennert.rx.operators.map
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.get
@@ -10,16 +12,27 @@ import xlib.*
 import kotlin.math.max
 
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager {
-    private var monitors: List<Monitor> = emptyList()
 
-    private var screenMode = ScreenMode.NORMAL
+    private val screenModeSj = BehaviorSubject(ScreenMode.NORMAL)
+    override val screenModeObs = screenModeSj.asObservable()
+    private var screenMode by screenModeSj
 
-    private val observers = mutableListOf<MonitorObserver>()
+    private val monitorsSj = BehaviorSubject<List<Monitor>>(emptyList())
+    override val monitorsObs = monitorsSj.asObservable()
+    private var monitors by monitorsSj
 
-    fun registerObserver(observer: MonitorObserver) {
-        observers.add(observer)
-        observer.updateMonitors(monitors)
-    }
+    override val primaryMonitorObs = monitorsObs
+        .apply(map { monitors -> monitors.firstOrNull { it.isPrimary } })
+
+    override val combinedScreenSizeObs = monitorsObs
+        .apply(map { monitors ->
+            monitors.fold(Pair(0, 0)) { (oldWidth, oldHeight), monitor ->
+                Pair(
+                    max(monitor.x + monitor.width, oldWidth),
+                    max(monitor.y + monitor.height, oldHeight)
+                )
+            }
+        })
 
     override fun updateMonitorList() {
         val monitorData = getMonitorData()
@@ -40,8 +53,6 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
             .zip(activeMonitorInfos.map { it.second })
             .map { (monitor, outputInfo) -> addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData) }
             .sortedBy { (it.y + it.height).toULong().shl(32) + it.x.toULong() }
-
-        observers.forEach { it.updateMonitors(monitors) }
     }
 
     private fun getMonitorData(): CPointer<XRRScreenResources> {
@@ -85,27 +96,12 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         return monitor
     }
 
-    override fun getMonitors(): List<Monitor> = monitors.toList()
-
-    override fun getPrimaryMonitor(): Monitor = monitors.single { it.isPrimary }
-
-    override fun getCombinedScreenSize(): Pair<Int, Int> = monitors
-        .fold(Pair(0, 0)) { (oldWidth, oldHeight), monitor ->
-            Pair(
-                max(monitor.x + monitor.width, oldWidth),
-                max(monitor.y + monitor.height, oldHeight)
-            )
-        }
-
-    override fun getScreenMode(): ScreenMode = screenMode
-
     override fun toggleScreenMode() {
         screenMode = when (screenMode) {
             ScreenMode.NORMAL -> ScreenMode.MAXIMIZED
             ScreenMode.MAXIMIZED -> ScreenMode.FULLSCREEN
             ScreenMode.FULLSCREEN -> ScreenMode.NORMAL
         }
-        observers.forEach { it.toggleScreenMode(screenMode) }
     }
 
     override fun toggleFramedScreenMode() {
@@ -114,6 +110,5 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         } else {
             ScreenMode.NORMAL
         }
-        observers.forEach { it.toggleScreenMode(screenMode) }
     }
 }

@@ -3,13 +3,8 @@ package de.atennert.lcarswm.system
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
-import platform.linux.mq_attr
-import platform.linux.mqd_t
-import platform.posix.mode_t
 import platform.posix.sigaction
 import platform.posix.sigset_t
-import platform.posix.size_t
-import platform.posix.ssize_t
 import xlib.*
 import kotlin.test.assertEquals
 
@@ -62,11 +57,6 @@ open class SystemFacadeMock : SystemApi {
         crtcInfo.width = usedCrtcInfos[2].convert()
         crtcInfo.height = usedCrtcInfos[3].convert()
         return crtcInfo.ptr
-    }
-
-    override fun fillArcs(drawable: Drawable, graphicsContext: GC, arcs: CValuesRef<XArc>, arcCount: Int): Int {
-        functionCalls.add(FunctionCall("fillArcs", drawable, graphicsContext, arcs, arcCount))
-        return 0
     }
 
     override fun fillRectangle(
@@ -376,35 +366,6 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    override fun configureWindow(
-        window: Window,
-        configurationMask: UInt,
-        configuration: CPointer<XWindowChanges>
-    ): Int {
-        functionCalls.add(FunctionCall("configureWindow", window, configurationMask, configuration))
-        return 0
-    }
-
-    override fun setWindowBorderWidth(window: Window, borderWidth: UInt): Int {
-        functionCalls.add(FunctionCall("setWindowBorderWidth", window, borderWidth))
-        return 0
-    }
-
-    override fun reparentWindow(window: Window, parent: Window, x: Int, y: Int): Int {
-        functionCalls.add(FunctionCall("reparentWindow", window, parent, x, y))
-        return 0
-    }
-
-    override fun resizeWindow(window: Window, width: UInt, height: UInt): Int {
-        functionCalls.add(FunctionCall("resizeWindow", window, width, height))
-        return 0
-    }
-
-    override fun moveResizeWindow(window: Window, x: Int, y: Int, width: UInt, height: UInt): Int {
-        functionCalls.add(FunctionCall("moveResizeWindow", window, x, y, width, height))
-        return 0
-    }
-
     override fun lowerWindow(window: Window): Int {
         functionCalls.add(FunctionCall("lowerWindow", window))
         return 0
@@ -415,21 +376,12 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    override fun unmapWindow(window: Window): Int {
-        functionCalls.add(FunctionCall("unmapWindow", window))
-        return 0
-    }
-
     override fun destroyWindow(window: Window): Int {
         functionCalls.add(FunctionCall("destroyWindow", window))
         return 0
     }
 
     override var display: CPointer<Display>? = null
-
-    override fun flush() {
-        functionCalls.add(FunctionCall("flush"))
-    }
 
     override fun openDisplay(): Boolean {
         functionCalls.add(FunctionCall("openDisplay"))
@@ -469,16 +421,6 @@ open class SystemFacadeMock : SystemApi {
         return 0
     }
 
-    override fun addToSaveSet(window: Window): Int {
-        functionCalls.add(FunctionCall("addToSaveSet", window))
-        return 0
-    }
-
-    override fun removeFromSaveSet(window: Window): Int {
-        functionCalls.add(FunctionCall("removeFromSaveSet", window))
-        return 0
-    }
-
     override fun queryTree(
         window: Window,
         rootReturn: CValuesRef<WindowVar>,
@@ -487,17 +429,6 @@ open class SystemFacadeMock : SystemApi {
         childrenReturnCounts: CValuesRef<UIntVar>
     ): Int {
         functionCalls.add(FunctionCall("queryTree", window, rootReturn, parentReturn, childrenReturn, childrenReturnCounts))
-        return 0
-    }
-
-    val windowBorderWidth = 2
-    override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
-        attributes.pointed.border_width = windowBorderWidth
-        return 1
-    }
-
-    override fun changeWindowAttributes(window: Window, mask: ULong, attributes: CPointer<XSetWindowAttributes>): Int {
-        functionCalls.add(FunctionCall("changeWindowAttributes", window, mask, attributes))
         return 0
     }
 
@@ -595,11 +526,6 @@ open class SystemFacadeMock : SystemApi {
         return nextWindowId++
     }
 
-    override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
-        functionCalls.add(FunctionCall("createSimpleWindow", parentWindow, measurements))
-        return nextWindowId++
-    }
-
     private var selectionOwner: Window = None.convert()
 
     override fun getSelectionOwner(atom: Atom): Window {
@@ -646,39 +572,6 @@ open class SystemFacadeMock : SystemApi {
     override fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>, oldSigAction: CPointer<sigaction>?) {
         functionCalls.add(FunctionCall("sigAction", signal, newSigAction, oldSigAction))
         signalActions[signal] = newSigAction
-    }
-
-    override fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?) {
-        functionCalls.add(FunctionCall("sigProcMask", how, newSigset, oldSigset))
-    }
-
-    override fun mqOpen(name: String, oFlag: Int, mode: mode_t, attributes: CPointer<mq_attr>): mqd_t {
-        functionCalls.add(FunctionCall("mqOpen", name, oFlag, mode, attributes))
-        return 0
-    }
-
-    override fun mqClose(mq: mqd_t): Int {
-        functionCalls.add(FunctionCall("mqClose", mq))
-        return 0
-    }
-
-    override fun mqSend(mq: mqd_t, msg: String, msgPrio: UInt): Int {
-        functionCalls.add(FunctionCall("mqSend", mq, msg, msgPrio))
-        return 0
-    }
-
-    override fun mqReceive(
-        mq: mqd_t,
-        msgPtr: CPointer<ByteVar>,
-        msgSize: size_t,
-        msgPrio: CPointer<UIntVar>?
-    ): ssize_t {
-        return 0
-    }
-
-    override fun mqUnlink(name: String): Int {
-        functionCalls.add(FunctionCall("mqUnlink", name))
-        return 0
     }
 
     override fun xftGetContext(screen: Int): CPointer<PangoContext>? {

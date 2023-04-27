@@ -2,6 +2,9 @@ package de.atennert.lcarswm.monitor
 
 import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.system.SystemFacadeMock
+import de.atennert.rx.NextObserver
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.shouldBe
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
@@ -10,8 +13,8 @@ import xlib.Window
 import xlib.XRROutputInfo
 import xlib.XRRScreenResources
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class MonitorManagerImplTest {
     @Test
@@ -19,20 +22,24 @@ class MonitorManagerImplTest {
         val systemApi = SystemFacadeMock()
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        val eventObserver = TestObserver()
-        monitorManager.registerObserver(eventObserver)
+        val monitors = mutableListOf<List<Monitor>>()
+        val monitorSub = monitorManager.monitorsObs.subscribe(NextObserver(monitors::add))
+        val primaries = mutableListOf<Monitor?>()
+        val primarySub = monitorManager.primaryMonitorObs.subscribe(NextObserver(primaries::add))
 
         monitorManager.updateMonitorList()
 
-        val monitorList = monitorManager.getMonitors()
-        val primaryMonitor = monitorManager.getPrimaryMonitor()
+        assertEquals( systemApi.outputs.toList(), monitors.last().map { it.id }, "The monitor IDs should match")
+        assertEquals( systemApi.outputNames.toList(), monitors.last().map { it.name }, "The monitor names should match")
+        assertEquals(systemApi.primaryOutput, primaries.last()?.id, "The ID of the primary monitor should match")
 
-        assertEquals(systemApi.outputs.size, monitorList.size, "There should be as many monitors as provided outputs")
+        monitors.last().shouldContain(primaries.last())
 
-        assertTrue(monitorList.contains(primaryMonitor), "The primary monitor should be part of the monitor list")
-        assertEquals(systemApi.primaryOutput, primaryMonitor.id, "The ID of the primary monitor should match")
+        monitors.size.shouldBe(2) // initial list + update
+        primaries.size.shouldBe(2) // initial monitor + update
 
-        assertEquals(2, eventObserver.monitorUpdates, "The event observer should have gotten updates for the monitors")
+        monitorSub.unsubscribe()
+        primarySub.unsubscribe()
     }
 
     @Test
@@ -42,27 +49,17 @@ class MonitorManagerImplTest {
         }
         val monitorManager: MonitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        monitorManager.updateMonitorList()
-
-        val monitorList = monitorManager.getMonitors()
-        val primaryMonitor = monitorManager.getPrimaryMonitor()
-
-        assertEquals(monitorList[0], primaryMonitor, "The first monitor shall become the primary, if there's no primary")
-    }
-
-    @Test
-    fun `check that monitors have their names`() {
-        val systemApi = SystemFacadeMock()
-
-        val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
+        val monitors = mutableListOf<List<Monitor>>()
+        val monitorSub = monitorManager.monitorsObs.subscribe(NextObserver(monitors::add))
+        val primaries = mutableListOf<Monitor?>()
+        val primarySub = monitorManager.primaryMonitorObs.subscribe(NextObserver(primaries::add))
 
         monitorManager.updateMonitorList()
 
-        val monitorList = monitorManager.getMonitors()
+        assertEquals(monitors.last()[0].id, primaries.last()?.id, "The first monitor shall become the primary, if there's no primary")
 
-        monitorList.forEachIndexed { index, monitor ->
-            assertEquals(systemApi.outputNames[index], monitor.name, "The monitor names should be correct")
-        }
+        monitorSub.unsubscribe()
+        primarySub.unsubscribe()
     }
 
     @Test
@@ -71,17 +68,20 @@ class MonitorManagerImplTest {
 
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
+        val monitors = mutableListOf<List<Monitor>>()
+        val monitorSub = monitorManager.monitorsObs.subscribe(NextObserver(monitors::add))
+
         monitorManager.updateMonitorList()
 
-        val monitorList = monitorManager.getMonitors()
-
-        monitorList.forEachIndexed { index, monitor ->
+        monitors.last().forEachIndexed { index, monitor ->
             val totalMeasurements = systemApi.crtcInfos[index]
             assertEquals(totalMeasurements[0], monitor.x, "The expected x value needs to match the monitors x value")
             assertEquals(totalMeasurements[1], monitor.y, "The expected y value needs to match the monitors y value")
             assertEquals(totalMeasurements[2], monitor.width, "The expected width needs to match the monitors width")
             assertEquals(totalMeasurements[3], monitor.height, "The expected height needs to match the monitors height")
         }
+
+        monitorSub.unsubscribe()
     }
 
     @Test
@@ -101,13 +101,14 @@ class MonitorManagerImplTest {
 
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
+        val monitors = mutableListOf<List<Monitor>>()
+        val monitorSub = monitorManager.monitorsObs.subscribe(NextObserver(monitors::add))
+
         monitorManager.updateMonitorList()
 
-        val monitorList = monitorManager.getMonitors()
+        assertContentEquals(listOf(systemApi.outputs[0]), monitors.last().map { it.id }, "The monitor with crtc should be in the monitor list ${monitors.last()}")
 
-        assertEquals(1, monitorList.size, "There should only be one monitor as the other doesn't have a crtc")
-
-        assertEquals(systemApi.outputs[0], monitorList[0].id, "The monitor with crtc should be in the monitor list")
+        monitorSub.unsubscribe()
     }
 
     @Test
@@ -116,13 +117,18 @@ class MonitorManagerImplTest {
 
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
+        val measurements = mutableListOf<Pair<Int, Int>>()
+        val measurementSub = monitorManager.combinedScreenSizeObs.subscribe(NextObserver(measurements::add))
+
         monitorManager.updateMonitorList()
 
-        val (width, height) = monitorManager.getCombinedScreenSize()
+        val (width, height) = measurements.last()
 
         assertEquals(2000, width, "The width should match the combined screen width")
 
         assertEquals(500, height, "The height should match the combined screen height")
+
+        measurementSub.unsubscribe()
     }
 
     @Test
@@ -131,7 +137,12 @@ class MonitorManagerImplTest {
 
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        assertEquals(ScreenMode.NORMAL, monitorManager.getScreenMode(), "The default screen mode should be normal")
+        val screenModes = mutableListOf<ScreenMode>()
+        val screenModeSub = monitorManager.screenModeObs.subscribe(NextObserver(screenModes::add))
+
+        assertContentEquals(listOf(ScreenMode.NORMAL), screenModes, "The default screen mode should be normal")
+
+        screenModeSub.unsubscribe()
     }
 
     @Test
@@ -140,28 +151,15 @@ class MonitorManagerImplTest {
 
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        val eventListener = TestObserver()
-        monitorManager.registerObserver(eventListener)
+        val screenModes = mutableListOf<ScreenMode>()
+        val screenModeSub = monitorManager.screenModeObs.subscribe(NextObserver(screenModes::add))
 
         listOf(ScreenMode.MAXIMIZED, ScreenMode.FULLSCREEN, ScreenMode.NORMAL)
             .forEach { screenMode ->
                 monitorManager.toggleScreenMode()
-                assertEquals(screenMode, monitorManager.getScreenMode(), "Finally it should wrap around back to $screenMode")
-                assertEquals(screenMode, eventListener.screenMode, "The listener should be notified about $screenMode")
+                assertEquals(screenMode, screenModes.last(), "It should switch to $screenMode")
             }
-    }
 
-    private class TestObserver : MonitorObserver {
-        var screenMode: ScreenMode? = null
-
-        override fun toggleScreenMode(newScreenMode: ScreenMode) {
-            screenMode = newScreenMode
-        }
-
-        var monitorUpdates = 0
-
-        override fun updateMonitors(monitors: List<Monitor>) {
-            monitorUpdates++
-        }
+        screenModeSub.unsubscribe()
     }
 }

@@ -2,15 +2,17 @@ package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.conversion.toULongArray
+import de.atennert.lcarswm.lifecycle.closeClosables
 import de.atennert.lcarswm.system.WindowUtilApiMock
 import kotlinx.cinterop.convert
 import xlib.Atom
 import xlib.Window
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class WindowListAtomHandlerTest {
+class UpdateWindowListAtomTest {
 
     private val windowUtilApi = object : WindowUtilApiMock() {
         var windows = ubyteArrayOf()
@@ -42,21 +44,28 @@ class WindowListAtomHandlerTest {
         windowUtilApi.reset()
     }
 
+    @AfterTest
+    fun tearDown() {
+        closeClosables()
+    }
+
     @Test
     fun `add one window to list`() {
-        val handler = WindowListAtomHandler(1.convert(), windowUtilApi, AtomLibrary(windowUtilApi))
+        val windowList = WindowList()
+        updateWindowListAtom(1.convert(), windowUtilApi, AtomLibrary(windowUtilApi), windowList)
 
-        handler.windowAdded(FramedWindow(42.convert(), 100))
+        windowList.add(FakeManagedWindow(id = 42.convert()))
 
         assertEquals(42.toULong(), windowUtilApi.windows.toULongArray()[0])
     }
 
     @Test
     fun `add two windows to list`() {
-        val handler = WindowListAtomHandler(1.convert(), windowUtilApi, AtomLibrary(windowUtilApi))
+        val windowList = WindowList()
+        updateWindowListAtom(1.convert(), windowUtilApi, AtomLibrary(windowUtilApi), windowList)
 
-        handler.windowAdded(FramedWindow(42.convert(), 100))
-        handler.windowAdded(FramedWindow(21.convert(), 100))
+        windowList.add(FakeManagedWindow(id = 42.convert()))
+        windowList.add(FakeManagedWindow(id = 21.convert()))
 
         assertEquals(8, windowUtilApi.windows.size)
         assertEquals(42.toULong(), windowUtilApi.windows.toULongArray()[0])
@@ -65,11 +74,13 @@ class WindowListAtomHandlerTest {
 
     @Test
     fun `remove window from list`() {
-        val handler = WindowListAtomHandler(1.convert(), windowUtilApi, AtomLibrary(windowUtilApi))
-        handler.windowAdded(FramedWindow(42.convert(), 100))
-        handler.windowAdded(FramedWindow(21.convert(), 100))
+        val windowList = WindowList()
+        updateWindowListAtom(1.convert(), windowUtilApi, AtomLibrary(windowUtilApi), windowList)
 
-        handler.windowRemoved(FramedWindow(42.convert(), 100))
+        windowList.add(FakeManagedWindow(id = 42.convert()))
+        windowList.add(FakeManagedWindow(id = 21.convert()))
+
+        windowList.remove(42.toULong())
 
         assertEquals(4, windowUtilApi.windows.size)
         assertEquals(21.toULong(), windowUtilApi.windows.toULongArray()[0])
@@ -77,10 +88,12 @@ class WindowListAtomHandlerTest {
 
     @Test
     fun `remove last window from list`() {
-        val handler = WindowListAtomHandler(1.convert(), windowUtilApi, AtomLibrary(windowUtilApi))
-        handler.windowAdded(FramedWindow(42.convert(), 100))
+        val windowList = WindowList()
+        updateWindowListAtom(1.convert(), windowUtilApi, AtomLibrary(windowUtilApi), windowList)
 
-        handler.windowRemoved(FramedWindow(42.convert(), 100))
+        windowList.add(FakeManagedWindow(id = 42.convert()))
+
+        windowList.remove(42.toULong())
 
         assertEquals(0, windowUtilApi.windows.size)
     }

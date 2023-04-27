@@ -22,15 +22,7 @@ interface WindowUtilApi {
 
     fun ungrabServer(): Int
 
-    fun addToSaveSet(window: Window): Int
-
-    fun removeFromSaveSet(window: Window): Int
-
     fun queryTree(window: Window, rootReturn: CValuesRef<WindowVar>, parentReturn: CValuesRef<WindowVar>, childrenReturn: CValuesRef<CPointerVar<WindowVar>>, childrenReturnCounts: CValuesRef<UIntVar>): Int
-
-    fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int
-
-    fun changeWindowAttributes(window: Window, mask: ULong, attributes: CPointer<XSetWindowAttributes>): Int
 
     fun getWMProtocols(window: Window, protocolsReturn: CPointer<CPointerVar<AtomVar>>, protocolCountReturn: CPointer<IntVar>): Int
 
@@ -57,8 +49,6 @@ interface WindowUtilApi {
     fun killClient(window: Window): Int
 
     fun createWindow(parentWindow: Window, measurements: List<Int>, depth: Int, visual: CPointer<Visual>?, attributeMask: ULong, attributes: CPointer<XSetWindowAttributes>): Window
-
-    fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window
 
     fun getSelectionOwner(atom: Atom): Window
 

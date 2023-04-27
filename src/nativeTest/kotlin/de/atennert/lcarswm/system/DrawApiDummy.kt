@@ -8,10 +8,6 @@ import kotlinx.cinterop.ULongVar
 import xlib.*
 
 open class DrawApiDummy : DrawApi {
-    override fun fillArcs(drawable: Drawable, graphicsContext: GC, arcs: CValuesRef<XArc>, arcCount: Int): Int {
-        throw NotImplementedError()
-    }
-
     override fun fillRectangle(
         drawable: Drawable,
         graphicsContext: GC,

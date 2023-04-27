@@ -1,9 +1,6 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
-import de.atennert.lcarswm.window.AppMenuHandler
-import de.atennert.lcarswm.window.StatusBarHandler
-import de.atennert.lcarswm.window.WindowRegistration
 import xlib.DestroyNotify
 import xlib.XEvent
 
@@ -13,9 +10,7 @@ import xlib.XEvent
  */
 class DestroyNotifyHandler(
     private val logger: Logger,
-    private val windowRegistration: WindowRegistration,
-    private val appMenuHandler: AppMenuHandler,
-    private val statusBarHandler: StatusBarHandler
+    private val eventStore: EventStore,
 ) : XEventHandler {
     override val xEventType = DestroyNotify
 
@@ -23,17 +18,8 @@ class DestroyNotifyHandler(
         val destroyedWindow = event.xdestroywindow.window
         logger.logDebug("DestroyNotifyHandler::handleEvent::clean up after destroyed window: $destroyedWindow")
 
-        when {
-            windowRegistration.isWindowManaged(destroyedWindow) -> {
-                windowRegistration.removeWindow(destroyedWindow)
-            }
-            appMenuHandler.isKnownAppMenu(destroyedWindow) -> {
-                appMenuHandler.removeWindow()
-            }
-            statusBarHandler.isStatusBar(destroyedWindow) -> {
-                statusBarHandler.removeWindow()
-            }
-        }
+        eventStore.destroySj.next(destroyedWindow)
+
         return false
     }
 }

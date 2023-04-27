@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
-import de.atennert.lcarswm.window.WindowRegistration
 import xlib.MapRequest
 import xlib.XEvent
 
@@ -10,20 +9,15 @@ import xlib.XEvent
  */
 class MapRequestHandler(
     private val logger: Logger,
-    private val windowRegistration: WindowRegistration
+    private val eventStore: EventStore
 ) : XEventHandler{
     override val xEventType = MapRequest
 
     override fun handleEvent(event: XEvent): Boolean {
         val mapEvent = event.xmaprequest
+        logger.logDebug("MapRequestHandler::handleEvent::map request for window ${mapEvent.window}, parent: ${mapEvent.parent}")
 
-        val isWindowKnown = windowRegistration.isWindowManaged(mapEvent.window)
-
-        logger.logDebug("MapRequestHandler::handleEvent::map request for window ${mapEvent.window}, parent: ${mapEvent.parent}, is known: $isWindowKnown")
-
-        if (!isWindowKnown) {
-            windowRegistration.addWindow(mapEvent.window, false)
-        }
+        eventStore.mapSj.next(mapEvent.window)
 
         return false
     }

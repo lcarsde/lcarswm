@@ -1,11 +1,18 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.keys.KeySessionManager
+import de.atennert.lcarswm.lifecycle.closeWith
+import de.atennert.rx.NextObserver
+import de.atennert.rx.ReplaySubject
 import xlib.Window
 
 typealias FocusObserver = (Window?, Window?, Boolean) -> Unit
+data class WindowFocusEvent(val newWindow: Window?, val oldWindow: Window?, val toggleSessionActive: Boolean)
 
-class WindowFocusHandler {
+class WindowFocusHandler(windowList: WindowList) {
+    private val windowFocusEventSj = ReplaySubject<WindowFocusEvent>(0)
+    val windowFocusEventObs = windowFocusEventSj.asObservable()
+
     private var activeWindow: Window? = null
 
     private val windowIdList = mutableListOf<Window>()
@@ -13,6 +20,18 @@ class WindowFocusHandler {
     private val observers = mutableListOf<FocusObserver>()
 
     private var toggleSessionActive = false
+
+    init {
+        windowList.windowEventObs
+            .subscribe(NextObserver {
+                when (it) {
+                    is WindowAddedEvent -> setFocusedWindow(it.window.id)
+                    is WindowRemovedEvent -> removeWindow(it.window.id)
+                    is WindowUpdatedEvent -> { /* Nothing to do */ }
+                }
+            })
+            .closeWith { this.unsubscribe() }
+    }
 
     val keySessionListener = object : KeySessionManager.KeySessionListener {
         override fun stopSession() {
@@ -26,6 +45,7 @@ class WindowFocusHandler {
                 }
             }
             observers.forEach { it(activeWindow, null, false) }
+            windowFocusEventSj.next(WindowFocusEvent(activeWindow, null, false))
         }
     }
 
@@ -51,16 +71,18 @@ class WindowFocusHandler {
         val oldActiveWindow = this.activeWindow
         this.activeWindow = activeWindow
         this.observers.forEach { it(activeWindow, oldActiveWindow, toggleSessionActive) }
+        windowFocusEventSj.next(WindowFocusEvent(activeWindow, oldActiveWindow, toggleSessionActive))
         if (!windowIdList.contains(activeWindow)) {
             windowIdList.add(activeWindow)
         }
     }
 
-    fun removeWindow(window: Window) {
+    private fun removeWindow(window: Window) {
         windowIdList.remove(window)
         if (window == activeWindow) {
             this.activeWindow = windowIdList.getOrNull(0)
             this.observers.forEach { it(this.activeWindow, window, false) }
+            windowFocusEventSj.next(WindowFocusEvent(this.activeWindow, window, false))
         }
     }
 

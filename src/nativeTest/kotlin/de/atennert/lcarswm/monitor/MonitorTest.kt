@@ -5,6 +5,9 @@ import de.atennert.lcarswm.BAR_GAP_SIZE
 import de.atennert.lcarswm.SIDE_BAR_WIDTH
 import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.window.WindowMeasurements
+import de.atennert.rx.BehaviorSubject
+import de.atennert.rx.NextObserver
+import de.atennert.rx.Observable
 import kotlinx.cinterop.convert
 import kotlin.test.*
 
@@ -93,7 +96,12 @@ class MonitorTest {
         val monitorManager = MonitorManagerMock()
         val monitor = Monitor(monitorManager, 1.convert(), "name", true)
 
-        assertEquals(ScreenMode.NORMAL, monitor.getScreenMode(), "The primary monitor should return the normal mode when the monitor manager defines normal mode")
+        val screenModes = mutableListOf<ScreenMode>()
+        val sub = monitor.screenModeObs.subscribe(NextObserver(screenModes::add))
+
+        assertContentEquals(listOf(ScreenMode.NORMAL), screenModes, "The primary monitor should return the normal mode when the monitor manager defines normal mode")
+
+        sub.unsubscribe()
     }
 
     @Test
@@ -101,7 +109,12 @@ class MonitorTest {
         val monitorManager = MonitorManagerMock()
         val monitor = Monitor(monitorManager, 1.convert(), "name", false)
 
-        assertEquals(ScreenMode.MAXIMIZED, monitor.getScreenMode(), "A non-primary monitor should return the maximized mode when the monitor manager defines normal mode")
+        val screenModes = mutableListOf<ScreenMode>()
+        val sub = monitor.screenModeObs.subscribe(NextObserver(screenModes::add))
+
+        assertEquals(listOf(ScreenMode.MAXIMIZED), screenModes, "A non-primary monitor should return the maximized mode when the monitor manager defines normal mode")
+
+        sub.unsubscribe()
     }
 
     @Test
@@ -110,43 +123,55 @@ class MonitorTest {
         val monitor = Monitor(monitorManager, 1.convert(), "name", true)
         monitor.setMonitorMeasurements(0, 0, 800.convert(), 600.convert())
 
-        val defaultMeasurements = monitor.getWindowMeasurements()
+        val measurements = mutableListOf<WindowMeasurements>()
+        val sub = monitor.windowMeasurementsObs.subscribe(NextObserver(measurements::add))
 
         val x = SIDE_BAR_WIDTH + BAR_GAP_SIZE + BAR_END_WIDTH + BAR_GAP_SIZE
         val width = monitor.width - x
-        assertEquals(WindowMeasurements(x, 240, width, 312, 360), defaultMeasurements)
+        assertEquals(WindowMeasurements(x, 240, width, 312, 360), measurements.last())
+
+        sub.unsubscribe()
     }
 
     @Test
     fun `verify calculation of maximized window measurements`() {
         val monitorManager = object : MonitorManagerMock() {
-            override fun getScreenMode(): ScreenMode = ScreenMode.MAXIMIZED
+            override val screenModeObs: Observable<ScreenMode>
+                get() = BehaviorSubject(ScreenMode.MAXIMIZED).asObservable()
         }
         val monitor = Monitor(monitorManager, 1.convert(), "name", false)
         monitor.setMonitorMeasurements(0, 0, 800.convert(), 600.convert())
 
-        val defaultMeasurements = monitor.getWindowMeasurements()
+        val measurements = mutableListOf<WindowMeasurements>()
+        val sub = monitor.windowMeasurementsObs.subscribe(NextObserver(measurements::add))
 
-        assertEquals(WindowMeasurements(0, 48, 800, 504, 552), defaultMeasurements)
+        assertEquals(WindowMeasurements(0, 48, 800, 504, 552), measurements.last())
+
+        sub.unsubscribe()
     }
 
     @Test
     fun `verify calculation of full window measurements`() {
         val monitorManager = object : MonitorManagerMock() {
-            override fun getScreenMode(): ScreenMode = ScreenMode.FULLSCREEN
+            override val screenModeObs: Observable<ScreenMode>
+                get() = BehaviorSubject(ScreenMode.FULLSCREEN).asObservable()
         }
         val monitor = Monitor(monitorManager, 1.convert(), "name", false)
         monitor.setMonitorMeasurements(0, 0, 800.convert(), 600.convert())
 
-        val defaultMeasurements = monitor.getWindowMeasurements()
+        val measurements = mutableListOf<WindowMeasurements>()
+        val sub = monitor.windowMeasurementsObs.subscribe(NextObserver(measurements::add))
 
-        assertEquals(WindowMeasurements(0, 0, 800, 600, 600), defaultMeasurements)
+        assertEquals(WindowMeasurements(0, 0, 800, 600, 600), measurements.last())
+
+        sub.unsubscribe()
     }
 
     @Test
     fun `verify on single monitor`() {
         val monitorManager = object : MonitorManagerMock() {
-            override fun getScreenMode(): ScreenMode = ScreenMode.FULLSCREEN
+            override val screenModeObs: Observable<ScreenMode>
+                get() = BehaviorSubject(ScreenMode.FULLSCREEN).asObservable()
         }
         val monitor = Monitor(monitorManager, 1.convert(), "name", false)
         monitor.setMonitorMeasurements(0, 0, 800.convert(), 600.convert())
@@ -165,7 +190,8 @@ class MonitorTest {
     @Test
     fun `verify on offset monitor`() {
         val monitorManager = object : MonitorManagerMock() {
-            override fun getScreenMode(): ScreenMode = ScreenMode.FULLSCREEN
+            override val screenModeObs: Observable<ScreenMode>
+                get() = BehaviorSubject(ScreenMode.FULLSCREEN).asObservable()
         }
         val monitor = Monitor(monitorManager, 1.convert(), "name", false)
         monitor.setMonitorMeasurements(800, 600, 800.convert(), 600.convert())

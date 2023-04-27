@@ -31,14 +31,6 @@ open class WindowUtilApiMock : WindowUtilApi {
         TODO("Not yet implemented")
     }
 
-    override fun addToSaveSet(window: Window): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeFromSaveSet(window: Window): Int {
-        TODO("Not yet implemented")
-    }
-
     override fun queryTree(
         window: Window,
         rootReturn: CValuesRef<WindowVar>,
@@ -46,14 +38,6 @@ open class WindowUtilApiMock : WindowUtilApi {
         childrenReturn: CValuesRef<CPointerVar<WindowVar>>,
         childrenReturnCounts: CValuesRef<UIntVar>
     ): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun getWindowAttributes(window: Window, attributes: CPointer<XWindowAttributes>): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun changeWindowAttributes(window: Window, mask: ULong, attributes: CPointer<XSetWindowAttributes>): Int {
         TODO("Not yet implemented")
     }
 
@@ -128,10 +112,6 @@ open class WindowUtilApiMock : WindowUtilApi {
         attributeMask: ULong,
         attributes: CPointer<XSetWindowAttributes>
     ): Window {
-        TODO("Not yet implemented")
-    }
-
-    override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
         TODO("Not yet implemented")
     }
 

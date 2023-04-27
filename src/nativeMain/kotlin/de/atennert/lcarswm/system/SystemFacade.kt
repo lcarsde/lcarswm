@@ -5,12 +5,10 @@ import de.atennert.lcarswm.X_TRUE
 import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.api.SystemApi
 import kotlinx.cinterop.*
-import platform.linux.*
-import platform.posix.*
-import platform.posix.mode_t
 import platform.posix.sigaction
+import platform.posix.sigemptyset
+import platform.posix.sigfillset
 import platform.posix.sigset_t
-import platform.posix.ssize_t
 import xlib.*
 
 /**
@@ -45,14 +43,6 @@ class SystemFacade : SystemApi {
         return XUngrabServer(display)
     }
 
-    override fun addToSaveSet(window: Window): Int {
-        return XAddToSaveSet(display, window)
-    }
-
-    override fun removeFromSaveSet(window: Window): Int {
-        return XRemoveFromSaveSet(display, window)
-    }
-
     override fun queryTree(
         window: Window,
         rootReturn: CValuesRef<WindowVar>,
@@ -61,17 +51,6 @@ class SystemFacade : SystemApi {
         childrenReturnCounts: CValuesRef<UIntVar>
     ): Int {
         return XQueryTree(display, window, rootReturn, parentReturn, childrenReturn, childrenReturnCounts)
-    }
-
-    override fun getWindowAttributes(
-        window: Window,
-        attributes: CPointer<XWindowAttributes>
-    ): Int {
-        return XGetWindowAttributes(display, window, attributes)
-    }
-
-    override fun changeWindowAttributes(window: Window, mask: ULong, attributes: CPointer<XSetWindowAttributes>): Int {
-        return XChangeWindowAttributes(display, window, mask, attributes)
     }
 
     override fun getWMProtocols(
@@ -151,11 +130,6 @@ class SystemFacade : SystemApi {
         return XCreateWindow(display, parentWindow, measurements[0], measurements[1], measurements[2].convert(), measurements[3].convert(), 0.convert(), depth, InputOutput, visual, attributeMask, attributes)
     }
 
-    override fun createSimpleWindow(parentWindow: Window, measurements: List<Int>): Window {
-        return XCreateSimpleWindow(display, parentWindow, measurements[0], measurements[1],
-            measurements[2].convert(), measurements[3].convert(), 0.convert(), 0.convert(), 0.convert())
-    }
-
     override fun getSelectionOwner(atom: Atom): Window {
         return XGetSelectionOwner(display, atom)
     }
@@ -166,10 +140,6 @@ class SystemFacade : SystemApi {
 
     override fun getDisplayString(): String {
         return XDisplayString(this.display)?.toKString() ?: ""
-    }
-
-    override fun flush() {
-        XFlush(this.display)
     }
 
     override fun synchronize(sync: Boolean) {
@@ -204,46 +174,12 @@ class SystemFacade : SystemApi {
         return XEventsQueued(display, mode)
     }
 
-    override fun configureWindow(
-        window: Window,
-        configurationMask: UInt,
-        configuration: CPointer<XWindowChanges>
-    ): Int {
-        return XConfigureWindow(display, window, configurationMask, configuration)
-    }
-
-    override fun setWindowBorderWidth(window: Window, borderWidth: UInt): Int {
-        return XSetWindowBorderWidth(display, window, borderWidth)
-    }
-
-    override fun reparentWindow(window: Window, parent: Window, x: Int, y: Int): Int {
-        return XReparentWindow(display, window, parent, x, y)
-    }
-
-    override fun resizeWindow(window: Window, width: UInt, height: UInt): Int {
-        return XResizeWindow(display, window, width, height)
-    }
-
-    override fun moveResizeWindow(
-        window: Window,
-        x: Int,
-        y: Int,
-        width: UInt,
-        height: UInt
-    ): Int {
-        return XMoveResizeWindow(display, window, x, y, width, height)
-    }
-
     override fun lowerWindow(window: Window): Int {
         return XLowerWindow(display, window)
     }
 
     override fun mapWindow(window: Window): Int {
         return XMapWindow(display, window)
-    }
-
-    override fun unmapWindow(window: Window): Int {
-        return XUnmapWindow(display, window)
     }
 
     override fun destroyWindow(window: Window): Int {
@@ -268,30 +204,6 @@ class SystemFacade : SystemApi {
 
     override fun sigAction(signal: Signal, newSigAction: CPointer<sigaction>, oldSigAction: CPointer<sigaction>?) {
         sigaction(signal.signalValue, newSigAction, oldSigAction)
-    }
-
-    override fun sigProcMask(how: Int, newSigset: CPointer<sigset_t>?, oldSigset: CPointer<sigset_t>?) {
-        sigprocmask(how, newSigset, oldSigset)
-    }
-
-    override fun mqOpen(name: String, oFlag: Int, mode: mode_t, attributes: CPointer<mq_attr>): mqd_t  {
-        return mq_open(name, oFlag, mode, attributes)
-    }
-
-    override fun mqClose(mq: mqd_t): Int {
-        return mq_close(mq)
-    }
-
-    override fun mqSend(mq: mqd_t, msg: String, msgPrio: UInt): Int {
-        return mq_send(mq, msg, msg.length.convert(), msgPrio)
-    }
-
-    override fun mqReceive(mq: mqd_t, msgPtr: CPointer<ByteVar>, msgSize: size_t, msgPrio: CPointer<UIntVar>?): ssize_t {
-        return mq_receive(mq, msgPtr, msgSize, msgPrio)
-    }
-
-    override fun mqUnlink(name: String): Int {
-        return mq_unlink(name)
     }
 
     override fun selectInput(window: Window, mask: Long): Int {
@@ -425,15 +337,6 @@ class SystemFacade : SystemApi {
         crtc: RRCrtc
     ): CPointer<XRRCrtcInfo>? {
         return XRRGetCrtcInfo(display, resources, crtc)
-    }
-
-    override fun fillArcs(
-        drawable: Drawable,
-        graphicsContext: GC,
-        arcs: CValuesRef<XArc>,
-        arcCount: Int
-    ): Int {
-        return XFillArcs(display, drawable, graphicsContext, arcs, arcCount)
     }
 
     override fun fillRectangle(
