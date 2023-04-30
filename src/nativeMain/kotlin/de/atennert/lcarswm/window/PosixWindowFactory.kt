@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.atom.AtomLibrary
+import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.atom.NumberAtomReader
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.drawing.Color
@@ -25,7 +26,7 @@ class PosixWindowFactory(
     private val colorFactory: ColorFactory,
     private val fontProvider: FontProvider,
     private val keyManager: KeyManager,
-    private val monitorManager: MonitorManager,
+    private val monitorManager: MonitorManager<RROutput>,
     private val atomLibrary: AtomLibrary,
     private val eventStore: EventStore,
     private val focusHandler: WindowFocusHandler,
@@ -33,6 +34,7 @@ class PosixWindowFactory(
     private val textAtomReader: TextAtomReader,
     private val numberAtomReader: NumberAtomReader,
     private val frameDrawer: IFrameDrawer,
+    private val windowListMessageQueue: MessageQueue,
 ) : WindowFactory<Window> {
 
     override fun createButton(
@@ -90,6 +92,7 @@ class PosixWindowFactory(
                 atomLibrary,
                 focusHandler,
                 windowList,
+                windowListMessageQueue,
                 id,
                 windowAttributes.border_width,
             )
@@ -104,21 +107,68 @@ class PosixWindowFactory(
                 windowAttributes.border_width,
             )
 
-            else -> PosixWindow(
-                logger,
-                display,
-                screen,
-                atomLibrary,
-                textAtomReader,
-                numberAtomReader,
-                frameDrawer,
-                keyManager,
-                id,
-                windowAttributes.border_width
-            )
+            else -> {
+                val (type, isTransient, transientFor) = determineTransienceAndType(id)
+                if (isTransient) {
+                    PosixTransientWindow(
+                        logger,
+                        display,
+                        screen,
+                        atomLibrary,
+                        textAtomReader,
+                        keyManager,
+                        id,
+                        windowAttributes.border_width,
+                        type,
+                        transientFor,
+                    )
+                } else {
+                    PosixWindow(
+                        logger,
+                        display,
+                        screen,
+                        atomLibrary,
+                        textAtomReader,
+                        frameDrawer,
+                        keyManager,
+                        id,
+                        windowAttributes.border_width,
+                        type,
+                    )
+                }
+            }
         }
 
         nativeHeap.free(windowAttributes)
         return window
+    }
+
+
+    private fun determineTransienceAndType(id: Window): Triple<WindowType, Boolean, Window?> {
+        var isTransient = false
+        var transientFor: Window? = null
+        var type = WindowType.NORMAL
+
+        val transientWindow = nativeHeap.alloc(None.toULong())
+        if (wrapXGetTransientForHint(display, id, transientWindow.ptr) != 0) {
+            isTransient = true
+            if (transientWindow.value != screen.root && type != WindowType.DOCK) {
+                transientFor = transientWindow.value
+            }
+        }
+        nativeHeap.free(transientWindow)
+
+        val windowTypeList = WindowType.values()
+            .map { Pair(it, atomLibrary[WINDOW_TYPE_ATOM_MAP.getValue(it)]) }
+
+        val windowTypeProperties =
+            numberAtomReader.readULongArrayPropertyOrNull(id, Atoms.NET_WM_WINDOW_TYPE, Atoms.ATOM)
+        type = windowTypeProperties?.firstNotNullOfOrNull { propertyAtom ->
+            windowTypeList.firstOrNull { it.second == propertyAtom }
+        }?.first ?: if (isTransient) WindowType.DIALOG else WindowType.NORMAL
+
+        isTransient = isTransient || TRANSIENT_WINDOW_TYPES.contains(type)
+
+        return Triple(type, isTransient, transientFor)
     }
 }

@@ -4,6 +4,7 @@ import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.mouse.MoveWindowManager
 import de.atennert.lcarswm.system.api.InputApi
 import de.atennert.lcarswm.window.Button
+import de.atennert.lcarswm.window.PosixTransientWindow
 import de.atennert.lcarswm.window.WindowFocusHandler
 import de.atennert.lcarswm.window.WindowList
 import xlib.ButtonPress
@@ -32,10 +33,13 @@ class ButtonPressHandler(
         }
 
         windowList.getByAny(windowId)?.let { window ->
+            if (window is PosixTransientWindow) {
+                return@let
+            }
             logger.logDebug("handle focus")
             focusHandler.setFocusedWindow(window.id)
 
-            if (windowId == window.titleBar) {
+            if (window.isTitleBar(windowId)) {
                 moveWindowManager.press(window, event.xbutton.x_root, event.xbutton.y_root)
             }
         }

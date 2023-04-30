@@ -8,6 +8,9 @@ import de.atennert.lcarswm.log.createLogger
 import de.atennert.lcarswm.system.SystemFacade
 import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.time.PosixTime
+import de.atennert.rx.NextObserver
+import de.atennert.rx.operators.filterNotNull
+import de.atennert.rx.operators.take
 import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.toKString
 import kotlinx.coroutines.coroutineScope
@@ -52,13 +55,18 @@ suspend fun runWindowManager(system: SystemApi, logger: Logger, resourceGenerato
 
     runtimeResources?.let { rr ->
         try {
-            runAutostartApps(
-                rr.platform.environment,
-                rr.platform.fileFactory,
-                rr.platform.commander,
-                rr.platform.files,
-                logger
-            )
+            (rr.platform.monitorManager.primaryMonitorObs)
+                .apply(filterNotNull())
+                .apply(take(1))
+                .subscribe(NextObserver {
+                    runAutostartApps(
+                        rr.platform.environment,
+                        rr.platform.fileFactory,
+                        rr.platform.commander,
+                        rr.platform.files,
+                        logger
+                    )
+                })
         } catch (e: Throwable) {
             logger.logError("::runWindowManager::error starting applications", e)
         }

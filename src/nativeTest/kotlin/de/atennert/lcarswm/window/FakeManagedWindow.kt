@@ -8,7 +8,6 @@ import xlib.Window
 class FakeManagedWindow(
     override val id: Window = 1.convert(),
     override val frame: Window = 2.convert(),
-    override val titleBar: Window = 3.convert(),
     override val wmClass: String = "class",
     override val title: String = "title"
 ) : ManagedWmWindow<Window> {

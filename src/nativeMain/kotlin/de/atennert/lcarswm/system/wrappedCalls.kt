@@ -24,6 +24,8 @@ var wrapXDestroyWindow = ::XDestroyWindow
 
 var wrapXReparentWindow = ::XReparentWindow
 
+var wrapXRestackWindows = ::XRestackWindows
+
 var wrapXMapWindow = ::XMapWindow
 
 var wrapXUnmapWindow = ::XUnmapWindow

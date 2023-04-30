@@ -11,6 +11,7 @@ import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.*
 import de.atennert.rx.NextObserver
+import de.atennert.rx.ReplaySubject
 import de.atennert.rx.Subscription
 import de.atennert.rx.operators.*
 import de.atennert.rx.util.Tuple3
@@ -20,7 +21,7 @@ import xlib.*
 class PosixStatusBarWindow(
     private val display: CPointer<Display>?,
     private val rootWindowId: Window,
-    monitorManager: MonitorManager,
+    monitorManager: MonitorManager<RROutput>,
     eventStore: EventStore,
     atomLibrary: AtomLibrary,
     override val id: Window,
@@ -33,24 +34,10 @@ class PosixStatusBarWindow(
     private val windowMeasurementsObs = monitorManager.primaryMonitorObs
         .apply(map(::getWindowMeasurements))
 
-    private val frameIdObs = windowMeasurementsObs
-        .apply(filterNotNull())
-        .apply(take(1))
-        .apply(map { measurements ->
-            wrapXCreateSimpleWindow(
-                display,
-                rootWindowId,
-                measurements.x,
-                measurements.y,
-                measurements.width.convert(),
-                measurements.frameHeight.convert(),
-                0.convert(),
-                0.convert(),
-                0.convert(),
-            )
-        })
+    private val frameIdSj = ReplaySubject<Window>(1)
+    private val frameIdObs = frameIdSj.asObservable()
 
-    private val nextHandler = NextObserver.NextHandler<Tuple3<Window, ScreenMode, Monitor?>> { (frameId, screenMode, primaryMonitor) ->
+    private val nextHandler = NextObserver.NextHandler<Tuple3<Window, ScreenMode, Monitor<RROutput>?>> { (frameId, screenMode, primaryMonitor) ->
         if (screenMode == ScreenMode.NORMAL && primaryMonitor != null) {
             internalShow(frameId)
         } else {
@@ -61,9 +48,28 @@ class PosixStatusBarWindow(
     private val subscription = Subscription()
 
     init {
+        subscription.add(windowMeasurementsObs
+            .apply(filterNotNull())
+            .apply(take(1))
+            .apply(map { measurements ->
+                wrapXCreateSimpleWindow(
+                    display,
+                    rootWindowId,
+                    measurements.x,
+                    measurements.y,
+                    measurements.width.convert(),
+                    measurements.frameHeight.convert(),
+                    0.convert(),
+                    0.convert(),
+                    0.convert(),
+                )
+            })
+            .subscribe(NextObserver { frameIdSj.next(it) }))
+
         subscription.add(
             frameIdObs
                 .apply(combineLatestWith(windowMeasurementsObs.apply(filterNotNull())))
+                .apply(take(1))
                 .subscribe(NextObserver { (frameId, measurements) ->
                     wrapXReparentWindow(display, id, frameId, 0, 0)
                     wrapXResizeWindow(display, id, measurements.width.convert(), measurements.height.convert())
@@ -99,13 +105,17 @@ class PosixStatusBarWindow(
             eventStore.destroyObs
                 .apply(filter { it == id })
                 .apply(switchMap { frameIdObs })
-                .subscribe(NextObserver { removeWindow(it) })
+                .subscribe(NextObserver {
+                    removeWindow(it)
+                })
         )
 
         subscription.add(
             frameIdObs
                 .apply(combineLatestWith(windowMeasurementsObs.apply(filterNotNull())))
-                .subscribe(NextObserver { (frameId, measurements) -> internalMoveResize(frameId, measurements) })
+                .subscribe(NextObserver { (frameId, measurements) ->
+                    internalMoveResize(frameId, measurements)
+                })
         )
     }
 
@@ -171,7 +181,7 @@ class PosixStatusBarWindow(
         // Nothing to do
     }
 
-    fun getWindowMeasurements(primaryMonitor: Monitor?): WindowMeasurements? {
+    private fun getWindowMeasurements(primaryMonitor: Monitor<*>?): WindowMeasurements? {
         if (primaryMonitor == null) {
             return null
         }

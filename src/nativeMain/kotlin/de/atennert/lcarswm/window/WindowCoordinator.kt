@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.monitor.Monitor
+import xlib.RROutput
 import xlib.Window
 
 /**
@@ -11,7 +12,5 @@ interface WindowCoordinator {
 
     fun moveWindowToPreviousMonitor(windowId: Window)
 
-    fun moveWindowToMonitor(windowId: Window, monitor: Monitor)
-
-    fun stackWindowToTheTop(windowId: Window)
+    fun moveWindowToMonitor(windowId: Window, monitor: Monitor<RROutput>)
 }

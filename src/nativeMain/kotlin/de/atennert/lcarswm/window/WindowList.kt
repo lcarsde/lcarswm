@@ -38,11 +38,7 @@ class WindowList {
     }
 
     fun getByAny(windowId: Window): ManagedWmWindow<Window>? {
-        return windows.firstOrNull {
-            it.id == windowId
-                    || it.frame == windowId
-                    || it.titleBar == windowId
-        }
+        return windows.firstOrNull { it.hasId(windowId) }
     }
 
     fun isManaged(windowId: Window): Boolean {

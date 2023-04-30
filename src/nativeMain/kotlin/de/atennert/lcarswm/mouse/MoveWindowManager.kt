@@ -7,17 +7,18 @@ import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.window.ManagedWmWindow
 import de.atennert.lcarswm.window.WindowCoordinator
 import de.atennert.rx.NextObserver
+import xlib.RROutput
 import xlib.Window
 
 class MoveWindowManager(
     private val logger: Logger,
     private val windowCoordinator: WindowCoordinator,
-    monitorManager: MonitorManager
+    monitorManager: MonitorManager<RROutput>
 ) {
 
-    private var monitors = emptyList<Monitor>()
+    private var monitors = emptyList<Monitor<RROutput>>()
 
-    private lateinit var lastWindowMonitor: Monitor
+    private lateinit var lastWindowMonitor: Monitor<RROutput>
 
     private var targetWindow: ManagedWmWindow<Window>? = null
 
@@ -59,7 +60,7 @@ class MoveWindowManager(
         targetWindow = null
     }
 
-    private fun getMonitor(x: Int, y: Int): Monitor? {
+    private fun getMonitor(x: Int, y: Int): Monitor<RROutput>? {
         return try {
             monitors.first { it.isOnMonitor(x, y) }
         } catch (e: Exception) {

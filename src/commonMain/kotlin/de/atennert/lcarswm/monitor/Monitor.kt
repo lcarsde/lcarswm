@@ -4,14 +4,15 @@ import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.window.WindowMeasurements
 import de.atennert.rx.operators.map
 import kotlinx.cinterop.convert
-import xlib.RROutput
+
+expect fun <Output> getOutputHash(output: Output): Int
 
 /**
  * Resource representing a physical monitor and its settings.
  */
-data class Monitor(
-    private val monitorManager: MonitorManager,
-    val id: RROutput,
+data class Monitor<Output>(
+    private val monitorManager: MonitorManager<Output>,
+    val id: Output,
     val name: String,
     val isPrimary: Boolean
 ) {
@@ -68,13 +69,13 @@ data class Monitor(
             }
         })
 
-    override fun hashCode(): Int = id.convert()
+    override fun hashCode(): Int = getOutputHash(id)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
 
-        other as Monitor
+        other as Monitor<*>
 
         if (id != other.id) return false
 
@@ -102,7 +103,7 @@ data class Monitor(
     /**
      * @return true when the other monitor has the same measurements as this monitor, false otherwise
      */
-    fun hasDifferentMeasurements(other: Monitor): Boolean {
+    fun hasDifferentMeasurements(other: Monitor<*>): Boolean {
         return this.x != other.x || this.y != other.y || this.width != other.width || this.height != other.height
     }
 
@@ -110,7 +111,7 @@ data class Monitor(
      * Check if a monitor is a clone of this monitor.
      * @return true if it is a clone, false otherwise
      */
-    fun isClone(other: Monitor): Boolean {
+    fun isClone(other: Monitor<*>): Boolean {
         return other.x == this.x && other.y == this.y
     }
 

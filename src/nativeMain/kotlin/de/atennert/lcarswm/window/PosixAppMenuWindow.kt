@@ -11,6 +11,7 @@ import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.*
 import de.atennert.rx.NextObserver
+import de.atennert.rx.ReplaySubject
 import de.atennert.rx.Subscription
 import de.atennert.rx.operators.*
 import de.atennert.rx.util.Tuple3
@@ -20,11 +21,12 @@ import xlib.*
 class PosixAppMenuWindow(
     private val display: CPointer<Display>?,
     private val rootWindowId: Window,
-    monitorManager: MonitorManager,
+    monitorManager: MonitorManager<RROutput>,
     eventStore: EventStore,
     atomLibrary: AtomLibrary,
     focusHandler: WindowFocusHandler,
     windowList: WindowList,
+    private val messageQueue: MessageQueue,
     override val id: Window,
     private val oldBorderWidth: Int,
 ) : WmWindow<Window> {
@@ -35,24 +37,10 @@ class PosixAppMenuWindow(
     private val windowMeasurementsObs = monitorManager.primaryMonitorObs
         .apply(map(::getWindowMeasurements))
 
-    private val frameIdObs = windowMeasurementsObs
-        .apply(filterNotNull())
-        .apply(take(1))
-        .apply(map { measurements ->
-            wrapXCreateSimpleWindow(
-                display,
-                rootWindowId,
-                measurements.x,
-                measurements.y,
-                measurements.width.convert(),
-                measurements.frameHeight.convert(),
-                0.convert(),
-                0.convert(),
-                0.convert(),
-            )
-        })
+    private val frameIdSj = ReplaySubject<Window>(1)
+    private val frameIdObs = frameIdSj.asObservable()
 
-    private val nextHandler = NextObserver.NextHandler<Tuple3<Window, ScreenMode, Monitor?>> { (frameId, screenMode, primaryMonitor) ->
+    private val nextHandler = NextObserver.NextHandler<Tuple3<Window, ScreenMode, Monitor<RROutput>?>> { (frameId, screenMode, primaryMonitor) ->
         if (screenMode == ScreenMode.NORMAL && primaryMonitor != null) {
             internalShow(frameId)
         } else {
@@ -75,9 +63,28 @@ class PosixAppMenuWindow(
     private val subscription = Subscription()
 
     init {
+        subscription.add(windowMeasurementsObs
+            .apply(filterNotNull())
+            .apply(take(1))
+            .apply(map { measurements ->
+                wrapXCreateSimpleWindow(
+                    display,
+                    rootWindowId,
+                    measurements.x,
+                    measurements.y,
+                    measurements.width.convert(),
+                    measurements.frameHeight.convert(),
+                    0.convert(),
+                    0.convert(),
+                    0.convert(),
+                )
+            })
+            .subscribe(NextObserver { frameIdSj.next(it) }))
+
         subscription.add(
             frameIdObs
                 .apply(combineLatestWith(windowMeasurementsObs.apply(filterNotNull())))
+                .apply(take(1))
                 .subscribe(NextObserver { (frameId, measurements) ->
                     wrapXReparentWindow(display, id, frameId, 0, 0)
                     wrapXResizeWindow(display, id, measurements.width.convert(), measurements.height.convert())
@@ -192,7 +199,7 @@ class PosixAppMenuWindow(
         // Nothing to do
     }
 
-    fun getWindowMeasurements(primaryMonitor: Monitor?): WindowMeasurements? {
+    private fun getWindowMeasurements(primaryMonitor: Monitor<*>?): WindowMeasurements? {
         if (primaryMonitor == null) {
             return null
         }
@@ -220,8 +227,6 @@ class PosixAppMenuWindow(
     /*###########################################*
      * Communicating window list updates
      *###########################################*/
-
-    private val messageQueue = MessageQueue("/lcarswm-active-window-list", MessageQueue.Mode.WRITE)
 
     private fun getWindowListString(activeWindow: Window?, windowList: Map<Window, String>): String {
         return windowList.asSequence()

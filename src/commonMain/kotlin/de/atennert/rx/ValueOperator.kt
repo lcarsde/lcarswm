@@ -10,10 +10,12 @@ class ValueOperator<X, Y>(val handleValue: (value: X, next: (Y) -> Unit) -> Unit
 
                 override fun error(error: Throwable) {
                     subscriber.error(error)
+                    subscriber.unsubscribe()
                 }
 
                 override fun complete() {
                     subscriber.complete()
+                    subscriber.unsubscribe()
                 }
             })
         }

@@ -23,7 +23,7 @@ import xlib.*
 class RootWindowDrawer(
     private val drawApi: DrawApi,
     private val fontApi: FontApi,
-    monitorManager: MonitorManager,
+    monitorManager: MonitorManager<RROutput>,
     private val screen: Screen,
     private val colorFactory: ColorFactory,
     settings: Map<GeneralSetting, String>,
@@ -89,7 +89,7 @@ class RootWindowDrawer(
         triggerDrawSj.next(Unit)
     }
 
-    private fun internalDrawWindowManagerFrame(monitorsWithScreens: List<Tuple2<Monitor, ScreenMode>>, combinedScreenSize: Pair<Int, Int>) {
+    private fun internalDrawWindowManagerFrame(monitorsWithScreens: List<Tuple2<Monitor<*>, ScreenMode>>, combinedScreenSize: Pair<Int, Int>) {
         val pixmap = drawApi.createPixmap(
             screen.root,
             combinedScreenSize.first.convert(),
@@ -158,7 +158,7 @@ class RootWindowDrawer(
         drawApi.freeGC(gcCopyImage)
     }
 
-    private fun drawMaximizedFrame(monitor: Monitor, pixmap: Pixmap) {
+    private fun drawMaximizedFrame(monitor: Monitor<*>, pixmap: Pixmap) {
         clearScreen(monitor, pixmap)
 
         val barEndsGC = getGC(COLOR_BAR_ENDS)
@@ -259,7 +259,7 @@ class RootWindowDrawer(
         nativeHeap.free(bars)
     }
 
-    private fun drawNormalFrame(monitor: Monitor, pixmap: Pixmap) {
+    private fun drawNormalFrame(monitor: Monitor<*>, pixmap: Pixmap) {
         clearScreen(monitor, pixmap)
 
         val barDownGC = getGC(COLOR_NORMAL_BAR_DOWN)
@@ -432,7 +432,7 @@ class RootWindowDrawer(
         nativeHeap.free(cornerRects)
     }
 
-    private fun clearScreen(monitor: Monitor, pixmap: Pixmap) {
+    private fun clearScreen(monitor: Monitor<*>, pixmap: Pixmap) {
         val backgroundGC = getGC(COLOR_BACKGROUND)
         drawApi.fillRectangle(
             pixmap,

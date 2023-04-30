@@ -15,8 +15,8 @@ import de.atennert.rx.util.Tuple
 import kotlinx.cinterop.*
 import xlib.*
 
-sealed class WindowToMonitorEvent(val window: ManagedWmWindow<Window>, val monitor: Monitor?)
-class WindowToMonitorSetEvent(window: ManagedWmWindow<Window>, monitor: Monitor) : WindowToMonitorEvent(window, monitor)
+sealed class WindowToMonitorEvent(val window: ManagedWmWindow<Window>, val monitor: Monitor<RROutput>?)
+class WindowToMonitorSetEvent(window: ManagedWmWindow<Window>, monitor: Monitor<RROutput>) : WindowToMonitorEvent(window, monitor)
 class WindowToMonitorRemoveEvent(window: ManagedWmWindow<Window>) : WindowToMonitorEvent(window, null)
 
 /**
@@ -25,7 +25,7 @@ class WindowToMonitorRemoveEvent(window: ManagedWmWindow<Window>) : WindowToMoni
 class PosixWindowCoordinator(
     private val logger: Logger,
     eventStore: EventStore,
-    monitorManager: MonitorManager,
+    monitorManager: MonitorManager<RROutput>,
     windowFactory: WindowFactory<Window>,
     windowList: WindowList,
     rootWindowDrawer: UIDrawing,
@@ -34,7 +34,7 @@ class PosixWindowCoordinator(
     private val windowToMonitorEventSj = Subject<WindowToMonitorEvent>()
     val windowToMonitorEventObs = windowToMonitorEventSj.asObservable()
 
-    private val windowsOnMonitorsSj = BehaviorSubject(emptyMap<ManagedWmWindow<Window>, Monitor>())
+    private val windowsOnMonitorsSj = BehaviorSubject(emptyMap<ManagedWmWindow<Window>, Monitor<*>>())
     val windowsOnMonitorsObs = windowsOnMonitorsSj.asObservable()
     private var windowsOnMonitors by windowsOnMonitorsSj
 
@@ -256,18 +256,9 @@ class PosixWindowCoordinator(
         moveWindowToPrevMonitorSj.next(windowId)
     }
 
-    override fun moveWindowToMonitor(windowId: Window, monitor: Monitor) {
+    override fun moveWindowToMonitor(windowId: Window, monitor: Monitor<RROutput>) {
         val window = windowsOnMonitors.keys.single { it.id == windowId }
         windowToMonitorEventSj.next(WindowToMonitorSetEvent(window, monitor))
-    }
-
-    override fun stackWindowToTheTop(windowId: Window) {
-        val window = windowsOnMonitors.keys.single { it.id == windowId }
-
-        val windowChanges = nativeHeap.alloc<XWindowChanges>()
-        windowChanges.stack_mode = Above
-
-        wrapXConfigureWindow(display, window.frame, CWStackMode.convert(), windowChanges.ptr)
     }
 
     private fun adjustWindowToScreen(

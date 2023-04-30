@@ -170,10 +170,14 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     val focusHandler = WindowFocusHandler(windowList)
 
+    WindowStack(logger, system.display, windowList, focusHandler)
+
     val frameDrawer = FrameDrawer(system, system, fontProvider, colorHandler, screen)
 
     val textAtomReader = TextAtomReader(system, atomLibrary)
     val numberAtomReader = NumberAtomReader(system.display, atomLibrary)
+
+    val windowListMessageQueue = MessageQueue("/lcarswm-active-window-list", MessageQueue.Mode.WRITE)
 
     val windowFactory = PosixWindowFactory(
         logger,
@@ -190,6 +194,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
         textAtomReader,
         numberAtomReader,
         frameDrawer,
+        windowListMessageQueue
     )
 
     val windowCoordinator =
@@ -253,10 +258,6 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
             newWindow?.focus()
         })
 
-    focusHandler.registerObserver { activeWindow, _, _ ->
-        activeWindow?.let { windowCoordinator.stackWindowToTheTop(it) }
-    }
-
     updateWindowListAtom(screen.root, system, atomLibrary, windowList)
 
     toggleSessionManager.addListener(focusHandler.keySessionListener)
@@ -289,7 +290,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     val xEventResources = XEventResources(eventManager, eventTime, eventBuffer)
     val appMenuResources = AppMenuResources(appMenuMessageHandler, appMenuMessageQueue)
-    val platformResources = PlatformResources(commander, fileFactory, files, environment)
+    val platformResources = PlatformResources(commander, fileFactory, files, monitorManager, environment)
 
     return RuntimeResources(xEventResources, appMenuResources, platformResources)
 }
@@ -367,7 +368,7 @@ private fun loadSettings(
 private fun setupRandr(
     system: SystemApi,
     randrHandlerFactory: RandrHandlerFactory,
-    monitorManager: MonitorManager,
+    monitorManager: MonitorManager<*>,
     rootWindowId: Window
 ): XEventHandler {
     val screenChangeHandler = randrHandlerFactory.createScreenChangeHandler(monitorManager)
@@ -387,7 +388,7 @@ private fun createEventManager(
     eventStore: EventStore,
     system: SystemApi,
     logger: Logger,
-    monitorManager: MonitorManager,
+    monitorManager: MonitorManager<*>,
     windowCoordinator: WindowCoordinator,
     focusHandler: WindowFocusHandler,
     keyManager: KeyManager,

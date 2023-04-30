@@ -70,11 +70,15 @@ fun mockXCreateSimpleWindow(
     i: ULong
 ) = 1.toULong()
 
+fun mockXDestroyWindow(display: CValuesRef<Display>?, window: Window): Int = 0
+
+fun mockXReparentWindow(display: CValuesRef<Display>?, window: Window, newParent: Window, x: Int, y: Int): Int = 0
+
+fun mockXRestackWindows(display: CValuesRef<Display>?, windows: CValuesRef<WindowVar>?, windowCount: Int): Int = 0
+
 fun mockXMapWindow(display: CValuesRef<Display>?, window: Window): Int = 0
 
 fun mockXUnmapWindow(display: CValuesRef<Display>?, window: Window): Int = 0
-
-fun mockXDestroyWindow(display: CValuesRef<Display>?, window: Window): Int = 0
 
 fun mockXClearWindow(display: CValuesRef<Display>?, window: Window): Int = 0
 

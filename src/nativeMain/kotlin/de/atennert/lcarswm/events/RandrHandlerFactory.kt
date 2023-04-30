@@ -29,7 +29,7 @@ class RandrHandlerFactory(systemApi: SystemApi, private val logger: Logger) {
     }
 
     fun createScreenChangeHandler(
-        monitorManager: MonitorManager
+        monitorManager: MonitorManager<*>
     ): XEventHandler = object : XEventHandler {
         override val xEventType = randrEventBase + RRScreenChangeNotify
 

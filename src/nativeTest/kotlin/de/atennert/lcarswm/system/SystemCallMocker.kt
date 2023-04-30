@@ -20,6 +20,8 @@ open class SystemCallMocker {
         wrapXChangeProperty = ::mockXChangeProperty
         wrapXCreateSimpleWindow = ::mockXCreateSimpleWindow
         wrapXDestroyWindow = ::mockXDestroyWindow
+        wrapXReparentWindow = ::mockXReparentWindow
+        wrapXRestackWindows = ::mockXRestackWindows
         wrapXMapWindow = ::mockXMapWindow
         wrapXUnmapWindow = ::mockXUnmapWindow
         wrapXClearWindow = ::mockXClearWindow
@@ -64,6 +66,8 @@ open class SystemCallMocker {
         wrapXChangeProperty = ::XChangeProperty
         wrapXCreateSimpleWindow = ::XCreateSimpleWindow
         wrapXDestroyWindow = ::XDestroyWindow
+        wrapXReparentWindow = ::XReparentWindow
+        wrapXRestackWindows = ::XRestackWindows
         wrapXMapWindow = ::XMapWindow
         wrapXUnmapWindow = ::XUnmapWindow
         wrapXClearWindow = ::XClearWindow

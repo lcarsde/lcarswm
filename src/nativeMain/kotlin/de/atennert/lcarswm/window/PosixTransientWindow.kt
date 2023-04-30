@@ -1,13 +1,11 @@
 package de.atennert.lcarswm.window
 
-import de.atennert.lcarswm.BAR_HEIGHT_WITH_OFFSET
 import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.atom.TextAtomReader
 import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
-import de.atennert.lcarswm.drawing.IFrameDrawer
 import de.atennert.lcarswm.events.sendConfigureNotify
 import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
@@ -25,22 +23,20 @@ private val wmStateData = listOf<ULong>(NormalState.convert(), None.convert())
     .map { it.toUByteArray() }
     .combine()
 
-class PosixWindow(
+class PosixTransientWindow(
     private val logger: Logger,
     private val display: CPointer<Display>?,
     private val screen: Screen,
     private val atomLibrary: AtomLibrary,
     private val textAtomReader: TextAtomReader,
-    private val frameDrawer: IFrameDrawer,
     private val keyManager: KeyManager,
     override val id: Window,
     private val borderWidth: Int,
-    val type: WindowType
+    val type: WindowType,
+    val transientFor: Window?
 ) : ManagedWmWindow<Window> {
     override var frame: Window = 0.convert()
         private set
-
-    private var titleBar: Window = 0.convert()
 
     override var title: String = TextAtomReader.NO_NAME
         private set
@@ -48,8 +44,6 @@ class PosixWindow(
     override var wmClass: String = TextAtomReader.NO_NAME
 
     private lateinit var measurements: WindowMeasurements
-    private lateinit var screenMode: ScreenMode
-    private var isFocused = true
 
     init {
         wmClass = textAtomReader.readTextProperty(id, Atoms.WM_CLASS)
@@ -59,7 +53,6 @@ class PosixWindow(
 
     override fun open(measurements: WindowMeasurements, screenMode: ScreenMode) {
         this.measurements = measurements
-        this.screenMode = screenMode
 
         frame = wrapXCreateSimpleWindow(
             display,
@@ -67,25 +60,13 @@ class PosixWindow(
             measurements.x,
             measurements.y,
             measurements.width.convert(),
-            measurements.frameHeight.convert(),
+            measurements.height.convert(),
             0.convert(),
             0.convert(),
             0.convert(),
         )
 
-        titleBar = wrapXCreateSimpleWindow(
-            display,
-            frame,
-            0,
-            measurements.frameHeight - BAR_HEIGHT_WITH_OFFSET,
-            measurements.width.convert(),
-            BAR_HEIGHT_WITH_OFFSET.convert(),
-            0.convert(),
-            0.convert(),
-            0.convert(),
-        )
-
-        logger.logDebug("PosixWindow::open::reparenting $id ($title) to $frame")
+        logger.logDebug("PosixTransientWindow::open::reparenting $id to $frame")
 
         wrapXSelectInput(display, frame, frameEventMask)
 
@@ -105,24 +86,12 @@ class PosixWindow(
                 None.convert()
             )
         }
-        buttonsToGrab.forEach { button ->
-            keyManager.grabButton(
-                button.convert(),
-                AnyModifier,
-                titleBar,
-                (ButtonPressMask or ButtonReleaseMask or ButtonMotionMask).convert(),
-                GrabModeAsync,
-                None.convert()
-            )
-        }
 
         wrapXResizeWindow(display, id, measurements.width.convert(), measurements.height.convert())
 
         wrapXUngrabServer(display)
 
         wrapXMapWindow(display, frame)
-
-        wrapXMapWindow(display, titleBar)
 
         wrapXMapWindow(display, id)
 
@@ -139,8 +108,6 @@ class PosixWindow(
             wmStateData.toCValues(),
             dataCount
         )
-
-        frameDrawer.drawFrame(measurements, screenMode, isFocused, title, titleBar)
     }
 
     override fun show() {
@@ -149,16 +116,6 @@ class PosixWindow(
 
     override fun moveResize(measurements: WindowMeasurements, screenMode: ScreenMode) {
         this.measurements = measurements
-        this.screenMode = screenMode
-
-        wrapXMoveResizeWindow(
-            display,
-            titleBar,
-            0,
-            measurements.frameHeight - BAR_HEIGHT_WITH_OFFSET,
-            measurements.width.convert(),
-            BAR_HEIGHT_WITH_OFFSET.convert()
-        )
 
         wrapXMoveResizeWindow(
             display,
@@ -166,7 +123,7 @@ class PosixWindow(
             measurements.x,
             measurements.y,
             measurements.width.convert(),
-            measurements.frameHeight.convert()
+            measurements.height.convert()
         )
 
         wrapXResizeWindow(
@@ -177,8 +134,6 @@ class PosixWindow(
         )
 
         sendConfigureNotify(display, id, measurements)
-
-        frameDrawer.drawFrame(measurements, screenMode, isFocused, title, titleBar)
     }
 
     override fun updateTitle() {
@@ -186,19 +141,12 @@ class PosixWindow(
         if (title == TextAtomReader.NO_NAME) {
             title = textAtomReader.readTextProperty(id, Atoms.WM_NAME)
         }
-        if (::measurements.isInitialized) {
-            frameDrawer.drawFrame(measurements, screenMode, isFocused, title, titleBar)
-        }
     }
 
     override fun focus() {
-        isFocused = true
-        frameDrawer.drawFrame(measurements, screenMode, isFocused, title, titleBar)
     }
 
     override fun unfocus() {
-        isFocused = false
-        frameDrawer.drawFrame(measurements, screenMode, isFocused, title, titleBar)
     }
 
     override fun hide() {
@@ -206,15 +154,13 @@ class PosixWindow(
     }
 
     override fun close() {
-        logger.logDebug("PosixWindow::removeWindow::remove window $id")
+        logger.logDebug("PosixTransientWindow::removeWindow::remove window $id")
 
         wrapXSelectInput(display, id, NoEventMask)
         buttonsToGrab.forEach {
-            keyManager.ungrabButton(it.convert(), AnyModifier, titleBar)
             keyManager.ungrabButton(it.convert(), AnyModifier, id)
         }
 
-        wrapXUnmapWindow(display, titleBar)
         wrapXUnmapWindow(display, frame)
         wrapXFlush(display)
 
@@ -222,16 +168,6 @@ class PosixWindow(
 
         wrapXReparentWindow(display, id, screen.root, 0, 0)
         wrapXRemoveFromSaveSet(display, id)
-        wrapXDestroyWindow(display, titleBar)
         wrapXDestroyWindow(display, frame)
     }
-
-    override fun hasId(windowId: Window): Boolean = id == windowId || frame == windowId || titleBar == windowId
-
-    override fun isTitleBar(windowId: Window): Boolean = titleBar == windowId
-
-    override fun toString(): String {
-        return "PosixWindow(id=$id, frame=$frame, title='$title')"
-    }
 }
-

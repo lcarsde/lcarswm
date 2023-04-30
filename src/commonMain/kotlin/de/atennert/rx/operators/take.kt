@@ -15,16 +15,18 @@ fun <X> take(count: Int): Operator<X, X> {
 
                     nextValueCount++
                     if (nextValueCount >= count) {
-                        subscriber.complete()
+                        complete()
                     }
                 }
 
                 override fun error(error: Throwable) {
                     subscriber.error(error)
+                    subscriber.unsubscribe()
                 }
 
                 override fun complete() {
                     subscriber.complete()
+                    subscriber.unsubscribe()
                 }
             })
         }

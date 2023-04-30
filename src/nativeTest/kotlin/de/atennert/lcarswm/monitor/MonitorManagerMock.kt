@@ -7,19 +7,20 @@ import de.atennert.rx.Observable
 import de.atennert.rx.operators.combineLatestWith
 import de.atennert.rx.operators.map
 import kotlinx.cinterop.convert
+import xlib.RROutput
 
-open class MonitorManagerMock : MonitorManager {
+open class MonitorManagerMock : MonitorManager<RROutput> {
     private val screenModeSj = BehaviorSubject(ScreenMode.NORMAL)
     override val screenModeObs = screenModeSj.asObservable()
     var screenMode by screenModeSj
 
-    val primaryMonitorSj = BehaviorSubject<Monitor?>(Monitor(this, 42.convert(), "", true))
+    val primaryMonitorSj = BehaviorSubject<Monitor<RROutput>?>(Monitor(this, 42.convert(), "", true))
     var primaryMonitor by primaryMonitorSj
 
-    val otherMonitorsSj = BehaviorSubject(emptyList<Monitor>())
+    val otherMonitorsSj = BehaviorSubject(emptyList<Monitor<RROutput>>())
     var otherMonitors by otherMonitorsSj
 
-    override val monitorsObs: Observable<List<Monitor>> = primaryMonitorSj
+    override val monitorsObs: Observable<List<Monitor<RROutput>>> = primaryMonitorSj
         .apply(combineLatestWith(otherMonitorsSj.asObservable()))
         .apply(map { (primaryMonitor, otherMonitors) ->
             if (primaryMonitor != null) {

@@ -14,7 +14,7 @@ class KeyPressHandler(
     private val keyManager: KeyManager,
     private val keyConfiguration: KeyConfiguration,
     private val toggleSessionManager: KeySessionManager,
-    private val monitorManager: MonitorManager,
+    private val monitorManager: MonitorManager<*>,
     private val windowCoordinator: WindowCoordinator,
     private val windowFocusHandler: WindowFocusHandler
 ) : XEventHandler {

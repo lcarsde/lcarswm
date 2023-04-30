@@ -22,7 +22,7 @@ class PosixButton(
     private val screen: Screen,
     private val colorFactory: ColorFactory,
     private val fontProvider: FontProvider,
-    monitorManager: MonitorManager,
+    monitorManager: MonitorManager<RROutput>,
     keyManager: KeyManager,
     private val text: String,
     backgroundColor: Color,
@@ -72,7 +72,7 @@ class PosixButton(
         }
     }
 
-    private val primaryMonitorHandler = NextObserver.NextHandler<Monitor?> { monitor ->
+    private val primaryMonitorHandler = NextObserver.NextHandler<Monitor<RROutput>?> { monitor ->
         monitor?.let {
             x = it.x
             y = it.y

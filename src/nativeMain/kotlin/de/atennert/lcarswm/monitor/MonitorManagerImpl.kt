@@ -11,13 +11,13 @@ import kotlinx.cinterop.pointed
 import xlib.*
 import kotlin.math.max
 
-class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager {
+class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager<RROutput> {
 
     private val screenModeSj = BehaviorSubject(ScreenMode.NORMAL)
     override val screenModeObs = screenModeSj.asObservable()
     private var screenMode by screenModeSj
 
-    private val monitorsSj = BehaviorSubject<List<Monitor>>(emptyList())
+    private val monitorsSj = BehaviorSubject<List<Monitor<RROutput>>>(emptyList())
     override val monitorsObs = monitorsSj.asObservable()
     private var monitors by monitorsSj
 
@@ -85,10 +85,10 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
     }
 
     private fun addMeasurementToMonitor(
-        monitor: Monitor,
+        monitor: Monitor<RROutput>,
         crtcReference: RRCrtc,
         monitorData: CPointer<XRRScreenResources>
-    ): Monitor {
+    ): Monitor<RROutput> {
         val crtcInfo = randrApi.rGetCrtcInfo(monitorData, crtcReference)!!.pointed
 
         monitor.setMonitorMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
