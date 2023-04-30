@@ -218,7 +218,9 @@ class PosixWindow(
         if (title == TextAtomReader.NO_NAME) {
             title = textAtomReader.readTextProperty(id, Atoms.WM_NAME)
         }
-        frameDrawer.drawFrame(measurements, screenMode, isFocused, title, titleBar)
+        if (::measurements.isInitialized) {
+            frameDrawer.drawFrame(measurements, screenMode, isFocused, title, titleBar)
+        }
     }
 
     override fun focus() {
