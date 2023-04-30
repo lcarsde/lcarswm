@@ -65,16 +65,11 @@ class PosixWindowCoordinator(
             updatedWindows
         })
 
-    val combinedMeasurementsObs = Observable.merge(
-        rearrangeObs,
-        windowToMonitorEventObs
-            .apply(filter { it is WindowToMonitorSetEvent })
-            .apply(map { listOf(it.window to it.monitor!!) })
-    )
+    val combinedMeasurementsObs = windowsOnMonitorsObs
         .apply(map { updatedWindows ->
             updatedWindows.map {
-                it.second.windowMeasurementsObs
-                    .apply(withLatestFrom(it.second.screenModeObs, Observable.of(it.first)))
+                it.value.windowMeasurementsObs
+                    .apply(withLatestFrom(it.value.screenModeObs, Observable.of(it.key)))
             }
         })
 
