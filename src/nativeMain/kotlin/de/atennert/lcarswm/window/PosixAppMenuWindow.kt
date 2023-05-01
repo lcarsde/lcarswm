@@ -7,14 +7,14 @@ import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.events.EventStore
 import de.atennert.lcarswm.events.sendConfigureNotify
-import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
+import de.atennert.lcarswm.monitor.NewMonitor
 import de.atennert.lcarswm.system.*
 import de.atennert.rx.NextObserver
 import de.atennert.rx.ReplaySubject
 import de.atennert.rx.Subscription
 import de.atennert.rx.operators.*
-import de.atennert.rx.util.Tuple3
+import de.atennert.rx.util.Tuple2
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -40,8 +40,8 @@ class PosixAppMenuWindow(
     private val frameIdSj = ReplaySubject<Window>(1)
     private val frameIdObs = frameIdSj.asObservable()
 
-    private val nextHandler = NextObserver.NextHandler<Tuple3<Window, ScreenMode, Monitor<RROutput>?>> { (frameId, screenMode, primaryMonitor) ->
-        if (screenMode == ScreenMode.NORMAL && primaryMonitor != null) {
+    private val nextHandler = NextObserver.NextHandler<Tuple2<Window, NewMonitor<RROutput>?>> { (frameId, primaryMonitor) ->
+        if (primaryMonitor != null && primaryMonitor.screenMode == ScreenMode.NORMAL) {
             internalShow(frameId)
         } else {
             internalHide(frameId)
@@ -109,12 +109,7 @@ class PosixAppMenuWindow(
 
         subscription.add(
             frameIdObs
-                .apply(
-                    combineLatestWith(
-                    monitorManager.screenModeObs,
-                    monitorManager.primaryMonitorObs,
-                )
-                )
+                .apply(combineLatestWith(monitorManager.primaryMonitorObs))
                 .subscribe(NextObserver(nextHandler))
         )
 
@@ -199,7 +194,7 @@ class PosixAppMenuWindow(
         // Nothing to do
     }
 
-    private fun getWindowMeasurements(primaryMonitor: Monitor<*>?): WindowMeasurements? {
+    private fun getWindowMeasurements(primaryMonitor: NewMonitor<*>?): WindowMeasurements? {
         if (primaryMonitor == null) {
             return null
         }

@@ -14,13 +14,23 @@ open class MonitorManagerMock : MonitorManager<RROutput> {
     override val screenModeObs = screenModeSj.asObservable()
     var screenMode by screenModeSj
 
-    val primaryMonitorSj = BehaviorSubject<Monitor<RROutput>?>(Monitor(this, 42.convert(), "", true))
+    val primaryMonitorSj = BehaviorSubject<NewMonitor<RROutput>?>(
+        NewMonitor.Builder<RROutput>(42.convert())
+            .setPrimary(true)
+            .setName("Prim")
+            .setX(0)
+            .setY(0)
+            .setWidth(800)
+            .setHeight(600)
+            .setScreenMode(screenMode)
+            .build()
+    )
     var primaryMonitor by primaryMonitorSj
 
-    val otherMonitorsSj = BehaviorSubject(emptyList<Monitor<RROutput>>())
+    val otherMonitorsSj = BehaviorSubject(emptyList<NewMonitor<RROutput>>())
     var otherMonitors by otherMonitorsSj
 
-    override val monitorsObs: Observable<List<Monitor<RROutput>>> = primaryMonitorSj
+    override val monitorsObs: Observable<List<NewMonitor<RROutput>>> = primaryMonitorSj
         .apply(combineLatestWith(otherMonitorsSj.asObservable()))
         .apply(map { (primaryMonitor, otherMonitors) ->
             if (primaryMonitor != null) {

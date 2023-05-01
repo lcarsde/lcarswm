@@ -2,18 +2,15 @@ package de.atennert.lcarswm.drawing
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.lifecycle.closeWith
-import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
+import de.atennert.lcarswm.monitor.NewMonitor
 import de.atennert.lcarswm.settings.GeneralSetting
 import de.atennert.lcarswm.system.api.DrawApi
 import de.atennert.lcarswm.system.api.FontApi
 import de.atennert.rx.NextObserver
-import de.atennert.rx.Observable
 import de.atennert.rx.Subject
 import de.atennert.rx.operators.map
-import de.atennert.rx.operators.switchMap
 import de.atennert.rx.operators.withLatestFrom
-import de.atennert.rx.util.Tuple2
 import kotlinx.cinterop.*
 import xlib.*
 
@@ -72,15 +69,9 @@ class RootWindowDrawer(
         triggerDrawSj
             .apply(withLatestFrom(monitorManager.monitorsObs))
             .apply(map { it.v2 })
-            .apply(switchMap { monitors ->
-                val extendedMonitors = monitors.map { monitor -> Observable.of(monitor)
-                    .apply(withLatestFrom(monitor.screenModeObs))
-                }
-                Observable.forkJoin(extendedMonitors)
-            })
             .apply(withLatestFrom(monitorManager.combinedScreenSizeObs))
-            .subscribe(NextObserver { (monitorsWithScreens, combinedScreenSize) ->
-                internalDrawWindowManagerFrame(monitorsWithScreens, combinedScreenSize)
+            .subscribe(NextObserver { (monitors, combinedScreenSize) ->
+                internalDrawWindowManagerFrame(monitors, combinedScreenSize)
             })
             .closeWith { this.unsubscribe() }
     }
@@ -89,18 +80,18 @@ class RootWindowDrawer(
         triggerDrawSj.next(Unit)
     }
 
-    private fun internalDrawWindowManagerFrame(monitorsWithScreens: List<Tuple2<Monitor<*>, ScreenMode>>, combinedScreenSize: Pair<Int, Int>) {
+    private fun internalDrawWindowManagerFrame(monitors: List<NewMonitor<*>>, combinedScreenSize: Pair<Int, Int>) {
         val pixmap = drawApi.createPixmap(
             screen.root,
             combinedScreenSize.first.convert(),
             combinedScreenSize.second.convert(),
             screen.root_depth.convert()
         )
-        monitorsWithScreens.forEach {
-            when (it.v2) { // -> with latest from
-                ScreenMode.NORMAL -> drawNormalFrame(it.v1, pixmap)
-                ScreenMode.MAXIMIZED -> drawMaximizedFrame(it.v1, pixmap)
-                ScreenMode.FULLSCREEN -> clearScreen(it.v1, pixmap)
+        monitors.forEach {
+            when (it.screenMode) { // -> with latest from
+                ScreenMode.NORMAL -> drawNormalFrame(it, pixmap)
+                ScreenMode.MAXIMIZED -> drawMaximizedFrame(it, pixmap)
+                ScreenMode.FULLSCREEN -> clearScreen(it, pixmap)
             }
         }
         drawApi.setWindowBackgroundPixmap(screen.root, pixmap)
@@ -158,7 +149,7 @@ class RootWindowDrawer(
         drawApi.freeGC(gcCopyImage)
     }
 
-    private fun drawMaximizedFrame(monitor: Monitor<*>, pixmap: Pixmap) {
+    private fun drawMaximizedFrame(monitor: NewMonitor<*>, pixmap: Pixmap) {
         clearScreen(monitor, pixmap)
 
         val barEndsGC = getGC(COLOR_BAR_ENDS)
@@ -259,7 +250,7 @@ class RootWindowDrawer(
         nativeHeap.free(bars)
     }
 
-    private fun drawNormalFrame(monitor: Monitor<*>, pixmap: Pixmap) {
+    private fun drawNormalFrame(monitor: NewMonitor<*>, pixmap: Pixmap) {
         clearScreen(monitor, pixmap)
 
         val barDownGC = getGC(COLOR_NORMAL_BAR_DOWN)
@@ -432,7 +423,7 @@ class RootWindowDrawer(
         nativeHeap.free(cornerRects)
     }
 
-    private fun clearScreen(monitor: Monitor<*>, pixmap: Pixmap) {
+    private fun clearScreen(monitor: NewMonitor<*>, pixmap: Pixmap) {
         val backgroundGC = getGC(COLOR_BACKGROUND)
         drawApi.fillRectangle(
             pixmap,

@@ -1,6 +1,6 @@
 package de.atennert.lcarswm.window
 
-import de.atennert.lcarswm.monitor.Monitor
+import de.atennert.lcarswm.monitor.NewMonitor
 import de.atennert.lcarswm.system.FunctionCall
 import xlib.RROutput
 import xlib.Window
@@ -16,7 +16,7 @@ class WindowCoordinatorMock : WindowCoordinator {
         functionCalls.add(FunctionCall("moveWindowToPreviousMonitor", windowId))
     }
 
-    override fun moveWindowToMonitor(windowId: Window, monitor: Monitor<RROutput>) {
+    override fun moveWindowToMonitor(windowId: Window, monitor: NewMonitor<RROutput>) {
         TODO("Not yet implemented")
     }
 }

@@ -3,6 +3,7 @@ package de.atennert.lcarswm.monitor
 import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.system.api.RandrApi
 import de.atennert.rx.BehaviorSubject
+import de.atennert.rx.operators.combineLatestWith
 import de.atennert.rx.operators.map
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
@@ -13,13 +14,18 @@ import kotlin.math.max
 
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager<RROutput> {
 
+    private val lastMonitorBuildersSj = BehaviorSubject<List<NewMonitor.Builder<RROutput>>>(emptyList())
+    private val lastMonitorBuildersObs = lastMonitorBuildersSj.asObservable()
+
     private val screenModeSj = BehaviorSubject(ScreenMode.NORMAL)
     override val screenModeObs = screenModeSj.asObservable()
     private var screenMode by screenModeSj
 
-    private val monitorsSj = BehaviorSubject<List<Monitor<RROutput>>>(emptyList())
-    override val monitorsObs = monitorsSj.asObservable()
-    private var monitors by monitorsSj
+    override val monitorsObs = lastMonitorBuildersObs
+        .apply(combineLatestWith(screenModeObs))
+        .apply(map { (monitorBuilders, screenMode) ->
+            monitorBuilders.map { it.setScreenMode(screenMode).build() }
+        })
 
     override val primaryMonitorObs = monitorsObs
         .apply(map { monitors -> monitors.firstOrNull { it.isPrimary } })
@@ -46,13 +52,13 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         val monitorNames = activeMonitorInfos
             .map { (_, outputInfo) -> getOutputName(outputInfo!!) }
 
-        monitors = activeMonitorInfos
+        lastMonitorBuildersSj.next(activeMonitorInfos
             .map { (monitorId, _) -> monitorId }
             .zip(monitorNames)
-            .map { (id, name) -> Monitor(this, id, name, id == primary) }
+            .map { (id, name) -> NewMonitor.Builder(id).setName(name).setPrimary(id == primary) }
             .zip(activeMonitorInfos.map { it.second })
             .map { (monitor, outputInfo) -> addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData) }
-            .sortedBy { (it.y + it.height).toULong().shl(32) + it.x.toULong() }
+            .sortedBy { (it.y + it.height).toULong().shl(32) + it.x.toULong() })
     }
 
     private fun getMonitorData(): CPointer<XRRScreenResources> {
@@ -85,13 +91,13 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
     }
 
     private fun addMeasurementToMonitor(
-        monitor: Monitor<RROutput>,
+        monitor: NewMonitor.Builder<RROutput>,
         crtcReference: RRCrtc,
         monitorData: CPointer<XRRScreenResources>
-    ): Monitor<RROutput> {
+    ): NewMonitor.Builder<RROutput> {
         val crtcInfo = randrApi.rGetCrtcInfo(monitorData, crtcReference)!!.pointed
 
-        monitor.setMonitorMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width, crtcInfo.height)
+        monitor.setX(crtcInfo.x).setY(crtcInfo.y).setWidth(crtcInfo.width.convert()).setHeight(crtcInfo.height.convert())
 
         return monitor
     }

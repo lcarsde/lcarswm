@@ -9,8 +9,8 @@ import de.atennert.lcarswm.drawing.ColorFactory
 import de.atennert.lcarswm.drawing.FontProvider
 import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.lifecycle.closeWith
-import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
+import de.atennert.lcarswm.monitor.NewMonitor
 import de.atennert.lcarswm.system.*
 import de.atennert.rx.NextObserver
 import de.atennert.rx.Subscription
@@ -72,7 +72,7 @@ class PosixButton(
         }
     }
 
-    private val primaryMonitorHandler = NextObserver.NextHandler<Monitor<RROutput>?> { monitor ->
+    private val primaryMonitorHandler = NextObserver.NextHandler<NewMonitor<RROutput>?> { monitor ->
         monitor?.let {
             x = it.x
             y = it.y
