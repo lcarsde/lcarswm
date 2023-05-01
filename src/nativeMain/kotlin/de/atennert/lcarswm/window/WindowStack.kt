@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.lifecycle.closeWith
-import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.wrapXRestackWindows
 import de.atennert.rx.NextObserver
 import kotlinx.cinterop.CPointer
@@ -11,7 +10,6 @@ import xlib.Display
 import xlib.Window
 
 class WindowStack(
-    private val logger: Logger,
     private val display: CPointer<Display>?,
     windowList: WindowList,
     focusHandler: WindowFocusHandler
@@ -35,7 +33,6 @@ class WindowStack(
                     stack.remove(it.window)
                 }
                 stack.sortWith(comparator)
-                logger.logDebug("STACK::add/remove::$stack")
                 triggerWmRestack()
             })
             .closeWith { this.unsubscribe() }
@@ -43,7 +40,6 @@ class WindowStack(
         focusHandler.windowFocusEventObs
             .subscribe(NextObserver { (newWindow) ->
                 activeWindow = newWindow
-                logger.logDebug("STACK::focus::$activeWindow")
                 if (newWindow == null) {
                     return@NextObserver
                 }
@@ -51,7 +47,6 @@ class WindowStack(
                     ?.let {
                         stack.remove(it)
                         stack.add(0, it)
-                        logger.logDebug("STACK::focus::$stack")
                         stack.sortWith(comparator)
                         triggerWmRestack()
                     }
@@ -60,7 +55,7 @@ class WindowStack(
     }
 
     private fun getWindowValue(a: ManagedWmWindow<Window>): Int {
-        var value = if (a is PosixTransientWindow && a.transientFor == null) 100 else 0 // transient for root
+        var value = if (a is PosixTransientWindow && (a.transientFor == null || a.transientFor == 0.toULong())) 100 else 0 // transient for root
         value += if (a.id == activeWindow) 1 else 0
         return value
     }
@@ -72,7 +67,6 @@ class WindowStack(
         stack.map { it.frame }
             .toULongArray()
             .usePinned {
-                logger.logDebug("STACK::send::${it.get()}")
                 wrapXRestackWindows(display, it.addressOf(0), it.get().size)
             }
     }

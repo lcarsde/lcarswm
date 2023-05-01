@@ -170,7 +170,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     val focusHandler = WindowFocusHandler(windowList)
 
-    WindowStack(logger, system.display, windowList, focusHandler)
+    WindowStack(system.display, windowList, focusHandler)
 
     val frameDrawer = FrameDrawer(system, system, fontProvider, colorHandler, screen)
 
