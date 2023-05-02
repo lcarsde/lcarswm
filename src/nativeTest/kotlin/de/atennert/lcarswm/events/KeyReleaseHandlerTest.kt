@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.AppMenuMessageHandler
 import de.atennert.lcarswm.LCARS_WM_KEY_SYMS
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
@@ -33,7 +34,8 @@ class KeyReleaseHandlerTest {
     @Test
     fun `return the event type KeyReleaseHandler`() {
         val systemApi = SystemFacadeMock()
-        val focusHandler = WindowFocusHandler(WindowList())
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val keyManager = KeyManager(systemApi)
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -57,7 +59,8 @@ class KeyReleaseHandlerTest {
     @Test
     fun `shutdown on Q`() {
         val systemApi = SystemFacadeMock()
-        val focusHandler = WindowFocusHandler(WindowList())
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val keyManager = KeyManager(systemApi)
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -93,7 +96,8 @@ class KeyReleaseHandlerTest {
             ): Int = -1
         }
         val keyManager = KeyManager(systemApi)
-        val focusHandler = WindowFocusHandler(WindowList())
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val windowId = systemApi.getNewWindowId()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -137,7 +141,8 @@ class KeyReleaseHandlerTest {
             }
         }
         val keyManager = KeyManager(systemApi)
-        val focusHandler = WindowFocusHandler(WindowList())
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val windowId = systemApi.getNewWindowId()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -172,7 +177,8 @@ class KeyReleaseHandlerTest {
     fun `send delete window event on F4 when client supports it`() {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi)
-        val focusHandler = WindowFocusHandler(WindowList())
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val windowId = systemApi.getNewWindowId()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(
@@ -216,7 +222,8 @@ class KeyReleaseHandlerTest {
     fun `execute configured command`() {
         val systemApi = SystemFacadeMock()
         val keyManager = KeyManager(systemApi)
-        val focusHandler = WindowFocusHandler(WindowList())
+        val windowList = WindowList()
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val windowId = systemApi.getNewWindowId()
         val keySessionManager = KeySessionManager(LoggerMock(), systemApi)
         val keyConfiguration = KeyConfiguration(

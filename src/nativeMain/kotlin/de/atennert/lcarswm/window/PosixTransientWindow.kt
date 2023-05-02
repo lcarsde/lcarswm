@@ -33,7 +33,7 @@ class PosixTransientWindow(
     override val id: Window,
     private val borderWidth: Int,
     val type: WindowType,
-    val transientFor: Window?
+    val transientFor: Window?,
 ) : ManagedWmWindow<Window> {
     override var frame: Window = 0.convert()
         private set
@@ -42,6 +42,8 @@ class PosixTransientWindow(
         private set
 
     override var wmClass: String = TextAtomReader.NO_NAME
+
+    val isTransientForRoot = transientFor == null
 
     private lateinit var measurements: WindowMeasurements
 
@@ -54,67 +56,77 @@ class PosixTransientWindow(
     override fun open(measurements: WindowMeasurements, screenMode: ScreenMode) {
         this.measurements = measurements
 
-        frame = wrapXCreateSimpleWindow(
-            display,
-            screen.root,
-            measurements.x,
-            measurements.y,
-            measurements.width.convert(),
-            measurements.height.convert(),
-            0.convert(),
-            0.convert(),
-            0.convert(),
-        )
+        if (!isTransientForRoot) {
+            frame = wrapXCreateSimpleWindow(
+                display,
+                screen.root,
+                measurements.x,
+                measurements.y,
+                measurements.width.convert(),
+                measurements.height.convert(),
+                0.convert(),
+                0.convert(),
+                0.convert(),
+            )
 
-        logger.logDebug("PosixTransientWindow::open::reparenting $id to $frame")
+            logger.logDebug("PosixTransientWindow::open::reparenting $id to $frame")
 
-        wrapXSelectInput(display, frame, frameEventMask)
+            wrapXSelectInput(display, frame, frameEventMask)
+        }
 
         wrapXAddToSaveSet(display, id)
 
         wrapXSetWindowBorderWidth(display, id, 0.convert())
 
-        wrapXReparentWindow(display, id, frame, 0, 0)
+        if (!isTransientForRoot) {
+            wrapXReparentWindow(display, id, frame, 0, 0)
 
-        buttonsToGrab.forEach { button ->
-            keyManager.grabButton(
-                button.convert(),
-                AnyModifier,
-                id,
-                ButtonPressMask.convert(),
-                GrabModeSync,
-                None.convert()
-            )
+            buttonsToGrab.forEach { button ->
+                keyManager.grabButton(
+                    button.convert(),
+                    AnyModifier,
+                    id,
+                    ButtonPressMask.convert(),
+                    GrabModeSync,
+                    None.convert()
+                )
+            }
+
+            wrapXResizeWindow(display, id, measurements.width.convert(), measurements.height.convert())
         }
-
-        wrapXResizeWindow(display, id, measurements.width.convert(), measurements.height.convert())
 
         wrapXUngrabServer(display)
 
-        wrapXMapWindow(display, frame)
+        if (!isTransientForRoot) {
+            wrapXMapWindow(display, frame)
+        }
 
         wrapXMapWindow(display, id)
 
-        val format = 32
-        val bytesPerData = format.div(8)
-        val dataCount = wmStateData.size.div(bytesPerData)
-        wrapXChangeProperty(
-            display,
-            id,
-            atomLibrary[Atoms.WM_STATE],
-            atomLibrary[Atoms.WM_STATE],
-            format,
-            PropModeReplace,
-            wmStateData.toCValues(),
-            dataCount
-        )
+        if (!isTransientForRoot) {
+            val format = 32
+            val bytesPerData = format.div(8)
+            val dataCount = wmStateData.size.div(bytesPerData)
+            wrapXChangeProperty(
+                display,
+                id,
+                atomLibrary[Atoms.WM_STATE],
+                atomLibrary[Atoms.WM_STATE],
+                format,
+                PropModeReplace,
+                wmStateData.toCValues(),
+                dataCount
+            )
+        }
     }
 
     override fun show() {
-        TODO("Not yet implemented")
     }
 
     override fun moveResize(measurements: WindowMeasurements, screenMode: ScreenMode) {
+        if (isTransientForRoot) {
+            return
+        }
         this.measurements = measurements
 
         wrapXMoveResizeWindow(
@@ -150,24 +162,27 @@ class PosixTransientWindow(
     }
 
     override fun hide() {
-        TODO("Not yet implemented")
     }
 
     override fun close() {
         logger.logDebug("PosixTransientWindow::removeWindow::remove window $id")
 
-        wrapXSelectInput(display, id, NoEventMask)
-        buttonsToGrab.forEach {
-            keyManager.ungrabButton(it.convert(), AnyModifier, id)
-        }
+        if (!isTransientForRoot) {
+            wrapXSelectInput(display, id, NoEventMask)
+            buttonsToGrab.forEach {
+                keyManager.ungrabButton(it.convert(), AnyModifier, id)
+            }
 
-        wrapXUnmapWindow(display, frame)
+            wrapXUnmapWindow(display, frame)
+        }
         wrapXFlush(display)
 
         wrapXSetWindowBorderWidth(display, id, borderWidth.convert())
 
-        wrapXReparentWindow(display, id, screen.root, 0, 0)
+        if (!isTransientForRoot) {
+            wrapXReparentWindow(display, id, screen.root, 0, 0)
+            wrapXDestroyWindow(display, frame)
+        }
         wrapXRemoveFromSaveSet(display, id)
-        wrapXDestroyWindow(display, frame)
     }
 }

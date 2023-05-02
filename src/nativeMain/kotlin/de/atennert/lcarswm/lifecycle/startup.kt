@@ -168,7 +168,16 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     val windowList = WindowList()
 
-    val focusHandler = WindowFocusHandler(windowList)
+    val appMenuMessageQueue = MessageQueue("/lcarswm-app-menu-messages", MessageQueue.Mode.READ)
+
+    val appMenuMessageHandler = AppMenuMessageHandler(
+        logger,
+        system,
+        atomLibrary,
+        windowList,
+    )
+
+    val focusHandler = WindowFocusHandler(windowList, appMenuMessageHandler)
 
     WindowStack(system.display, windowList, focusHandler)
 
@@ -226,16 +235,6 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
             monitorManager,
             screen.root
         )
-
-    val appMenuMessageQueue = MessageQueue("/lcarswm-app-menu-messages", MessageQueue.Mode.READ)
-
-    val appMenuMessageHandler = AppMenuMessageHandler(
-        logger,
-        system,
-        atomLibrary,
-        windowList,
-        focusHandler
-    )
 
     val moveWindowManager = MoveWindowManager(logger, windowCoordinator, monitorManager)
 

@@ -55,7 +55,11 @@ class WindowStack(
     }
 
     private fun getWindowValue(a: ManagedWmWindow<Window>): Int {
-        var value = if (a is PosixTransientWindow && (a.transientFor == null || a.transientFor == 0.toULong())) 100 else 0 // transient for root
+        var value = when {
+            a is PosixTransientWindow && a.isTransientForRoot -> 100
+//            a is PosixTransientWindow -> 10 // TODO make sure that transient windows are only on top of their parents
+            else -> 0
+        }
         value += if (a.id == activeWindow) 1 else 0
         return value
     }
@@ -64,7 +68,7 @@ class WindowStack(
         if (stack.isEmpty()) {
             return
         }
-        stack.map { it.frame }
+        stack.map { if (it is PosixTransientWindow && it.isTransientForRoot) it.id else it.frame }
             .toULongArray()
             .usePinned {
                 wrapXRestackWindows(display, it.addressOf(0), it.get().size)

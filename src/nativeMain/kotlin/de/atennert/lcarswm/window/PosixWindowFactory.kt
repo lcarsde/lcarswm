@@ -152,7 +152,7 @@ class PosixWindowFactory(
         val transientWindow = nativeHeap.alloc(None.toULong())
         if (wrapXGetTransientForHint(display, id, transientWindow.ptr) != 0) {
             isTransient = true
-            if (transientWindow.value != screen.root && type != WindowType.DOCK) {
+            if (transientWindow.value != screen.root && transientWindow.value != 0.toULong() && type != WindowType.DOCK) {
                 transientFor = transientWindow.value
             }
         }

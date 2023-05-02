@@ -1,15 +1,18 @@
 package de.atennert.lcarswm.window
 
+import de.atennert.lcarswm.AppMenuMessageHandler
 import de.atennert.lcarswm.keys.KeySessionManager
 import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.rx.NextObserver
 import de.atennert.rx.ReplaySubject
+import de.atennert.rx.operators.filter
+import de.atennert.rx.operators.withLatestFrom
 import xlib.Window
 
 typealias FocusObserver = (Window?, Window?, Boolean) -> Unit
 data class WindowFocusEvent(val newWindow: Window?, val oldWindow: Window?, val toggleSessionActive: Boolean)
 
-class WindowFocusHandler(windowList: WindowList) {
+class WindowFocusHandler(windowList: WindowList, appMenuMessageHandler: AppMenuMessageHandler) {
     private val windowFocusEventSj = ReplaySubject<WindowFocusEvent>(0)
     val windowFocusEventObs = windowFocusEventSj.asObservable()
 
@@ -23,6 +26,7 @@ class WindowFocusHandler(windowList: WindowList) {
 
     init {
         windowList.windowEventObs
+            .apply(filter { it.window !is PosixTransientWindow || !it.window.isTransientForRoot })
             .subscribe(NextObserver {
                 when (it) {
                     is WindowAddedEvent -> setFocusedWindow(it.window.id)
@@ -30,6 +34,14 @@ class WindowFocusHandler(windowList: WindowList) {
                     is WindowUpdatedEvent -> { /* Nothing to do */ }
                 }
             })
+            .closeWith { this.unsubscribe() }
+
+        appMenuMessageHandler.selectAppObs
+            .apply(withLatestFrom(windowList.windowsObs))
+            .apply(filter { (selectedWindowId, windows) ->
+                windows.find { it.id == selectedWindowId && (it !is PosixTransientWindow || !it.isTransientForRoot) } != null
+            })
+            .subscribe(NextObserver { (selectedWindowId) -> setFocusedWindow(selectedWindowId)})
             .closeWith { this.unsubscribe() }
     }
 

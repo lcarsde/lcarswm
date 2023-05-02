@@ -1,6 +1,10 @@
 package de.atennert.lcarswm.window
 
+import de.atennert.lcarswm.AppMenuMessageHandler
+import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.lifecycle.closeClosables
+import de.atennert.lcarswm.log.LoggerMock
+import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.convert
 import xlib.Window
 import kotlin.test.AfterTest
@@ -16,7 +20,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `check that initially there is no focused window`() {
-        val windowFocusHandler = WindowFocusHandler(WindowList())
+        val systemApi = SystemFacadeMock()
+        val windowList = WindowList()
+        val windowFocusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
 
         assertNull(windowFocusHandler.getFocusedWindow(), "There is no focused window")
 
@@ -29,7 +35,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `update focused window`() {
-        val windowFocusHandler = WindowFocusHandler(WindowList())
+        val systemApi = SystemFacadeMock()
+        val windowList = WindowList()
+        val windowFocusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val testWindow1 = 21.convert<Window>()
         val testWindow2 = 22.convert<Window>()
         var newWindow: Window? = 42.convert()
@@ -50,8 +58,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `remove last focused window`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
 
         windowList.add(FakeManagedWindow(id = 1.convert()))
 
@@ -62,8 +71,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `remove second focused window`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
 
         windowList.add(FakeManagedWindow(id = 1.convert()))
         windowList.add(FakeManagedWindow(id = 2.convert()))
@@ -76,8 +86,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `remove third focused window`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
 
         windowList.add(FakeManagedWindow(id = 1.convert()))
         windowList.add(FakeManagedWindow(id = 2.convert()))
@@ -92,8 +103,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `remove unfocused window`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
 
         windowList.add(FakeManagedWindow(id = 1.convert()))
         windowList.add(FakeManagedWindow(id = 2.convert()))
@@ -106,8 +118,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -128,8 +141,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows with reset`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -152,8 +166,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows reversed`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -174,8 +189,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows reversed with reset`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -198,8 +214,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows mixed`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -231,8 +248,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `toggle through windows mixed with reset`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
         val window1: Window = 1.convert()
         val window2: Window = 2.convert()
         val window3: Window = 3.convert()
@@ -266,8 +284,9 @@ class WindowFocusHandlerTest {
 
     @Test
     fun `don't react on toggle without windows`() {
+        val systemApi = SystemFacadeMock()
         val windowList = WindowList()
-        val focusHandler = WindowFocusHandler(windowList)
+        val focusHandler = WindowFocusHandler(windowList, AppMenuMessageHandler(LoggerMock(), systemApi, AtomLibrary(systemApi), windowList))
 
         focusHandler.toggleWindowFocusForward()
 

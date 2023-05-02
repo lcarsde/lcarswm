@@ -162,19 +162,13 @@ class PosixWindowCoordinator(
         subscription.add(combinedMeasurementsObs
             .subscribe(NextObserver { rootWindowDrawer.drawWindowManagerFrame() }))
 
-//        subscription.add(monitorManager.monitorsObs
-//            .apply(switchMap { monitors ->
-//                Observable.merge(*monitors.map { it.windowMeasurementsObs }.toTypedArray())
-//            })
-//            .subscribe(NextObserver { rootWindowDrawer.drawWindowManagerFrame() }))
-
         // configure window
         subscription.add(
             eventStore.configureRequestObs
                 .apply(withLatestFrom(windowList.windowsObs))
                 // TODO should filter using windowsOnMonitors
                 .apply(filter { (configureRequest, windows) ->
-                    windows.any { it.id == configureRequest.window }
+                    windows.any { it.id == configureRequest.window && (it !is PosixTransientWindow || !it.isTransientForRoot) }
                 })
                 .apply(map { (configureRequest) -> configureRequest })
                 .apply(switchMap { configureRequest ->
@@ -197,7 +191,7 @@ class PosixWindowCoordinator(
                 .apply(withLatestFrom(windowList.windowsObs))
                 // TODO should filter using windowsOnMonitors
                 .apply(filter { (configureRequest, windows) ->
-                    !windows.any { it.id == configureRequest.window }
+                    !windows.any { it.id == configureRequest.window && (it !is PosixTransientWindow || !it.isTransientForRoot) }
                 })
                 .apply(map { (configureRequest) -> configureRequest })
                 .subscribe(NextObserver { configureRequest ->
