@@ -2,8 +2,8 @@ package de.atennert.lcarswm.mouse
 
 import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
-import de.atennert.lcarswm.monitor.NewMonitor
 import de.atennert.lcarswm.window.ManagedWmWindow
 import de.atennert.lcarswm.window.WindowCoordinator
 import de.atennert.rx.NextObserver
@@ -16,9 +16,9 @@ class MoveWindowManager(
     monitorManager: MonitorManager<RROutput>
 ) {
 
-    private var monitors = emptyList<NewMonitor<RROutput>>()
+    private var monitors = emptyList<Monitor<RROutput>>()
 
-    private lateinit var lastWindowMonitor: NewMonitor<RROutput>
+    private lateinit var lastWindowMonitor: Monitor<RROutput>
 
     private var targetWindow: ManagedWmWindow<Window>? = null
 
@@ -60,7 +60,7 @@ class MoveWindowManager(
         targetWindow = null
     }
 
-    private fun getMonitor(x: Int, y: Int): NewMonitor<RROutput>? {
+    private fun getMonitor(x: Int, y: Int): Monitor<RROutput>? {
         return try {
             monitors.first { it.isOnMonitor(x, y) }
         } catch (e: Exception) {

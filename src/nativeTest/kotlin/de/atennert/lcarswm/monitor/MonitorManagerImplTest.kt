@@ -22,9 +22,9 @@ class MonitorManagerImplTest {
         val systemApi = SystemFacadeMock()
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        val monitors = mutableListOf<List<NewMonitor<RROutput>>>()
+        val monitors = mutableListOf<List<Monitor<RROutput>>>()
         val monitorSub = monitorManager.monitorsObs.subscribe(NextObserver(monitors::add))
-        val primaries = mutableListOf<NewMonitor<RROutput>?>()
+        val primaries = mutableListOf<Monitor<RROutput>?>()
         val primarySub = monitorManager.primaryMonitorObs.subscribe(NextObserver(primaries::add))
 
         monitorManager.updateMonitorList()
@@ -49,9 +49,9 @@ class MonitorManagerImplTest {
         }
         val monitorManager: MonitorManager<RROutput> = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        val monitors = mutableListOf<List<NewMonitor<RROutput>>>()
+        val monitors = mutableListOf<List<Monitor<RROutput>>>()
         val monitorSub = monitorManager.monitorsObs.subscribe(NextObserver(monitors::add))
-        val primaries = mutableListOf<NewMonitor<RROutput>?>()
+        val primaries = mutableListOf<Monitor<RROutput>?>()
         val primarySub = monitorManager.primaryMonitorObs.subscribe(NextObserver(primaries::add))
 
         monitorManager.updateMonitorList()
@@ -68,7 +68,7 @@ class MonitorManagerImplTest {
 
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        val monitors = mutableListOf<List<NewMonitor<RROutput>>>()
+        val monitors = mutableListOf<List<Monitor<RROutput>>>()
         val monitorSub = monitorManager.monitorsObs.subscribe(NextObserver(monitors::add))
 
         monitorManager.updateMonitorList()
@@ -101,7 +101,7 @@ class MonitorManagerImplTest {
 
         val monitorManager = MonitorManagerImpl(systemApi, systemApi.rootWindowId)
 
-        val monitors = mutableListOf<List<NewMonitor<RROutput>>>()
+        val monitors = mutableListOf<List<Monitor<RROutput>>>()
         val monitorSub = monitorManager.monitorsObs.subscribe(NextObserver(monitors::add))
 
         monitorManager.updateMonitorList()

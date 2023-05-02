@@ -14,7 +14,7 @@ import kotlin.math.max
 
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager<RROutput> {
 
-    private val lastMonitorBuildersSj = BehaviorSubject<List<NewMonitor.Builder<RROutput>>>(emptyList())
+    private val lastMonitorBuildersSj = BehaviorSubject<List<Monitor.Builder<RROutput>>>(emptyList())
     private val lastMonitorBuildersObs = lastMonitorBuildersSj.asObservable()
 
     private val screenModeSj = BehaviorSubject(ScreenMode.NORMAL)
@@ -55,7 +55,7 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
         lastMonitorBuildersSj.next(activeMonitorInfos
             .map { (monitorId, _) -> monitorId }
             .zip(monitorNames)
-            .map { (id, name) -> NewMonitor.Builder(id).setName(name).setPrimary(id == primary) }
+            .map { (id, name) -> Monitor.Builder(id, name, id == primary) }
             .zip(activeMonitorInfos.map { it.second })
             .map { (monitor, outputInfo) -> addMeasurementToMonitor(monitor, outputInfo!!.pointed.crtc, monitorData) }
             .sortedBy { (it.y + it.height).toULong().shl(32) + it.x.toULong() })
@@ -91,13 +91,13 @@ class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowI
     }
 
     private fun addMeasurementToMonitor(
-        monitor: NewMonitor.Builder<RROutput>,
+        monitor: Monitor.Builder<RROutput>,
         crtcReference: RRCrtc,
         monitorData: CPointer<XRRScreenResources>
-    ): NewMonitor.Builder<RROutput> {
+    ): Monitor.Builder<RROutput> {
         val crtcInfo = randrApi.rGetCrtcInfo(monitorData, crtcReference)!!.pointed
 
-        monitor.setX(crtcInfo.x).setY(crtcInfo.y).setWidth(crtcInfo.width.convert()).setHeight(crtcInfo.height.convert())
+        monitor.setMeasurements(crtcInfo.x, crtcInfo.y, crtcInfo.width.convert(), crtcInfo.height.convert())
 
         return monitor
     }

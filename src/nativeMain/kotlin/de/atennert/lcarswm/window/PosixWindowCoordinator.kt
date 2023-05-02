@@ -5,8 +5,8 @@ import de.atennert.lcarswm.events.EventStore
 import de.atennert.lcarswm.events.ReparentEvent
 import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.log.Logger
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
-import de.atennert.lcarswm.monitor.NewMonitor
 import de.atennert.lcarswm.system.wrapXConfigureWindow
 import de.atennert.lcarswm.system.wrapXSendEvent
 import de.atennert.rx.*
@@ -15,8 +15,8 @@ import de.atennert.rx.util.Tuple
 import kotlinx.cinterop.*
 import xlib.*
 
-sealed class WindowToMonitorEvent(val window: ManagedWmWindow<Window>, val monitor: NewMonitor<RROutput>?)
-class WindowToMonitorSetEvent(window: ManagedWmWindow<Window>, monitor: NewMonitor<RROutput>) : WindowToMonitorEvent(window, monitor)
+sealed class WindowToMonitorEvent(val window: ManagedWmWindow<Window>, val monitor: Monitor<RROutput>?)
+class WindowToMonitorSetEvent(window: ManagedWmWindow<Window>, monitor: Monitor<RROutput>) : WindowToMonitorEvent(window, monitor)
 class WindowToMonitorRemoveEvent(window: ManagedWmWindow<Window>) : WindowToMonitorEvent(window, null)
 
 /**
@@ -34,7 +34,7 @@ class PosixWindowCoordinator(
     private val windowToMonitorEventSj = Subject<WindowToMonitorEvent>()
     val windowToMonitorEventObs = windowToMonitorEventSj.asObservable()
 
-    private val windowsOnMonitorsSj = BehaviorSubject(emptyMap<ManagedWmWindow<Window>, NewMonitor<*>>())
+    private val windowsOnMonitorsSj = BehaviorSubject(emptyMap<ManagedWmWindow<Window>, Monitor<*>>())
     val windowsOnMonitorsObs = windowsOnMonitorsSj.asObservable()
     private var windowsOnMonitors by windowsOnMonitorsSj
 
@@ -250,7 +250,7 @@ class PosixWindowCoordinator(
         moveWindowToPrevMonitorSj.next(windowId)
     }
 
-    override fun moveWindowToMonitor(windowId: Window, monitor: NewMonitor<RROutput>) {
+    override fun moveWindowToMonitor(windowId: Window, monitor: Monitor<RROutput>) {
         val window = windowsOnMonitors.keys.single { it.id == windowId }
         windowToMonitorEventSj.next(WindowToMonitorSetEvent(window, monitor))
     }

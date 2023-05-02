@@ -7,8 +7,8 @@ import de.atennert.lcarswm.conversion.combine
 import de.atennert.lcarswm.conversion.toUByteArray
 import de.atennert.lcarswm.events.EventStore
 import de.atennert.lcarswm.events.sendConfigureNotify
+import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
-import de.atennert.lcarswm.monitor.NewMonitor
 import de.atennert.lcarswm.system.*
 import de.atennert.rx.NextObserver
 import de.atennert.rx.ReplaySubject
@@ -37,7 +37,7 @@ class PosixStatusBarWindow(
     private val frameIdSj = ReplaySubject<Window>(1)
     private val frameIdObs = frameIdSj.asObservable()
 
-    private val nextHandler = NextObserver.NextHandler<Tuple2<Window, NewMonitor<RROutput>?>> { (frameId, primaryMonitor) ->
+    private val nextHandler = NextObserver.NextHandler<Tuple2<Window, Monitor<RROutput>?>> { (frameId, primaryMonitor) ->
         if (primaryMonitor != null && primaryMonitor.screenMode == ScreenMode.NORMAL) {
             internalShow(frameId)
         } else {
@@ -178,7 +178,7 @@ class PosixStatusBarWindow(
         // Nothing to do
     }
 
-    private fun getWindowMeasurements(primaryMonitor: NewMonitor<*>?): WindowMeasurements? {
+    private fun getWindowMeasurements(primaryMonitor: Monitor<*>?): WindowMeasurements? {
         if (primaryMonitor == null) {
             return null
         }
