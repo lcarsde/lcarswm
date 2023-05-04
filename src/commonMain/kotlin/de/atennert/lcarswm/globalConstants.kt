@@ -40,31 +40,43 @@ const val WINDOW_TITLE_FONT_SIZE = BAR_HEIGHT
 const val WINDOW_TITLE_OFFSET = 30
 
 // Base colors
-val BLACK = Color(0, 0, 0)
-val YELLOW = Color(0xFFFF, 0x9999, 0)
-val ORCHID = Color(0xCCCC, 0x9999, 0xCCCC)
-val DAMPENED_PURPLE = Color(0x9999, 0x9999, 0xCCCC)
-val DARK_RED = Color(0xCCCC, 0x6666, 0x6666)
-val SAND = Color(0xFFFF, 0xCCCC, 0x9999)
-val BRIGHT_PURPLE = Color(0x9999, 0x9999, 0xFFFF)
-val ORANGE = Color(0xFFFF, 0x9999, 0x6666)
-val DARK_PINK = Color(0xCCCC, 0x6666, 0x9999)
+val BLACK = Color("#000000")
+val YELLOW = Color("#FF9900")
+val ORCHID = Color("#CC99CC")
+val DAMPENED_PURPLE = Color("#9999CC")
+val DARK_RED = Color("#CC6666")
+val SAND = Color("#FFCC99")
+val BRIGHT_PURPLE = Color("#9999FF")
+val ORANGE = Color("#FF9966")
+val DARK_PINK = Color("#CC6699")
+
+data class ColorSet(val base: Color, val light: Color, val dark: Color)
+val COLOR_1 = ColorSet(Color("#AA7FAA"), Color("#BE9BB4"), Color("#906193"))
+val COLOR_2 = ColorSet(Color("#6B477A"), Color("#9C7299"), Color("#533668"))
+val COLOR_3 = ColorSet(Color("#5D3449"), Color("#915E75"), Color("#3D232E"))
+val COLOR_4 = ColorSet(Color("#8E4465"), Color("#AB6D86"), Color("#6B2D47"))
+val COLOR_5 = ColorSet(Color("#B5517F"), Color("#CA7896"), Color("#A73769"))
+val COLOR_6 = ColorSet(Color("#C1574C"), Color("#D88274"), Color("#A9372E"))
+val COLOR_7 = ColorSet(Color("#E6661D"), Color("#EE8F49"), Color("#F5571D"))
+val COLOR_8 = ColorSet(Color("#ED924E"), Color("#EEAC7B"), Color("#E3722A"))
+val COLOR_9 = ColorSet(Color("#D88568"), Color("#E39C84"), Color("#BE6044"))
+val COLOR_10 = ColorSet(Color("#E26A49"), Color("#F09173"), Color("#E53B28"))
 
 val COLOR_LOGO = YELLOW
 val COLOR_ACTIVE_TITLE = YELLOW
-val COLOR_INACTIVE_TITLE = DARK_RED
-val COLOR_BAR_ENDS = BRIGHT_PURPLE
+val COLOR_INACTIVE_TITLE = COLOR_6.base
+val COLOR_BAR_ENDS = COLOR_1.base
 val COLOR_BACKGROUND = BLACK
 
-val COLOR_NORMAL_BAR_DOWN = BRIGHT_PURPLE
-val COLOR_NORMAL_SIDEBAR_DOWN = DAMPENED_PURPLE
-val COLOR_NORMAL_BAR_MIDDLE_1 = DAMPENED_PURPLE
-val COLOR_NORMAL_BAR_MIDDLE_2 = DARK_RED
-val COLOR_NORMAL_BAR_MIDDLE_3 = BRIGHT_PURPLE
-val COLOR_NORMAL_BAR_MIDDLE_4 = ORCHID
-val COLOR_NORMAL_CORNER_1 = ORCHID
-val COLOR_NORMAL_CORNER_2 = ORCHID
-val COLOR_NORMAL_CORNER_3 = ORCHID
+val COLOR_NORMAL_BAR_DOWN = COLOR_8.base
+val COLOR_NORMAL_SIDEBAR_DOWN = COLOR_6.light
+val COLOR_NORMAL_BAR_MIDDLE_1 = COLOR_1.light
+val COLOR_NORMAL_BAR_MIDDLE_2 = COLOR_5.light
+val COLOR_NORMAL_BAR_MIDDLE_3 = COLOR_8.base
+val COLOR_NORMAL_BAR_MIDDLE_4 = COLOR_9.base
+val COLOR_NORMAL_CORNER_1 = COLOR_1.base
+val COLOR_NORMAL_CORNER_2 = COLOR_8.base
+val COLOR_NORMAL_CORNER_3 = COLOR_9.light
 
-val COLOR_MAX_BAR_UP = ORCHID
-val COLOR_MAX_BAR_DOWN = ORCHID
+val COLOR_MAX_BAR_UP = COLOR_5.light
+val COLOR_MAX_BAR_DOWN = COLOR_5.light

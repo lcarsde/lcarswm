@@ -17,7 +17,7 @@ class ColorFactoryTest {
     @Test
     fun `create color GCs`() {
         val colorFactory = ColorFactory(drawApi, screen)
-        val color = Color(0xFFFF, 0x9999, 0)
+        val color = Color(0xFF, 0x99, 0)
 
         val gc = colorFactory.createColorGC(1.convert(), color)
 
@@ -28,8 +28,8 @@ class ColorFactoryTest {
     @Test
     fun `create two color GCs`() {
         val colorFactory = ColorFactory(drawApi, screen)
-        val color1 = Color(0xFFFF, 0x9999, 0)
-        val color2 = Color(0xFFFF, 0, 0x9999)
+        val color1 = Color(0xFF, 0x99, 0)
+        val color2 = Color(0xFF, 0, 0x99)
 
         val gc1 = colorFactory.createColorGC(1.convert(), color1)
         val gc2 = colorFactory.createColorGC(1.convert(), color2)
@@ -42,7 +42,7 @@ class ColorFactoryTest {
     @Test
     fun `allocate a color only once`() {
         val colorFactory = ColorFactory(drawApi, screen)
-        val color = Color(0xFFFF, 0x9999, 0)
+        val color = Color(0xFF, 0x99, 0)
 
         val gc1 = colorFactory.createColorGC(1.convert(), color)
         val gc2 = colorFactory.createColorGC(1.convert(), color)
@@ -55,7 +55,7 @@ class ColorFactoryTest {
     @Test
     fun `create different GCs for different drawables`() {
         val colorFactory = ColorFactory(drawApi, screen)
-        val color = Color(0xFFFF, 0x9999, 0)
+        val color = Color(0xFF, 0x99, 0)
 
         val gc1 = colorFactory.createColorGC(1.convert(), color)
         val gc2 = colorFactory.createColorGC(2.convert(), color)
@@ -69,7 +69,7 @@ class ColorFactoryTest {
     @Test
     fun `create XFT color by color`() {
         val colorFactory = ColorFactory(drawApi, screen)
-        val color = Color(0xFFFF, 0x9999, 0)
+        val color = Color(0xFF, 0x99, 0)
 
         val xftColor = colorFactory.createXftColor(color)
 
@@ -82,7 +82,7 @@ class ColorFactoryTest {
     @Test
     fun `get same XFT color twice`() {
         val colorFactory = ColorFactory(drawApi, screen)
-        val color = Color(0xFFFF, 0x9999, 0)
+        val color = Color(0xFF, 0x99, 0)
 
         val xftColor1 = colorFactory.createXftColor(color)
         val xftColor2 = colorFactory.createXftColor(color)

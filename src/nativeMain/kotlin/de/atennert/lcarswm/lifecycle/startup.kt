@@ -219,7 +219,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     val modeButton = windowFactory.createButton(
         "MODE",
-        DARK_RED,
+        COLOR_4,
         0,
         0,
         SIDE_BAR_WIDTH,
@@ -439,5 +439,7 @@ private fun createEventManager(
         .addEventHandler(SelectionClearHandler(logger))
         .addEventHandler(MappingNotifyHandler(logger, keyManager, keyConfiguration, rootWindowId))
         .addEventHandler(PropertyNotifyHandler(atomLibrary, eventStore))
+        .addEventHandler(EnterNotifyHandler(logger, eventStore))
+        .addEventHandler(LeaveNotifyHandler(logger, eventStore))
         .build()
 }

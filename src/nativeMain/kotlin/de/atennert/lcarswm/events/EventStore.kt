@@ -24,4 +24,10 @@ class EventStore {
 
     internal val configureRequestSj = Subject<XConfigureRequestEvent>()
     val configureRequestObs = configureRequestSj.asObservable()
+
+    internal val enterNotifySj = Subject<Window>()
+    val enterNotifyObs = enterNotifySj.asObservable()
+
+    internal val leaveNotifySj = Subject<Window>()
+    val leaveNotifyObs = leaveNotifySj.asObservable()
 }

@@ -1,38 +1,41 @@
 package de.atennert.lcarswm.window
 
-import de.atennert.lcarswm.BAR_END_WIDTH
-import de.atennert.lcarswm.BAR_GAP_SIZE
-import de.atennert.lcarswm.BLACK
-import de.atennert.lcarswm.ScreenMode
-import de.atennert.lcarswm.drawing.Color
+import de.atennert.lcarswm.*
 import de.atennert.lcarswm.drawing.ColorFactory
 import de.atennert.lcarswm.drawing.FontProvider
+import de.atennert.lcarswm.events.EventStore
 import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.lifecycle.closeWith
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.*
 import de.atennert.rx.NextObserver
 import de.atennert.rx.Subscription
+import de.atennert.rx.operators.filter
 import kotlinx.cinterop.*
 import xlib.*
 
 class PosixButton(
+    logger: Logger,
     private val display: CPointer<Display>?,
     private val screen: Screen,
     private val colorFactory: ColorFactory,
     private val fontProvider: FontProvider,
     monitorManager: MonitorManager<RROutput>,
     keyManager: KeyManager,
+    eventStore: EventStore,
     private val text: String,
-    backgroundColor: Color,
+    colorSet: ColorSet,
     private var x: Int,
     private var y: Int,
     private val width: Int,
     private val height: Int,
-    private val onClick: () -> Unit
+    private val onClick: () -> Unit,
 ) : Button<Window> {
-    private val backgroundColorXft = colorFactory.createXftColor(backgroundColor)
+    private val normalColorXft = colorFactory.createXftColor(colorSet.base)
+    private val hoverColorXft = colorFactory.createXftColor(colorSet.light)
+    private val pressedColorXft = colorFactory.createXftColor(colorSet.dark)
     private val textColorXft = colorFactory.createXftColor(BLACK)
 
     override val id: Window = wrapXCreateSimpleWindow(
@@ -52,6 +55,9 @@ class PosixButton(
     private var xOffset = 0
 
     private val subscription = Subscription()
+
+    private var isHovered = false
+    private var isPressed = false
 
     // TODO combine screen mode and primary monitor handling
     private val screenModeHandler = NextObserver.NextHandler<ScreenMode> {
@@ -81,7 +87,25 @@ class PosixButton(
     }
 
     init {
+        subscription.add(eventStore.enterNotifyObs
+            .apply(filter { it == id })
+            .subscribe(NextObserver {
+                isHovered = true
+                draw()
+            }))
+
+        subscription.add(eventStore.leaveNotifyObs
+            .apply(filter { it == id })
+            .subscribe(NextObserver {
+                isHovered = false
+                draw()
+            }))
+
         closeWith(PosixButton::cleanup)
+
+        val attributeSet = nativeHeap.alloc<XSetWindowAttributes>()
+        attributeSet.event_mask = EnterWindowMask or LeaveWindowMask
+        wrapXChangeWindowAttributes(display, id, CWEventMask.convert(), attributeSet.ptr)
 
         keyManager.grabButton(
             Button1.convert(),
@@ -111,8 +135,13 @@ class PosixButton(
         val pixmap =
             wrapXCreatePixmap(display, screen.root, width.convert(), height.convert(), screen.root_depth.convert())
         val xftDraw = wrapXftDrawCreate(display, pixmap, screen.root_visual!!, colorFactory.colorMapId)
+        val backgroundColor = when {
+            isPressed -> pressedColorXft
+            isHovered -> hoverColorXft
+            else -> normalColorXft
+        }
 
-        wrapXftDrawRect(xftDraw, backgroundColorXft.ptr, 0, 0, width.convert(), height.convert())
+        wrapXftDrawRect(xftDraw, backgroundColor.ptr, 0, 0, width.convert(), height.convert())
 
         val textW = width - 2 * borderSpace
         val textH = 11
@@ -141,11 +170,13 @@ class PosixButton(
     }
 
     override fun press() {
-        // TODO press coloring
+        isPressed = true
+        draw()
     }
 
     override fun release() {
-        // TODO normal coloring
+        isPressed = false
+        draw()
         onClick()
     }
 

@@ -1,10 +1,10 @@
 package de.atennert.lcarswm.window
 
+import de.atennert.lcarswm.ColorSet
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.atom.NumberAtomReader
 import de.atennert.lcarswm.atom.TextAtomReader
-import de.atennert.lcarswm.drawing.Color
 import de.atennert.lcarswm.drawing.ColorFactory
 import de.atennert.lcarswm.drawing.FontProvider
 import de.atennert.lcarswm.drawing.IFrameDrawer
@@ -39,7 +39,7 @@ class PosixWindowFactory(
 
     override fun createButton(
         text: String,
-        backgroundColor: Color,
+        colorSet: ColorSet,
         x: Int,
         y: Int,
         width: Int,
@@ -47,8 +47,8 @@ class PosixWindowFactory(
         onClick: () -> Unit
     ): PosixButton {
         return PosixButton(
-            display, screen, colorFactory, fontProvider, monitorManager, keyManager,
-            text, backgroundColor, x, y, width, height, onClick
+            logger, display, screen, colorFactory, fontProvider, monitorManager, keyManager, eventStore,
+            text, colorSet, x, y, width, height, onClick
         )
     }
 

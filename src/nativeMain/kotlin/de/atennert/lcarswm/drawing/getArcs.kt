@@ -8,7 +8,7 @@ fun getArcs(
 ): List<Triple<Int, Int, Color>> {
     val colors = mutableListOf<Triple<Int, Int, Color>>()
     val adjust = { opacity: Double ->
-        baseColor.run { Color((red * opacity).toInt(), (green * opacity).toInt(), (blue * opacity).toInt()) }
+        baseColor.run { Color(redSpec, greenSpec, blueSpec, opacity) }
     }
 
     for ((x, y, opacity) in opacities) {

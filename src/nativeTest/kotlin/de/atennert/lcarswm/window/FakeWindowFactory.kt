@@ -1,12 +1,12 @@
 package de.atennert.lcarswm.window
 
-import de.atennert.lcarswm.drawing.Color
+import de.atennert.lcarswm.ColorSet
 import xlib.Window
 
 class FakeWindowFactory : WindowFactory<Window> {
     override fun createButton(
         text: String,
-        backgroundColor: Color,
+        colorSet: ColorSet,
         x: Int,
         y: Int,
         width: Int,
