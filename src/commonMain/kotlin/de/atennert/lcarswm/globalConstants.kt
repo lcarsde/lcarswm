@@ -12,9 +12,6 @@ const val LOG_FILE_PATH = "/$LCARS_DE_DIR/lcarswm.log"
 
 const val SETTINGS_FILE = "/$LCARS_DE_DIR/settings.xml"
 
-const val AUTOSTART_FILE = "/$LCARS_DE_DIR/autostart"
-
-
 // layout values
 
 const val BAR_HEIGHT = 40

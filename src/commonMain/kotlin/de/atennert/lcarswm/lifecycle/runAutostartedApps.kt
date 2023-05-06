@@ -1,29 +1,11 @@
 package de.atennert.lcarswm.lifecycle
 
-import de.atennert.lcarswm.AUTOSTART_FILE
 import de.atennert.lcarswm.HOME_CONFIG_DIR_PROPERTY
 import de.atennert.lcarswm.command.Commander
 import de.atennert.lcarswm.environment.Environment
 import de.atennert.lcarswm.file.FileFactory
 import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.log.Logger
-
-/**
- * Get the users (if available) or default autostart file path.
- * @deprecated autostart files should not be used anymore but stay for compatibility
- */
-private fun getAutostartFile(environment: Environment, files: Files): String? {
-    val userConfigPath = environment[HOME_CONFIG_DIR_PROPERTY]
-    val userAutostartPath = userConfigPath?.let { "$it$AUTOSTART_FILE" }
-
-    return when {
-        userAutostartPath != null && files.exists(userAutostartPath) ->
-            userAutostartPath
-        files.exists("/etc$AUTOSTART_FILE") ->
-            "/etc$AUTOSTART_FILE"
-        else -> null
-    }
-}
 
 /**
  * Read the *.desktop file names from the directory.
@@ -86,13 +68,6 @@ private class Autostart {
  * Start all the apps / run the commands from the users or default autostart file.
  */
 fun runAutostartApps(environment: Environment, dirFactory: FileFactory, commander: Commander, files: Files, logger: Logger) {
-    getAutostartFile(environment, files)?.let { path ->
-        files.readLines(path) {
-            logger.logDebug("starting $it")
-            commander.run(it)
-        }
-    }
-
     var localApps = emptyList<String>()
     val globalAutostart = "/etc/xdg/autostart"
     val localAutostart = environment[HOME_CONFIG_DIR_PROPERTY]
