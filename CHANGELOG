@@ -1,5 +1,20 @@
-22.2
-* update kotlin version to 1.6.20
+23.1
+* update kotlin version to 1.8.10
+* add dependency to libxcrypt-compat
+* build for Ubuntu 22.04
+* audio adjust default settings make use of pulse
+* remove default top bar and bar ends in normal mode
+* stretch windows to full available width in normal and maximized modes
+* add mode button for switching between normal and maximized mode
+* don't crash due to app launching errors
+* identify transient windows
+* don't force root transient windows into window area
+* allow root transient windows to move and resize freely
+* add partial pure Kotlin RX implementation
+* rewrite window handling to use RX -> fix issues with not yet available resources
+* adjust color scheme
+* refactor window stack handling
+* remove evaluation of autostart file
 
 22.1
 * catch exception on highest level
