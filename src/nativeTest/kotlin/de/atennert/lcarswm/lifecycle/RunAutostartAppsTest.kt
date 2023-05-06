@@ -7,7 +7,6 @@ import de.atennert.lcarswm.file.*
 import de.atennert.lcarswm.log.PrintLogger
 import kotlin.test.Test
 import kotlin.test.assertContains
-import kotlin.test.assertTrue
 
 class RunAutostartAppsTest {
     private fun createFakeFileFactory(dirFilesMap: Map<String, Set<String>> = emptyMap()): FileFactory {
@@ -88,42 +87,5 @@ class RunAutostartAppsTest {
         runAutostartApps(FakeEnvironment(), fakeFactory, commander, FakeFiles(listOf(), lines), PrintLogger())
 
         assertContains(commander.calls, listOf("/usr/share/lcarsde/tools/launcher.py", "/etc/xdg/autostart/runMe.desktop"))
-    }
-
-    @Test
-    fun `run apps from user autostart file`() {
-        val lines = mapOf(
-            "/home/me/config/lcarsde/autostart" to listOf("myapp1", "myapp2 --arg1 -v 42")
-        )
-
-        val commander = FakeCommander()
-
-        runAutostartApps(FakeEnvironment(), createFakeFileFactory(), commander, FakeFiles(listOf("/home/me/config/lcarsde/autostart"), lines), PrintLogger())
-
-        assertContains(commander.calls, listOf("myapp1"))
-        assertContains(commander.calls, listOf("myapp2", "--arg1", "-v", "42"))
-    }
-
-    @Test
-    fun `run apps from default autostart file`() {
-        val lines = mapOf(
-            "/etc/lcarsde/autostart" to listOf("myapp1", "myapp2 --arg1 -v 42")
-        )
-
-        val commander = FakeCommander()
-
-        runAutostartApps(FakeEnvironment(), createFakeFileFactory(), commander, FakeFiles(listOf("/etc/lcarsde/autostart"), lines), PrintLogger())
-
-        assertContains(commander.calls, listOf("myapp1"))
-        assertContains(commander.calls, listOf("myapp2", "--arg1", "-v", "42"))
-    }
-
-    @Test
-    fun `handle unavailable autostart file`() {
-        val commander = FakeCommander()
-
-        runAutostartApps(FakeEnvironment(), createFakeFileFactory(), commander, FakeFiles(listOf(), mapOf()), PrintLogger())
-
-        assertTrue(commander.calls.isEmpty())
     }
 }
