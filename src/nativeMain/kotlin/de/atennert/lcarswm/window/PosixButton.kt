@@ -60,7 +60,7 @@ class PosixButton(
     private var isPressed = false
 
     // TODO combine screen mode and primary monitor handling
-    private val screenModeHandler = NextObserver.NextHandler<ScreenMode> {
+    private val screenModeHandler = NextObserver.Handler<ScreenMode> {
         when (it) {
             ScreenMode.NORMAL -> {
                 xOffset = 0
@@ -78,7 +78,7 @@ class PosixButton(
         }
     }
 
-    private val primaryMonitorHandler = NextObserver.NextHandler<Monitor<RROutput>?> { monitor ->
+    private val primaryMonitorHandler = NextObserver.Handler<Monitor<RROutput>?> { monitor ->
         monitor?.let {
             x = it.x
             y = it.y

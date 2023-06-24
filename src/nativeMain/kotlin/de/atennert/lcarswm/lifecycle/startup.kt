@@ -150,7 +150,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
     val fontProvider = FontProvider(system, settings.generalSettings, system.defaultScreenNumber())
     val colorHandler = ColorFactory(system, screen)
     val uiDrawer =
-        RootWindowDrawer(system, system, monitorManager, screen, colorHandler, settings.generalSettings, fontProvider)
+        RootWindowDrawer(logger, system, system, monitorManager, screen, colorHandler, settings.generalSettings, fontProvider)
 
     keyManager.ungrabAllKeys(screen.root)
 

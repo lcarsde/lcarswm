@@ -2,6 +2,7 @@ package de.atennert.lcarswm.drawing
 
 import de.atennert.lcarswm.*
 import de.atennert.lcarswm.lifecycle.closeWith
+import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.Monitor
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.settings.GeneralSetting
@@ -18,6 +19,7 @@ import xlib.*
  * Class for drawing the root window decorations.
  */
 class RootWindowDrawer(
+    private val logger: Logger,
     private val drawApi: DrawApi,
     private val fontApi: FontApi,
     monitorManager: MonitorManager<RROutput>,
@@ -70,9 +72,17 @@ class RootWindowDrawer(
             .apply(withLatestFrom(monitorManager.monitorsObs))
             .apply(map { it.v2 })
             .apply(withLatestFrom(monitorManager.combinedScreenSizeObs))
-            .subscribe(NextObserver { (monitors, combinedScreenSize) ->
-                internalDrawWindowManagerFrame(monitors, combinedScreenSize)
-            })
+            .subscribe(NextObserver( { (monitors, combinedScreenSize) ->
+                try {
+                    internalDrawWindowManagerFrame(monitors, combinedScreenSize)
+                } catch (error: Throwable) {
+                    logger.logError("RootWindowDrawer::init::drawing crashed", error)
+                }
+            }, { error ->
+                logger.logError("RootWindowDrawer::init::drawing subscription crashed", error)
+            }, {
+                logger.logDebug("RootWindowDrawer::init::drawing subscription closed")
+            }))
             .closeWith { this.unsubscribe() }
     }
 

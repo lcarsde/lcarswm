@@ -37,7 +37,7 @@ class PosixStatusBarWindow(
     private val frameIdSj = ReplaySubject<Window>(1)
     private val frameIdObs = frameIdSj.asObservable()
 
-    private val nextHandler = NextObserver.NextHandler<Tuple2<Window, Monitor<RROutput>?>> { (frameId, primaryMonitor) ->
+    private val nextHandler = NextObserver.Handler<Tuple2<Window, Monitor<RROutput>?>> { (frameId, primaryMonitor) ->
         if (primaryMonitor != null && primaryMonitor.screenMode == ScreenMode.NORMAL) {
             internalShow(frameId)
         } else {
