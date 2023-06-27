@@ -147,7 +147,13 @@ class PosixWindowCoordinator(
                 })
         )
         subscription.add(eventStore.unmapObs
-            .subscribe(NextObserver { rootWindowDrawer.drawWindowManagerFrame() }))
+            .subscribe(NextObserver({
+                rootWindowDrawer.drawWindowManagerFrame()
+            }, { e ->
+                this.logger.logError("PosixWindowCoordinator::init::unmap crashed", e)
+            }, {
+                this.logger.logDebug("PosixWindowCoordinator::init::unmap closed")
+            })))
 
         // rearrange windows
         subscription.add(rearrangeObs.subscribe(NextObserver { updatedWindows ->
@@ -160,7 +166,13 @@ class PosixWindowCoordinator(
             })
         )
         subscription.add(combinedMeasurementsObs
-            .subscribe(NextObserver { rootWindowDrawer.drawWindowManagerFrame() }))
+            .subscribe(NextObserver({
+                rootWindowDrawer.drawWindowManagerFrame()
+            }, { e ->
+                this.logger.logError("PosixWindowCoordinator::init::measurement change crashed", e)
+            }, {
+                this.logger.logDebug("PosixWindowCoordinator::init::measurement change closed")
+            })))
 
         // configure window
         subscription.add(
@@ -208,10 +220,14 @@ class PosixWindowCoordinator(
                 val currentMonitorIndex = monitors.indexOf(windowsOnMonitors[window])
                 Tuple(window, monitors[(currentMonitorIndex + 1).rem(monitors.size)])
             })
-            .subscribe(NextObserver { (window, nextMonitor) ->
+            .subscribe(NextObserver ({ (window, nextMonitor) ->
                 windowToMonitorEventSj.next(WindowToMonitorSetEvent(window, nextMonitor))
                 rootWindowDrawer.drawWindowManagerFrame()
-            })
+            }, { e ->
+                this.logger.logError("PosixWindowCoordinator::init::move next crashed", e)
+            }, {
+                this.logger.logDebug("PosixWindowCoordinator::init::move next closed")
+            }))
         )
 
         subscription.add(moveWindowToPrevMonitorObs
@@ -225,10 +241,14 @@ class PosixWindowCoordinator(
                     monitors[if (currentMonitorIndex == 0) monitors.size - 1 else currentMonitorIndex - 1]
                 )
             })
-            .subscribe(NextObserver { (window, prevMonitor) ->
+            .subscribe(NextObserver ({ (window, prevMonitor) ->
                 windowToMonitorEventSj.next(WindowToMonitorSetEvent(window, prevMonitor))
                 rootWindowDrawer.drawWindowManagerFrame()
-            })
+            }, { e ->
+                this.logger.logError("PosixWindowCoordinator::init::move previous crashed", e)
+            }, {
+                this.logger.logDebug("PosixWindowCoordinator::init::move previous closed")
+            }))
         )
 
         // edit window title

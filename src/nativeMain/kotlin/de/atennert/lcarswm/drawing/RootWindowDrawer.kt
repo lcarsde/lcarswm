@@ -58,6 +58,7 @@ class RootWindowDrawer(
     private val triggerDrawSj = Subject<Unit>()
 
     init {
+        logger.logDebug("RootWindowDrawer::init::initialising")
         val imagePtr = nativeHeap.allocPointerTo<XImage>()
         val wmLogoPath = settings[GeneralSetting.TITLE_IMAGE]
         logoImage = if (wmLogoPath != null) {
@@ -87,10 +88,12 @@ class RootWindowDrawer(
     }
 
     override fun drawWindowManagerFrame() {
+        logger.logDebug("RootWindowDrawer::drawWindowManagerFrame::triggering")
         triggerDrawSj.next(Unit)
     }
 
     private fun internalDrawWindowManagerFrame(monitors: List<Monitor<*>>, combinedScreenSize: Pair<Int, Int>) {
+        logger.logDebug("RootWindowDrawer::internalDrawWindowManagerFrame::drawing start")
         val pixmap = drawApi.createPixmap(
             screen.root,
             combinedScreenSize.first.convert(),
@@ -107,6 +110,7 @@ class RootWindowDrawer(
         drawApi.setWindowBackgroundPixmap(screen.root, pixmap)
         drawApi.clearWindow(screen.root)
         drawApi.freePixmap(pixmap)
+        logger.logDebug("RootWindowDrawer::internalDrawWindowManagerFrame::drawing finished")
     }
 
     private fun drawLogoTextBack(pixmap: Pixmap, barX: Int, y: Int, barWidth: Int) {
