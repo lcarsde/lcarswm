@@ -2,9 +2,11 @@ package de.atennert.lcarswm.keys
 
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.InputApi
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import xlib.*
 
+@ExperimentalForeignApi
 class KeySessionManager(private val logger: Logger, private val inputApi: InputApi) {
     private val listeners = mutableListOf<KeySessionListener>()
 

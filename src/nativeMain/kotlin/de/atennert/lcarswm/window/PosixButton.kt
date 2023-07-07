@@ -16,6 +16,7 @@ import de.atennert.rx.operators.filter
 import kotlinx.cinterop.*
 import xlib.*
 
+@ExperimentalForeignApi
 class PosixButton(
     logger: Logger,
     private val display: CPointer<Display>?,

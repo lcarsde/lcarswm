@@ -1,12 +1,14 @@
 package de.atennert.lcarswm.system.api
 
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.IntVar
 import xlib.*
 
 /**
  * Interface for accessing X RANDR functions
  */
+@ExperimentalForeignApi
 interface RandrApi {
     fun rQueryExtension(eventBase: CPointer<IntVar>, errorBase: CPointer<IntVar>): Int
 

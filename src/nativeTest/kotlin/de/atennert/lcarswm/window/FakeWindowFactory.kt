@@ -1,8 +1,10 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.ColorSet
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.Window
 
+@ExperimentalForeignApi
 class FakeWindowFactory : WindowFactory<Window> {
     override fun createButton(
         text: String,

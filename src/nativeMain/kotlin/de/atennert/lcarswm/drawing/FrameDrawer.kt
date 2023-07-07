@@ -7,6 +7,7 @@ import de.atennert.lcarswm.window.WindowMeasurements
 import kotlinx.cinterop.*
 import xlib.*
 
+@ExperimentalForeignApi
 class FrameDrawer(
     private val fontApi: FontApi,
     private val drawApi: DrawApi,

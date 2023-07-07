@@ -1,12 +1,10 @@
 package de.atennert.lcarswm.system
 
 import de.atennert.lcarswm.system.api.DrawApi
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.CPointerVar
-import kotlinx.cinterop.CValuesRef
-import kotlinx.cinterop.ULongVar
+import kotlinx.cinterop.*
 import xlib.*
 
+@ExperimentalForeignApi
 open class DrawApiDummy : DrawApi {
     override fun fillRectangle(
         drawable: Drawable,

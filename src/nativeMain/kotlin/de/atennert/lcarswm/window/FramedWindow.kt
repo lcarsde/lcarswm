@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.atom.TextAtomReader
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import xlib.Window
 
@@ -11,6 +12,7 @@ import xlib.Window
  * @param borderWidth Desired program window border width,
  *      we need to remember and reset it to this when we stop handling it
  */
+@ExperimentalForeignApi
 data class FramedWindow(val id: Window, val borderWidth: Int) {
     /** Frame window ID */
     var frame: Window = 0.convert()

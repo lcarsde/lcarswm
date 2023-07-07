@@ -1,14 +1,12 @@
 package de.atennert.lcarswm.system.api
 
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.CPointerVar
-import kotlinx.cinterop.CValuesRef
-import kotlinx.cinterop.ULongVar
+import kotlinx.cinterop.*
 import xlib.*
 
 /**
  * API interface for X drawing functions
  */
+@ExperimentalForeignApi
 interface DrawApi {
     fun fillRectangle(drawable: Drawable, graphicsContext: GC, x: Int, y: Int, width: UInt, height: UInt): Int
 

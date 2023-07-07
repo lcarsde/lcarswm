@@ -5,6 +5,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.lifecycle.closeClosables
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import xlib.Window
 import kotlin.test.AfterTest
@@ -12,6 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
+@ExperimentalForeignApi
 class WindowFocusHandlerTest {
     @AfterTest
     fun teardown() {

@@ -1,11 +1,13 @@
 package de.atennert.lcarswm.system.api
 
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.*
 
 /**
  * API for font and text handling
  */
+@ExperimentalForeignApi
 interface FontApi {
     fun xftGetContext(screen: Int): CPointer<PangoContext>?
 

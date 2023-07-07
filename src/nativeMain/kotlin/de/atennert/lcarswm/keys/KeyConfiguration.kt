@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.keys
 
 import de.atennert.lcarswm.system.api.InputApi
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.AnyModifier
 import xlib.KeySym
 import xlib.Window
@@ -8,6 +9,7 @@ import xlib.Window
 /**
  * Loads the key configuration of the users and provides the corresponding key bindings.
  */
+@ExperimentalForeignApi
 class KeyConfiguration(
     private val inputApi: InputApi,
     private val keyConfiguration: Set<KeyBinding>,

@@ -3,10 +3,12 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.keys.KeyConfiguration
 import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.MappingNotify
 import xlib.Window
 import xlib.XEvent
 
+@ExperimentalForeignApi
 class MappingNotifyHandler(
     private val logger: Logger,
     private val keyManager: KeyManager,

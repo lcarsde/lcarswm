@@ -17,6 +17,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@ExperimentalForeignApi
 class ShutdownTest : SystemCallMocker() {
     private class FakeResourceGenerator : ResourceGenerator {
         override fun createEnvironment(): Environment {

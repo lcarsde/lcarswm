@@ -17,6 +17,7 @@ import xlib.*
 /**
  * Class for drawing the root window decorations.
  */
+@ExperimentalForeignApi
 class RootWindowDrawer(
     private val drawApi: DrawApi,
     private val fontApi: FontApi,

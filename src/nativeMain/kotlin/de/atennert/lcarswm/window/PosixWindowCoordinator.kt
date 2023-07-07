@@ -22,6 +22,7 @@ class WindowToMonitorRemoveEvent(window: ManagedWmWindow<Window>) : WindowToMoni
 /**
  *
  */
+@ExperimentalForeignApi
 class PosixWindowCoordinator(
     private val logger: Logger,
     eventStore: EventStore,

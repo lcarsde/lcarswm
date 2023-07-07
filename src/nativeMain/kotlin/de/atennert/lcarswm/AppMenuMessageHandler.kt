@@ -6,8 +6,10 @@ import de.atennert.lcarswm.system.api.SystemApi
 import de.atennert.lcarswm.window.WindowList
 import de.atennert.lcarswm.window.closeWindow
 import de.atennert.rx.Subject
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.Window
 
+@ExperimentalForeignApi
 class AppMenuMessageHandler(
     private val logger: Logger,
     private val systemApi: SystemApi,

@@ -5,6 +5,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
 import de.atennert.lcarswm.system.api.WindowUtilApi
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import xlib.*
@@ -12,6 +13,7 @@ import xlib.*
 /**
  * Tracks the time of events.
  */
+@ExperimentalForeignApi
 class EventTime(
     private val windowUtilApi: WindowUtilApi,
     private val eventBuffer: EventBuffer,

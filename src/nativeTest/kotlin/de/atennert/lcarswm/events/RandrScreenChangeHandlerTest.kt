@@ -3,6 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.monitor.MonitorManagerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.nativeHeap
 import xlib.RRScreenChangeNotify
@@ -11,6 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
+@ExperimentalForeignApi
 class RandrScreenChangeHandlerTest {
     @Test
     fun `check correct type of RandrScreenChangeHandler`() {

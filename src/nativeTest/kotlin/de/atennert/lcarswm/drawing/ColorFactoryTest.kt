@@ -6,6 +6,7 @@ import kotlinx.cinterop.*
 import xlib.*
 import kotlin.test.*
 
+@ExperimentalForeignApi
 class ColorFactoryTest {
 
     @AfterTest

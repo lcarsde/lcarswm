@@ -5,10 +5,12 @@ import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.rx.BehaviorSubject
 import de.atennert.rx.operators.combineLatestWith
 import de.atennert.rx.operators.map
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import xlib.RROutput
 import kotlin.math.max
 
+@ExperimentalForeignApi
 open class MonitorManagerMock : MonitorManager<RROutput> {
     val functionCalls = mutableListOf<FunctionCall>()
 

@@ -6,6 +6,7 @@ import de.atennert.rx.NextObserver
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import xlib.RROutput
@@ -16,6 +17,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
+@ExperimentalForeignApi
 class MonitorManagerImplTest {
     @Test
     fun `update monitor list`() {

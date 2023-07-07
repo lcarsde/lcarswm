@@ -6,6 +6,7 @@ import xlib.*
 /**
  *
  */
+@ExperimentalForeignApi
 interface WindowUtilApi {
     val display: CPointer<Display>?
 

@@ -3,9 +3,11 @@ package de.atennert.lcarswm.drawing
 import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.settings.GeneralSetting
 import de.atennert.lcarswm.system.api.FontApi
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.nativeHeap
 import xlib.*
 
+@ExperimentalForeignApi
 class FontProvider(
     private val fontApi: FontApi,
     private val generalSettings: Map<GeneralSetting, String>,

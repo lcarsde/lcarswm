@@ -5,6 +5,7 @@ import de.atennert.lcarswm.system.api.DrawApi
 import kotlinx.cinterop.*
 import xlib.*
 
+@ExperimentalForeignApi
 class ColorFactory(private val drawApi: DrawApi, screen: Screen) {
     val colorMapId = drawApi.createColormap(screen.root, screen.root_visual!!, AllocNone)
 

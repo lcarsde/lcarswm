@@ -10,6 +10,7 @@ import xlib.XEvent
 /**
  * Buffers events in an internal queue.
  */
+@ExperimentalForeignApi
 class EventBuffer(private val eventApi: EventApi) {
     private val internalEventQueue = mutableListOf<CPointer<XEvent>>()
 

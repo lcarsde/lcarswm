@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.LoggerMock
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.free
 import kotlinx.cinterop.nativeHeap
@@ -9,6 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@ExperimentalForeignApi
 class EventDistributorTest {
 
     @Test

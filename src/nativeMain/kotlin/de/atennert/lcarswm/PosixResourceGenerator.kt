@@ -6,7 +6,9 @@ import de.atennert.lcarswm.file.FileFactory
 import de.atennert.lcarswm.file.Files
 import de.atennert.lcarswm.file.PosixFileFactory
 import de.atennert.lcarswm.file.PosixFiles
+import kotlinx.cinterop.ExperimentalForeignApi
 
+@ExperimentalForeignApi
 class PosixResourceGenerator : ResourceGenerator {
     override fun createEnvironment(): Environment = PosixEnvironment()
 

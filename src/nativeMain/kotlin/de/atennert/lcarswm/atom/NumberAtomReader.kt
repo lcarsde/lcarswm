@@ -9,6 +9,7 @@ import xlib.FALSE
 import xlib.Success
 import xlib.Window
 
+@ExperimentalForeignApi
 class NumberAtomReader(private val display: CPointer<Display>?, private val atomLibrary: AtomLibrary) {
 
     fun readULongArrayPropertyOrNull(windowId: Window, atom: Atoms, type: Atoms): ULongArray? {

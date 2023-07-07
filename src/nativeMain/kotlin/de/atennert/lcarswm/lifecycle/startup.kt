@@ -46,6 +46,7 @@ const val ROOT_WINDOW_MASK = SubstructureRedirectMask or StructureNotifyMask or 
 private const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotifyMask or
         RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
 
+@ExperimentalForeignApi
 fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenerator): RuntimeResources? {
     val eventStore = EventStore()
     val commander = PosixCommander(logger)
@@ -297,6 +298,7 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 /**
  * Signal handler for usual stuff.
  */
+@ExperimentalForeignApi
 private fun handleSignal(signalValue: Int, exitState: AtomicRef<Int?>) {
     val signal = Signal.values().single { it.signalValue == signalValue }
     staticLogger?.logDebug("::handleSignal::signal: $signal")
@@ -312,11 +314,13 @@ private fun handleSignal(signalValue: Int, exitState: AtomicRef<Int?>) {
     }
 }
 
+@ExperimentalForeignApi
 private fun setDisplayEnvironment(system: SystemApi, environment: Environment) {
     val displayString = system.getDisplayString()
     environment["DISPLAY"] = displayString
 }
 
+@ExperimentalForeignApi
 private fun setupScreen(
     system: SystemApi,
     rootWindow: Window,
@@ -350,6 +354,7 @@ private fun setupScreen(
 /**
  * Load the key configuration from the users key configuration file.
  */
+@ExperimentalForeignApi
 private fun loadSettings(
     logger: Logger,
     systemApi: SystemApi,
@@ -364,6 +369,7 @@ private fun loadSettings(
 /**
  * @return RANDR base value
  */
+@ExperimentalForeignApi
 private fun setupRandr(
     system: SystemApi,
     randrHandlerFactory: RandrHandlerFactory,
@@ -383,6 +389,7 @@ private fun setupRandr(
 /**
  * Create the event handling for the event loop.
  */
+@ExperimentalForeignApi
 private fun createEventManager(
     eventStore: EventStore,
     system: SystemApi,

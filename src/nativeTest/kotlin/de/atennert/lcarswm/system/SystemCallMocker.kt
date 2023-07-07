@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.system
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.linux.mq_close
 import platform.linux.mq_receive
 import platform.linux.mq_send
@@ -8,6 +9,7 @@ import xlib.*
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
+@ExperimentalForeignApi
 open class SystemCallMocker {
     @BeforeTest
     open fun setup() {

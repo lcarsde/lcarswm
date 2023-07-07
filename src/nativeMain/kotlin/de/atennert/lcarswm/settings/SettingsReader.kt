@@ -10,10 +10,7 @@ import de.atennert.lcarswm.keys.KeyExecution
 import de.atennert.lcarswm.keys.WmAction
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.SystemApi
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.get
-import kotlinx.cinterop.pointed
-import kotlinx.cinterop.toCValues
+import kotlinx.cinterop.*
 import xlib.XML_ELEMENT_NODE
 import xlib._xmlNode
 import xlib.xmlDoc
@@ -32,6 +29,7 @@ import kotlin.collections.set
 import kotlin.collections.setOf
 import kotlin.collections.toMutableMap
 
+@ExperimentalForeignApi
 class SettingsReader(
     private val logger: Logger,
     private val systemApi: SystemApi,

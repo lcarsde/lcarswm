@@ -16,6 +16,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@ExperimentalForeignApi
 class PosixWindowCoordinatorTest : SystemCallMocker() {
     private val eventStore = EventStore()
     private var display: CPointer<Display>? = null

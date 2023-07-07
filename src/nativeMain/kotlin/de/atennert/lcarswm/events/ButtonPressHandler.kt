@@ -7,11 +7,13 @@ import de.atennert.lcarswm.window.Button
 import de.atennert.lcarswm.window.PosixTransientWindow
 import de.atennert.lcarswm.window.WindowFocusHandler
 import de.atennert.lcarswm.window.WindowList
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.ButtonPress
 import xlib.ReplayPointer
 import xlib.Window
 import xlib.XEvent
 
+@ExperimentalForeignApi
 class ButtonPressHandler(
     private val logger: Logger,
     private val inputApi: InputApi,

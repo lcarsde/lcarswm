@@ -1,8 +1,7 @@
 package de.atennert.lcarswm.keys
 
-import de.atennert.lcarswm.keys.KeyManager
-import de.atennert.lcarswm.keys.Modifiers
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import xlib.ControlMask
 import xlib.LockMask
@@ -11,6 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
+@ExperimentalForeignApi
 class KeyManagerTest {
     @Test
     fun `ungrab all keys`() {

@@ -8,6 +8,7 @@ import platform.posix.sigset_t
 import xlib.*
 import kotlin.test.assertEquals
 
+@ExperimentalForeignApi
 open class SystemFacadeMock : SystemApi {
     val functionCalls = mutableListOf<FunctionCall>()
 

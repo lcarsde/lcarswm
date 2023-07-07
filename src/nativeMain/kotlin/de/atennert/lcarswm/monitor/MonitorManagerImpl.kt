@@ -5,13 +5,11 @@ import de.atennert.lcarswm.system.api.RandrApi
 import de.atennert.rx.BehaviorSubject
 import de.atennert.rx.operators.combineLatestWith
 import de.atennert.rx.operators.map
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.get
-import kotlinx.cinterop.pointed
+import kotlinx.cinterop.*
 import xlib.*
 import kotlin.math.max
 
+@ExperimentalForeignApi
 class MonitorManagerImpl(private val randrApi: RandrApi, private val rootWindowId: Window) : MonitorManager<RROutput> {
 
     private val lastMonitorBuildersSj = BehaviorSubject<List<Monitor.Builder<RROutput>>>(emptyList())

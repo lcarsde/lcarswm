@@ -5,10 +5,12 @@ import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.window.WindowCoordinator
 import de.atennert.lcarswm.window.WindowFocusHandler
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import xlib.KeyPress
 import xlib.XEvent
 
+@ExperimentalForeignApi
 class KeyPressHandler(
     private val logger: Logger,
     private val keyManager: KeyManager,

@@ -12,6 +12,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@ExperimentalForeignApi
 class EventTimeTest {
     @Test
     fun `set and get event`() {

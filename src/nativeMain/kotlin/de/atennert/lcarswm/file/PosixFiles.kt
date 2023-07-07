@@ -1,9 +1,11 @@
 package de.atennert.lcarswm.file
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.posix.*
 
+@ExperimentalForeignApi
 class PosixFiles : Files {
     private val readBufferSize = 60
 

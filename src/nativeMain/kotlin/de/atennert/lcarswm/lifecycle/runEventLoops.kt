@@ -2,13 +2,11 @@ package de.atennert.lcarswm.lifecycle
 
 import de.atennert.lcarswm.log.Logger
 import exitState
-import kotlinx.cinterop.free
-import kotlinx.cinterop.nativeHeap
-import kotlinx.cinterop.pointed
-import kotlinx.cinterop.ptr
+import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 
 
+@ExperimentalForeignApi
 suspend fun runEventLoops(
     logger: Logger,
     runtimeResources: RuntimeResources
@@ -26,6 +24,7 @@ suspend fun runEventLoops(
     logger.logDebug("::eventLoop::finished event loops")
 }
 
+@ExperimentalForeignApi
 private fun CoroutineScope.runXEventLoop(
     logger: Logger,
     xEventResources: XEventResources
@@ -59,6 +58,7 @@ private fun CoroutineScope.runXEventLoop(
     return xEventJob
 }
 
+@ExperimentalForeignApi
 private fun CoroutineScope.runAppMenuLoop(
     logger: Logger,
     appMenuResources: AppMenuResources

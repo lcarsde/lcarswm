@@ -1,9 +1,11 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.system.FunctionCall
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.StructureNotifyMask
 import kotlin.test.assertEquals
 
+@ExperimentalForeignApi
 fun checkMoveWindow(
     systemCalls: MutableList<FunctionCall>,
     window: FramedWindow

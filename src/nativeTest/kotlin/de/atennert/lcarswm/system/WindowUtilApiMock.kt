@@ -4,6 +4,7 @@ import de.atennert.lcarswm.system.api.WindowUtilApi
 import kotlinx.cinterop.*
 import xlib.*
 
+@ExperimentalForeignApi
 open class WindowUtilApiMock : WindowUtilApi {
     override val display: CPointer<Display>? = null
 

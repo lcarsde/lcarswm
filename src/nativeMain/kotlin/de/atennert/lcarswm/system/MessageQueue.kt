@@ -14,6 +14,7 @@ import platform.posix.*
  * @param name The name of the message queue, unique identifier for each queue
  * @param mode The usage mode for this queue in this app: READ, WRITE or READ_WRITE
  */
+@ExperimentalForeignApi
 class MessageQueue(private val name: String, private val mode: Mode) {
 
     enum class Mode (val flag: Int) {

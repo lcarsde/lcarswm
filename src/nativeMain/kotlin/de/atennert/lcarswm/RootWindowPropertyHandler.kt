@@ -17,6 +17,7 @@ private const val OTHER_WM_SHUTDOWN_TIMEOUT = 15000000
 /**
  * Class for handling property (atom) related actions.
  */
+@ExperimentalForeignApi
 class RootWindowPropertyHandler(
     private val logger: Logger,
     private val system: SystemApi,

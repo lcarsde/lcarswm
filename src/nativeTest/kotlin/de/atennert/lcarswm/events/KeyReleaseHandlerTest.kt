@@ -18,6 +18,7 @@ import kotlin.test.*
 /**
  *
  */
+@ExperimentalForeignApi
 class KeyReleaseHandlerTest {
 
     private val keySetting = setOf(

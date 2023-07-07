@@ -1,12 +1,14 @@
 package de.atennert.lcarswm.system.api
 
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.IntVar
 import xlib.*
 
 /**
  *
  */
+@ExperimentalForeignApi
 interface InputApi {
     fun selectInput(window: Window, mask: Long): Int
 

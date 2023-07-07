@@ -6,6 +6,7 @@ import xlib.XEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@ExperimentalForeignApi
 class EventBufferTest {
     @Test
     fun `get available events`() {

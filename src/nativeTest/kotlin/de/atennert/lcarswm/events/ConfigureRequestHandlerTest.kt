@@ -3,10 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.rx.NextObserver
 import io.kotest.matchers.shouldBe
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.free
-import kotlinx.cinterop.nativeHeap
+import kotlinx.cinterop.*
 import xlib.ConfigureRequest
 import xlib.Window
 import xlib.XConfigureRequestEvent
@@ -18,6 +15,7 @@ import kotlin.test.assertFalse
 /**
  *
  */
+@ExperimentalForeignApi
 class ConfigureRequestHandlerTest {
     private val eventStore = EventStore()
 

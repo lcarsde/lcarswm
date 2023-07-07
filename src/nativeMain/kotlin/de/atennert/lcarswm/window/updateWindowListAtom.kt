@@ -7,8 +7,10 @@ import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.system.api.WindowUtilApi
 import de.atennert.rx.NextObserver
 import de.atennert.rx.operators.map
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.Window
 
+@ExperimentalForeignApi
 fun updateWindowListAtom(
     rootWindow: Window,
     windowUtilApi: WindowUtilApi,

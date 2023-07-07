@@ -4,6 +4,7 @@ import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.conversion.toULongArray
 import de.atennert.lcarswm.lifecycle.closeClosables
 import de.atennert.lcarswm.system.WindowUtilApiMock
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import xlib.Atom
 import xlib.Window
@@ -12,6 +13,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@ExperimentalForeignApi
 class UpdateWindowListAtomTest {
 
     private val windowUtilApi = object : WindowUtilApiMock() {

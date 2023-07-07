@@ -7,11 +7,13 @@ import de.atennert.rx.NextObserver
 import de.atennert.rx.ReplaySubject
 import de.atennert.rx.operators.filter
 import de.atennert.rx.operators.withLatestFrom
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.Window
 
 typealias FocusObserver = (Window?, Window?, Boolean) -> Unit
 data class WindowFocusEvent(val newWindow: Window?, val oldWindow: Window?, val toggleSessionActive: Boolean)
 
+@ExperimentalForeignApi
 class WindowFocusHandler(windowList: WindowList, appMenuMessageHandler: AppMenuMessageHandler) {
     private val windowFocusEventSj = ReplaySubject<WindowFocusEvent>(0)
     val windowFocusEventObs = windowFocusEventSj.asObservable()

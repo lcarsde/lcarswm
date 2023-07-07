@@ -7,12 +7,15 @@ import platform.posix.SA_NOCLDSTOP
 import platform.posix.sigaction
 import platform.posix.sigset_t
 
+@ExperimentalForeignApi
 private var globalPosixApi: PosixApi? = null
 
+@ExperimentalForeignApi
 private fun handleCoreSignal() {
     globalPosixApi?.abort()
 }
 
+@ExperimentalForeignApi
 class SignalHandler(private val posixApi: PosixApi) {
     private val allSignals: sigset_t = nativeHeap.alloc()
 

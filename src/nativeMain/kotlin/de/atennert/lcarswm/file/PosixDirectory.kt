@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.file
 
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
 import platform.posix.DIR
@@ -10,6 +11,7 @@ import platform.posix.readdir
 /**
  * Handles directories using POSIX.
  */
+@ExperimentalForeignApi
 class PosixDirectory(private val dir: CPointer<DIR>) : Directory {
     override fun readFiles(): Set<String> {
         val files = mutableSetOf<String>()

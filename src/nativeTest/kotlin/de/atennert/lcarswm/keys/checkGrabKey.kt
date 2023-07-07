@@ -1,9 +1,11 @@
 package de.atennert.lcarswm.keys
 
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.GrabModeAsync
 import kotlin.test.assertEquals
 
+@ExperimentalForeignApi
 fun checkGrabKey(
     systemApi: SystemFacadeMock,
     key: String,

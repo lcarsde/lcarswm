@@ -11,6 +11,7 @@ import de.atennert.lcarswm.keys.KeyManager
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.*
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.toCValues
 import xlib.*
@@ -19,10 +20,12 @@ private const val frameEventMask = SubstructureRedirectMask or FocusChangeMask o
 
 private val buttonsToGrab = setOf(Button1, Button2, Button3)
 
+@ExperimentalForeignApi
 private val wmStateData = listOf<ULong>(NormalState.convert(), None.convert())
     .map { it.toUByteArray() }
     .combine()
 
+@ExperimentalForeignApi
 class PosixTransientWindow(
     private val logger: Logger,
     private val display: CPointer<Display>?,

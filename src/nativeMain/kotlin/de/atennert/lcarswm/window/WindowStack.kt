@@ -4,11 +4,13 @@ import de.atennert.lcarswm.lifecycle.closeWith
 import de.atennert.lcarswm.system.wrapXRestackWindows
 import de.atennert.rx.NextObserver
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import xlib.Display
 import xlib.Window
 
+@ExperimentalForeignApi
 class WindowStack(
     private val display: CPointer<Display>?,
     windowList: WindowList,

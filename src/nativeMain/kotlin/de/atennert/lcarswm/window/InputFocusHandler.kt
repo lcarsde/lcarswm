@@ -3,6 +3,7 @@ package de.atennert.lcarswm.window
 import de.atennert.lcarswm.events.EventTime
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.system.api.InputApi
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.RevertToNone
 import xlib.RevertToPointerRoot
 import xlib.Window
@@ -10,6 +11,7 @@ import xlib.Window
 /**
  * Sets the input focus based on the current window focus.
  */
+@ExperimentalForeignApi
 class InputFocusHandler(
     private val logger: Logger,
     private val inputApi: InputApi,

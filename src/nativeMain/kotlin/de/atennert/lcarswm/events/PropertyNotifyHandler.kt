@@ -2,9 +2,11 @@ package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.atom.AtomLibrary
 import de.atennert.lcarswm.atom.Atoms
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.PropertyNotify
 import xlib.XEvent
 
+@ExperimentalForeignApi
 class PropertyNotifyHandler(
     private val atomLibrary: AtomLibrary,
     private val eventStore: EventStore,

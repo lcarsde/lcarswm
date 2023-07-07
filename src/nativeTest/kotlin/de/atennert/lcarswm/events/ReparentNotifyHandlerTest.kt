@@ -3,6 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.rx.NextObserver
 import io.kotest.matchers.collections.shouldContainExactly
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.nativeHeap
@@ -12,6 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
+@ExperimentalForeignApi
 class ReparentNotifyHandlerTest {
     private val eventStore = EventStore()
 

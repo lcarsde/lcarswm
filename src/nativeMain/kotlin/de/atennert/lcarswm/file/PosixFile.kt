@@ -1,8 +1,10 @@
 package de.atennert.lcarswm.file
 
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.posix.*
 
+@ExperimentalForeignApi
 class PosixFile(
     path: String,
     accessMode: AccessMode

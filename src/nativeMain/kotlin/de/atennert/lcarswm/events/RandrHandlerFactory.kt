@@ -3,11 +3,13 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.log.Logger
 import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.api.SystemApi
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import xlib.RRScreenChangeNotify
 import xlib.XEvent
 
+@ExperimentalForeignApi
 class RandrHandlerFactory(systemApi: SystemApi, private val logger: Logger) {
     private val randrEventBase: Int
     private val randrErrorBase: Int

@@ -5,6 +5,7 @@ import kotlinx.cinterop.*
 import xlib.Window
 import xlib.XTextProperty
 
+@ExperimentalForeignApi
 class TextAtomReader(private val system: SystemApi, private val atomLibrary: AtomLibrary) {
     fun readTextProperty(windowId: Window, atom: Atoms): String {
         val textProperty = nativeHeap.alloc<XTextProperty>()

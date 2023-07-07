@@ -1,9 +1,6 @@
 package de.atennert.lcarswm.conversion
 
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.UByteVar
-import kotlinx.cinterop.get
-import kotlinx.cinterop.toKString
+import kotlinx.cinterop.*
 
 /** Convert ULong value to byte array as used in X properties */
 fun ULong.toUByteArray(): UByteArray {
@@ -48,6 +45,7 @@ fun List<UByteArray>.combine(): UByteArray {
 }
 
 /** convert this ubyte array pointer to a string */
+@ExperimentalForeignApi
 fun CPointer<UByteVar>.toKString(): String {
     val byteString = mutableListOf<Byte>()
     var i = 0
@@ -65,4 +63,5 @@ fun CPointer<UByteVar>.toKString(): String {
 }
 
 /** convert this ubyte array pointer to a string */
+@ExperimentalForeignApi
 fun CPointer<UByteVar>?.toKString(): String = this?.toKString() ?: ""

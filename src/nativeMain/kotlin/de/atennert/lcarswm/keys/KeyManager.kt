@@ -8,6 +8,7 @@ import xlib.*
 /**
  * This class handles the registration of keys for keyboard commands.
  */
+@ExperimentalForeignApi
 class KeyManager(private val inputApi: InputApi) {
     private val modifierIndexes = arrayOf(
         ShiftMask,

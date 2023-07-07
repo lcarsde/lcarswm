@@ -2,9 +2,11 @@ package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.ScreenMode
 import de.atennert.lcarswm.system.FunctionCall
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import xlib.Window
 
+@ExperimentalForeignApi
 class FakeManagedWindow(
     override val id: Window = 1.convert(),
     override val frame: Window = 2.convert(),

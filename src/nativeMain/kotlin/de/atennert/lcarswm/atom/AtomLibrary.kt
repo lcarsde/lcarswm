@@ -1,11 +1,13 @@
 package de.atennert.lcarswm.atom
 
 import de.atennert.lcarswm.system.api.WindowUtilApi
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.Atom
 
 /**
  * This class is supposed to hold the required X atoms and provide them to other classes.
  */
+@ExperimentalForeignApi
 class AtomLibrary(windowUtils: WindowUtilApi) {
 
     /**

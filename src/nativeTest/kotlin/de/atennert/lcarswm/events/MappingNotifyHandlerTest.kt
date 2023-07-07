@@ -3,6 +3,7 @@ package de.atennert.lcarswm.events
 import de.atennert.lcarswm.keys.*
 import de.atennert.lcarswm.log.LoggerMock
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.nativeHeap
 import xlib.MappingNotify
@@ -11,6 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@ExperimentalForeignApi
 class MappingNotifyHandlerTest {
 
     private val keySetting = setOf(

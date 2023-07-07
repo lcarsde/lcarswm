@@ -12,6 +12,7 @@ import de.atennert.rx.NextObserver
 import de.atennert.rx.operators.filterNotNull
 import de.atennert.rx.operators.take
 import kotlinx.atomicfu.atomic
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
@@ -28,6 +29,7 @@ var staticLogger: Logger? = null
 val exitState = atomic<Int?>(null)
 
 // the main method apparently must not be inside a package, so it can be compiled with Kotlin/Native
+@ExperimentalForeignApi
 fun main() = runBlocking {
     val system = SystemFacade()
     val cacheDirPath = getenv(HOME_CACHE_DIR_PROPERTY)?.toKString()?.plus(LOG_FILE_PATH)
@@ -41,6 +43,7 @@ fun main() = runBlocking {
     }
 }
 
+@ExperimentalForeignApi
 suspend fun runWindowManager(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenerator) = coroutineScope {
     logger.logInfo("::runWindowManager::start lcarswm initialization")
     exitState.value = null

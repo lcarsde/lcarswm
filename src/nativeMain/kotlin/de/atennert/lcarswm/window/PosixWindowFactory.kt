@@ -19,6 +19,7 @@ import xlib.*
 private const val clientEventMask = PropertyChangeMask or StructureNotifyMask or ColormapChangeMask
 private const val clientNoPropagateMask = ButtonPressMask or ButtonReleaseMask or ButtonMotionMask
 
+@ExperimentalForeignApi
 class PosixWindowFactory(
     private val logger: Logger,
     private val display: CPointer<Display>?,

@@ -14,6 +14,7 @@ import xlib.*
 /**
  * This is the facade for accessing system functions.
  */
+@ExperimentalForeignApi
 class SystemFacade : SystemApi {
     override var display: CPointer<Display>? = null
         private set
@@ -127,7 +128,7 @@ class SystemFacade : SystemApi {
         attributeMask: ULong,
         attributes: CPointer<XSetWindowAttributes>
     ): Window {
-        return XCreateWindow(display, parentWindow, measurements[0], measurements[1], measurements[2].convert(), measurements[3].convert(), 0.convert(), depth, InputOutput, visual, attributeMask, attributes)
+        return XCreateWindow(display, parentWindow, measurements[0], measurements[1], measurements[2].convert(), measurements[3].convert(), 0.convert(), depth, InputOutput.convert(), visual, attributeMask, attributes)
     }
 
     override fun getSelectionOwner(atom: Atom): Window {
@@ -224,7 +225,7 @@ class SystemFacade : SystemApi {
     }
 
     override fun ungrabKey(window: Window) {
-        XUngrabKey(display, AnyKey.convert(), AnyModifier, window)
+        XUngrabKey(display, AnyKey.convert(), AnyModifier.convert(), window)
     }
 
     override fun grabKeyboard(window: Window, time: Time) {

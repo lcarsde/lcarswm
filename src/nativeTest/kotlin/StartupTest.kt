@@ -7,6 +7,7 @@ import de.atennert.lcarswm.signal.Signal
 import de.atennert.lcarswm.system.FunctionCall
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import kotlinx.coroutines.runBlocking
@@ -17,6 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 
+@ExperimentalForeignApi
 class StartupTest {
     private class FakeResourceGenerator : ResourceGenerator {
         val variables = mutableMapOf<String, String>()

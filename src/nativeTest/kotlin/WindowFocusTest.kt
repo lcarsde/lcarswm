@@ -1,5 +1,6 @@
 import de.atennert.lcarswm.system.FunctionCall
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import xlib.Above
@@ -8,6 +9,7 @@ import xlib.Window
 import xlib.XWindowChanges
 import kotlin.test.assertEquals
 
+@ExperimentalForeignApi
 class WindowFocusTest {
     private fun checkRestacking(restackCall: FunctionCall, window: Window) {
         assertEquals("configureWindow", restackCall.name, "The window $window needs to be configured")

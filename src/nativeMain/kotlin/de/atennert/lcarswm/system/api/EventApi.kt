@@ -1,12 +1,14 @@
 package de.atennert.lcarswm.system.api
 
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.Window
 import xlib.XEvent
 
 /**
  *
  */
+@ExperimentalForeignApi
 interface EventApi {
 
     fun sync(discardQueuedEvents: Boolean): Int

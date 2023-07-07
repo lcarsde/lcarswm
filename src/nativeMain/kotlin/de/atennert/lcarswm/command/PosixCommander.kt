@@ -5,6 +5,7 @@ import kotlinx.cinterop.*
 import platform.posix.*
 import kotlin.system.exitProcess
 
+@ExperimentalForeignApi
 class PosixCommander(private val logger: Logger) : Commander() {
     override fun run(command: List<String>): Boolean {
         return when (fork()) {

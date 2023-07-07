@@ -1,10 +1,12 @@
 package de.atennert.lcarswm.conversion
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
+@ExperimentalForeignApi
 class UByteArrayConversionTest {
 
     @Test

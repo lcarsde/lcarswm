@@ -3,6 +3,7 @@ package de.atennert.lcarswm.keys
 import de.atennert.lcarswm.events.EventTime
 import de.atennert.lcarswm.system.api.InputApi
 import de.atennert.lcarswm.window.FocusObserver
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import xlib.CurrentTime
 import xlib.Time
@@ -12,6 +13,7 @@ import xlib.Window
  * Used to grab the key during a focus toggle session
  * so we also get key release events for modifier keys.
  */
+@ExperimentalForeignApi
 class FocusSessionKeyboardGrabber(
     private val inputApi: InputApi,
     private val eventTime: EventTime,

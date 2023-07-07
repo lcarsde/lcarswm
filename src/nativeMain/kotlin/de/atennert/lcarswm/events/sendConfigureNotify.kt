@@ -5,6 +5,7 @@ import de.atennert.lcarswm.window.WindowMeasurements
 import kotlinx.cinterop.*
 import xlib.*
 
+@ExperimentalForeignApi
 fun sendConfigureNotify(
     display: CPointer<Display>?,
     window: Window,

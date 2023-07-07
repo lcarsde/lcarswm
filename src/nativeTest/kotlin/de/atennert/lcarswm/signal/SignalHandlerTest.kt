@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.signal
 
 import de.atennert.lcarswm.system.SystemFacadeMock
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.invoke
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.staticCFunction
@@ -8,6 +9,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@ExperimentalForeignApi
 class SignalHandlerTest {
     @BeforeTest
     fun setup() {
