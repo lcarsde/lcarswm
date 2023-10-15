@@ -2,6 +2,7 @@ package de.atennert.lcarswm.keys
 
 import de.atennert.lcarswm.system.api.InputApi
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.convert
 import xlib.AnyModifier
 import xlib.KeySym
 import xlib.Window
@@ -49,7 +50,7 @@ class KeyConfiguration(
 
             if (keyBinding is KeyAction && (keyBinding.action == WmAction.WINDOW_TOGGLE_FWD ||
                         keyBinding.action == WmAction.WINDOW_TOGGLE_BWD)) {
-                toggleSessionManager.addModifiers(modifiers, keySym, mask)
+                toggleSessionManager.addModifiers(modifiers, keySym.convert(), mask)
             }
         }
     }

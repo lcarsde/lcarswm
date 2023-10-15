@@ -2,7 +2,7 @@ package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.ColorSet
 
-interface WindowFactory<ID> {
+interface WindowFactory<WindowId> {
     fun createButton(
         text: String,
         colorSet: ColorSet,
@@ -11,10 +11,10 @@ interface WindowFactory<ID> {
         width: Int,
         height: Int,
         onClick: () -> Unit
-    ): Button<ID>
+    ): Button<WindowId>
 
     fun createWindow(
-        id: ID,
+        id: WindowId,
         isSetup: Boolean = false
     ): WmWindow<ID>?
 }

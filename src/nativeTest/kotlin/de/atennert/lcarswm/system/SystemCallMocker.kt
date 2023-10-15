@@ -42,6 +42,7 @@ open class SystemCallMocker {
         wrapXSelectInput = ::mockXSelectInput
         wrapXAddToSaveSet = ::mockXAddToSaveSet
         wrapXRemoveFromSaveSet = ::mockXRemoveFromSaveSet
+        wrapXKeysymToKeycode = ::mockXKeysymToKeycode
         wrapXftDrawCreate = ::mockXftDrawCreate
         wrapXftDrawDestroy = ::mockXftDrawDestroy
         wrapXftDrawRect = ::mockXftDrawRect
@@ -81,6 +82,14 @@ open class SystemCallMocker {
         wrapXCreatePixmap = ::XCreatePixmap
         wrapXFreePixmap = ::XFreePixmap
         wrapXFree = ::XFree
+        wrapXSetWindowBackgroundPixmap = ::XSetWindowBackgroundPixmap
+        wrapXGetTransientForHint = ::XGetTransientForHint
+        wrapXSendEvent = ::XSendEvent
+        wrapXConfigureWindow = ::XConfigureWindow
+        wrapXSelectInput = ::XSelectInput
+        wrapXAddToSaveSet = ::XAddToSaveSet
+        wrapXRemoveFromSaveSet = ::XRemoveFromSaveSet
+        wrapXKeysymToKeycode = ::XKeysymToKeycode
         wrapXftDrawCreate = ::XftDrawCreate
         wrapXftDrawDestroy = ::XftDrawDestroy
         wrapXftDrawRect = ::XftDrawRect
@@ -89,13 +98,6 @@ open class SystemCallMocker {
         wrapPangoLayoutGetPixelExtents = ::pango_layout_get_pixel_extents
         wrapPangoLayoutGetLineReadonly = ::pango_layout_get_line_readonly
         wrapPangoXftRenderLayoutLine = ::pango_xft_render_layout_line
-        wrapXSetWindowBackgroundPixmap = ::XSetWindowBackgroundPixmap
-        wrapXGetTransientForHint = ::XGetTransientForHint
-        wrapXSendEvent = ::XSendEvent
-        wrapXConfigureWindow = ::XConfigureWindow
-        wrapXSelectInput = ::XSelectInput
-        wrapXAddToSaveSet = ::XAddToSaveSet
-        wrapXRemoveFromSaveSet = ::XRemoveFromSaveSet
         wrapMqOpen = ::mqWrapper
         wrapMqClose = ::mq_close
         wrapMqSend = ::mq_send

@@ -93,6 +93,9 @@ var wrapXAddToSaveSet = ::XAddToSaveSet
 var wrapXRemoveFromSaveSet = ::XRemoveFromSaveSet
 
 @ExperimentalForeignApi
+var wrapXKeysymToKeycode = ::XKeysymToKeycode
+
+@ExperimentalForeignApi
 var wrapXftDrawCreate = ::XftDrawCreate
 
 @ExperimentalForeignApi

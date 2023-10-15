@@ -1,17 +1,16 @@
 package de.atennert.lcarswm.keys
 
+import de.atennert.lcarswm.Environment
 import de.atennert.lcarswm.log.Logger
-import de.atennert.lcarswm.system.api.InputApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
-import xlib.*
 
 @ExperimentalForeignApi
-class KeySessionManager(private val logger: Logger, private val inputApi: InputApi) {
+class KeySessionManager(private val logger: Logger, private val env: Environment) {
     private val listeners = mutableListOf<KeySessionListener>()
 
-    private var keyCodes = mutableSetOf<KeyCode>()
-    private var keyMaskCodes = mutableListOf<List<KeyCode>>()
+    private var keyCodes = mutableSetOf<UInt>()
+    private var keyMaskCodes = mutableListOf<List<UInt>>()
     private var keyMasks = mutableListOf<Int>()
 
     fun resetKeyCodes() {
@@ -20,42 +19,42 @@ class KeySessionManager(private val logger: Logger, private val inputApi: InputA
         keyMasks.clear()
     }
 
-    fun addModifiers(modifiers: List<Modifiers>, keySym: KeySym, keyMask: Int) {
+    fun addModifiers(modifiers: List<Modifiers>, keySym: Int, keyMask: Int) {
         val keySyms = mutableListOf<Int>()
 
         for (modifier in modifiers) {
             when (modifier) {
                 Modifiers.SHIFT -> {
-                    keySyms.add(XK_Shift_L)
-                    keySyms.add(XK_Shift_R)
+                    keySyms.add(keyShiftL)
+                    keySyms.add(keyShiftR)
                 }
                 Modifiers.CONTROL -> {
-                    keySyms.add(XK_Control_L)
-                    keySyms.add(XK_Control_R)
+                    keySyms.add(keyControlL)
+                    keySyms.add(keyControlR)
                 }
                 Modifiers.SUPER -> {
-                    keySyms.add(XK_Super_L)
-                    keySyms.add(XK_Super_R)
+                    keySyms.add(keySuperL)
+                    keySyms.add(keySuperR)
                 }
                 Modifiers.HYPER -> {
-                    keySyms.add(XK_Hyper_L)
-                    keySyms.add(XK_Hyper_R)
+                    keySyms.add(keyHyperL)
+                    keySyms.add(keyHyperR)
                 }
                 Modifiers.META -> {
-                    keySyms.add(XK_Meta_L)
-                    keySyms.add(XK_Meta_R)
+                    keySyms.add(keyMetaL)
+                    keySyms.add(keyMetaR)
                 }
                 Modifiers.ALT -> {
-                    keySyms.add(XK_Alt_L)
-                    keySyms.add(XK_Alt_R)
+                    keySyms.add(keyAltL)
+                    keySyms.add(keyAltR)
                 }
                 else -> throw IllegalArgumentException("Unsupported modifier: $modifier")
             }
         }
 
-        keyCodes.add(inputApi.keysymToKeycode(keySym))
+        keyCodes.add(keysymToKeycode(env, keySym))
         keyMasks.add(keyMask)
-        keyMaskCodes.add(keySyms.map { inputApi.keysymToKeycode(it.convert()) })
+        keyMaskCodes.add(keySyms.map { keysymToKeycode(env, it) })
     }
 
     fun addListener(listener: KeySessionListener) {
@@ -63,7 +62,7 @@ class KeySessionManager(private val logger: Logger, private val inputApi: InputA
     }
 
     fun pressKeys(keyCode: UInt, keyMask: Int) {
-        val isSameSession = keyMasks.contains(keyMask) and keyCodes.contains(keyCode.convert())
+        val isSameSession = keyMasks.contains(keyMask) and keyCodes.contains(keyCode)
         if (!isSameSession) {
             logger.logDebug("KeySessionManager::pressKeys::stop session")
             listeners.forEach(KeySessionListener::stopSession)

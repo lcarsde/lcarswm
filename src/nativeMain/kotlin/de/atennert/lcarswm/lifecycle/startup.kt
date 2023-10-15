@@ -159,7 +159,9 @@ fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenera
 
     keyManager.ungrabAllKeys(screen.root)
 
-    val toggleSessionManager = KeySessionManager(logger, system)
+    val env = de.atennert.lcarswm.Environment(system.display)
+
+    val toggleSessionManager = KeySessionManager(logger, env)
 
     val keyConfiguration = KeyConfiguration(
         system,

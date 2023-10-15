@@ -1,14 +1,14 @@
 package de.atennert.lcarswm.window
 
-interface ManagedWmWindow<ID> : WmWindow<ID> {
+interface ManagedWmWindow<WindowId> : WmWindow<WindowId> {
     /** Frame window ID */
-    val frame: ID
+    val frame: WindowId
     /** Name of the program */
     val wmClass: String
     /** Window title (usually depends on program content) */
     val title: String
 
-    fun hasId(windowId: ID): Boolean = id == windowId || frame == windowId
+    fun hasId(windowId: WindowId): Boolean = id == windowId || frame == windowId
 
-    fun isTitleBar(windowId: ID): Boolean = false
+    fun isTitleBar(windowId: WindowId): Boolean = false
 }

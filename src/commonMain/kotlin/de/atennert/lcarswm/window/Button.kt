@@ -1,7 +1,7 @@
 package de.atennert.lcarswm.window
 
-interface Button<ID> {
-    val id: ID
+interface Button<WindowID> {
+    val id: WindowID
 
     fun changePosition(x: Int, y: Int)
 

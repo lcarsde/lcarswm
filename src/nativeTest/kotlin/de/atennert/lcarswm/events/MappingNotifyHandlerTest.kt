@@ -1,7 +1,9 @@
 package de.atennert.lcarswm.events
 
+import de.atennert.lcarswm.Environment
 import de.atennert.lcarswm.keys.*
 import de.atennert.lcarswm.log.LoggerMock
+import de.atennert.lcarswm.system.SystemCallMocker
 import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.alloc
@@ -13,7 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @ExperimentalForeignApi
-class MappingNotifyHandlerTest {
+class MappingNotifyHandlerTest : SystemCallMocker() {
 
     private val keySetting = setOf(
         KeyExecution("Ctrl+F4", "command arg1 arg2")
@@ -22,8 +24,9 @@ class MappingNotifyHandlerTest {
     @Test
     fun `return the event type MappingNotify`() {
         val system = SystemFacadeMock()
+        val env = Environment(system.display)
         val keyManager = KeyManager(system)
-        val keySessionManager = KeySessionManager(LoggerMock(), system)
+        val keySessionManager = KeySessionManager(LoggerMock(), env)
         val keyConfiguration = KeyConfiguration(
             system,
             keySetting,
@@ -39,8 +42,9 @@ class MappingNotifyHandlerTest {
     @Test
     fun `reload the key bindings`() {
         val system = SystemFacadeMock()
+        val env = Environment(system.display)
         val keyManager = KeyManager(system)
-        val keySessionManager = KeySessionManager(LoggerMock(), system)
+        val keySessionManager = KeySessionManager(LoggerMock(), env)
         val keyConfiguration = KeyConfiguration(
             system,
             keySetting,

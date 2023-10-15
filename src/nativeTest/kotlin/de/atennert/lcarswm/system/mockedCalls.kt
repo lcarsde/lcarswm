@@ -166,6 +166,50 @@ fun mockXAddToSaveSet(display: CValuesRef<Display>?, window: Window) = 0
 @ExperimentalForeignApi
 fun mockXRemoveFromSaveSet(display: CValuesRef<Display>?, window: Window) = 0
 
+private var startKeyCode = 0
+
+val keyStrings = mapOf(
+    "Tab" to XK_Tab,
+    "A" to XK_A,
+    "B" to XK_B,
+    "C" to XK_C,
+    "D" to XK_D,
+    "E" to XK_E,
+    "I" to XK_I,
+    "M" to XK_M,
+    "Q" to XK_Q,
+    "T" to XK_T,
+    "X" to XK_X,
+    "F4" to XK_F4,
+    "Up" to XK_Up,
+    "Down" to XK_Down,
+    "Left" to XK_Left,
+    "Right" to XK_Right,
+    "space" to XK_space,
+    "XF86AudioMute" to XF86XK_AudioMute,
+    "XF86AudioRaiseVolume" to XF86XK_AudioRaiseVolume,
+    "XF86AudioLowerVolume" to XF86XK_AudioLowerVolume,
+    "Shift-L" to XK_Shift_L,
+    "Shift-R" to XK_Shift_R,
+    "Control-L" to XK_Control_L,
+    "Control-R" to XK_Control_R,
+    "Super-L" to XK_Super_L,
+    "Super-R" to XK_Super_R,
+    "Hyper-L" to XK_Hyper_L,
+    "Hyper-R" to XK_Hyper_R,
+    "Meta-L" to XK_Meta_L,
+    "Meta-R" to XK_Meta_R,
+    "Alt-L" to XK_Alt_L,
+    "Alt-R" to XK_Alt_R,
+)
+
+val keySymKeyCodeMapping = keyStrings.values.associateWith { startKeyCode++ }
+
+@ExperimentalForeignApi
+fun mockXKeysymToKeycode(display: CValuesRef<Display>?, keySym: KeySym): KeyCode {
+    return keySymKeyCodeMapping[keySym.convert()]?.convert() ?: error("keySym not found")
+}
+
 @ExperimentalForeignApi
 fun mockXftDrawCreate(
     display: CValuesRef<Display>?,

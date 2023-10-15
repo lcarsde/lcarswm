@@ -2,8 +2,8 @@ package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.ScreenMode
 
-interface WmWindow<ID> {
-    val id: ID
+interface WmWindow<WindowId> {
+    val id: WindowId
 
     fun open(measurements: WindowMeasurements, screenMode: ScreenMode)
 

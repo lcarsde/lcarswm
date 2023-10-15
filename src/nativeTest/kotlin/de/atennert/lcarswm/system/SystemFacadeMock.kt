@@ -260,6 +260,8 @@ open class SystemFacadeMock : SystemApi {
         "F4" to XK_F4,
         "Up" to XK_Up,
         "Down" to XK_Down,
+        "Left" to XK_Left,
+        "Right" to XK_Right,
         "space" to XK_space,
         "XF86AudioMute" to XF86XK_AudioMute,
         "XF86AudioRaiseVolume" to XF86XK_AudioRaiseVolume,
