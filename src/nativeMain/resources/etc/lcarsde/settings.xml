@@ -52,6 +52,38 @@
             <keys>Lin+Q</keys>
             <action>lcarswm-quit</action>
         </binding>
+        <binding>
+            <keys>Lin+Ctrl+Up</keys>
+          <action>window-split-up</action>
+        </binding>
+        <binding>
+            <keys>Lin+Ctrl+Down</keys>
+            <action>window-split-down</action>
+        </binding>
+        <binding>
+            <keys>Lin+Ctrl+Left</keys>
+            <action>window-split-left</action>
+        </binding>
+        <binding>
+            <keys>Lin+Ctrl+Right</keys>
+            <action>window-split-right</action>
+        </binding>
+        <binding>
+            <keys>Lin+Ctrl+Shift+Up</keys>
+            <action>window-combine-up</action>
+        </binding>
+        <binding>
+            <keys>Lin+Ctrl+Shift+Down</keys>
+            <action>window-combine-down</action>
+        </binding>
+        <binding>
+            <keys>Lin+Ctrl+Shift+Left</keys>
+            <action>window-combine-left</action>
+        </binding>
+        <binding>
+            <keys>Lin+Ctrl+Shift+Right</keys>
+            <action>window-combine-right</action>
+        </binding>
     </key-config>
     <general>
         <title>LCARS</title><!-- Will be shown when there's no title image -->

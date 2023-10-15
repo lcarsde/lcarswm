@@ -198,9 +198,17 @@ class SettingsReader(
             KeyAction("Alt+Shift+Tab", WmAction.WINDOW_TOGGLE_BWD),
             KeyAction("Lin+Alt+Up", WmAction.WINDOW_MOVE_NEXT),
             KeyAction("Lin+Alt+Down", WmAction.WINDOW_MOVE_PREVIOUS),
+            KeyAction("Lin+Ctrl+Up", WmAction.WINDOW_SPLIT_UP),
+            KeyAction("Lin+Ctrl+Down", WmAction.WINDOW_SPLIT_DOWN),
+            KeyAction("Lin+Ctrl+Left", WmAction.WINDOW_SPLIT_LEFT),
+            KeyAction("Lin+Ctrl+Right", WmAction.WINDOW_SPLIT_RIGHT),
+            KeyAction("Lin+Ctrl+Shift+Up", WmAction.WINDOW_COMBINE_UP),
+            KeyAction("Lin+Ctrl+Shift+Down", WmAction.WINDOW_COMBINE_DOWN),
+            KeyAction("Lin+Ctrl+Shift+Left", WmAction.WINDOW_COMBINE_LEFT),
+            KeyAction("Lin+Ctrl+Shift+Right", WmAction.WINDOW_COMBINE_RIGHT),
             KeyAction("Alt+F4", WmAction.WINDOW_CLOSE),
             KeyAction("Lin+M", WmAction.SCREEN_MODE_TOGGLE),
-            KeyAction("Lin+Q", WmAction.WM_QUIT)
+            KeyAction("Lin+Q", WmAction.WM_QUIT),
         )
 
         generalSettings = generalSettingsDefault
