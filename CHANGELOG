@@ -1,5 +1,6 @@
 23.2
 * update kotlin version to 1.9.22
+* fix linked library order for library dependencies
 
 23.1
 * update kotlin version to 1.8.10
