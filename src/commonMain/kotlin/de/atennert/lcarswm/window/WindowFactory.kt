@@ -16,5 +16,5 @@ interface WindowFactory<WindowId> {
     fun createWindow(
         id: WindowId,
         isSetup: Boolean = false
-    ): WmWindow<ID>?
+    ): WmWindow<WindowId>?
 }

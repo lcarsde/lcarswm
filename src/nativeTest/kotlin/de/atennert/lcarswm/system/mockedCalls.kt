@@ -168,6 +168,7 @@ fun mockXRemoveFromSaveSet(display: CValuesRef<Display>?, window: Window) = 0
 
 private var startKeyCode = 0
 
+@ExperimentalForeignApi
 val keyStrings = mapOf(
     "Tab" to XK_Tab,
     "A" to XK_A,
@@ -203,6 +204,7 @@ val keyStrings = mapOf(
     "Alt-R" to XK_Alt_R,
 )
 
+@ExperimentalForeignApi
 val keySymKeyCodeMapping = keyStrings.values.associateWith { startKeyCode++ }
 
 @ExperimentalForeignApi
