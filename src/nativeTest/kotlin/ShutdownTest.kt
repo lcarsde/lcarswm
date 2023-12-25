@@ -13,10 +13,12 @@ import de.atennert.lcarswm.system.SystemFacadeMock
 import kotlinx.cinterop.*
 import kotlinx.coroutines.runBlocking
 import xlib.*
+import kotlin.experimental.ExperimentalNativeApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@ExperimentalNativeApi
 @ExperimentalForeignApi
 class ShutdownTest : SystemCallMocker() {
     private class FakeResourceGenerator : ResourceGenerator {

@@ -4,8 +4,10 @@ import de.atennert.lcarswm.log.Logger
 import exitState
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
+import kotlin.experimental.ExperimentalNativeApi
 
 
+@ExperimentalNativeApi
 @ExperimentalForeignApi
 suspend fun runEventLoops(
     logger: Logger,
@@ -58,6 +60,7 @@ private fun CoroutineScope.runXEventLoop(
     return xEventJob
 }
 
+@ExperimentalNativeApi
 @ExperimentalForeignApi
 private fun CoroutineScope.runAppMenuLoop(
     logger: Logger,

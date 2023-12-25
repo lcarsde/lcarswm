@@ -1,11 +1,12 @@
 package de.atennert.lcarswm.keys
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.AnyModifier
 import xlib.ControlMask
 import xlib.LockMask
 import xlib.ShiftMask
 
-
+@ExperimentalForeignApi
 fun getMask(l: List<Modifiers>): Int {
     val mask = l.fold(0) { acc, m ->
         acc or when (m) {

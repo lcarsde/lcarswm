@@ -15,11 +15,15 @@ import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.system.*
 import kotlinx.cinterop.*
 import xlib.*
+import kotlin.experimental.ExperimentalNativeApi
 
+@ExperimentalForeignApi
 private const val clientEventMask = PropertyChangeMask or StructureNotifyMask or ColormapChangeMask
+@ExperimentalForeignApi
 private const val clientNoPropagateMask = ButtonPressMask or ButtonReleaseMask or ButtonMotionMask
 
 @ExperimentalForeignApi
+@ExperimentalNativeApi
 class PosixWindowFactory(
     private val logger: Logger,
     private val display: CPointer<Display>?,

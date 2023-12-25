@@ -37,16 +37,20 @@ import kotlinx.cinterop.*
 import platform.posix.waitpid
 import staticLogger
 import xlib.*
+import kotlin.experimental.ExperimentalNativeApi
 
 private var wmDetected = false
 
+@ExperimentalForeignApi
 const val ROOT_WINDOW_MASK = SubstructureRedirectMask or StructureNotifyMask or PropertyChangeMask or
         FocusChangeMask or KeyPressMask or KeyReleaseMask
 
+@ExperimentalForeignApi
 private const val XRANDR_MASK = RRScreenChangeNotifyMask or RROutputChangeNotifyMask or
         RRCrtcChangeNotifyMask or RROutputPropertyNotifyMask
 
 @ExperimentalForeignApi
+@ExperimentalNativeApi
 fun startup(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenerator): RuntimeResources? {
     val eventStore = EventStore()
     val commander = PosixCommander(logger)

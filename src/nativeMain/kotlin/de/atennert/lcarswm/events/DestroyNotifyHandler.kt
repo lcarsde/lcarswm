@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.DestroyNotify
 import xlib.XEvent
 
@@ -12,8 +13,10 @@ class DestroyNotifyHandler(
     private val logger: Logger,
     private val eventStore: EventStore,
 ) : XEventHandler {
+    @ExperimentalForeignApi
     override val xEventType = DestroyNotify
 
+    @ExperimentalForeignApi
     override fun handleEvent(event: XEvent): Boolean {
         val destroyedWindow = event.xdestroywindow.window
         logger.logDebug("DestroyNotifyHandler::handleEvent::clean up after destroyed window: $destroyedWindow")

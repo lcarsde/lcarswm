@@ -1,7 +1,6 @@
 package de.atennert.lcarswm.window
 
 import de.atennert.lcarswm.ColorSet
-import xlib.Window
 
 interface WindowFactory<ID> {
     fun createButton(
@@ -17,5 +16,5 @@ interface WindowFactory<ID> {
     fun createWindow(
         id: ID,
         isSetup: Boolean = false
-    ): WmWindow<Window>?
+    ): WmWindow<ID>?
 }

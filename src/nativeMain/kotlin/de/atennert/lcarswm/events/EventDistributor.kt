@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.XEvent
 
 /**
@@ -17,6 +18,7 @@ class EventDistributor private constructor(
      * Process a given event via one of the registered event handlers.
      * @return true if the WM should shut down, false otherwise
      */
+    @ExperimentalForeignApi
     fun handleEvent(event: XEvent): Boolean {
         val eventHandler = this.eventHandlers[event.type]
 

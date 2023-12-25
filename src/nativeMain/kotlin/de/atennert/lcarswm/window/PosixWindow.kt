@@ -18,8 +18,10 @@ import kotlinx.cinterop.convert
 import kotlinx.cinterop.toCValues
 import xlib.*
 
+@ExperimentalForeignApi
 private const val frameEventMask = SubstructureRedirectMask or FocusChangeMask or ButtonPressMask or ButtonReleaseMask
 
+@ExperimentalForeignApi
 private val buttonsToGrab = setOf(Button1, Button2, Button3)
 
 @ExperimentalForeignApi

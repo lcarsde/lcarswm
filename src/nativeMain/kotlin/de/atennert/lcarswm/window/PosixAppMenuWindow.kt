@@ -17,7 +17,9 @@ import de.atennert.rx.operators.*
 import de.atennert.rx.util.Tuple2
 import kotlinx.cinterop.*
 import xlib.*
+import kotlin.experimental.ExperimentalNativeApi
 
+@ExperimentalNativeApi
 @ExperimentalForeignApi
 class PosixAppMenuWindow(
     private val display: CPointer<Display>?,

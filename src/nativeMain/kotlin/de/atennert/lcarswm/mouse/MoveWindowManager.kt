@@ -7,9 +7,11 @@ import de.atennert.lcarswm.monitor.MonitorManager
 import de.atennert.lcarswm.window.ManagedWmWindow
 import de.atennert.lcarswm.window.WindowCoordinator
 import de.atennert.rx.NextObserver
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.RROutput
 import xlib.Window
 
+@OptIn(ExperimentalForeignApi::class)
 class MoveWindowManager(
     private val logger: Logger,
     private val windowCoordinator: WindowCoordinator,

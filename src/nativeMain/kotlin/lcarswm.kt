@@ -17,6 +17,7 @@ import kotlinx.cinterop.toKString
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import platform.posix.getenv
+import kotlin.experimental.ExperimentalNativeApi
 import kotlin.system.exitProcess
 
 // this is a somewhat dirty hack to hand the logger to staticCFunction as error handler
@@ -29,6 +30,7 @@ var staticLogger: Logger? = null
 val exitState = atomic<Int?>(null)
 
 // the main method apparently must not be inside a package, so it can be compiled with Kotlin/Native
+@ExperimentalNativeApi
 @ExperimentalForeignApi
 fun main() = runBlocking {
     val system = SystemFacade()
@@ -43,6 +45,7 @@ fun main() = runBlocking {
     }
 }
 
+@ExperimentalNativeApi
 @ExperimentalForeignApi
 suspend fun runWindowManager(system: SystemApi, logger: Logger, resourceGenerator: ResourceGenerator) = coroutineScope {
     logger.logInfo("::runWindowManager::start lcarswm initialization")

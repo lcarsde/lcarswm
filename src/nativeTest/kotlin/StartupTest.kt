@@ -13,12 +13,14 @@ import kotlinx.cinterop.pointed
 import kotlinx.coroutines.runBlocking
 import xlib.*
 import kotlin.collections.set
+import kotlin.experimental.ExperimentalNativeApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 
 @ExperimentalForeignApi
+@ExperimentalNativeApi
 class StartupTest {
     private class FakeResourceGenerator : ResourceGenerator {
         val variables = mutableMapOf<String, String>()

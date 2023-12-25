@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.ConfigureRequest
 import xlib.XEvent
 
@@ -12,8 +13,10 @@ class ConfigureRequestHandler(
     private val logger: Logger,
     private val eventStore: EventStore,
 ) : XEventHandler {
+    @ExperimentalForeignApi
     override val xEventType = ConfigureRequest
 
+    @ExperimentalForeignApi
     override fun handleEvent(event: XEvent): Boolean {
         val configureEvent = event.xconfigurerequest
 

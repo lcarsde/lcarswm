@@ -221,6 +221,7 @@ fun mockPangoXftRenderLayoutLine(
 ) {
 }
 
+@ExperimentalForeignApi
 fun mockMqOpen(name: String?, oflag: Int, permissions: mode_t, attributes: mq_attr): mqd_t = 1
 
 fun mockMqClose(mqd: mqd_t) = 0

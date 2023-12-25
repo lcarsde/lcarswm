@@ -10,7 +10,9 @@ import de.atennert.rx.operators.withLatestFrom
 import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.Window
 
+@ExperimentalForeignApi
 typealias FocusObserver = (Window?, Window?, Boolean) -> Unit
+@ExperimentalForeignApi
 data class WindowFocusEvent(val newWindow: Window?, val oldWindow: Window?, val toggleSessionActive: Boolean)
 
 @ExperimentalForeignApi

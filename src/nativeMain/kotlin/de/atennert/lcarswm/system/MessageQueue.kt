@@ -5,6 +5,7 @@ import kotlinx.cinterop.*
 import platform.linux.mq_attr
 import platform.linux.mqd_t
 import platform.posix.*
+import kotlin.experimental.ExperimentalNativeApi
 
 /**
  * Adapter class for Posix message queue. The message queue will be created and destroyed
@@ -43,12 +44,14 @@ class MessageQueue(private val name: String, private val mode: Mode) {
         closeWith(MessageQueue::close)
     }
 
+    @ExperimentalNativeApi
     fun sendMessage(message: String) {
         assert(mode == Mode.WRITE || mode == Mode.READ_WRITE)
 
         wrapMqSend(mqDes, message, message.length.convert(), 0.convert())
     }
 
+    @ExperimentalNativeApi
     fun receiveMessage(): String? {
         assert(mode == Mode.READ || mode == Mode.READ_WRITE)
 

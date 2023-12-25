@@ -15,8 +15,11 @@ import de.atennert.rx.util.Tuple
 import kotlinx.cinterop.*
 import xlib.*
 
+@ExperimentalForeignApi
 sealed class WindowToMonitorEvent(val window: ManagedWmWindow<Window>, val monitor: Monitor<RROutput>?)
+@ExperimentalForeignApi
 class WindowToMonitorSetEvent(window: ManagedWmWindow<Window>, monitor: Monitor<RROutput>) : WindowToMonitorEvent(window, monitor)
+@ExperimentalForeignApi
 class WindowToMonitorRemoveEvent(window: ManagedWmWindow<Window>) : WindowToMonitorEvent(window, null)
 
 /**

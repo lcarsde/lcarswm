@@ -1,6 +1,7 @@
 package de.atennert.lcarswm.events
 
 import de.atennert.lcarswm.log.Logger
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.UnmapNotify
 import xlib.XEvent
 
@@ -11,8 +12,10 @@ class UnmapNotifyHandler(
     private val logger: Logger,
     private val eventStore: EventStore
 ) : XEventHandler {
+    @OptIn(ExperimentalForeignApi::class)
     override val xEventType = UnmapNotify
 
+    @OptIn(ExperimentalForeignApi::class)
     override fun handleEvent(event: XEvent): Boolean {
         val window = event.xunmap.window
 

@@ -1,5 +1,6 @@
 package de.atennert.lcarswm.events
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import xlib.XEvent
 
 /**
@@ -12,5 +13,6 @@ interface XEventHandler {
     /**
      * @return true if event evaluation and WM shall stop, false otherwise
      */
+    @OptIn(ExperimentalForeignApi::class)
     fun handleEvent(event: XEvent): Boolean
 }
